@@ -63,38 +63,38 @@ namespace Karthus
             MenuIni.AddGroupLabel("Welcome to the worst karthus addon!");
 
             ComboMenu = MenuIni.AddSubMenu("Combo");
-            ComboMenu.Add("CUse_Q", new CheckBox("CUse_Q"));
-            ComboMenu.Add("CUse_W", new CheckBox("CUse_W"));
-            ComboMenu.Add("CUse_E", new CheckBox("CUse_E"));
-            ComboMenu.Add("CUse_AA", new CheckBox("CUse_AA"));
+            ComboMenu.Add("CUse_Q", new CheckBox("Use Q"));
+            ComboMenu.Add("CUse_W", new CheckBox("Use W"));
+            ComboMenu.Add("CUse_E", new CheckBox("Use E"));
+            ComboMenu.Add("CUse_AA", new CheckBox("Use AA"));
             ComboMenu.Add("CEPercent", new Slider("Use E Mana %", 30, 0, 100));
             ComboMenu.AddSeparator();
-            ComboMenu.Add("CE_Auto_False", new CheckBox("CE_Auto_False"));
+            ComboMenu.Add("CE_Auto_False", new CheckBox("Auto E"));
             ComboMenu.AddLabel("E auto false when target isn't valid");
 
             HarassMenu = MenuIni.AddSubMenu("Harass");
-            HarassMenu.Add("HUse_Q", new CheckBox("HUse_Q"));
-            HarassMenu.Add("HUse_E", new CheckBox("HUse_E"));
+            HarassMenu.Add("HUse_Q", new CheckBox("Use Q"));
+            HarassMenu.Add("HUse_E", new CheckBox("Use E"));
             HarassMenu.Add("HEPercent", new Slider("Use E Mana %", 30, 0, 100));
-            HarassMenu.Add("HUse_AA", new CheckBox("HUse_AA"));
-            HarassMenu.Add("HUse_AA_to_minion", new CheckBox("HUse_AA_to_minion"));
-            HarassMenu.Add("E_LastHit", new CheckBox("E_LastHit"));
+            HarassMenu.Add("HUse_AA", new CheckBox("Use AA"));
+            HarassMenu.Add("HUse_AA_to_minion", new CheckBox("Use AA on minions"));
+            HarassMenu.Add("E_LastHit", new CheckBox("Use E lasthit"));
             HarassMenu.AddSeparator();
-            HarassMenu.Add("HE_Auto_False", new CheckBox("HE_Auto_False"));
+            HarassMenu.Add("HE_Auto_False", new CheckBox("Auto E"));
             HarassMenu.AddLabel("E auto false when target isn't valid");
 
             LaneMenu = MenuIni.AddSubMenu("Farm");
-            LaneMenu.Add("FUse_Q", new CheckBox("FUse_Q"));
+            LaneMenu.Add("FUse_Q", new CheckBox("Use Q"));
             LaneMenu.Add("FQPercent", new Slider("Use Q Mana %", 30, 0, 100));
-            LaneMenu.Add("FUse_E", new CheckBox("FUse_E"));
+            LaneMenu.Add("FUse_E", new CheckBox("Use E"));
             LaneMenu.Add("FEPercent", new Slider("Use E Mana %", 30, 0, 100));
 
             LHMenu = MenuIni.AddSubMenu("LastHit");
-            LHMenu.Add("LUse_Q", new CheckBox("LUse_Q"));
+            LHMenu.Add("LUse_Q", new CheckBox("Use Q"));
 
             MiscMenu = MenuIni.AddSubMenu("Misc");
-            MiscMenu.Add("NotifyUlt", new CheckBox("Ult_notify_text"));
-            MiscMenu.Add("DeadCast", new CheckBox("DeadCast"));
+            MiscMenu.Add("NotifyUlt", new CheckBox("Ult notify text"));
+            MiscMenu.Add("DeadCast", new CheckBox("Dead Cast"));
 
             DrawMenu = MenuIni.AddSubMenu("Draw");
             DrawMenu.Add("Enabled", new CheckBox("Enabled"));
