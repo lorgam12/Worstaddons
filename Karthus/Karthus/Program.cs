@@ -67,7 +67,7 @@ namespace Karthus
             ComboMenu.Add("CUse_W", new CheckBox("CUse_W"));
             ComboMenu.Add("CUse_E", new CheckBox("CUse_E"));
             ComboMenu.Add("CUse_AA", new CheckBox("CUse_AA"));
-            ComboMenu.Add("CEPercent", new Slider("Use E Mana %", 100, 30, 0));
+            ComboMenu.Add("CEPercent", new Slider("Use E Mana %", 30, 0, 100));
             ComboMenu.AddSeparator();
             ComboMenu.Add("CE_Auto_False", new CheckBox("CE_Auto_False"));
             ComboMenu.AddLabel("E auto false when target isn't valid");
@@ -75,7 +75,7 @@ namespace Karthus
             HarassMenu = MenuIni.AddSubMenu("Harass");
             HarassMenu.Add("HUse_Q", new CheckBox("HUse_Q"));
             HarassMenu.Add("HUse_E", new CheckBox("HUse_E"));
-            HarassMenu.Add("HEPercent", new Slider("Use E Mana %", 100, 30, 0));
+            HarassMenu.Add("HEPercent", new Slider("Use E Mana %", 30, 0, 100));
             HarassMenu.Add("HUse_AA", new CheckBox("HUse_AA"));
             HarassMenu.Add("HUse_AA_to_minion", new CheckBox("HUse_AA_to_minion"));
             HarassMenu.Add("E_LastHit", new CheckBox("E_LastHit"));
@@ -85,9 +85,9 @@ namespace Karthus
 
             LaneMenu = MenuIni.AddSubMenu("Farm");
             LaneMenu.Add("FUse_Q", new CheckBox("FUse_Q"));
-            LaneMenu.Add("FQPercent", new Slider("Use Q Mana %", 100, 30, 0));
+            LaneMenu.Add("FQPercent", new Slider("Use Q Mana %", 30, 0, 100));
             LaneMenu.Add("FUse_E", new CheckBox("FUse_E"));
-            LaneMenu.Add("FEPercent", new Slider("Use E Mana %", 100, 30, 0));
+            LaneMenu.Add("FEPercent", new Slider("Use E Mana %", 30, 0, 100));
 
             LHMenu = MenuIni.AddSubMenu("LastHit");
             LHMenu.Add("LUse_Q", new CheckBox("LUse_Q"));
@@ -173,14 +173,23 @@ namespace Karthus
                 Combo();
                 if (!ComboMenu.Get<CheckBox>("CUse_AA").CurrentValue || player.Mana < Q.Handle.SData.Mana * 3)
                 {
-                    Orbwalker.DisableAttacking = true;
+                    Orbwalker.DisableAttacking = false;
                 }
                 else
                 {
-                    Orbwalker.DisableAttacking = false;
+                    Orbwalker.DisableAttacking = true;
                 }
-            }
+			}
+				
+            if (Orbwalker.ActiveModesFlags != Orbwalker.ActiveModes.Combo)
+					{
+                    Orbwalker.DisableAttacking = false;
+					}
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear)
+            {
+                Farm(true);
+            }
+            if (Orbwalker.ActiveModesFlags != Orbwalker.ActiveModes.LaneClear)
             {
                 Farm();
             }
@@ -189,16 +198,12 @@ namespace Karthus
                 Harass();
                 if (!HarassMenu.Get<CheckBox>("HUse_AA").CurrentValue || player.Mana < Q.Handle.SData.Mana * 3)
                 {
-                    Orbwalker.DisableAttacking = true;
+                    Orbwalker.DisableAttacking = false;
                 }
                 else
                 {
-                    Orbwalker.DisableAttacking = false;
+                    Orbwalker.DisableAttacking = true;
                 }
-            }
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
-            {
-                LastHit();
             }
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
             {
@@ -379,13 +384,13 @@ namespace Karthus
 
                 if (R.IsReady())
                 {
-                    DS += QTarget.GetSpellDamage(player, SpellSlot.R);
+                    DS += player.GetSpellDamage(player, SpellSlot.R);
                     countmana += R.Handle.SData.Mana;
                 }
 
                 while (DS < QTarget.MaxHealth)
                 {
-                    var qd = QTarget.GetSpellDamage(player, SpellSlot.Q);
+                    var qd = player.GetSpellDamage(player, SpellSlot.Q);
 
                     DS += qd;
                     countmana += Q.Handle.SData.Mana;
@@ -461,13 +466,13 @@ namespace Karthus
             var canQ = Can || LaneMenu.Get<CheckBox>("FUse_Q").CurrentValue;
             var canE = Can || LaneMenu.Get<CheckBox>("FUse_E").CurrentValue;
             //bool QtoOne = MenuIni.SubMenu("Farm").Item("Q_to_One").GetValue<bool>();
-            List<Obj_AI_Base> minions;
 
-            if (canQ && Q.IsReady() && (((player.Mana / player.MaxMana) * 100f) >= LaneMenu.Get<Slider>("FQPercent").CurrentValue))
+            if (canQ && Q.IsReady() && player.ManaPercent >= LaneMenu.Get<Slider>("FQPercent").CurrentValue)
             {
-               minions = new List<Obj_AI_Base>(EntityManager.MinionsAndMonsters.GetLaneMinions(
-                   EntityManager.UnitTeam.Enemy, Player.Instance.Position, E.Range).ToArray());
-                minions.RemoveAll(x => x.MaxHealth <= 5);
+                var minions1 = EntityManager.MinionsAndMonsters.EnemyMinions;
+
+                if (minions1 == null || !minions1.Any()) return;
+                
                 var location =
                 GetBestCircularFarmLocation(
                     EntityManager.MinionsAndMonsters.EnemyMinions.Where(x => x.Distance(Player.Instance) <= Q.Range)
@@ -482,10 +487,12 @@ namespace Karthus
             }
 
             if (!canE || !E.IsReady() || player.IsZombie)
+            {
                 return;
+            }
             NowE = false;
 
-            minions = new List<Obj_AI_Base>(EntityManager.MinionsAndMonsters.GetLaneMinions(
+            var minions = new List<Obj_AI_Base>(EntityManager.MinionsAndMonsters.GetLaneMinions(
                 EntityManager.UnitTeam.Enemy, Player.Instance.Position, E.Range).ToArray());
             minions.RemoveAll(x => x.MaxHealth <= 5);
             var jgm = minions.Any(x => x.Team == GameObjectTeam.Neutral);
