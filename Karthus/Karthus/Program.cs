@@ -158,43 +158,45 @@ namespace Karthus
             wTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
             eTarget = TargetSelector.GetTarget(E.Range, DamageType.Magical);
 
-            var activeOrbwalker = Orbwalker.ActiveModesFlags;
-            switch (activeOrbwalker)
+            var flags = Orbwalker.ActiveModesFlags;
+            if (flags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
-                case Orbwalker.ActiveModes.Combo:
-                    Orbwalker.DisableAttacking = ComboMenu.Get<CheckBox>("CUse_AA").CurrentValue || player.Mana > Q.Handle.SData.Mana * 3;
-                    Combo();
-                    break;
-                case Orbwalker.ActiveModes.LaneClear:
-                    Orbwalker.DisableAttacking = false;
-                    LaneClear();
-                    break;
-                case Orbwalker.ActiveModes.JungleClear:
-                    Orbwalker.DisableAttacking = false;
-                    LaneClear();
-                    break;
-                case Orbwalker.ActiveModes.Harass:
-                    Orbwalker.DisableAttacking = HarassMenu.Get<CheckBox>("HUse_AA").CurrentValue || Player.Instance.Mana < Q.Handle.SData.Mana * 3;
-                    Harass();
-                    break;
-                case Orbwalker.ActiveModes.LastHit:
-                    Orbwalker.DisableAttacking = false;
-                    LastHit();
-                    break;
-                default:
-                    Orbwalker.DisableAttacking = false;
-                    calcE();
+                Combo();
+                Orbwalker.DisableAttacking = ComboMenu.Get<CheckBox>("CUse_AA").CurrentValue || player.Mana > Q.Handle.SData.Mana * 3;
 
-                    if (MiscMenu.Get<CheckBox>("DeadCast").CurrentValue)
-                        if (player.IsZombie)
-                            if (!Combo())
-                            {
-                                LaneClear();
-                            }
-                    Ks();
-                    break;
             }
-        }
+
+            if (flags.HasFlag(Orbwalker.ActiveModes.LaneClear))
+            {
+                Orbwalker.DisableAttacking = false;
+                LaneClear();
+            }
+
+            if (flags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+            {
+                Orbwalker.DisableAttacking = false;
+                JungleClear();
+            }
+
+            if (flags.HasFlag(Orbwalker.ActiveModes.Harass))
+            {
+                Harass();
+                Orbwalker.DisableAttacking = HarassMenu.Get<CheckBox>("HUse_AA").CurrentValue || Player.Instance.Mana < Q.Handle.SData.Mana * 3;
+            }
+
+            if (flags.HasFlag(Orbwalker.ActiveModes.LastHit))
+            {
+                LastHit();
+            }
+
+            if (MiscMenu.Get<CheckBox>("DeadCast").CurrentValue)
+                    if (player.IsZombie)
+                        if (!Combo())
+                        {
+                            LaneClear();
+                        }
+                Ks();
+            }
         
 
         private static void OnDraw(EventArgs args)
@@ -429,10 +431,14 @@ namespace Karthus
             return true;
         }
 
-        private static void LaneClear(bool Can = false)
+        private static void JungleClear()
         {
-            var canQ = Can || LaneMenu.Get<CheckBox>("FUse_Q").CurrentValue;
-            var canE = Can || LaneMenu.Get<CheckBox>("FUse_E").CurrentValue;
+            //SoonTM
+        }
+
+        private static void LaneClear()
+        {
+            var canQ = LaneMenu.Get<CheckBox>("FUse_Q").CurrentValue && Q.IsReady();
 
             // bool QtoOne = MenuIni.SubMenu("Farm").Item("Q_to_One").GetValue<bool>();
             if (canQ && Q.IsReady() && player.ManaPercent >= LaneMenu.Get<Slider>("FQPercent").CurrentValue)
@@ -455,28 +461,6 @@ namespace Karthus
                     Q.Cast(location.Position.To3D());
                 }
             }
-
-            if (!canE || !E.IsReady() || player.IsZombie)
-            {
-                return;
-            }
-
-            nowE = false;
-
-            var minions = new List<Obj_AI_Base>(EntityManager.MinionsAndMonsters.GetLaneMinions(
-                EntityManager.UnitTeam.Enemy, Player.Instance.Position, E.Range).ToArray());
-            minions.RemoveAll(x => x.MaxHealth <= 5);
-            var jgm = minions.Any(x => x.Team == GameObjectTeam.Neutral);
-
-            if (player.Spellbook != null
-                && ((player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && (minions.Count >= 3 || jgm))
-                    && player.ManaPercent >= LaneMenu.Get<Slider>("FEPercent").CurrentValue)) E.Cast();
-            if (player.Spellbook != null
-                && ((player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 2 && (minions.Count <= 2 && !jgm))
-                         || !(player.ManaPercent >= LaneMenu.Get<Slider>("FEPercent").CurrentValue)))
-            {
-                calcE();
-            }
         }
 
         private static void LastHit()
@@ -498,7 +482,7 @@ namespace Karthus
                     Q.Width,
                     Q.Range);
 
-                if (Q.IsReady() && location.MinionsHit > 0)
+                if (!player.CanAttack && Q.IsReady() && location.MinionsHit > 0)
                 {
                     Q.Cast(location.Position.To3D());
                 }
