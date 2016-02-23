@@ -12,6 +12,7 @@ using EloBuddy.SDK.Rendering;
 
 namespace Karthus
 {
+
     class Program
     {
         public static Check Check;
@@ -94,7 +95,6 @@ namespace Karthus
             MiscMenu = MenuIni.AddSubMenu("Misc");
             MiscMenu.Add("NotifyUlt", new CheckBox("Ult notify text"));
             MiscMenu.Add("DeadCast", new CheckBox("Dead Cast"));
-            MiscMenu.Add("KS", new CheckBox("Kill Steal"));
 
             DrawMenu = MenuIni.AddSubMenu("Draw");
             DrawMenu.Add("Enabled", new CheckBox("Enabled"));
@@ -118,7 +118,10 @@ namespace Karthus
 
             if (czx < czx2)
             {
-                cz = czx2 >= QTarget.ServerPosition.X;
+                if (czx2 >= QTarget.ServerPosition.X)
+                    cz = true;
+                else
+                    cz = false;
             }
             else if (czx == czx2)
             {
@@ -129,25 +132,34 @@ namespace Karthus
             }
             else
             {
-                cz = czx2 <= QTarget.ServerPosition.X;
+                if (czx2 <= QTarget.ServerPosition.X)
+                    cz = true;
+                else
+                    cz = false;
             }
             czx = czx2;
             czx2 = QTarget.ServerPosition.X;
 
             if (czy < czy2)
             {
-                cz = czy2 >= QTarget.ServerPosition.Y;
+                if (czy2 >= QTarget.ServerPosition.Y)
+                    cz = true;
+                else
+                    cz = false;
             }
             else if (czy == czy2)
                 cz = false;
             else
             {
-                cz = czy2 <= QTarget.ServerPosition.Y;
+                if (czy2 <= QTarget.ServerPosition.Y)
+                    cz = true;
+                else
+                    cz = false;
             }
             czy = czy2;
             czy2 = QTarget.ServerPosition.Y;
         }
-        
+
         private static void OnUpdate(EventArgs args)
         {
             if (player.IsDead) return;
@@ -159,32 +171,48 @@ namespace Karthus
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();
-                if (!ComboMenu.Get<CheckBox>("CUse_AA").CurrentValue || player.Mana < Q.Handle.SData.Mana * 3) Orbwalker.DisableAttacking = false;
-
-                else Orbwalker.DisableAttacking = true;
+                if (!ComboMenu.Get<CheckBox>("CUse_AA").CurrentValue || player.Mana < Q.Handle.SData.Mana * 3)
+                {
+                    Orbwalker.DisableAttacking = false;
+                }
+                else
+                {
+                    Orbwalker.DisableAttacking = true;
+                }
+			}
+				
+            if (Orbwalker.ActiveModesFlags != Orbwalker.ActiveModes.Combo)
+					{
+                    Orbwalker.DisableAttacking = false;
+					}
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear)
+            {
+                Farm(true);
             }
-
-            if (Orbwalker.ActiveModesFlags != Orbwalker.ActiveModes.Combo) Orbwalker.DisableAttacking = false;
-
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear) Farm(true);
-
-            if (Orbwalker.ActiveModesFlags != Orbwalker.ActiveModes.LaneClear) Farm();
-
+            if (Orbwalker.ActiveModesFlags != Orbwalker.ActiveModes.LaneClear)
+            {
+                Farm();
+            }
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Harass)
             {
                 Harass();
-                if (!HarassMenu.Get<CheckBox>("HUse_AA").CurrentValue || player.Mana < Q.Handle.SData.Mana * 3) Orbwalker.DisableAttacking = false;
-                else Orbwalker.DisableAttacking = true;
+                if (!HarassMenu.Get<CheckBox>("HUse_AA").CurrentValue || player.Mana < Q.Handle.SData.Mana * 3)
+                {
+                    Orbwalker.DisableAttacking = false;
+                }
+                else
+                {
+                    Orbwalker.DisableAttacking = true;
+                }
             }
-
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit) LastHit();
-
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
+            {
+                LastHit();
+            }
             if (MiscMenu.Get<CheckBox>("DeadCast").CurrentValue)
                 if (player.IsZombie)
                     if (!Combo())
                         Farm(true);
-
-            KS();
         }
 
         private static void OnDraw(EventArgs args)
@@ -201,7 +229,9 @@ namespace Karthus
             {
                 var killable = "";
 
-                foreach (Ti target in Check.TI.Where(x => x.Player.IsValid && !x.Player.IsDead && x.Player.IsEnemy && (Check.recalltc(x) /*|| (x.Player.IsVisible && Utility.IsValidTarget(x.Player))*/) && player.GetSpellDamage(x.Player, SpellSlot.R) >= Program.Check.GetTargetHealth(x, (int)(R.CastDelay * 1000f))))
+                var time = Game.Time;
+
+                foreach (TI target in Check.TI.Where(x => x.Player.IsValid && !x.Player.IsDead && x.Player.IsEnemy && (Check.recalltc(x) /*|| (x.Player.IsVisible && Utility.IsValidTarget(x.Player))*/) && player.GetSpellDamage(x.Player, SpellSlot.R) >= Program.Check.GetTargetHealth(x, (int)(R.CastDelay * 1000f))))
                 {
                     killable += target.Player.ChampionName + " ";
                 }
@@ -212,6 +242,23 @@ namespace Karthus
                 }
             }
         }
+
+
+        private static void BeforeAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
+        {
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && ComboMenu.Get<CheckBox>("CUse_AA").CurrentValue)
+            {
+                if (Player.Instance.Mana > 44)
+                {
+                    if (target.Type == GameObjectType.AIHeroClient)
+                    {
+                        args.Process = false;
+                    }
+                }
+            }
+        }
+        
+
 
         private static void calcE(bool TC = false)
         {
@@ -318,6 +365,8 @@ namespace Karthus
 
         private static bool Combo()
         {
+            bool Qtarget = false;
+
             var Qm = ComboMenu.Get<CheckBox>("CUse_Q").CurrentValue;
             var Wm = ComboMenu.Get<CheckBox>("CUse_W").CurrentValue;
             var Em = ComboMenu.Get<CheckBox>("CUse_E").CurrentValue;
@@ -330,24 +379,21 @@ namespace Karthus
 
             if (Wm && W.IsReady() && WTarget.IsValid)
             {
-                double ds = 0;
+                double DS = 0;
                 double countmana = W.Handle.SData.Mana;
 
                 if (R.IsReady())
                 {
-                    ds += DamageLibrary.GetSpellDamage(player, player, SpellSlot.R);
+                    DS += player.GetSpellDamage(player, SpellSlot.R);
                     countmana += R.Handle.SData.Mana;
                 }
 
-                while (QTarget != null && ds < QTarget.MaxHealth)
+                while (DS < QTarget.MaxHealth)
                 {
-                    var qd = DamageLibrary.GetSpellDamage(player, player, SpellSlot.Q);
+                    var qd = player.GetSpellDamage(player, SpellSlot.Q);
 
-                    ds += qd;
-                    if (Q.Handle != null)
-                    {
-                        countmana += Q.Handle.SData.Mana;
-                    }
+                    DS += qd;
+                    countmana += Q.Handle.SData.Mana;
                 }
 
                 var predW = W.GetPrediction(WTarget);
@@ -398,19 +444,18 @@ namespace Karthus
                 }
             }
 
-            if (QTarget == null || (!Qm || !Q.IsReady() || !QTarget.IsValid))
+            if (QTarget != null && (Qm && Q.IsReady() && QTarget.IsValid))
             {
-                return false;
-            }
-            var predQ = Q.GetPrediction(QTarget);
-            var Qtarget = true;
-            if (!cz)
-            {
-                Q.Cast(predQ.CastPosition);
-            }
-            else
-            {
-                Q.Cast(QTarget);
+                var predQ = Q.GetPrediction(QTarget);
+                Qtarget = true;
+                if (!cz)
+                {
+                    Q.Cast(predQ.CastPosition);
+                }
+                else
+                {
+                    Q.Cast(QTarget);
+                }
             }
 
             return Qtarget;
@@ -426,11 +471,8 @@ namespace Karthus
             {
                 var minions1 = EntityManager.MinionsAndMonsters.EnemyMinions;
 
-                if (minions1 == null || !minions1.Any())
-                {
-                    return;
-                }
-
+                if (minions1 == null || !minions1.Any()) return;
+                
                 var location =
                 GetBestCircularFarmLocation(
                     EntityManager.MinionsAndMonsters.EnemyMinions.Where(x => x.Distance(Player.Instance) <= Q.Range)
@@ -448,7 +490,6 @@ namespace Karthus
             {
                 return;
             }
-
             NowE = false;
 
             var minions = new List<Obj_AI_Base>(EntityManager.MinionsAndMonsters.GetLaneMinions(
@@ -471,56 +512,41 @@ namespace Karthus
         {
             if (LHMenu.Get<CheckBox>("LUse_Q").CurrentValue)
             {
+                /*
                 List<Obj_AI_Base> minions, minions2;
 
                 minions = new List<Obj_AI_Base>(EntityManager.MinionsAndMonsters.GetLaneMinions(
-                    EntityManager.UnitTeam.Enemy, Player.Instance.Position, Q.Range).ToArray());
+                    EntityManager.UnitTeam.Enemy, Player.Instance.Position, E.Range).ToArray());
 
                 minions2 = new List<Obj_AI_Base>(EntityManager.MinionsAndMonsters.GetLaneMinions(
-                    EntityManager.UnitTeam.Enemy, Player.Instance.Position, Q.Range).ToArray());
+                    EntityManager.UnitTeam.Enemy, Player.Instance.Position, E.Range).ToArray());
                 minions.RemoveAll(x => x.MaxHealth <= 5);
                 minions.RemoveAll(x => x.Health > QTarget.GetSpellDamage(player, SpellSlot.Q));
                 var i = new List<int>() { -100, -70, 0, 70, 100 };
                 var j = new List<int>() { -100, -70, 0, 70, 100 };
 
-                foreach (var minion in from minion in minions from xi in i select minion)
-                    foreach (int yj in j)
+                foreach (var minion in minions)
+                {
+                    foreach (int xi in i)
                     {
-                        int cnt = 0;
-
-                    var location =
-                        GetBestCircularFarmLocation(
-                            EntityManager.MinionsAndMonsters.EnemyMinions.Where(x => x.Distance(Player.Instance) <= Q.Range)
-                                .Select(xm => xm.ServerPosition.To2D())
-                                .ToList(),
-                            Q.Width,
-                            Q.Range);
-                    {
-                        cnt++;
-                    }
-
-                        if (cnt == 1 && minion.Health < QTarget.GetSpellDamage(player, SpellSlot.Q))
+                        foreach (int yj in j)
                         {
-                            Q.Cast(location.Position.To3D());
-                            break;
+                            int cnt = 0;
+                            Vector3 temp = new Vector3(Prediction.GetPrediction(minion, 250f).UnitPosition.X + xi, y: Prediction.GetPrediction(minion, 250f).UnitPosition.Y + yj, z: Prediction.GetPrediction(minion, 250f).UnitPosition.Z);
+                            foreach (var minion2 in minions2.Where(x => Vector3.Distance(temp, Prediction.GetPrediction(x, 250f).UnitPosition) < 200))
+                            {
+                                cnt++;
+                            }
+
+                            if (cnt == 1 && minion.Health < QTarget.GetSpellDamage(player, SpellSlot.Q))
+                            {
+                                Q.Cast(temp);
+                                break;
+                            }
                         }
                     }
-            }
-        }
-
-        private static void KS()
-        {
-            if (MiscMenu.Get<CheckBox>("KS").CurrentValue)
-            {
-                var predQ = Q.GetPrediction(QTarget);
-                if (!cz && QTarget.Health <= QTarget.GetSpellDamage(player, SpellSlot.Q))
-                {
-                    Q.Cast(predQ.CastPosition);
                 }
-                else
-                {
-                    Q.Cast(QTarget);
-                }
+                */
             }
         }
 
