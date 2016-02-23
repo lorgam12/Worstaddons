@@ -49,7 +49,10 @@ namespace Karthus
 
         private static void Game_OnGameLoad(EventArgs args)
         {
-            if (player.ChampionName != "Karthus") return;
+            if (player.ChampionName != "Karthus")
+            {
+                return;
+            }
 
             Check = new Check();
 
@@ -86,10 +89,9 @@ namespace Karthus
             LaneMenu.Add("FQPercent", new Slider("Use Q Mana %", 30, 0, 100));
             LaneMenu.Add("FUse_E", new CheckBox("Use E"));
             LaneMenu.Add("FEPercent", new Slider("Use E Mana %", 30, 0, 100));
-            /*
-            LHMenu = MenuIni.AddSubMenu("LastHit");
-            LHMenu.Add("LUse_Q", new CheckBox("Use Q"));
-            */
+
+            LhMenu = menuIni.AddSubMenu("LastHit");
+            LhMenu.Add("LUse_Q", new CheckBox("Use Q"));
 
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.Add("NotifyUlt", new CheckBox("Ult notify text"));
@@ -155,19 +157,12 @@ namespace Karthus
             qTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
             wTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
             eTarget = TargetSelector.GetTarget(E.Range, DamageType.Magical);
-            
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
-            {
-                Combo();
-                if (!ComboMenu.Get<CheckBox>("CUse_AA").CurrentValue || player.Mana < Q.Handle.SData.Mana * 3) Orbwalker.DisableAttacking = false;
-                else Orbwalker.DisableAttacking = true;
-            }
 
             var activeOrbwalker = Orbwalker.ActiveModesFlags;
             switch (activeOrbwalker)
             {
                 case Orbwalker.ActiveModes.Combo:
-                    Orbwalker.DisableAttacking = ComboMenu.Get<CheckBox>("CUse_AA").CurrentValue || Player.Instance.Mana < Q.Handle.SData.Mana * 3;
+                    Orbwalker.DisableAttacking = ComboMenu.Get<CheckBox>("CUse_AA").CurrentValue || player.Mana > Q.Handle.SData.Mana * 3;
                     Combo();
                     break;
                 case Orbwalker.ActiveModes.LaneClear:
@@ -223,7 +218,7 @@ namespace Karthus
 
                 if (killable != "" && MiscMenu.Get<CheckBox>("NotifyUlt").CurrentValue)
                 {
-                    Drawing.DrawText(Drawing.Width * 1f, Drawing.Height * 1.26f, System.Drawing.Color.Red, "Killable by ult: " + killable);
+                    Drawing.DrawText(Drawing.Width * 0.44f, Drawing.Height * 0.7f, System.Drawing.Color.Red, "Killable by ult: " + killable);
                 }
             }
         }
@@ -259,7 +254,7 @@ namespace Karthus
                 var predQ = Q.GetPrediction(qTarget);
                 if (HarassMenu.Get<CheckBox>("HUse_Q").CurrentValue && (Q.IsReady() && qTarget.IsValidTarget(Q.Range)))
                 {
-                    if (!cz)
+                    if (!cz && predQ.HitChance >= HitChance.High)
                     {
                         Q.Cast(predQ.CastPosition);
                     }
@@ -347,10 +342,10 @@ namespace Karthus
                 return false;
             }
 
+            double countmana = W.Handle.SData.Mana;
             if (wm && W.IsReady() && wTarget.IsValid)
             {
                 double ds = 0;
-                double countmana = W.Handle.SData.Mana;
 
                 if (R.IsReady())
                 {
@@ -403,13 +398,13 @@ namespace Karthus
                     {
                         if (player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
                         {
-                            if (player.Distance(eTarget.ServerPosition) <= E.Range && (((player.Mana / player.MaxMana) * 100f) >= ComboMenu.Get<Slider>("CEPercent").CurrentValue))
+                            if (player.Distance(eTarget.ServerPosition) <= E.Range && player.ManaPercent >= ComboMenu.Get<Slider>("CEPercent").CurrentValue)
                             {
                                 nowE = true;
                                 E.Cast();
                             }
                         }
-                        else if (((player.Mana / player.MaxMana) * 100f) <= ComboMenu.Get<Slider>("CEPercent").CurrentValue)
+                        else if (player.ManaPercent <= ComboMenu.Get<Slider>("CEPercent").CurrentValue)
                         {
                             calcE(true);
                         }
@@ -422,7 +417,7 @@ namespace Karthus
                 return false;
             }
             var predQ = Q.GetPrediction(qTarget);
-            if (!cz)
+            if (!cz && predQ.HitChance >= HitChance.High)
             {
                 Q.Cast(predQ.CastPosition);
             }
@@ -434,14 +429,19 @@ namespace Karthus
             return true;
         }
 
-        private static void LaneClear()
+        private static void LaneClear(bool Can = false)
         {
-            var canQ = LaneMenu.Get<CheckBox>("FUse_Q").CurrentValue;
-            var canE = LaneMenu.Get<CheckBox>("FUse_E").CurrentValue;
+            var canQ = Can || LaneMenu.Get<CheckBox>("FUse_Q").CurrentValue;
+            var canE = Can || LaneMenu.Get<CheckBox>("FUse_E").CurrentValue;
 
             // bool QtoOne = MenuIni.SubMenu("Farm").Item("Q_to_One").GetValue<bool>();
             if (canQ && Q.IsReady() && player.ManaPercent >= LaneMenu.Get<Slider>("FQPercent").CurrentValue)
             {
+                var minions1 = EntityManager.MinionsAndMonsters.EnemyMinions;
+                if (minions1 == null || !minions1.Any())
+                {
+                    return;
+                }
 
                 var location =
                 GetBestCircularFarmLocation(
@@ -470,10 +470,10 @@ namespace Karthus
 
             if (player.Spellbook != null
                 && ((player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && (minions.Count >= 3 || jgm))
-                    && (((player.Mana / player.MaxMana) * 100f) >= LaneMenu.Get<Slider>("FEPercent").CurrentValue))) E.Cast();
-            else if (player.Spellbook != null
-                     && ((player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 2 && (minions.Count <= 2 && !jgm))
-                         || !(((player.Mana / player.MaxMana) * 100f) >= LaneMenu.Get<Slider>("FEPercent").CurrentValue)))
+                    && player.ManaPercent >= LaneMenu.Get<Slider>("FEPercent").CurrentValue)) E.Cast();
+            if (player.Spellbook != null
+                && ((player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 2 && (minions.Count <= 2 && !jgm))
+                         || !(player.ManaPercent >= LaneMenu.Get<Slider>("FEPercent").CurrentValue)))
             {
                 calcE();
             }
@@ -481,17 +481,51 @@ namespace Karthus
 
         private static void LastHit()
         {
-            /*
-            if (LHMenu.Get<CheckBox>("LUse_Q").CurrentValue)
+            var canQ = LhMenu.Get<CheckBox>("LUse_Q").CurrentValue;
+            if (canQ && player.ManaPercent >= LaneMenu.Get<Slider>("FEPercent").CurrentValue)
             {
-                var minion = TargetManager.GetMinionTarget(SpellManager.Q.Range, DamageType.Magical, false, false, true);
+                var minions = EntityManager.MinionsAndMonsters.EnemyMinions;
+
+                if (minions == null || !minions.Any())
                 {
-                            Q.Cast(location.Position.To3D());
-                            break;
-                        }
-                    }
-                    */
+                    return;
+                }
+
+                var location = GetBestCircularFarmLocation(
+                    EntityManager.MinionsAndMonsters.EnemyMinions.Where(x => x.Distance(Player.Instance) <= Q.Range && (x.CountEnemiesInRange(155) == 0) && x.Health <= (2 * player.GetSpellDamage(player, SpellSlot.Q)))
+                        .Select(xm => xm.ServerPosition.To2D())
+                        .ToList(),
+                    Q.Width,
+                    Q.Range);
+
+                if (Q.IsReady() && location.MinionsHit > 0)
+                {
+                    Q.Cast(location.Position.To3D());
+                }
             }
+
+            if (canQ && Player.Instance.ManaPercent >= LaneMenu.Get<Slider>("FEPercent").CurrentValue)
+            {
+                var minions2 = EntityManager.MinionsAndMonsters.EnemyMinions;
+
+                if (minions2 == null || !minions2.Any())
+                {
+                    return;
+                }
+
+                var locations = GetBestCircularFarmLocation(
+                    EntityManager.MinionsAndMonsters.EnemyMinions.Where(x => x.Distance(Player.Instance) <= Q.Range && (x.Health <= player.GetSpellDamage(qTarget, SpellSlot.Q)))
+                        .Select(xm => xm.ServerPosition.To2D())
+                        .ToList(),
+                    Q.Width,
+                    Q.Range);
+
+                if (Q.IsReady() && locations.MinionsHit > 0)
+                {
+                    Q.Cast(locations.Position.To3D());
+                }
+            }
+        }
 
         private static void Ks()
         {
