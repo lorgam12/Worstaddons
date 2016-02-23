@@ -87,8 +87,6 @@ namespace Karthus
             LaneMenu = menuIni.AddSubMenu("Farm");
             LaneMenu.Add("FUse_Q", new CheckBox("Use Q"));
             LaneMenu.Add("FQPercent", new Slider("Use Q Mana %", 30, 0, 100));
-            LaneMenu.Add("FUse_E", new CheckBox("Use E"));
-            LaneMenu.Add("FEPercent", new Slider("Use E Mana %", 30, 0, 100));
 
             LhMenu = menuIni.AddSubMenu("LastHit");
             LhMenu.Add("LUse_Q", new CheckBox("Use Q"));
