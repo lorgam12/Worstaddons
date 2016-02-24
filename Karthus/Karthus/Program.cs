@@ -9,7 +9,6 @@ using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Rendering;
-
 namespace Karthus
 {
     class Program
@@ -33,7 +32,9 @@ namespace Karthus
         public static Menu ComboMenu { get; private set; }
         public static Menu HarassMenu { get; private set; }
         public static Menu LaneMenu { get; private set; }
+        public static Menu JungleMenu { get; private set; }
         public static Menu LhMenu { get; private set; }
+        public static Menu KillStealMenu { get; private set; }
         public static Menu MiscMenu { get; private set; }
         public static Menu DrawMenu { get; private set; }
         private static Menu menuIni;
@@ -62,13 +63,13 @@ namespace Karthus
             R = new Spell.Skillshot(SpellSlot.R, 25000, SkillShotType.Circular, 3000, int.MaxValue, int.MaxValue);
 
             menuIni = MainMenu.AddMenu("Karthus", "Karthus");
-            menuIni.AddGroupLabel("Welcome to the worst karthus addon!");
+            menuIni.AddGroupLabel("Welcome to the worst Karthus addon!");
 
             ComboMenu = menuIni.AddSubMenu("Combo");
             ComboMenu.Add("CUse_Q", new CheckBox("Use Q"));
             ComboMenu.Add("CUse_W", new CheckBox("Use W"));
             ComboMenu.Add("CUse_E", new CheckBox("Use E"));
-            ComboMenu.Add("CUse_AA", new CheckBox("Disable AA"));
+            ComboMenu.Add("CUse_AA", new CheckBox("Disable AA", false));
             ComboMenu.Add("CEPercent", new Slider("Use E Mana %", 30, 0, 100));
             ComboMenu.AddSeparator();
             ComboMenu.Add("CE_Auto_False", new CheckBox("Auto E"));
@@ -78,7 +79,7 @@ namespace Karthus
             HarassMenu.Add("HUse_Q", new CheckBox("Use Q"));
             HarassMenu.Add("HUse_E", new CheckBox("Use E"));
             HarassMenu.Add("HEPercent", new Slider("Use E Mana %", 30, 0, 100));
-            HarassMenu.Add("HUse_AA", new CheckBox("Disable AA"));
+            HarassMenu.Add("HUse_AA", new CheckBox("Disable AA", false));
             HarassMenu.Add("E_LastHit", new CheckBox("Use E lasthit"));
             HarassMenu.AddSeparator();
             HarassMenu.Add("HE_Auto_False", new CheckBox("Auto E"));
@@ -88,17 +89,33 @@ namespace Karthus
             LaneMenu.Add("FUse_Q", new CheckBox("Use Q"));
             LaneMenu.Add("FQPercent", new Slider("Use Q Mana %", 30, 0, 100));
 
+            JungleMenu = menuIni.AddSubMenu("JungleClear");
+            JungleMenu.Add("JUse_Q", new CheckBox("Use Q"));
+            JungleMenu.Add("JQPercent", new Slider("Use Q Mana %", 30, 0, 100));
+
             LhMenu = menuIni.AddSubMenu("LastHit");
             LhMenu.Add("LUse_Q", new CheckBox("Use Q"));
+
+            KillStealMenu = menuIni.AddSubMenu("KillSteal");
+            KillStealMenu.Add("EnableKS", new CheckBox("Enable"));
+            KillStealMenu.Add("KS", new CheckBox("Kill Steal Q"));
+            KillStealMenu.AddSeparator();
+            KillStealMenu.Add("UltKS", new CheckBox("Ultimate KillSteal R", false));
+            KillStealMenu.Add("Rnear", new Slider("Min Enemies In [Min Range] to block Cast R", 1, 0, 5));
+            KillStealMenu.Add("Rranged", new Slider("Min Range For Enemies near", 2000, 100, 5000));
+            KillStealMenu.AddLabel("Recommended Range (2000+)");
 
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.Add("NotifyUlt", new CheckBox("Ult notify text"));
             MiscMenu.Add("DeadCast", new CheckBox("Dead Cast"));
-            MiscMenu.Add("KS", new CheckBox("Kill Steal Q"));
+            
 
             DrawMenu = menuIni.AddSubMenu("Draw");
             DrawMenu.Add("Enabled", new CheckBox("Enabled"));
-            DrawMenu.Add("Draw_Q", new CheckBox("Draw_Q"));
+            DrawMenu.Add("Draw_Q", new CheckBox("Draw Q"));
+            DrawMenu.Add("Draw_W", new CheckBox("Draw W"));
+            DrawMenu.Add("Draw_E", new CheckBox("Draw E"));
+            DrawMenu.Add("Rranged", new CheckBox("Min Range for enemies to cast R"));
 
             Game.OnUpdate += Zigzag;
             Game.OnUpdate += OnUpdate;
@@ -185,6 +202,7 @@ namespace Karthus
             if (flags.HasFlag(Orbwalker.ActiveModes.LastHit))
             {
                 LastHit();
+                Orbwalker.DisableAttacking = false;
             }
 
             if (MiscMenu.Get<CheckBox>("DeadCast").CurrentValue)
@@ -199,11 +217,23 @@ namespace Karthus
 
         private static void OnDraw(EventArgs args)
         {
-            if (!player.IsDead)
+            if (!player.IsDead && DrawMenu.Get<CheckBox>("Enabled").CurrentValue)
             {
                 if (DrawMenu.Get<CheckBox>("Draw_Q").CurrentValue)
                 {
                     Circle.Draw(Color.DarkRed, Q.Range, Player.Instance.Position);
+                }
+                if (DrawMenu.Get<CheckBox>("Draw_W").CurrentValue)
+                {
+                    Circle.Draw(Color.DarkRed, W.Range, Player.Instance.Position);
+                }
+                if (DrawMenu.Get<CheckBox>("Draw_E").CurrentValue)
+                {
+                    Circle.Draw(Color.DarkRed, E.Range, Player.Instance.Position);
+                }
+                if (DrawMenu.Get<CheckBox>("Rranged").CurrentValue)
+                {
+                    Circle.Draw(Color.DarkRed, KillStealMenu.Get<Slider>("Rranged").CurrentValue, Player.Instance.Position);
                 }
             }
 
@@ -211,7 +241,7 @@ namespace Karthus
             {
                 var killable = "";
 
-                foreach (Ti target in Check.TI.Where(x => x.Player.IsValid && !x.Player.IsDead && x.Player.IsEnemy && (Check.recalltc(x) /*|| (x.Player.IsVisible && Utility.IsValidTarget(x.Player))*/) && player.GetSpellDamage(x.Player, SpellSlot.R) >= Program.Check.GetTargetHealth(x, (int)(R.CastDelay * 1000f))))
+                foreach (var target in Check.TI.Where(x => x.Player.IsValid && !x.Player.IsDead && x.Player.IsEnemy && (Check.recalltc(x) /*|| (x.Player.IsVisible && Utility.IsValidTarget(x.Player))*/) && player.GetSpellDamage(x.Player, SpellSlot.R) >= Check.GetTargetHealth(x, (int)(R.CastDelay * 1000f))))
                 {
                     killable += target.Player.ChampionName + " ";
                 }
@@ -381,13 +411,15 @@ namespace Karthus
                         {
                             if (player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
                             {
-                                if (player.Distance(eTarget.ServerPosition) <= E.Range && (((player.Mana / player.MaxMana) * 100f) >= ComboMenu.Get<Slider>("CEPercent").CurrentValue))
+                                if (player.Distance(eTarget.ServerPosition) <= E.Range
+                                    && (player.ManaPercent >= ComboMenu.Get<Slider>("CEPercent").CurrentValue))
                                 {
                                     nowE = true;
                                     E.Cast();
                                 }
                             }
-                            else if (player.Distance(eTarget.ServerPosition) >= E.Range || (((player.Mana / player.MaxMana) * 100f) <= ComboMenu.Get<Slider>("CEPercent").CurrentValue))
+                            else if (player.Distance(eTarget.ServerPosition) >= E.Range
+                                     || (player.ManaPercent <= ComboMenu.Get<Slider>("CEPercent").CurrentValue))
                             {
                                 calcE(true);
                             }
@@ -398,13 +430,14 @@ namespace Karthus
                     {
                         if (player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
                         {
-                            if (player.Distance(eTarget.ServerPosition) <= E.Range && player.ManaPercent >= ComboMenu.Get<Slider>("CEPercent").CurrentValue)
+                            if (player.Distance(eTarget.ServerPosition) <= E.Range
+                                && player.ManaPercent <= ComboMenu.Get<Slider>("CEPercent").CurrentValue)
                             {
                                 nowE = true;
                                 E.Cast();
                             }
                         }
-                        else if (player.ManaPercent <= ComboMenu.Get<Slider>("CEPercent").CurrentValue)
+                        else if (!eTarget.IsValidTarget(E.Range) || (player.ManaPercent >= ComboMenu.Get<Slider>("CEPercent").CurrentValue))
                         {
                             calcE(true);
                         }
@@ -431,14 +464,34 @@ namespace Karthus
 
         private static void JungleClear()
         {
-            //SoonTM
+
+            var canQ = JungleMenu.Get<CheckBox>("JUse_Q").CurrentValue && Q.IsReady();
+            if (canQ && Q.IsReady() && player.ManaPercent >= JungleMenu.Get<Slider>("JQPercent").CurrentValue)
+            {
+                var minions1 = EntityManager.MinionsAndMonsters.EnemyMinions;
+                if (minions1 == null || !minions1.Any())
+                {
+                    return;
+                }
+
+                var location =
+                GetBestCircularFarmLocation(
+                    EntityManager.MinionsAndMonsters.GetJungleMonsters().Where(x => x.Distance(Player.Instance) <= Q.Range)
+                        .Select(xm => xm.ServerPosition.To2D())
+                        .ToList(),
+                    Q.Width,
+                    Q.Range);
+                if (location.MinionsHit >= 1)
+                {
+                    Q.Cast(location.Position.To3D());
+                }
+            }
         }
 
         private static void LaneClear()
         {
+            LastHit();
             var canQ = LaneMenu.Get<CheckBox>("FUse_Q").CurrentValue && Q.IsReady();
-
-            // bool QtoOne = MenuIni.SubMenu("Farm").Item("Q_to_One").GetValue<bool>();
             if (canQ && Q.IsReady() && player.ManaPercent >= LaneMenu.Get<Slider>("FQPercent").CurrentValue)
             {
                 var minions1 = EntityManager.MinionsAndMonsters.EnemyMinions;
@@ -463,16 +516,14 @@ namespace Karthus
 
         private static void LastHit()
         {
-            var canQ = LhMenu.Get<CheckBox>("LUse_Q").CurrentValue;
-            if (canQ && player.ManaPercent >= LaneMenu.Get<Slider>("FEPercent").CurrentValue)
+            var canQ = LhMenu.Get<CheckBox>("LUse_Q").CurrentValue && Q.IsReady();
+            if (canQ && player.ManaPercent >= LaneMenu.Get<Slider>("FQPercent").CurrentValue)
             {
-                var minions = EntityManager.MinionsAndMonsters.EnemyMinions;
-
-                if (minions == null || !minions.Any())
+                var minions1 = EntityManager.MinionsAndMonsters.EnemyMinions;
+                if (minions1 == null || !minions1.Any())
                 {
                     return;
                 }
-
                 var location = GetBestCircularFarmLocation(
                     EntityManager.MinionsAndMonsters.EnemyMinions.Where(x => x.Distance(Player.Instance) <= Q.Range && (x.CountEnemiesInRange(155) == 0) && x.Health <= (2 * player.GetSpellDamage(player, SpellSlot.Q)))
                         .Select(xm => xm.ServerPosition.To2D())
@@ -480,52 +531,66 @@ namespace Karthus
                     Q.Width,
                     Q.Range);
 
-                if (!player.CanAttack && Q.IsReady() && location.MinionsHit > 0)
+                if (Q.IsReady() && location.MinionsHit > 0)
                 {
                     Q.Cast(location.Position.To3D());
                 }
             }
 
-            if (canQ && Player.Instance.ManaPercent >= LaneMenu.Get<Slider>("FEPercent").CurrentValue)
+            if (canQ && player.ManaPercent >= LaneMenu.Get<Slider>("FQPercent").CurrentValue)
             {
-                var minions2 = EntityManager.MinionsAndMonsters.EnemyMinions;
-
-                if (minions2 == null || !minions2.Any())
+                
+                var minions1 = EntityManager.MinionsAndMonsters.EnemyMinions;
+                if (minions1 == null || !minions1.Any())
                 {
                     return;
                 }
 
-                var locations = GetBestCircularFarmLocation(
+                var location = GetBestCircularFarmLocation(
                     EntityManager.MinionsAndMonsters.EnemyMinions.Where(x => x.Distance(Player.Instance) <= Q.Range && (x.Health <= player.GetSpellDamage(qTarget, SpellSlot.Q)))
                         .Select(xm => xm.ServerPosition.To2D())
                         .ToList(),
                     Q.Width,
                     Q.Range);
 
-                if (Q.IsReady() && locations.MinionsHit > 0)
+                if (Q.IsReady() && location.MinionsHit > 0)
                 {
-                    Q.Cast(locations.Position.To3D());
+                    Q.Cast(location.Position.To3D());
                 }
             }
         }
-
         private static void Ks()
         {
-            if (qTarget != null && MiscMenu.Get<CheckBox>("KS").CurrentValue)
+            if (KillStealMenu.Get<CheckBox>("EnableKS").CurrentValue)
             {
-                if (!cz && qTarget.Health <= qTarget.GetSpellDamage(player, SpellSlot.Q))
+                if (qTarget != null && KillStealMenu.Get<CheckBox>("KS").CurrentValue)
                 {
-                    Q.Cast(qTarget.ServerPosition);
+                    if (!cz && qTarget.Health <= qTarget.GetSpellDamage(player, SpellSlot.Q))
+                    {
+                        Q.Cast(qTarget.ServerPosition);
+                    }
+                }
+
+                if (KillStealMenu.Get<CheckBox>("UltKS").CurrentValue
+                    && (R.IsLearned && R.IsReady()
+                        && KillStealMenu.Get<Slider>("Rnear").CurrentValue
+                        <= player.ServerPosition.CountEnemiesInRange(KillStealMenu.Get<Slider>("Rranged").CurrentValue)))
+                {
+                    var target = TargetSelector.GetTarget(R.Range, DamageType.Magical);
+                    if (target != null && target.IsValid && target.Health <= target.GetSpellDamage(player, SpellSlot.R) && !Combo())
+                    {
+                        R.Cast();
+                    }
                 }
             }
         }
-
 
         // For debugging.
 
         // Find the points nearest the upper left, upper right,
         // lower left, and lower right corners.
-        private static void GetMinMaxCorners(List<Vector2> points,
+        private static void GetMinMaxCorners(
+            List<Vector2> points,
             ref Vector2 ul,
             ref Vector2 ur,
             ref Vector2 ll,
@@ -630,8 +695,7 @@ namespace Karthus
             // if (there's a tie, take the one with the smaller X value.
             Vector2[] bestPt = { points[0] };
             foreach (
-                var pt in points.Where(pt => (pt.Y < bestPt[0].Y) || ((pt.Y == bestPt[0].Y) && (pt.X < bestPt[0].X)))
-                )
+                var pt in points.Where(pt => (pt.Y < bestPt[0].Y) || ((pt.Y == bestPt[0].Y) && (pt.X < bestPt[0].X))))
             {
                 bestPt[0] = pt;
             }
