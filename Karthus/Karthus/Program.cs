@@ -404,40 +404,46 @@ namespace Karthus
             {
                 if (em && E.IsReady() && !player.IsZombie)
                 {
-                        if (eTarget != null)
+                    if (eTarget != null)
                     {
-                            if (player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
-                            {
-                                if (player.Distance(eTarget.ServerPosition) <= E.Range && (player.ManaPercent >= HarassMenu.Get<Slider>("HEPercent").CurrentValue))
-                                {
-                                    nowE = true;
-                                    E.Cast();
-                                }
-                            }
-                            else if (player.Distance(eTarget.ServerPosition) >= E.Range || (player.ManaPercent <= HarassMenu.Get<Slider>("HEPercent").CurrentValue))
-                            {
-                                calcE(true);
-                            }
-                        }
-                        else calcE();
-                }
-                    else
-                    {
-                        if (Player.Instance.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
+                        if (player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
                         {
                             if (player.Distance(eTarget.ServerPosition) <= E.Range
-                                && player.ManaPercent <= ComboMenu.Get<Slider>("CEPercent").CurrentValue)
+                                && (player.ManaPercent >= ComboMenu.Get<Slider>("CEPercent").CurrentValue))
                             {
                                 nowE = true;
                                 E.Cast();
                             }
                         }
-                        else if ((Player.Instance.Spellbook.GetSpell(SpellSlot.E).ToggleState == 2 || (player.ManaPercent <= ComboMenu.Get<Slider>("CEPercent").CurrentValue)) || player.Distance(eTarget.ServerPosition) >= E.Range)
+                        else if (player.Distance(eTarget.ServerPosition) >= E.Range
+                                 || (player.ManaPercent <= ComboMenu.Get<Slider>("CEPercent").CurrentValue))
                         {
                             calcE(true);
+                        }
                     }
+                    else calcE();
+                }
+                else
+                {
+                    if (eTarget != null)
+                    {
+                        if (player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
+                        {
+                            if (player.Distance(eTarget.ServerPosition) <= E.Range
+                                && (player.ManaPercent >= ComboMenu.Get<Slider>("CEPercent").CurrentValue))
+                            {
+                                nowE = true;
+                                E.Cast();
+                            }
+                        }
+                        else if (player.ManaPercent
+                                 <= ComboMenu.Get<Slider>("CEPercent").CurrentValue)
+                        {
+                            calcE(true);
+                        }
                     }
                 }
+            }
 
             if (qTarget == null || (!qm || !Q.IsReady() || !qTarget.IsValid))
             {
@@ -450,7 +456,7 @@ namespace Karthus
             }
             else
             {
-                Q.Cast(qTarget);
+                Q.Cast(qTarget.ServerPosition);
             }
 
             return true;
