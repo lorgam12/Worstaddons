@@ -11,6 +11,7 @@ using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Rendering;
 namespace Karthus
 {
+
     class Program
     {
         public static Check Check;
@@ -534,6 +535,7 @@ namespace Karthus
                             .ToList(),
                         Q.Width,
                         Q.Range);
+                
                 if (location.MinionsHit >= 1)
                 {
                     Q.Cast(location.Position.To3D());
@@ -579,8 +581,8 @@ namespace Karthus
                     GetBestCircularFarmLocation(
                         EntityManager.MinionsAndMonsters.EnemyMinions.Where(
                             x =>
-                            x.Distance(Player.Instance) <= Q.Range && (x.CountEnemiesInRange(155) == 0)
-                            && x.Health <= (2 * player.GetSpellDamage(player, SpellSlot.Q)))
+                            x.Distance(Player.Instance) <= Q.Range && x.Health > 5 && (x.CountEnemiesInRange(155) == 0)
+                            && x.Health <= (2 * player.GetSpellDamage(x, SpellSlot.Q)))
                             .Select(xm => xm.ServerPosition.To2D())
                             .ToList(),
                         Q.Width,
@@ -604,8 +606,8 @@ namespace Karthus
                     GetBestCircularFarmLocation(
                         EntityManager.MinionsAndMonsters.EnemyMinions.Where(
                             x =>
-                            x.Distance(Player.Instance) <= Q.Range
-                            && (x.Health <= player.GetSpellDamage(qTarget, SpellSlot.Q)))
+                            x.Distance(Player.Instance) <= Q.Range && x.Health > 5
+                            && (x.Health <= player.GetSpellDamage(x, SpellSlot.Q)))
                             .Select(xm => xm.ServerPosition.To2D())
                             .ToList(),
                         Q.Width,
