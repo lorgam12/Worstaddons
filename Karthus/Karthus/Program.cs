@@ -325,13 +325,13 @@ namespace Karthus
                     {
                         if (player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
                         {
-                            if (player.Distance(eTarget.ServerPosition) <= E.Range && (((player.Mana / player.MaxMana) * 100f) >= HarassMenu.Get<Slider>("HEPercent").CurrentValue))
+                            if (player.Distance(eTarget.ServerPosition) <= E.Range && (player.ManaPercent >= HarassMenu.Get<Slider>("HEPercent").CurrentValue))
                             {
                                 nowE = true;
                                 E.Cast();
                             }
                         }
-                        else if (player.Distance(eTarget.ServerPosition) >= E.Range || (((player.Mana / player.MaxMana) * 100f) <= HarassMenu.Get<Slider>("HEPercent").CurrentValue))
+                        else if (player.Distance(eTarget.ServerPosition) >= E.Range || (player.ManaPercent <= HarassMenu.Get<Slider>("HEPercent").CurrentValue))
                         {
                             calcE(true);
                         }
@@ -344,7 +344,7 @@ namespace Karthus
                     {
                         if (player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
                         {
-                            if (player.Distance(eTarget.ServerPosition) <= E.Range && (((player.Mana / player.MaxMana) * 100f) >= HarassMenu.Get<Slider>("HEPercent").CurrentValue))
+                            if (player.Distance(eTarget.ServerPosition) <= E.Range && (player.ManaPercent >= HarassMenu.Get<Slider>("HEPercent").CurrentValue))
                             {
                                 nowE = true;
                                 E.Cast();
@@ -365,7 +365,6 @@ namespace Karthus
             var qm = ComboMenu.Get<CheckBox>("CUse_Q").CurrentValue;
             var wm = ComboMenu.Get<CheckBox>("CUse_W").CurrentValue;
             var em = ComboMenu.Get<CheckBox>("CUse_E").CurrentValue;
-            var eFm = ComboMenu.Get<CheckBox>("CE_Auto_False").CurrentValue;
 
             if (wTarget == null)
             {
@@ -405,30 +404,26 @@ namespace Karthus
             {
                 if (em && E.IsReady() && !player.IsZombie)
                 {
-                    if (eFm)
-                    {
                         if (eTarget != null)
-                        {
+                    {
                             if (player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
                             {
-                                if (player.Distance(eTarget.ServerPosition) <= E.Range
-                                    && (player.ManaPercent >= ComboMenu.Get<Slider>("CEPercent").CurrentValue))
+                                if (player.Distance(eTarget.ServerPosition) <= E.Range && (player.ManaPercent >= HarassMenu.Get<Slider>("HEPercent").CurrentValue))
                                 {
                                     nowE = true;
                                     E.Cast();
                                 }
                             }
-                            else if (player.Distance(eTarget.ServerPosition) >= E.Range
-                                     || (player.ManaPercent <= ComboMenu.Get<Slider>("CEPercent").CurrentValue))
+                            else if (player.Distance(eTarget.ServerPosition) >= E.Range || (player.ManaPercent <= HarassMenu.Get<Slider>("HEPercent").CurrentValue))
                             {
                                 calcE(true);
                             }
                         }
                         else calcE();
-                    }
+                }
                     else
                     {
-                        if (player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
+                        if (Player.Instance.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
                         {
                             if (player.Distance(eTarget.ServerPosition) <= E.Range
                                 && player.ManaPercent <= ComboMenu.Get<Slider>("CEPercent").CurrentValue)
@@ -437,13 +432,12 @@ namespace Karthus
                                 E.Cast();
                             }
                         }
-                        else if (!eTarget.IsValidTarget(E.Range) || (player.ManaPercent >= ComboMenu.Get<Slider>("CEPercent").CurrentValue))
+                        else if ((Player.Instance.Spellbook.GetSpell(SpellSlot.E).ToggleState == 2 || (player.ManaPercent <= ComboMenu.Get<Slider>("CEPercent").CurrentValue)) || player.Distance(eTarget.ServerPosition) >= E.Range)
                         {
                             calcE(true);
-                        }
+                    }
                     }
                 }
-            }
 
             if (qTarget == null || (!qm || !Q.IsReady() || !qTarget.IsValid))
             {
@@ -570,16 +564,18 @@ namespace Karthus
                         Q.Cast(qTarget.ServerPosition);
                     }
                 }
-
                 if (KillStealMenu.Get<CheckBox>("UltKS").CurrentValue
-                    && (R.IsLearned && R.IsReady()
-                        && KillStealMenu.Get<Slider>("Rnear").CurrentValue
-                        <= player.ServerPosition.CountEnemiesInRange(KillStealMenu.Get<Slider>("Rranged").CurrentValue)))
+                    && (R.IsLearned && R.IsReady()))
                 {
                     var target = TargetSelector.GetTarget(R.Range, DamageType.Magical);
                     if (target != null && target.IsValid && target.Health <= target.GetSpellDamage(player, SpellSlot.R) && !Combo())
                     {
-                        R.Cast();
+                        if (KillStealMenu.Get<Slider>("Rnear").CurrentValue
+                            >= player.ServerPosition.CountEnemiesInRange(KillStealMenu.Get<Slider>("Rranged").CurrentValue))
+                        {
+                            return;
+                        }
+                        R.Cast(target.ServerPosition);
                     }
                 }
             }
