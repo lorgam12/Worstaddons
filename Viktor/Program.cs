@@ -153,8 +153,13 @@ public class Program
             }
             AutoW();
         }
+    /*
         private static bool KillableWithAA(Obj_AI_Base target)
         {
+            if (target == null)
+            {
+                return false;
+            }
             var qaaDmg = new Double[] { 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80, 90, 110, 130, 150, 170, 190, 210 };
             if (player.HasBuff("viktorpowertransferreturn") && Orbwalker.CanAutoAttack
                 && (player.GetSpellDamage(
@@ -167,13 +172,14 @@ public class Program
             }
             return false;
         }
+        */
         private static void OnCombo()
         {
             bool useQ = UseQCombo && Q.IsReady();
             bool useW = UseWCombo && W.IsReady();
             bool useE = UseECombo && E.IsReady();
             bool useR = UseRCombo && R.IsReady();
-            bool killpriority = ComboMenu.Get < CheckBox >("spPriority").CurrentValue && R.IsReady();
+            bool killpriority = ComboMenu.Get<CheckBox>("spPriority").CurrentValue && R.IsReady();
             bool rKillSteal = ComboMenu.Get<CheckBox>("rLastHit").CurrentValue;
             var etarget = TargetSelector.GetTarget(maxRangeE, DamageType.Magical);
             var qtarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
@@ -186,28 +192,33 @@ public class Program
                 etarget = qtarget;
             }
 
-            if (rTarget != null && rKillSteal && useR)
+        if (useQ)
+        {
+            if (qtarget != null)
+            {
+                Q.Cast(qtarget);
+            }
+        }
+        if (useE)
+        {
+            var target = TargetSelector.GetTarget(maxRangeE, DamageType.Magical);
+
+            if (target == null)
+            {
+                return;
+            }
+                PredictCastE(target);
+        }
+
+        if (rTarget != null && rKillSteal && useR)
             {
                 if (TotalDmg(rTarget, true, true, false, false) < rTarget.Health && TotalDmg(rTarget, true, true, true, true) > rTarget.Health)
                 {
                     R.Cast(rTarget.ServerPosition);
                 }
             }
-
-
-            if (useE)
-            {
-                if (etarget != null)
-                    PredictCastE(etarget);
-            }
-            if (useQ)
-            {
-                if (qtarget != null)
-                {
-                    Q.Cast(qtarget);
-                }
-            }
-            if (useW)
+            
+        if (useW)
             {
                 var t = TargetSelector.GetTarget(W.Range, DamageType.Magical);
 
@@ -290,30 +301,24 @@ public class Program
             return;
         }
 
-        bool useQ = LaneMenu.Get < CheckBox >("waveUseQ").CurrentValue && Q.IsReady();
-            bool useE = LaneMenu.Get < CheckBox >("waveUseE").CurrentValue && E.IsReady();
+        bool useQ = LaneMenu.Get<CheckBox>("waveUseQ").CurrentValue && Q.IsReady();
+        bool useE = LaneMenu.Get<CheckBox>("waveUseE").CurrentValue && E.IsReady();
 
-            if (useQ)
-            {
+        var minions = EntityManager.MinionsAndMonsters.Get(EntityManager.MinionsAndMonsters.EntityType.Minion, EntityManager.UnitTeam.Enemy, player.Position, maxRangeE, false);
 
-            var minion =
-                EntityManager.MinionsAndMonsters.GetLaneMinions()
-                    .OrderBy(m => m.Health)
-                    .FirstOrDefault(
-                        mi =>
-                            mi.IsValidTarget(Q.Range) &&
-                            Prediction.Health.GetPrediction(mi, Q.CastDelay) <= player.GetSpellDamage(mi, SpellSlot.Q) &&
-                            Prediction.Health.GetPrediction(mi, Q.CastDelay) > 20);
-            if (minion != null && !minion.IsInRange(Player.Instance, Player.Instance.GetAutoAttackRange()))
-            {
-                        QLastHit(minion);
-                    }
-        }
-        if (useE)
+        foreach (var minion in minions)
         {
-            PredictCastMinionE();
+            if (useE)
+            {
+                var loc = EntityManager.MinionsAndMonsters.GetLineFarmLocation(minions, E.Width, maxRangeE);
+                PredictCastMinionE();
+            }
+            if (useQ && minion.IsValidTarget(Q.Range))
+            {
+                QLastHit(minion);
+            }
         }
-        }
+    }
 
     private static void QLastHit(Obj_AI_Base minion)
     {
@@ -387,8 +392,10 @@ public class Program
         }
     }
 
-    if (startPos.X != 0 && startPos.Y != 0)
+        if (startPos.X != 0 && startPos.Y != 0)
+        {
             return PredictCastMinionE(startPos, requiredHitNumber);
+        }
         return false;
     }
 
@@ -428,10 +435,12 @@ public class Program
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
     {
-        if (sender.IsMe && args.SData.Name.ToLower().Contains("viktorpowertransferreturn"))
-            Core.DelayAction(Orbwalker.ResetAutoAttack, 230);
+            if (sender.IsMe && args.SData.Name.ToLower().Contains("viktorpowertransferreturn"))
+            {
+                Core.DelayAction(Orbwalker.ResetAutoAttack, 230);
+            }
 
-        // Console.WriteLine("Enemy casted skill: " + args.SData.Name);
+            // Console.WriteLine("Enemy casted skill: " + args.SData.Name);
         var start = InterruptSkills(args.SData.Name);
         if (start && sender.IsEnemy && MiscMenu.Get<CheckBox>("miscGapcloser").CurrentValue && W.IsReady())
         {
@@ -452,21 +461,31 @@ public class Program
 
     private static void Gapcloser_OnGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
     {
-        if (sender.IsAlly || !MiscMenu.Get<CheckBox>("miscGapcloser").CurrentValue) return;
+        if (sender.IsAlly || !MiscMenu.Get<CheckBox>("miscGapcloser").CurrentValue)
+        {
+            return;
+        }
         if (e.End.Distance(sender) <= 170)
+        {
             W.Cast(sender);
+        }
     }
 
     private static void AutoW()
+    {
+        if (!W.IsReady() || !MiscMenu.Get<CheckBox>("autoW").CurrentValue)
         {
-            if (!W.IsReady() || !MiscMenu.Get<CheckBox>("autoW").CurrentValue)
-                return;
-            Obj_AI_Base tPanth = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(x => x.IsEnemy && W.IsInRange(x) && (x.HasBuff("teleport_target") || x.HasBuff("Pantheon_GrandSkyfall_Jump")));
-            if (tPanth != null)
-            {
-                if (W.Cast(tPanth.ServerPosition))
-                    return;
-            }
+            return;
+        }
+        Obj_AI_Base tPanth = ObjectManager.Get<Obj_AI_Base>()
+                .FirstOrDefault(
+                    x =>
+                    x.IsEnemy && W.IsInRange(x)
+                    && (x.HasBuff("teleport_target") || x.HasBuff("Pantheon_GrandSkyfall_Jump")));
+        if (tPanth != null)
+        {
+            Core.DelayAction(() => W.Cast(tPanth.ServerPosition), 20);
+        }
         /*
             if (Target.HasBuff("rocketgrab2"))
             {
@@ -479,22 +498,22 @@ public class Program
             }
             */
         var wtarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
-        if (Player.HasBuffOfType(BuffType.Stun) || Player.HasBuffOfType(BuffType.Snare) ||
-                         Player.HasBuffOfType(BuffType.Charm) || Player.HasBuffOfType(BuffType.Fear) ||
-                         Player.HasBuffOfType(BuffType.Taunt) || Player.HasBuffOfType(BuffType.Suppression) ||
-                         Player.HasBuffOfType(BuffType.Stun))
-                {
-                    if (W.Cast(wtarget))
-                        return;
-                }
-                if (W.GetPrediction(wtarget).HitChance == HitChance.Immobile)
-                {
-                    if (W.Cast(wtarget))
-                    {
-                        return;
-                    }
-                }
+        if (wtarget != null)
+        {
+            if (Player.HasBuffOfType(BuffType.Stun) || Player.HasBuffOfType(BuffType.Snare)
+                || Player.HasBuffOfType(BuffType.Charm) || Player.HasBuffOfType(BuffType.Fear)
+                || Player.HasBuffOfType(BuffType.Taunt) || Player.HasBuffOfType(BuffType.Suppression)
+                || Player.HasBuffOfType(BuffType.Stun))
+            {
+                W.Cast(wtarget);
             }
+            if (W.GetPrediction(wtarget).HitChance == HitChance.Immobile)
+            {
+                Core.DelayAction(() => W.Cast(wtarget.ServerPosition), 20);
+            }
+        }
+    }
+
     /*
         private static void Drawing_OnDraw(EventArgs args)
         {
@@ -512,7 +531,7 @@ public class Program
             var qaaDmg = new Double[] { 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80, 90, 110, 130, 150, 170, 190, 210 };
             var damage = 0d;
             var rTicks = RTicks;
-            bool inQRange = ((qRange && player.IsInAutoAttackRange(enemy)) || qRange == false);
+            bool inQRange = (qRange && player.IsInAutoAttackRange(enemy)) || qRange == false;
             //Base Q damage
             if (useQ && Q.IsReady() && inQRange)
             {
@@ -523,17 +542,25 @@ public class Program
             // Q damage on AA
             if (useQ && !Q.IsReady() && player.HasBuff("viktorpowertransferreturn") && inQRange)
             {
-                damage += player.GetSpellDamage(enemy, (SpellSlot)DamageType.Magical, (DamageLibrary.SpellStages)(qaaDmg[player.Level >= 18 ? 18 - 1 : player.Level - 1] +
-                                                                                                           (player.TotalMagicalDamage * .5) + player.TotalAttackDamage));
+                damage += player.GetSpellDamage(
+                    enemy,
+                    (SpellSlot)DamageType.Magical,
+                    (DamageLibrary.SpellStages)
+                    (qaaDmg[player.Level >= 18 ? 18 - 1 : player.Level - 1] + (player.TotalMagicalDamage * .5)
+                     + player.TotalAttackDamage));
             }
 
             //E damage
             if (useE && E.IsReady())
             {
                 if (player.HasBuff("viktoreaug") || player.HasBuff("viktorqeaug") || player.HasBuff("viktorqweaug"))
+                {
                     damage += player.GetSpellDamage(enemy, SpellSlot.E);
+                }
                 else
+                {
                     damage += player.GetSpellDamage(enemy, SpellSlot.E, 0);
+                }
             }
 
             //R damage + 2 ticks
@@ -545,15 +572,30 @@ public class Program
 
             // Ludens Echo damage
             if (player.HasItem(3285))
-                damage += player.GetSpellDamage(enemy, (SpellSlot)DamageType.Magical, (DamageLibrary.SpellStages)(100 + player.FlatMagicDamageMod * 0.1));
+            {
+                damage += player.GetSpellDamage(
+                    enemy,
+                    (SpellSlot)DamageType.Magical,
+                    (DamageLibrary.SpellStages)(100 + player.FlatMagicDamageMod * 0.1));
+            }
 
             //sheen damage
             if (player.HasItem(3057))
-                damage += player.GetSpellDamage(enemy, (SpellSlot)DamageType.Physical, (DamageLibrary.SpellStages)(0.5 * player.BaseAttackDamage));
+            {
+                damage += player.GetSpellDamage(
+                    enemy,
+                    (SpellSlot)DamageType.Physical,
+                    (DamageLibrary.SpellStages)(0.5 * player.BaseAttackDamage));
+            }
 
             //lich bane dmg
             if (player.HasItem(3100))
-                damage += player.GetSpellDamage(enemy, (SpellSlot)DamageType.Magical, (DamageLibrary.SpellStages)(0.5 * player.FlatMagicDamageMod + 0.75 * player.BaseAttackDamage));
+            {
+                damage += player.GetSpellDamage(
+                    enemy,
+                    (SpellSlot)DamageType.Magical,
+                    (DamageLibrary.SpellStages)(0.5 * player.FlatMagicDamageMod + 0.75 * player.BaseAttackDamage));
+            }
 
             return (float)damage;
         }
@@ -567,7 +609,7 @@ public class Program
         {
 
         menuIni = MainMenu.AddMenu("Viktor", "Viktor");
-        menuIni.AddGroupLabel("Welcome to the worst Viktor addon!");
+        menuIni.AddGroupLabel("Welcome to the Worst Viktor addon!");
 
         ComboMenu = menuIni.AddSubMenu("Combo");
         ComboMenu.Add("comboUseQ", new CheckBox("Use Q"));
@@ -633,7 +675,7 @@ public class Program
 
         private static double CalculateAADmg()
         {
-            double[] AAdmg = new double[] { 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80, 90, 110, 130, 150, 170, 190, 210 };
+            double[] AAdmg = { 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80, 90, 110, 130, 150, 170, 190, 210 };
 
             return (double)AAdmg[player.Level - 1] + player.TotalMagicalDamage * 0.5 + player.TotalAttackDamage;
         }
@@ -642,12 +684,12 @@ public class Program
         {
             if (R.Level == 0) return 0;
             double dmg = 0;
-            if (R.Level == 1)
-                dmg += (15 + player.TotalMagicalDamage * 0.10) * ticks;
-            else if (R.Level == 2)
-                dmg += (30 + player.TotalMagicalDamage * 0.10) * ticks;
+            if (R.Level == 1) dmg += (15 + player.TotalMagicalDamage * 0.10) * ticks;
+            else if (R.Level == 2) dmg += (30 + player.TotalMagicalDamage * 0.10) * ticks;
             else if (R.Level == 3) //No point for that,  just testing if that was the error..
+            {
                 dmg += (45 + player.TotalMagicalDamage * 0.10) * ticks;
+            }
 
             return dmg;
         }
@@ -695,9 +737,13 @@ public class Program
         foreach (var champ in nearChamps)
         {
             if (Vector2.DistanceSquared(champ.ServerPosition.To2D(), player.Position.To2D()) < E.Range * E.Range)
+            {
                 innerChamps.Add(champ);
+            }
             else
+            {
                 outerChamps.Add(champ);
+            }
         }
 
         // Minions
@@ -708,9 +754,13 @@ public class Program
         foreach (var minion in nearMinions)
         {
             if (Vector2.DistanceSquared(minion.ServerPosition.To2D(), player.Position.To2D()) < E.Range * E.Range)
+            {
                 innerMinions.Add(minion);
+            }
             else
+            {
                 outerMinions.Add(minion);
+            }
         }
 
         // Main target in close range
@@ -723,8 +773,7 @@ public class Program
             E.RangeCheckSource = player.Position;
 
             // Prediction in range, go on
-            if (prediction.CastPosition.Distance(player.Position) < E.Range)
-                pos1 = prediction.CastPosition;
+            if (prediction.CastPosition.Distance(player.Position) < E.Range) pos1 = prediction.CastPosition;
             // Prediction not in range, use exact position
             else
             {
@@ -749,8 +798,12 @@ public class Program
                     // Get prediction
                     prediction = E.GetPrediction(enemy);
                     // Validate target
-                    if (prediction.HitChance >= HitChance.High && Vector2.DistanceSquared(pos1.To2D(), prediction.CastPosition.To2D()) < (E.Range * E.Range) * 0.8)
+                    if (prediction.HitChance >= HitChance.High
+                        && Vector2.DistanceSquared(pos1.To2D(), prediction.CastPosition.To2D())
+                        < (E.Range * E.Range) * 0.8)
+                    {
                         closeToPrediction.Add(enemy);
+                    }
                 }
 
                 // Champ found
@@ -799,29 +852,33 @@ public class Program
             {
                 // Sort table by health DEC
                 if (targets.Count > 1)
+                {
                     targets.Sort((enemy1, enemy2) => enemy2.Health.CompareTo(enemy1.Health));
+                }
 
                 // Set target
                 pos1 = targets[0].ServerPosition;
             }
             else
             {
-                var minionTargets = (nearMinions.Where(
+                var minionTargets = nearMinions.Where(
                     minion =>
                     Vector2.DistanceSquared(minion.ServerPosition.To2D(), startPoint.To2D())
                     < startPointRadius * startPointRadius
-                    && Vector2.DistanceSquared(player.Position.To2D(), minion.ServerPosition.To2D()) < rangeE * rangeE)).ToList();
+                    && Vector2.DistanceSquared(player.Position.To2D(), minion.ServerPosition.To2D()) < rangeE * rangeE).ToList();
                 if (minionTargets.Count > 0)
                 {
                     // Sort table by health DEC
                     if (minionTargets.Count > 1)
+                    {
                         minionTargets.Sort((enemy1, enemy2) => enemy2.Health.CompareTo(enemy1.Health));
+                    }
 
                     // Set target
                     pos1 = minionTargets[0].ServerPosition;
                 }
                 else
-                    // Just the regular, calculated start pos
+                // Just the regular, calculated start pos
                     pos1 = startPoint;
             }
 
