@@ -180,10 +180,11 @@ public class Program
             bool useE = UseECombo && E.IsReady();
             bool useR = UseRCombo && R.IsReady();
             bool killpriority = ComboMenu.Get<CheckBox>("spPriority").CurrentValue && R.IsReady();
-            bool rKillSteal = ComboMenu.Get<CheckBox>("rLastHit").CurrentValue;
+            bool rKillSteal = ComboMenu.Get<CheckBox>("rLastHit").CurrentValue && R.IsReady();
             var etarget = TargetSelector.GetTarget(maxRangeE, DamageType.Magical);
             var qtarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
             var rTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
+
             if (killpriority && qtarget != null & etarget != null && etarget != qtarget
                 && ((etarget.Health > TotalDmg(etarget, false, true, false, false))
                     || (etarget.Health > TotalDmg(etarget, false, true, true, false) && etarget == rTarget))
@@ -199,6 +200,7 @@ public class Program
                 Q.Cast(qtarget);
             }
         }
+        /*
         if (useE)
         {
             var target = TargetSelector.GetTarget(maxRangeE, DamageType.Magical);
@@ -241,6 +243,7 @@ public class Program
                     }
                 }
             }
+            */
             if (useR && R.Name == "ViktorChaosStorm" && player.CanCast && !player.Spellbook.IsCastingSpell)
             {
                 var target = TargetSelector.GetTarget(R.Range, DamageType.Magical);
@@ -430,7 +433,7 @@ public class Program
 
         private static void CastE(Vector2 source, Vector2 destination)
     {
-        Player.CastSpell(SpellSlot.E, (Vector3)source, true);
+        Player.CastSpell(SpellSlot.E, (Vector3)source, false);
     }
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -450,7 +453,6 @@ public class Program
                 //Console.WriteLine("Self Cast. Skill: " + args.SData.Name);
                 W.Cast(player);
             }
-
             else if (MiscMenu.Get<CheckBox>("wInterrupt").CurrentValue)
             {
                 // Console.WriteLine("Enemy Cast. Skill: " + args.SData.Name);
