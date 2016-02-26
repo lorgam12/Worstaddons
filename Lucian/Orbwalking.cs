@@ -1268,8 +1268,8 @@ namespace Lucian
                                 && mob.CharData.BaseSkinName != "gangplankbarrel");
 
                     result = Program.OrbMiscMenu["Smallminionsprio"].Cast<CheckBox>().CurrentValue
-                                 ? jminions.FirstOrDefault(mob => mob.MaxHealth)
-                                 : jminions.LastOrDefault(mob => mob.MaxHealth);
+                                 ? jminions.OrderBy(it => it.MaxHealth).FirstOrDefault()
+                                 : jminions.OrderBy(it => it.MaxHealth).LastOrDefault();
 
                     if (result != null)
                     {
@@ -1303,9 +1303,12 @@ namespace Lucian
                                       HealthPrediction.LaneClearHealthPrediction(
                                           minion, (int)((this.Player.AttackDelay * 1000) * LaneClearWaitTimeMod), Program.FarmDelay)
                                   where
-                                      predHealth >= 2 * this.Player.GetAutoAttackDamage(minion) ||
+                                      predHealth >= 2 * Player.GetAutoAttackDamage(minion) ||
                                       Math.Abs(predHealth - minion.Health) < float.Epsilon
-                                  select minion).FirstOrDefault(m => !IsMinion(m, true) ? float.MaxValue : m.Health);
+                                  select minion).OrderBy(it => !IsMinion(it, true)
+                                  ? float.MaxValue
+                                  : it.Health);
+
 
                         if (result != null)
                         {
