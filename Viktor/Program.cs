@@ -124,7 +124,8 @@ public class Program
             */
             Gapcloser.OnGapcloser += Gapcloser_OnGapcloser;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
-        }
+        Teleport.OnTeleport += OnTeleport;
+    }
     
         private static void Game_OnGameUpdate(EventArgs args)
         {
@@ -175,16 +176,17 @@ public class Program
         */
         private static void OnCombo()
         {
-            bool useQ = UseQCombo && Q.IsReady();
-            bool useW = UseWCombo && W.IsReady();
-            bool useE = UseECombo && E.IsReady();
-            bool useR = UseRCombo && R.IsReady();
-            bool killpriority = ComboMenu.Get<CheckBox>("spPriority").CurrentValue && R.IsReady();
-            bool rKillSteal = ComboMenu.Get<CheckBox>("rLastHit").CurrentValue && R.IsReady();
+            var useQ = UseQCombo && Q.IsReady();
+            var useW = UseWCombo && W.IsReady();
+            var useE = UseECombo && E.IsReady();
+            var useR = UseRCombo && R.IsReady();
+            var killpriority = ComboMenu.Get<CheckBox>("spPriority").CurrentValue && R.IsReady();
+            var rKillSteal = ComboMenu.Get<CheckBox>("rLastHit").CurrentValue && R.IsReady();
             var etarget = TargetSelector.GetTarget(maxRangeE, DamageType.Magical);
             var qtarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
-            var rTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
+            var rTarget = TargetSelector.GetTarget(R.Range, DamageType.Magical);
 
+        /*
             if (killpriority && qtarget != null & etarget != null && etarget != qtarget
                 && ((etarget.Health > TotalDmg(etarget, false, true, false, false))
                     || (etarget.Health > TotalDmg(etarget, false, true, true, false) && etarget == rTarget))
@@ -192,14 +194,25 @@ public class Program
             {
                 etarget = qtarget;
             }
-
-        if (useQ)
-        {
-            if (qtarget != null)
+            */
+            if (useQ)
             {
+                if (qtarget == null)
+                {
+                    return;
+            }
                 Q.Cast(qtarget);
             }
-        }
+
+            if (useE)
+            {
+                if (etarget == null)
+                {
+                    return;
+                    
+                }
+                PredictCastE(etarget);
+            }
         /*
         if (useE)
         {
@@ -243,8 +256,7 @@ public class Program
                     }
                 }
             }
-            */
-            if (useR && R.Name == "ViktorChaosStorm" && player.CanCast && !player.Spellbook.IsCastingSpell)
+        if (useR && R.Name == "ViktorChaosStorm" && player.CanCast && !player.Spellbook.IsCastingSpell)
             {
                 var target = TargetSelector.GetTarget(R.Range, DamageType.Magical);
                 if (target != null && target.IsEnemy && !target.IsZombie && target.CountEnemiesInRange(R.Width) >= ComboMenu.Get<Slider>("HitR").CurrentValue && R.Name == "ViktorChaosStorm")
@@ -265,10 +277,11 @@ public class Program
                     }
                 }
             }
+            
+            */
+    }
 
-        }
-
-        private static void OnHarass()
+    private static void OnHarass()
         {
             // Mana check
             if (player.ManaPercent < HarassMenu.Get<Slider>("harassMana").CurrentValue)
@@ -450,12 +463,10 @@ public class Program
 
             if (args.End.Distance(player.Position) <= 100)
             {
-                //Console.WriteLine("Self Cast. Skill: " + args.SData.Name);
                 W.Cast(player);
             }
             else if (MiscMenu.Get<CheckBox>("wInterrupt").CurrentValue)
             {
-                // Console.WriteLine("Enemy Cast. Skill: " + args.SData.Name);
                 W.Cast(sender.ServerPosition);
             }
         }
@@ -486,7 +497,7 @@ public class Program
                     && (x.HasBuff("teleport_target") || x.HasBuff("Pantheon_GrandSkyfall_Jump")));
         if (tPanth != null)
         {
-            Core.DelayAction(() => W.Cast(tPanth.ServerPosition), 20);
+            Core.DelayAction(() => W.Cast(tPanth.ServerPosition), 1500);
         }
         /*
             if (Target.HasBuff("rocketgrab2"))
@@ -511,10 +522,29 @@ public class Program
             }
             if (W.GetPrediction(wtarget).HitChance == HitChance.Immobile)
             {
-                Core.DelayAction(() => W.Cast(wtarget.ServerPosition), 20);
+                Core.DelayAction(() => W.Cast(wtarget.ServerPosition), 1500);
             }
         }
     }
+    
+         private static void OnTeleport(Obj_AI_Base sender, Teleport.TeleportEventArgs args)
+         {
+             if (sender.Team == Player.Instance.Team)
+             {
+                 return;
+             }
+
+             if (!W.IsReady() || !MiscMenu.Get<CheckBox>("autoW").CurrentValue || sender.IsAlly)
+             {
+                 return;
+             }
+             {
+                 if (args.Status == TeleportStatus.Start && W.IsInRange(sender))
+                 {
+                Core.DelayAction(() => W.Cast(sender.ServerPosition), 1500);
+                 }
+             }
+         }
 
     /*
         private static void Drawing_OnDraw(EventArgs args)

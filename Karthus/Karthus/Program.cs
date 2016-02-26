@@ -358,7 +358,7 @@ namespace Karthus
                     minions.RemoveAll(
                         x =>
                         player.Distance(x.ServerPosition) > E.Range
-                        || x.Health > qTarget.GetSpellDamage(player, SpellSlot.E));
+                        || x.Health > player.GetSpellDamage(eTarget, SpellSlot.E));
                     var jgm = minions.Any(x => x.Team == GameObjectTeam.Neutral);
 
                     if ((player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && (minions.Count >= 1 || jgm))
@@ -437,13 +437,13 @@ namespace Karthus
 
                     if (R.IsReady())
                     {
-                        ds += DamageLibrary.GetSpellDamage(player, player, SpellSlot.R);
+                        ds += DamageLibrary.GetSpellDamage(player, qTarget, SpellSlot.R);
                         countmana += R.Handle.SData.Mana;
                     }
 
                     while (qTarget != null && ds < qTarget.MaxHealth)
                     {
-                        var qd = DamageLibrary.GetSpellDamage(player, player, SpellSlot.Q);
+                        var qd = DamageLibrary.GetSpellDamage(player, qTarget, SpellSlot.Q);
 
                         ds += qd;
                         if (Q.Handle != null)
@@ -627,7 +627,7 @@ namespace Karthus
                 if (UltMenu.Get<CheckBox>("UltKS").CurrentValue && (R.IsLearned && R.IsReady()))
                 {
                     var target = TargetSelector.GetTarget(R.Range, DamageType.Magical);
-                    if (target != null && target.IsValid && target.Health <= target.GetSpellDamage(player, SpellSlot.R)
+                    if (target != null && target.IsValid && target.Health <= player.GetSpellDamage(target, SpellSlot.R)
                         && !Combo())
                     {
                         if (UltMenu.Get<Slider>("Rnear").CurrentValue
@@ -647,7 +647,7 @@ namespace Karthus
             {
                 if (qTarget != null && KillStealMenu.Get<CheckBox>("KS").CurrentValue)
                 {
-                    if (!cz && qTarget.Health <= qTarget.GetSpellDamage(player, SpellSlot.Q))
+                    if (!cz && qTarget.Health <= player.GetSpellDamage(qTarget, SpellSlot.Q))
                     {
                         Q.Cast(qTarget.ServerPosition);
                     }
