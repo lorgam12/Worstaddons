@@ -227,7 +227,7 @@ namespace Lucian
         /// <param name="target">The target.</param>
         private static void FireOnAttack(AttackableUnit unit, AttackableUnit target)
         {
-            OnAttack?.Invoke(unit, target);
+            OnAttack.Invoke(unit, target);
         }
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace Lucian
         /// <param name="minion">The minion.</param>
         private static void FireOnNonKillableMinion(AttackableUnit minion)
         {
-            OnNonKillableMinion?.Invoke(minion);
+            OnNonKillableMinion.Invoke(minion);
         }
 
         /// <summary>
@@ -316,18 +316,6 @@ namespace Lucian
         /// </summary>
         /// <param name="target">The target.</param>
         /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
-        public static bool InAutoAttackRange(AttackableUnit target)
-        {
-            if (!target.IsValidTarget())
-            {
-                return false;
-            }
-            var myRange = GetRealAutoAttackRange(target);
-            return
-                Vector2.DistanceSquared(
-                    (target as AIHeroClient)?.ServerPosition.To2D() ?? target.Position.To2D(),
-                    Players.ServerPosition.To2D()) <= myRange * myRange;
-        }
 
         /// <summary>
         /// Returns if the player's auto-attack is ready.
@@ -859,10 +847,6 @@ namespace Lucian
             /// </summary>
             /// <param name="target">The target.</param>
             /// <returns><c>true</c> if a target is in auto attack range, <c>false</c> otherwise.</returns>
-            public virtual bool InAutoAttackRange(AttackableUnit target)
-            {
-                return Orbwalking.InAutoAttackRange(target);
-            }
 
             /// <summary>
             /// Registers the Custom Mode of the Orbwalker. Useful for adding a flee mode and such.
@@ -994,7 +978,7 @@ namespace Lucian
                         .Any(
                             minion =>
                                 minion.IsValidTarget() && minion.Team != GameObjectTeam.Neutral &&
-                                ObjectManager.Player.IsInAutoAttackRange(minion) &&
+                                Player.IsInAutoAttackRange(minion) &&
                                 Prediction.Health.GetPrediction(minion, (int)((ObjectManager.Player.AttackDelay * 1000) * 2)) <=
                                 ObjectManager.Player.GetAutoAttackDamage(minion));
             }
@@ -1164,7 +1148,7 @@ namespace Lucian
                     !Program.OrbMiscMenu["PriorizeFarm"].Cast<CheckBox>().CurrentValue)
                 {
                     var target = TargetSelector.GetTarget(-1, DamageType.Physical);
-                    if (target != null && InAutoAttackRange(target))
+                    if (target != null && Player.IsInAutoAttackRange(target))
                     {
                         return target;
                     }
@@ -1178,7 +1162,7 @@ namespace Lucian
                         ObjectManager.Get<Obj_AI_Minion>()
                             .Where(
                                 minion =>
-                                    minion.IsValidTarget() && InAutoAttackRange(minion))
+                                    minion.IsValidTarget() && Player.IsInAutoAttackRange(minion))
                                     .OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
                                     .ThenBy(minion => minion.CharData.BaseSkinName.Contains("Super"))
                                     .ThenBy(minion => minion.Health)
@@ -1216,7 +1200,7 @@ namespace Lucian
                 }
 
                 //Forced target
-                if (_forcedTarget.IsValidTarget() && InAutoAttackRange(_forcedTarget))
+                if (_forcedTarget.IsValidTarget() && Player.IsInAutoAttackRange(_forcedTarget))
                 {
                     return _forcedTarget;
                 }
@@ -1226,21 +1210,21 @@ namespace Lucian
                 {
                     /* turrets */
                     foreach (var turret in
-                        ObjectManager.Get<Obj_AI_Turret>().Where(t => t.IsValidTarget() && InAutoAttackRange(t)))
+                        ObjectManager.Get<Obj_AI_Turret>().Where(t => t.IsValidTarget() && Player.IsInAutoAttackRange(t)))
                     {
                         return turret;
                     }
 
                     /* inhibitor */
                     foreach (var turret in
-                        ObjectManager.Get<Obj_BarracksDampener>().Where(t => t.IsValidTarget() && InAutoAttackRange(t)))
+                        ObjectManager.Get<Obj_BarracksDampener>().Where(t => t.IsValidTarget() && Player.IsInAutoAttackRange(t)))
                     {
                         return turret;
                     }
 
                     /* nexus */
                     foreach (var nexus in
-                        ObjectManager.Get<Obj_HQ>().Where(t => t.IsValidTarget() && InAutoAttackRange(t)))
+                        ObjectManager.Get<Obj_HQ>().Where(t => t.IsValidTarget() && Player.IsInAutoAttackRange(t)))
                     {
                         return nexus;
                     }
@@ -1250,7 +1234,7 @@ namespace Lucian
                 if (ActiveMode != OrbwalkingMode.LastHit && !this.Player.HasBuff("LucianR"))
                 {
                     var target = TargetSelector.GetTarget(-1, DamageType.Physical);
-                    if (target.IsValidTarget() && InAutoAttackRange(target))
+                    if (target.IsValidTarget() && Player.IsInAutoAttackRange(target))
                     {
                         return target;
                     }
@@ -1264,7 +1248,7 @@ namespace Lucian
                     var jminions =
                         ObjectManager.Get<Obj_AI_Minion>().Where(
                                 mob =>
-                                mob.IsValidTarget() && mob.Team == GameObjectTeam.Neutral && InAutoAttackRange(mob)
+                                mob.IsValidTarget() && mob.Team == GameObjectTeam.Neutral && Player.IsInAutoAttackRange(mob)
                                 && mob.CharData.BaseSkinName != "gangplankbarrel");
 
                     result = Program.OrbMiscMenu["Smallminionsprio"].Cast<CheckBox>().CurrentValue
@@ -1282,7 +1266,7 @@ namespace Lucian
                 {
                     if (!ShouldWait())
                     {
-                        if (_prevMinion.IsValidTarget() && InAutoAttackRange(_prevMinion))
+                        if (_prevMinion.IsValidTarget() && Player.IsInAutoAttackRange(_prevMinion))
                         {
                             var predHealth = HealthPrediction.LaneClearHealthPrediction(
                                 _prevMinion, (int)((this.Player.AttackDelay * 1000) * LaneClearWaitTimeMod), Program.FarmDelay);
@@ -1293,21 +1277,19 @@ namespace Lucian
                             }
                         }
 
-                        result = (from minion in
-                                      ObjectManager.Get<Obj_AI_Minion>()
-                                          .Where(minion => minion.IsValidTarget() && InAutoAttackRange(minion) &&
-                                          (Program.OrbMiscMenu["AttackWards"].Cast<CheckBox>().CurrentValue &&
-                                          (Program.OrbMiscMenu["AttackPetsnTraps"].Cast<CheckBox>().CurrentValue && minion.CharData.BaseSkinName != "jarvanivstandard" || IsMinion(minion, Program.OrbMiscMenu["AttackWards"].Cast<CheckBox>().CurrentValue)) &&
-                                          minion.CharData.BaseSkinName != "gangplankbarrel"))
-                                  let predHealth =
-                                      HealthPrediction.LaneClearHealthPrediction(
-                                          minion, (int)((this.Player.AttackDelay * 1000) * LaneClearWaitTimeMod), Program.FarmDelay)
-                                  where
-                                      predHealth >= 2 * Player.GetAutoAttackDamage(minion) ||
-                                      Math.Abs(predHealth - minion.Health) < float.Epsilon
-                                  select minion).OrderBy(it => !IsMinion(it, true)
-                                  ? float.MaxValue
-                                  : it.Health);
+                        result = (AttackableUnit)(from minion in
+                                     ObjectManager.Get<Obj_AI_Minion>()
+                                         .Where(minion => minion.IsValidTarget() && Player.IsInAutoAttackRange(minion) &&
+                                         (Program.OrbMiscMenu["AttackWards"].Cast<CheckBox>().CurrentValue &&
+                                         (Program.OrbMiscMenu["AttackPetsnTraps"].Cast<CheckBox>().CurrentValue && minion.CharData.BaseSkinName != "jarvanivstandard" || IsMinion(minion, Program.OrbMiscMenu["AttackWards"].Cast<CheckBox>().CurrentValue)) &&
+                                         minion.CharData.BaseSkinName != "gangplankbarrel"))
+                                                  let predHealth =
+                                                      HealthPrediction.LaneClearHealthPrediction(
+                                                          minion, (int)((this.Player.AttackDelay * 1000) * LaneClearWaitTimeMod), Program.FarmDelay)
+                                                  where
+                                                      predHealth >= 2 * Player.GetAutoAttackDamage(minion) ||
+                                                      Math.Abs(predHealth - minion.Health) < float.Epsilon
+                                                  select minion).OrderBy(it => !IsMinion(it, true) ? float.MaxValue : it.Health).FirstOrDefault();
 
 
                         if (result != null)

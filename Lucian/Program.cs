@@ -6,14 +6,13 @@ using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Menu.Values;
-using ItemData = EloBuddy.ItemData;
 using SharpDX;
 using EloBuddy.SDK.Rendering;
+using System.Collections.Generic;
 
 
 namespace Lucian
 {
-    using System.Collections.Generic;
 
     public class Program
     {
@@ -36,46 +35,189 @@ namespace Lucian
         private static HpBarIndicator indicator = new HpBarIndicator();
         private static Spell.Skillshot q1, w, e, r;
         private static Spell.Targeted q;
-        private static bool aaPassive;
-        public static bool LWH => orbwalkermenu["LWH"].Cast<CheckBox>().CurrentValue;
-        public static bool MissileCheck => orbwalkermenu["MissileCheck"].Cast<CheckBox>().CurrentValue;
-        public static int FarmDelay => orbwalkermenu["FarmDelay"].Cast<Slider>().CurrentValue;
-        public static int ExtraWindup => orbwalkermenu["ExtraWindup"].Cast<Slider>().CurrentValue;
-        public static int HoldPosRadius => OrbMiscMenu["HoldPosRadius"].Cast<Slider>().CurrentValue;
-        public static bool AACircle => OrbDrawMenu["AACircle"].Cast<CheckBox>().CurrentValue;
-        public static bool AACircle2 => OrbDrawMenu["AACircle2"].Cast<CheckBox>().CurrentValue;
-        public static bool HoldZone => OrbDrawMenu["HoldZone"].Cast<CheckBox>().CurrentValue;
-        public static bool AALineWidth => OrbDrawMenu["AALineWidth"].Cast<CheckBox>().CurrentValue;
 
-        private static bool Nocolision => MiscMenu["Nocolision"].Cast<CheckBox>().CurrentValue;
-        private static bool Hexq => HarassMenu["HEXQ"].Cast<CheckBox>().CurrentValue;
-        private static bool KillstealQ => KillStealMenu["KillstealQ"].Cast<CheckBox>().CurrentValue;
-        private static bool Cq => ComboMenu["CQ"].Cast<CheckBox>().CurrentValue;
-        private static bool Cw => ComboMenu["CW"].Cast<CheckBox>().CurrentValue;
-        private static int Ce => ComboMenu["CE"].Cast<Slider>().CurrentValue;
-        private static bool Hq => HarassMenu["HQ"].Cast<CheckBox>().CurrentValue;
-        private static bool Hw => HarassMenu["HW"].Cast<CheckBox>().CurrentValue;
-        private static int He => HarassMenu["HE"].Cast<Slider>().CurrentValue;
-        private static int HMinMana => HarassMenu["HMinMana"].Cast<Slider>().CurrentValue;
-        private static bool Jq => LaneMenu["JQ"].Cast<CheckBox>().CurrentValue;
-        private static bool Jw => LaneMenu["JW"].Cast<CheckBox>().CurrentValue;
-        private static bool Je => LaneMenu["JE"].Cast<CheckBox>().CurrentValue;
-        private static bool Lhq => LaneMenu["LHQ"].Cast<CheckBox>().CurrentValue;
-        private static int Lq => LaneMenu["LQ"].Cast<Slider>().CurrentValue;
-        private static bool Lw => LaneMenu["LW"].Cast<CheckBox>().CurrentValue;
-        private static bool Le => LaneMenu["LE"].Cast<CheckBox>().CurrentValue;
-        private static int LMinMana => LaneMenu["LMinMana"].Cast<Slider>().CurrentValue;
-        private static bool Dind => DrawMenu["Dind"].Cast<CheckBox>().CurrentValue;
-        private static bool Deq => DrawMenu["DEQ"].Cast<CheckBox>().CurrentValue;
-        private static bool Dq => DrawMenu["DQ"].Cast<CheckBox>().CurrentValue;
-        private static bool Dw => DrawMenu["DW"].Cast<CheckBox>().CurrentValue;
-        private static bool De => DrawMenu["DE"].Cast<CheckBox>().CurrentValue;
-        static bool AutoQ => AutoMenu["AutoQ"].Cast<KeyBind>().CurrentValue;
-        private static int MinMana => AutoMenu["MinMana"].Cast<Slider>().CurrentValue;
-        private static int HhMinMana => HarassMenu["HHMinMana"].Cast<Slider>().CurrentValue;
-        private static int Humanizer => MiscMenu["Humanizer"].Cast<Slider>().CurrentValue;
-        static bool ForceR => ComboMenu["ForceR"].Cast<KeyBind>().CurrentValue;
-        static bool Lt => LaneMenu["LT"].Cast<KeyBind>().CurrentValue;
+        public static bool LWH
+        {
+            get { return orbwalkermenu["LWH"].Cast<CheckBox>().CurrentValue; }
+        }
+
+        public static bool MissileCheck
+        {
+            get { return orbwalkermenu["MissileCheck"].Cast<CheckBox>().CurrentValue; }
+        }
+
+        public static int FarmDelay
+        {
+            get { return orbwalkermenu["FarmDelay"].Cast<Slider>().CurrentValue; }
+        }
+
+        public static int ExtraWindup
+        {
+            get { return orbwalkermenu["ExtraWindup"].Cast<Slider>().CurrentValue; }
+        }
+
+        public static int HoldPosRadius
+        {
+            get { return OrbMiscMenu["HoldPosRadius"].Cast<Slider>().CurrentValue; }
+        }
+
+        public static bool HoldZone
+        {
+            get { return OrbDrawMenu["HoldZone"].Cast<CheckBox>().CurrentValue; }
+        }
+
+        public static bool AACircle
+        {
+            get { return orbwalkermenu["AACircle"].Cast<CheckBox>().CurrentValue; }
+        }
+        public static bool AACircle2
+        {
+            get { return orbwalkermenu["AACircle2"].Cast<CheckBox>().CurrentValue; }
+        }
+
+
+        public static bool Hexq
+        {
+            get { return HarassMenu["Hexq"].Cast<CheckBox>().CurrentValue; }
+        }
+
+        public static bool Hq
+        {
+            get { return HarassMenu["HQ"].Cast<CheckBox>().CurrentValue; }
+        }
+
+        public static bool Hw
+        {
+            get { return HarassMenu["HW"].Cast<CheckBox>().CurrentValue; }
+        }
+        public static bool He
+        {
+            get { return HarassMenu["HE"].Cast<CheckBox>().CurrentValue; }
+        }
+
+        public static int Hes
+        {
+            get { return HarassMenu["HES"].Cast<Slider>().CurrentValue; }
+        }
+
+        public static int HMinMana
+        {
+            get { return HarassMenu["HMinMana"].Cast<Slider>().CurrentValue; }
+        }
+
+        public static int HhMinMana
+        {
+            get { return HarassMenu["HHMinMana"].Cast<Slider>().CurrentValue; }
+        }
+
+
+        public static bool Cq
+        {
+            get { return ComboMenu["CQ"].Cast<CheckBox>().CurrentValue; }
+        }
+        public static bool Cw
+        {
+            get { return ComboMenu["CW"].Cast<CheckBox>().CurrentValue; }
+        }
+        public static bool Ce
+        {
+            get { return ComboMenu["CE"].Cast<CheckBox>().CurrentValue; }
+        }
+        static bool ForceR
+        {
+            get { return ComboMenu["ForceR"].Cast<KeyBind>().CurrentValue; }
+        }
+        public static int CES
+        {
+            get { return ComboMenu["CES"].Cast<Slider>().CurrentValue; }
+        }
+
+
+        public static bool Jq
+        {
+            get { return LaneMenu["JQ"].Cast<CheckBox>().CurrentValue; }
+        }
+        public static bool Jw
+        {
+            get { return LaneMenu["JW"].Cast<CheckBox>().CurrentValue; }
+        }
+        public static bool Je
+        {
+            get { return LaneMenu["JE"].Cast<CheckBox>().CurrentValue; }
+        }
+        public static bool Lhq
+        {
+            get { return LaneMenu["LHQ"].Cast<CheckBox>().CurrentValue; }
+        }
+        public static int Lq
+        {
+            get { return LaneMenu["LQ"].Cast<Slider>().CurrentValue; }
+        }
+        public static bool Lw
+        {
+            get { return LaneMenu["LW"].Cast<CheckBox>().CurrentValue; }
+        }
+        public static bool Le
+        {
+            get { return LaneMenu["LE"].Cast<CheckBox>().CurrentValue; }
+        }
+        public static int LMinMana
+        {
+            get { return LaneMenu["LMinMana"].Cast<Slider>().CurrentValue; }
+        }
+        static bool Lt
+        {
+            get { return LaneMenu["LT"].Cast<KeyBind>().CurrentValue; }
+        }
+
+
+        public static bool Dind
+        {
+            get { return DrawMenu["Dind"].Cast<CheckBox>().CurrentValue; }
+        }
+
+        public static bool Deq
+        {
+            get { return DrawMenu["DEQ"].Cast<CheckBox>().CurrentValue; }
+        }
+
+        public static bool Dq
+        {
+            get { return DrawMenu["DQ"].Cast<CheckBox>().CurrentValue; }
+        }
+
+        public static bool Dw
+        {
+            get { return DrawMenu["DW"].Cast<CheckBox>().CurrentValue; }
+        }
+
+        public static bool De
+        {
+            get { return DrawMenu["DE"].Cast<CheckBox>().CurrentValue; }
+        }
+
+
+        static bool AutoQ
+        {
+            get { return AutoMenu["AutoQ"].Cast<KeyBind>().CurrentValue; }
+        }
+
+        public static int MinMana
+        {
+            get { return AutoMenu["MinMana"].Cast<Slider>().CurrentValue; }
+        }
+
+        public static bool KillstealQ
+        {
+            get { return KillStealMenu["KillstealQ"].Cast<CheckBox>().CurrentValue; }
+        }
+
+        public static int Humanizer
+        {
+            get { return MiscMenu["Humanizer"].Cast<Slider>().CurrentValue; }
+        }
+        private static bool aaPassive;
+        
 
         static void Main()
         {
@@ -386,21 +528,21 @@ namespace Lucian
                 if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && target.IsValid)
                 {
                     if (Youmuu.IsReady()) Youmuu.Cast();
-                    if (e.IsReady() && !aaPassive && Ce == 0) e.Cast((Deviation(player.Position.To2D(), target.Position.To2D(), 65).To3D()));
-                    if (e.IsReady() && !aaPassive && Ce == 1) e.Cast(Game.CursorPos);
-                    if (e.IsReady() && !aaPassive && Ce == 2) e.Cast((Vector3)player.Position.Extend(target.Position, 50));
-                    if (q.IsReady() && (!e.IsReady() || (e.IsReady() && Ce == 3)) && Cq && !aaPassive) q.Cast(target);
-                    if ((!e.IsReady() || (e.IsReady() && Ce == 3)) && (!q.IsReady() || (q.IsReady() && !Cq)) && Cw && w.IsReady() && !aaPassive) w.Cast(target.Position);
+                    if (e.IsReady() && !aaPassive && Ce && CES == 0) e.Cast((Deviation(player.Position.To2D(), target.Position.To2D(), 65).To3D()));
+                    if (e.IsReady() && !aaPassive && Ce && CES == 1) e.Cast(Game.CursorPos);
+                    if (e.IsReady() && !aaPassive && Ce && CES == 2) e.Cast((Vector3)player.Position.Extend(target.Position, 50));
+                    if (q.IsReady() && (!e.IsReady() || (e.IsReady() && CES == 3)) && Cq && !aaPassive) q.Cast(target);
+                    if ((!e.IsReady() || (e.IsReady() && Ce && CES == 3)) && (!q.IsReady() || (q.IsReady() && !Cq)) && Cw && w.IsReady() && !aaPassive) w.Cast(target.Position);
                 }
                 if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && target.IsValid)
                 {
                     if (player.ManaPercent < HhMinMana) return;
 
-                    if (e.IsReady() && !aaPassive && He == 0) e.Cast((Deviation(player.Position.To2D(), target.Position.To2D(),65).To3D()));
-                    if (e.IsReady() && !aaPassive && He == 1) e.Cast((Vector3)player.Position.Extend(Game.CursorPos, 50));
-                    if (e.IsReady() && !aaPassive && He == 2) e.Cast((Vector3)player.Position.Extend(target.Position, 50));
-                    if (q.IsReady() && (!e.IsReady() || (e.IsReady() && He == 3)) && Hq && !aaPassive) q.Cast(target);
-                    if ((!e.IsReady() || (e.IsReady() && He == 3)) && (!q.IsReady() || (q.IsReady() && !Hq)) && Hw && w.IsReady() && !aaPassive) w.Cast(target.Position);
+                    if (e.IsReady() && !aaPassive && He && Hes == 0) e.Cast((Deviation(player.Position.To2D(), target.Position.To2D(),65).To3D()));
+                    if (e.IsReady() && !aaPassive && He && Hes == 1) e.Cast((Vector3)player.Position.Extend(Game.CursorPos, 50));
+                    if (e.IsReady() && !aaPassive && He && Hes == 2) e.Cast((Vector3)player.Position.Extend(target.Position, 50));
+                    if (q.IsReady() && (!e.IsReady() || (e.IsReady() && He && Hes == 3)) && Hq && !aaPassive) q.Cast(target);
+                    if ((!e.IsReady() || (e.IsReady() && He && Hes == 3)) && (!q.IsReady() || (q.IsReady() && !Hq)) && Hw && w.IsReady() && !aaPassive) w.Cast(target.Position);
                 }
             }
             if (args.Target is Obj_AI_Minion && args.Target.IsValid)
