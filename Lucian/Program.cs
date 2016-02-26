@@ -68,11 +68,11 @@ namespace Lucian
 
         public static bool AACircle
         {
-            get { return orbwalkermenu["AACircle"].Cast<CheckBox>().CurrentValue; }
+            get { return OrbDrawMenu["AACircle"].Cast<CheckBox>().CurrentValue; }
         }
         public static bool AACircle2
         {
-            get { return orbwalkermenu["AACircle2"].Cast<CheckBox>().CurrentValue; }
+            get { return OrbDrawMenu["AACircle2"].Cast<CheckBox>().CurrentValue; }
         }
 
 
@@ -197,9 +197,9 @@ namespace Lucian
         }
 
 
-        static bool AutoQ
+        public static bool AutoQ
         {
-            get { return AutoMenu["AutoQ"].Cast<KeyBind>().CurrentValue; }
+            get { return AutoMenu["AutoQ"].Cast<CheckBox>().CurrentValue; }
         }
 
         public static int MinMana
@@ -429,18 +429,18 @@ namespace Lucian
             if (args.Target is AIHeroClient)
             {
                 var target = (Obj_AI_Base)args.Target;
-                if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && target.IsValid)
+                if (Orbwalking.Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && target.IsValid)
                 {
                     Core.DelayAction(() => OnDoCastDelayed(args), Humanizer);
                 }
-                if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && target.IsValid)
+                if (Orbwalking.Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && target.IsValid)
                 {
                     Core.DelayAction(() => OnDoCastDelayed(args), Humanizer);
                 }
             }
             if (args.Target is Obj_AI_Minion)
             {
-                if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && args.Target.IsValid)
+                if (Orbwalking.Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && args.Target.IsValid)
                 {
                     Core.DelayAction(() => OnDoCastDelayed(args), Humanizer);
                 }
@@ -453,7 +453,7 @@ namespace Lucian
 
             if (args.Target is Obj_AI_Minion)
             {
-                if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && args.Target.IsValid)
+                if (Orbwalking.Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && args.Target.IsValid)
                 {
                     Core.DelayAction(() => OnDoCastDelayedLc(args), Humanizer);
                 }
@@ -477,7 +477,7 @@ namespace Lucian
             aaPassive = false;
             if (args.Target is Obj_AI_Minion && args.Target.IsValid)
             {
-                if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && player.ManaPercent > LMinMana)
+                if (Orbwalking.Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && player.ManaPercent > LMinMana)
                 {
                     var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(
                         EntityManager.UnitTeam.Enemy, Player.Instance.ServerPosition, Orbwalking.GetRealAutoAttackRange(player)).ToArray();
@@ -504,7 +504,11 @@ namespace Lucian
                                 }
                             }
                         }
-                        if ((!e.IsReady() || (e.IsReady() && !Le)) && (!q.IsReady() || (q.IsReady() && Lq == 0)) && Lw && w.IsReady() && !aaPassive) w.Cast(minions[0].ServerPosition);
+                        if ((!e.IsReady() || (e.IsReady() && !Le)) && (!q.IsReady() || (q.IsReady() && Lq == 0)) && Lw
+                            && w.IsReady() && !aaPassive)
+                        {
+                            w.Cast(minions[0].ServerPosition);
+                        }
                     }
                 }
             }
@@ -525,7 +529,7 @@ namespace Lucian
             if (args.Target is AIHeroClient)
             {
                 var target = (Obj_AI_Base)args.Target;
-                if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && target.IsValid)
+                if (Orbwalking.Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && target.IsValid)
                 {
                     if (Youmuu.IsReady()) Youmuu.Cast();
                     if (e.IsReady() && !aaPassive && Ce && CES == 0) e.Cast((Deviation(player.Position.To2D(), target.Position.To2D(), 65).To3D()));
@@ -534,7 +538,7 @@ namespace Lucian
                     if (q.IsReady() && (!e.IsReady() || (e.IsReady() && CES == 3)) && Cq && !aaPassive) q.Cast(target);
                     if ((!e.IsReady() || (e.IsReady() && Ce && CES == 3)) && (!q.IsReady() || (q.IsReady() && !Cq)) && Cw && w.IsReady() && !aaPassive) w.Cast(target.Position);
                 }
-                if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && target.IsValid)
+                if (Orbwalking.Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && target.IsValid)
                 {
                     if (player.ManaPercent < HhMinMana) return;
 
@@ -547,7 +551,7 @@ namespace Lucian
             }
             if (args.Target is Obj_AI_Minion && args.Target.IsValid)
             {
-                if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear)
+                if (Orbwalking.Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear)
                 {
                     var mobs = EntityManager.MinionsAndMonsters.GetJungleMonsters(Player.Instance.ServerPosition, Orbwalking.GetRealAutoAttackRange(player)).ToArray();
                     if (mobs[0].IsValid && mobs.Count() != 0)
@@ -604,7 +608,7 @@ namespace Lucian
         }
         static void AutoUseQ()
         {
-            if (q.IsReady() && AutoQ && player.ManaPercent > MinMana)
+            if (q.IsReady() && player.ManaPercent > MinMana)
             {
                 var extarget = TargetSelector.GetTarget(q1.Range, DamageType.Physical);
                 var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(
@@ -625,16 +629,33 @@ namespace Lucian
         static void UseRTarget()
         {
             var target = TargetSelector.GetTarget(r.Range, DamageType.Physical);
-            if (ForceR && r.IsReady() && target.IsValid && !player.HasBuff("LucianR")) r.Cast(target.ServerPosition);
+            if (ForceR && r.IsReady() && target.IsValid && !player.HasBuff("LucianR"))
+            {
+                r.Cast(target.ServerPosition);
+            }
         }
+
         static void Game_OnUpdate(EventArgs args)
         {
-            AutoUseQ();
 
-            if (ForceR) UseRTarget();
+            if (player.IsDead) return;
+            if (AutoQ)
+            {
+                AutoUseQ();
+            }
+            if (ForceR)
+            {
+                UseRTarget();
+            }
             Killsteal();
-            if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed) Harass();
-            if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear) LaneClear();
+            if (Orbwalking.Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+            {
+                Harass();
+            }
+            if (Orbwalking.Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear)
+            {
+                LaneClear();
+            }
         }
         static void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {

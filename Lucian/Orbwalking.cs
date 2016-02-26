@@ -740,7 +740,7 @@ namespace Lucian
             /// <summary>
             /// The orbalker mode
             /// </summary>
-            private OrbwalkingMode _mode = OrbwalkingMode.None;
+            private static OrbwalkingMode _mode = OrbwalkingMode.None;
 
             /// <summary>
             /// The orbwalking point
@@ -858,7 +858,7 @@ namespace Lucian
             /// Gets or sets the active mode.
             /// </summary>
             /// <value>The active mode.</value>
-            public OrbwalkingMode ActiveMode
+            public static OrbwalkingMode ActiveMode
             {
                 get
                 {
@@ -1327,7 +1327,8 @@ namespace Lucian
 
                     var target = this.GetTarget();
                     Orbwalk(
-                        target, (this._orbwalkingPoint.To2D().IsValid()) ? _orbwalkingPoint : Game.CursorPos,
+                        target,
+                        (this._orbwalkingPoint.To2D().IsValid()) ? _orbwalkingPoint : Game.CursorPos,
                         Program.ExtraWindup,
                         Math.Max(Program.HoldPosRadius, 30));
                 }
@@ -1345,7 +1346,7 @@ namespace Lucian
             {
                 if (Program.AACircle)
                 {
-                    Circle.Draw(Color.White, Player.GetAutoAttackRange(), Player.ServerPosition);
+                    Circle.Draw(Color.White, ObjectManager.Player.GetAutoAttackRange(), Player.Position);
                 }
 
                 if (Program.AACircle2)
@@ -1353,7 +1354,7 @@ namespace Lucian
                     foreach (var target in
                         HeroManager.Enemies.FindAll(target => target.IsValidTarget(1175)))
                     {
-                        Circle.Draw(Color.White, GetAttackRange(target), target.ServerPosition);
+                        Circle.Draw(Color.White, GetAttackRange(target), target.Position);
                     }
                 }
 
