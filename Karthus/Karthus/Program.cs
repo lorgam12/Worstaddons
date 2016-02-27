@@ -627,7 +627,11 @@ namespace Karthus
                 if (UltMenu.Get<CheckBox>("UltKS").CurrentValue && (R.IsLearned && R.IsReady()))
                 {
                     var target = TargetSelector.GetTarget(R.Range, DamageType.Magical);
-                    if (target != null && target.IsValid && target.Health <= player.GetSpellDamage(target, SpellSlot.R)
+                    if (target.CountAlliesInRange(500) >= 1)
+                    {
+                        return;
+                    }
+                    if (target != null && target.IsValid && target.Health - 10 <= player.GetSpellDamage(target, SpellSlot.R)
                         && !Combo())
                     {
                         if (UltMenu.Get<Slider>("Rnear").CurrentValue
