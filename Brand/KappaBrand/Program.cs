@@ -174,6 +174,7 @@
         private static void OnUpdate(EventArgs args)
         {
             if (Player.IsDead) return;
+            comboTarget = TargetSelector.GetTarget(_Q.Range, DamageType.Magical);
 
             var flags = Orbwalker.ActiveModesFlags;
             if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
