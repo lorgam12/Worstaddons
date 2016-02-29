@@ -533,7 +533,7 @@ namespace Karthus
             var canQ = LaneMenu.Get<CheckBox>("JUse_Q").CurrentValue && Q.IsReady();
             if (canQ && Q.IsReady() && player.ManaPercent >= LaneMenu.Get<Slider>("JQPercent").CurrentValue)
             {
-                var minions1 = EntityManager.MinionsAndMonsters.EnemyMinions;
+                var minions1 = EntityManager.MinionsAndMonsters.GetJungleMonsters();
                 if (minions1 == null || !minions1.Any())
                 {
                     return;
@@ -1153,6 +1153,5 @@ namespace Karthus
                 MinionsHit = minionsHit;
             }
         }
-
     }
 }
