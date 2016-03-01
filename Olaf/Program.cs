@@ -6,7 +6,7 @@ using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Enumerations;
-using Color = System.Drawing.Color;
+using EloBuddy.SDK.Rendering;
 using SharpDX;
 
 namespace Olaf
@@ -120,7 +120,7 @@ namespace Olaf
             UltMenu.Add("hp", new Slider("Use Only When HP is Under %", 25, 0, 100));
             UltMenu.Add("Rene", new Slider("Enemies Near to Cast R", 1, 0, 5));
             UltMenu.Add("enemydetect", new Slider("Enemies Detect Range", 2000, 50, 5000));
-            UltMenu.Add("human", new Slider("Humanizer Delay", 150, 50, 1500));
+            UltMenu.Add("human", new Slider("Humanizer Delay", 150, 0, 1500));
             UltMenu.AddLabel("Ult logic: It will Cast if you have one of the selected debuffs, HP under selected and Nearby enemies.");
             
 
@@ -166,8 +166,10 @@ namespace Olaf
             DrawMenu.AddGroupLabel("Drawing Settings");
             DrawMenu.Add("Qdraw", new CheckBox("Draw Q"));
             DrawMenu.Add("Edraw", new CheckBox("Draw E"));
-            DrawMenu.Add("Rdraw", new CheckBox("Draw R"));
+            DrawMenu.Add("Rdraw", new CheckBox("Draw R Detection Range"));
+            /*
             DrawMenu.Add("combodamage", new CheckBox("Draw Healthbar Damage"));
+            */
 
             /*
             Config = new Menu(Menuname, Menuname, true);
@@ -274,7 +276,7 @@ namespace Olaf
             if (R.IsReady() && UltMenu["UseR"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(R.Range))
                 if (debuff && player.HealthPercent <= hp && enemys >= ObjectManager.Player.Position.CountEnemiesInRange(enemysrange))
                 {
-                    R.Cast();
+                    Core.DelayAction(() => R.Cast(), UltMenu["human"].Cast<Slider>().CurrentValue);
                 }
         }
         private static void combo()
@@ -631,16 +633,17 @@ namespace Olaf
 
             if (DrawMenu["Qdraw"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
-                Drawing.DrawCircle(ObjectManager.Player.Position, Q.Range, Color.White);
+                Circle.Draw(Color.White, Q.Range, Player.Instance.Position);
             }
-            if (DrawMenu["Edraw"].Cast<CheckBox>().CurrentValue && E.IsReady()) Drawing.DrawCircle(ObjectManager.Player.Position, E.Range, System.Drawing.Color.White);
+            if (DrawMenu["Edraw"].Cast<CheckBox>().CurrentValue && E.IsReady())
+            {
+                Circle.Draw(Color.White, E.Range, Player.Instance.Position);
+            }
             if (DrawMenu["Rdraw"].Cast<CheckBox>().CurrentValue)
             {
-                Drawing.DrawCircle(
-                    ObjectManager.Player.Position,
-                    UltMenu["enemydetect"].Cast<Slider>().CurrentValue,
-                    Color.White);
+                Circle.Draw(Color.DarkOrange, UltMenu["enemydetect"].Cast<Slider>().CurrentValue, Player.Instance.Position);
             }
+            /*
             if (Target != null && DrawMenu["combodamage"].Cast<CheckBox>().CurrentValue && Q.IsInRange(Target))
             {
                 float[] Positions = GetLength();
@@ -649,9 +652,9 @@ namespace Olaf
 
                         new Vector2(Target.HPBarPosition.X + Positions[0] * 104, Target.HPBarPosition.Y),
                         new Vector2(Target.HPBarPosition.X + Positions[1] * 104, Target.HPBarPosition.Y),
-                        15,
-                        Color.Orange);
+                        15);
             }
+            */
         }
     }
 }
