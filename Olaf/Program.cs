@@ -97,20 +97,30 @@ namespace Olaf
             ItemsMenu.Add("UseBilge", new CheckBox("Use Bilgewater Cutlass"));
             ItemsMenu.Add("eL", new Slider("Use On Enemy health", 65, 0, 100));
             ItemsMenu.Add("oL", new Slider("Use On My health", 65, 0, 100));
-
+            
 
             UltMenu = menuIni.AddSubMenu("Ultimate [BETA]");
             UltMenu.AddGroupLabel("Ultimate Settings");
             UltMenu.Add("UseR", new CheckBox("Use R"));
             UltMenu.AddLabel("Use R Settings:");
+            UltMenu.Add("poly", new CheckBox("Use On Polymorph?"));
+            UltMenu.Add("silence", new CheckBox("Use On Silence?"));
             UltMenu.Add("charm", new CheckBox("Use On Charms?"));
+            UltMenu.Add("fear", new CheckBox("Use On Fear?"));
+            UltMenu.Add("snare", new CheckBox("Use On Snare?"));
+            UltMenu.Add("sleep", new CheckBox("Use On Sleep?"));
+            UltMenu.Add("frenzy", new CheckBox("Use On Frenzy?"));
+            UltMenu.Add("disarm", new CheckBox("Use On Disarm?"));
+            UltMenu.Add("nearsight", new CheckBox("Use On NearSight?"));
+            UltMenu.Add("blind", new CheckBox("Use On Blinds?"));
             UltMenu.Add("stun", new CheckBox("Use On Stuns?"));
             UltMenu.Add("root", new CheckBox("Use On Roots?"));
-            UltMenu.Add("suppress", new CheckBox("Use On Supperss?"));
+            UltMenu.Add("supperss", new CheckBox("Use On Supperss?"));
             UltMenu.Add("tunt", new CheckBox("Use On Tunts?"));
-            UltMenu.Add("hp", new Slider("Use When HP is Under %", 25, 0, 100));
-            UltMenu.Add("Rene", new Slider("Enemies Near to Cast R", 1, 1, 5));
+            UltMenu.Add("hp", new Slider("Use Only When HP is Under %", 25, 0, 100));
+            UltMenu.Add("Rene", new Slider("Enemies Near to Cast R", 1, 0, 5));
             UltMenu.Add("enemydetect", new Slider("Enemies Detect Range", 2000, 50, 5000));
+            UltMenu.Add("human", new Slider("Humanizer Delay", 150, 50, 1500));
             UltMenu.AddLabel("Ult logic: It will Cast if you have one of the selected debuffs, HP under selected and Nearby enemies.");
             
 
@@ -149,7 +159,7 @@ namespace Olaf
 
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.AddGroupLabel("Misc Settings");
-            MiscMenu.Add("gapclose", new CheckBox("Use Q On GapCloser"));
+            MiscMenu.Add("gapcloser", new CheckBox("Use Q On GapCloser"));
 
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
@@ -222,19 +232,42 @@ namespace Olaf
 
             Drawing.OnDraw += OnDraw;
             Game.OnUpdate += Game_OnGameUpdate;
+            Gapcloser.OnGapcloser += Gapcloser_OnGap;
             GameObject.OnCreate += GameObject_OnCreate;
             GameObject.OnDelete += GameObject_OnDelete;
             }
 
+
+
+        private static void Gapcloser_OnGap(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
+        {
+            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || !MiscMenu.Get<CheckBox>("gapcloser").CurrentValue || Sender == null)
+            {
+                return;
+            }
+            if (Sender.IsValidTarget(Q.Range) && Q.IsReady())
+            {
+                Q.Cast(Sender.Position);
+            }
+        }
+
         private static void Ult()
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-            var debuff = (player.IsCharmed && UltMenu["charm"].Cast<CheckBox>().CurrentValue)
-                         || (player.IsRooted && UltMenu["root"].Cast<CheckBox>().CurrentValue)
-                         || (player.IsTaunted && UltMenu["tunt"].Cast<CheckBox>().CurrentValue)
-                         || (player.IsFeared && UltMenu["fear"].Cast<CheckBox>().CurrentValue)
-                         || (player.IsStunned && UltMenu["stun"].Cast<CheckBox>().CurrentValue)
-                         || (player.IsSuppressCallForHelp && UltMenu["supperss"].Cast<CheckBox>().CurrentValue);
+            var debuff = (UltMenu["charm"].Cast<CheckBox>().CurrentValue && player.IsCharmed)
+                         || (UltMenu["root"].Cast<CheckBox>().CurrentValue && player.IsRooted)
+                         || (UltMenu["tunt"].Cast<CheckBox>().CurrentValue && player.IsTaunted)
+                         || (UltMenu["stun"].Cast<CheckBox>().CurrentValue && player.IsStunned)
+                         || (UltMenu["fear"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Fear))
+                         || (UltMenu["silence"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Silence))
+                         || (UltMenu["snare"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Snare))
+                         || (UltMenu["supperss"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Suppression))
+                         || (UltMenu["sleep"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Sleep))
+                         || (UltMenu["poly"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Polymorph))
+                         || (UltMenu["frenzy"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Frenzy))
+                         || (UltMenu["disarm"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Disarm))
+                         || (UltMenu["nearsight"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.NearSight))
+                         || (UltMenu["blind"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Blind));
             var enemys = UltMenu["Rene"].Cast<Slider>().CurrentValue;
             var hp = UltMenu["hp"].Cast<Slider>().CurrentValue;
             var enemysrange = UltMenu["enemydetect"].Cast<Slider>().CurrentValue;
@@ -601,15 +634,21 @@ namespace Olaf
                 Drawing.DrawCircle(ObjectManager.Player.Position, Q.Range, Color.White);
             }
             if (DrawMenu["Edraw"].Cast<CheckBox>().CurrentValue && E.IsReady()) Drawing.DrawCircle(ObjectManager.Player.Position, E.Range, System.Drawing.Color.White);
-            if (DrawMenu["Rdraw"].Cast<CheckBox>().CurrentValue && R.IsReady())
-                Drawing.DrawCircle(ObjectManager.Player.Position, R.Range, System.Drawing.Color.White);
+            if (DrawMenu["Rdraw"].Cast<CheckBox>().CurrentValue)
+            {
+                Drawing.DrawCircle(
+                    ObjectManager.Player.Position,
+                    UltMenu["enemydetect"].Cast<Slider>().CurrentValue,
+                    Color.White);
+            }
             if (Target != null && DrawMenu["combodamage"].Cast<CheckBox>().CurrentValue && Q.IsInRange(Target))
             {
                 float[] Positions = GetLength();
                 Drawing.DrawLine
                     (
-                        new Vector2(Target.HPBarPosition.X + 10 + Positions[0] * 104, Target.HPBarPosition.Y + 20),
-                        new Vector2(Target.HPBarPosition.X + 10 + Positions[1] * 104, Target.HPBarPosition.Y + 20),
+
+                        new Vector2(Target.HPBarPosition.X + Positions[0] * 104, Target.HPBarPosition.Y),
+                        new Vector2(Target.HPBarPosition.X + Positions[1] * 104, Target.HPBarPosition.Y),
                         15,
                         Color.Orange);
             }
