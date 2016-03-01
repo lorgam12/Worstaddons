@@ -20,6 +20,7 @@
         private static AIHeroClient Player { get { return ObjectManager.Player; } }
         public static Spell.Skillshot _Q { get; private set; }
         public static Spell.Skillshot _W { get; private set; }
+        public static Spell.Skillshot _W2 { get; private set; }
         public static Spell.Targeted _E { get; private set; }
         public static Spell.Targeted _R { get; private set; }
         
@@ -103,7 +104,8 @@
 
                 _Q = new Spell.Skillshot(SpellSlot.Q, 1100, SkillShotType.Linear, 250, 1600, 120);
                 _W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, 850, -1, 250);
-                _E = new Spell.Targeted(SpellSlot.E, 640);
+            _W2 = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, 850, -1, 125);
+            _E = new Spell.Targeted(SpellSlot.E, 640);
                 _R = new Spell.Targeted(SpellSlot.R, 750);
             
 
@@ -414,10 +416,14 @@
                     }
                 }
             }
-            var predw = _W.GetPrediction(target);
-                if (_W.IsReady() && target.IsValidTarget(_W.Range) && predw.HitChance >= HitChance.High)
+            var predw = _W2.GetPrediction(target);
+                if (_W2.IsReady() && target.IsValidTarget(_W2.Range) && predw.HitChance >= HitChance.High)
             {
-                _W.Cast(predw.CastPosition);
+                _W2.Cast(predw.CastPosition);
+            }
+                else
+                {
+                _W.Cast(target.Position);
             }
         }
 
