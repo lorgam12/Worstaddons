@@ -8,11 +8,11 @@ namespace Karthus
 
     internal class EnemyInfo
     {
-        public Obj_AI_Base Player;
+        public AIHeroClient Player;
         public int LastSeen;
         //public int LastPinged;
 
-        public EnemyInfo(Obj_AI_Base player)
+        public EnemyInfo(AIHeroClient player)
         {
             Player = player;
         }
@@ -35,13 +35,13 @@ namespace Karthus
                 return Environment.TickCount & int.MaxValue;
             }
         }
-        public static IEnumerable<Obj_AI_Base> EnemyTeam;
-        public static IEnumerable<Obj_AI_Base> OwnTeam;
+        public static IEnumerable<AIHeroClient> EnemyTeam;
+        public static IEnumerable<AIHeroClient> OwnTeam;
         public static List<EnemyInfo> EnemyInfo = new List<EnemyInfo>();
 
         public Helper()
         {
-            var champions = ObjectManager.Get<Obj_AI_Base>().ToList();
+            var champions = ObjectManager.Get<AIHeroClient>().ToList();
 
             OwnTeam = champions.Where(x => x.IsAlly);
             EnemyTeam = champions.Where(x => x.IsEnemy);
@@ -56,10 +56,12 @@ namespace Karthus
             var time = TickCount;
 
             foreach (EnemyInfo enemyInfo in EnemyInfo.Where(x => x.Player.IsVisible))
+            {
                 enemyInfo.LastSeen = time;
+            }
         }
 
-        public static EnemyInfo GetPlayerInfo(Obj_AI_Base enemy)
+        public static EnemyInfo GetPlayerInfo(AIHeroClient enemy)
         {
             return EnemyInfo.Find(x => x.Player.NetworkId == enemy.NetworkId);
         }
@@ -67,7 +69,9 @@ namespace Karthus
         public static float GetTargetHealth(EnemyInfo playerInfo, int additionalTime)
         {
             if (playerInfo.Player.IsVisible)
+            {
                 return playerInfo.Player.Health;
+            }
 
             var predictedhealth = playerInfo.Player.Health + playerInfo.Player.HPRegenRate * ((TickCount - playerInfo.LastSeen + additionalTime) / 1000f);
 

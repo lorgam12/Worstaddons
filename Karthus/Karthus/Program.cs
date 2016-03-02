@@ -80,14 +80,17 @@ namespace Karthus
             UltMenu.AddGroupLabel("Ultimate Settings");
             UltMenu.Add("NotifyUlt", new CheckBox("Ult notify text"));
             UltMenu.Add("UltKS", new CheckBox("Ultimate KillSteal R", false));
-            UltMenu.Add("UltSet", new Slider("Ultimate Mode", 1, 1, 2));
-            UltMenu.AddLabel("Ultimate Mode 1 = Kappa Ultimate Logic");
-            UltMenu.AddLabel("Ultimate Mode 2 = Beaving Ultimate Logic (KarthusSharp L#)");
-            UltMenu.AddSeparator();
+            UltMenu.Add("UltMode", new ComboBox("Ult Logic", 0, "Kappa Logic", "Beaving Logic"));
             UltMenu.AddGroupLabel("Kappa Ultimate Logic Settings");
-            UltMenu.Add("Rnear", new Slider("Min Enemies In Range to block Cast R", 1, 0, 5));
-            UltMenu.Add("Rranged", new Slider("Range to detect enemies to block Cast R", 2000, 100, 5000));
-            UltMenu.AddLabel("Recommended Range (2000+)");
+            UltMenu.Add("RnearE", new CheckBox("Block Ult when Enemies Near My Champion?"));
+            UltMenu.Add("RnearEn", new Slider("Min Enemies Near to block Cast R", 1, 1, 5));
+            UltMenu.Add("Rranged", new Slider("Range to detect Enemies to block Cast R", 1600, 100, 3000));
+            UltMenu.AddLabel("Recommended Range (1600 >)");
+            UltMenu.AddSeparator();
+            UltMenu.Add("RnearA", new CheckBox("Block Ult When Alies Near target?"));
+            UltMenu.Add("RnearAl", new Slider("Min Alies Near target to block Cast R", 1, 1, 5));
+            UltMenu.Add("RrangedA", new Slider("Range to detect Alies near enemy to block Cast R", 500, 100, 1650));
+            UltMenu.AddLabel("Recommended Range (500 <)");
             UltMenu.AddSeparator();
             UltMenu.AddGroupLabel("Beaving Ultimate Logic Settings (KarthusSharp L#)");
             UltMenu.AddLabel("Auto Settings.");
@@ -151,6 +154,7 @@ namespace Karthus
             DrawMenu.Add("Draw_W", new CheckBox("Draw W"));
             DrawMenu.Add("Draw_E", new CheckBox("Draw E"));
             DrawMenu.Add("Rranged", new CheckBox("Min Range for enemies to cast R"));
+            DrawMenu.Add("Rtarget", new CheckBox("Draw R Target"));
 
             Game.OnUpdate += Zigzag;
             Game.OnUpdate += OnUpdate;
@@ -251,11 +255,11 @@ namespace Karthus
                 Ks();
             }
 
-            if (menuIni.Get<CheckBox>("Ultimate").CurrentValue && UltMenu.Get<Slider>("UltSet").CurrentValue == 1 && UltMenu.Get<CheckBox>("UltKS").CurrentValue && (R.IsLearned && R.IsReady()))
+            if (menuIni.Get<CheckBox>("Ultimate").CurrentValue && UltMenu.Get<ComboBox>("UltMode").CurrentValue == 0 && UltMenu.Get<CheckBox>("UltKS").CurrentValue && (R.IsLearned && R.IsReady()))
             {
                 Ult();
             }
-            if (menuIni.Get<CheckBox>("Ultimate").CurrentValue && UltMenu.Get<Slider>("UltSet").CurrentValue == 2 && UltMenu.Get<CheckBox>("UltKS").CurrentValue && (R.IsLearned && R.IsReady()))
+            if (menuIni.Get<CheckBox>("Ultimate").CurrentValue && UltMenu.Get<ComboBox>("UltMode").CurrentValue == 1 && UltMenu.Get<CheckBox>("UltKS").CurrentValue && (R.IsLearned && R.IsReady()))
             {
                 Ult2();
             }
@@ -264,8 +268,13 @@ namespace Karthus
 
         private static void OnDraw(EventArgs args)
         {
-            if (!player.IsDead &&
-            menuIni.Get<CheckBox>("Drawings").CurrentValue)
+            var enemiesrange =
+                ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("Rranged").CurrentValue);
+            var enemieinsrange =
+                UltMenu.Get<Slider>("RnearEn").CurrentValue;
+
+            var Rtarget = TargetSelector.GetTarget(R.Range, DamageType.Magical);
+            if (!player.IsDead && menuIni.Get<CheckBox>("Drawings").CurrentValue)
             {
                 if (DrawMenu.Get<CheckBox>("Draw_Q").CurrentValue)
                 {
@@ -283,18 +292,26 @@ namespace Karthus
                 {
                     Circle.Draw(Color.DarkRed, UltMenu.Get<Slider>("Rranged").CurrentValue, Player.Instance.Position);
                 }
+                if (Rtarget != null && DrawMenu.Get<CheckBox>("Rtarget").CurrentValue)
+                {
+                    Circle.Draw(Color.DarkRed, UltMenu.Get<Slider>("RrangedA").CurrentValue, Rtarget.Position);
+                }
+                if (UltMenu.Get<CheckBox>("RnearE").CurrentValue && enemiesrange >= enemieinsrange)
+                {
+                    Drawing.DrawText(Drawing.Width * 0.44f, Drawing.Height * 0.8f, System.Drawing.Color.Red, "R Blocked Enemies in rage: " + enemieinsrange);
+                }
             }
 
             if (player.Spellbook.GetSpell(SpellSlot.R).Level > 0)
             {
-                var killable = "";
+                var killable = string.Empty;
 
                 foreach (var target in Check.TI.Where(x => x.Player.IsValid && !x.Player.IsDead && x.Player.IsEnemy && (Check.recalltc(x) /*|| (x.Player.IsVisible && Utility.IsValidTarget(x.Player))*/) && player.GetSpellDamage(x.Player, SpellSlot.R) >= Check.GetTargetHealth(x, (int)(R.CastDelay * 1000f))))
                 {
-                    killable += target.Player.ChampionName + " ";
+                    killable += target.Player.ChampionName + ", ";
                 }
 
-                if (killable != "" && UltMenu.Get<CheckBox>("NotifyUlt").CurrentValue)
+                if (killable != string.Empty && UltMenu.Get<CheckBox>("NotifyUlt").CurrentValue)
                 {
                     Drawing.DrawText(Drawing.Width * 0.44f, Drawing.Height * 0.7f, System.Drawing.Color.Red, "Killable by ult: " + killable);
                 }
@@ -633,26 +650,51 @@ namespace Karthus
 
         private static void Ult()
         {
+            var enemiesrange =
+                ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("Rranged").CurrentValue);
+            var enemieinsrange =
+                UltMenu.Get<Slider>("RnearEn").CurrentValue;
+            var aliesrange =
+                ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("RrangedA").CurrentValue);
+            var aliesinrange =
+                UltMenu.Get<Slider>("RnearAl").CurrentValue;
+
             if (!R.IsReady() || Combo())
             {
                 return;
             }
+
             var target = TargetSelector.GetTarget(R.Range, DamageType.Magical);
-            if (target.CountAlliesInRange(500) >= 1)
-                    {
-                        return;
-                    }
-            if (target != null && target.IsValid && target.Health - 10 <= player.GetSpellDamage(target, SpellSlot.R))
+            if (target != null && target.IsValid
+                && target.Health - 25 <= ObjectManager.Player.GetSpellDamage(target, SpellSlot.R)
+                && !target.HasBuff("kindrednodeathbuff") && !target.HasBuff("Undying Rage")
+                && !target.HasBuff("JudicatorIntervention") && !target.IsZombie && !target.IsDead)
             {
-                if (UltMenu.Get<Slider>("Rnear").CurrentValue
-                            >= player.ServerPosition.CountEnemiesInRange(UltMenu.Get<Slider>("Rranged").CurrentValue))
-                        {
-                            return;
-                        }
-                        R.Cast(target.ServerPosition);
-                    }
+                if (UltMenu.Get<CheckBox>("RnearE").CurrentValue && enemieinsrange <= enemiesrange
+                    && !UltMenu.Get<CheckBox>("RnearA").CurrentValue)
+                {
+                    R.Cast(target.Position);
+                }
+                if (!UltMenu.Get<CheckBox>("RnearE").CurrentValue && aliesinrange <= aliesrange
+                    && UltMenu.Get<CheckBox>("RnearA").CurrentValue)
+                {
+                    R.Cast(target.Position);
+                }
+
+                if (UltMenu.Get<CheckBox>("RnearE").CurrentValue && aliesinrange <= aliesrange
+                    && enemieinsrange <= enemiesrange && UltMenu.Get<CheckBox>("RnearA").CurrentValue)
+                {
+                    R.Cast(target.Position);
+                }
+
+                if (!UltMenu.Get<CheckBox>("RnearE").CurrentValue && !UltMenu.Get<CheckBox>("RnearA").CurrentValue)
+                {
+                    R.Cast(target.Position);
+                }
+            }
         }
-        private static void Ult2()
+
+            private static void Ult2()
         {
             if (!R.IsReady() || Combo())
             {
@@ -660,7 +702,7 @@ namespace Karthus
             }
             var time = Helper.TickCount;
 
-            List<Obj_AI_Base> ultTargets = new List<Obj_AI_Base>();
+            List<AIHeroClient> ultTargets = new List<AIHeroClient>();
 
             foreach (
                 var target in
@@ -719,10 +761,10 @@ namespace Karthus
                         targets--; //remove one target, because zilean can save one
                     }
                 }
-
+                var rTarget = TargetSelector.GetTarget(R.Range, DamageType.Magical);
                 if (targets > 0)
                 {
-                    R.Cast();
+                    R.Cast(rTarget.Position);
                 }
             }
         }
