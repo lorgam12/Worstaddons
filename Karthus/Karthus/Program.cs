@@ -87,11 +87,6 @@ namespace Karthus
             UltMenu.Add("Rranged", new Slider("Range to detect Enemies to block Cast R", 1600, 100, 3000));
             UltMenu.AddLabel("Recommended Range (1600 >)");
             UltMenu.AddSeparator();
-            UltMenu.Add("RnearA", new CheckBox("Block Ult When Alies Near target?"));
-            UltMenu.Add("RnearAl", new Slider("Min Alies Near target to block Cast R", 1, 1, 5));
-            UltMenu.Add("RrangedA", new Slider("Range to detect Alies near enemy to block Cast R", 500, 100, 1650));
-            UltMenu.AddLabel("Recommended Range (500 <)");
-            UltMenu.AddSeparator();
             UltMenu.AddGroupLabel("Beaving Ultimate Logic Settings (KarthusSharp L#)");
             UltMenu.AddLabel("Auto Settings.");
 
@@ -127,7 +122,8 @@ namespace Karthus
             LaneMenu.Add("JQPercent", new Slider("Use Q Mana %", 30, 0, 100));
             LaneMenu.AddSeparator();
             LaneMenu.AddGroupLabel("LastHit Settings");
-            LaneMenu.Add("LUse_Q", new CheckBox("Use Q For UnKillable Minion"));
+            LaneMenu.Add("LUse_Q", new CheckBox("Use Q"));
+            LaneMenu.Add("LAA", new CheckBox("Disable AA if Q is Ready"));
             LaneMenu.Add("LHQPercent", new Slider("Use Q Mana %", 30, 0, 100));
             /*
             JungleMenu = menuIni.AddSubMenu("JungleClear");
@@ -240,12 +236,13 @@ namespace Karthus
 
             if (flags.HasFlag(Orbwalker.ActiveModes.LastHit) && menuIni.Get<CheckBox>("LastHit").CurrentValue)
             {
-                Orbwalker.DisableAttacking = false;
-                    LastHit();
+                Orbwalker.DisableAttacking = LaneMenu.Get<CheckBox>("LAA").CurrentValue && Q.IsReady()
+                                             && ObjectManager.Player.ManaPercent >= LaneMenu.Get<Slider>("LHQPercent").CurrentValue;
+                LastHit();
             }
 
             if (MiscMenu.Get<CheckBox>("DeadCast").CurrentValue)
-                if (player.IsZombie && !Combo())
+                if (ObjectManager.Player.IsZombie && !Combo())
                 {
                     LaneClear();
                 }
@@ -272,8 +269,7 @@ namespace Karthus
                 ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("Rranged").CurrentValue);
             var enemieinsrange =
                 UltMenu.Get<Slider>("RnearEn").CurrentValue;
-
-            var Rtarget = TargetSelector.GetTarget(R.Range, DamageType.Magical);
+            
             if (!player.IsDead && menuIni.Get<CheckBox>("Drawings").CurrentValue)
             {
                 if (DrawMenu.Get<CheckBox>("Draw_Q").CurrentValue)
@@ -292,13 +288,25 @@ namespace Karthus
                 {
                     Circle.Draw(Color.DarkRed, UltMenu.Get<Slider>("Rranged").CurrentValue, Player.Instance.Position);
                 }
-                if (Rtarget != null && DrawMenu.Get<CheckBox>("Rtarget").CurrentValue)
+
+                foreach (var target in
+                    Check.TI.Where(
+                        x =>
+                        x.Player.IsValid && !x.Player.IsDead && x.Player.IsEnemy
+                        && !x.Player.HasBuff("kindrednodeathbuff") && !x.Player.HasBuff("Undying Rage")
+                        && !x.Player.HasBuff("JudicatorIntervention") && !x.Player.IsZombie
+                        && (Check.recalltc(x) /*|| (x.Player.IsVisible && Utility.IsValidTarget(x.Player))*/)
+                        && player.GetSpellDamage(x.Player, SpellSlot.R)
+                        >= Check.GetTargetHealth(x, (int)(R.CastDelay * 1000f))))
                 {
-                    Circle.Draw(Color.DarkRed, UltMenu.Get<Slider>("RrangedA").CurrentValue, Rtarget.Position);
+                    if (DrawMenu.Get<CheckBox>("Rtarget").CurrentValue)
+                    {
+                        Circle.Draw(Color.DarkRed, 650, target.Player.Position);
+                    }
                 }
                 if (UltMenu.Get<CheckBox>("RnearE").CurrentValue && enemiesrange >= enemieinsrange)
                 {
-                    Drawing.DrawText(Drawing.Width * 0.44f, Drawing.Height * 0.8f, System.Drawing.Color.Red, "R Blocked Enemies in rage: " + enemieinsrange);
+                    Drawing.DrawText(Drawing.Width * 0.44f, Drawing.Height * 0.8f, System.Drawing.Color.Red, "R Blocked Enemies in Rage: " + enemieinsrange);
                 }
             }
 
@@ -654,6 +662,32 @@ namespace Karthus
                 ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("Rranged").CurrentValue);
             var enemieinsrange =
                 UltMenu.Get<Slider>("RnearEn").CurrentValue;
+            foreach (
+                var target in
+                    Check.TI.Where(
+                        x =>
+                        x.Player.IsValid && !x.Player.IsDead && x.Player.IsEnemy && !x.Player.HasBuff("kindrednodeathbuff") && !x.Player.HasBuff("Undying Rage")
+                && !x.Player.HasBuff("JudicatorIntervention") && !x.Player.IsZombie
+                        && (Check.recalltc(x) /*|| (x.Player.IsVisible && Utility.IsValidTarget(x.Player))*/)
+                        && player.GetSpellDamage(x.Player, SpellSlot.R)
+                        >= Check.GetTargetHealth(x, (int)(R.CastDelay * 1000f))))
+            {
+                if (UltMenu.Get<CheckBox>("RnearE").CurrentValue && enemieinsrange <= enemiesrange)
+                {
+                    R.Cast(target.Player.Position);
+                }
+
+                if (!UltMenu.Get<CheckBox>("RnearE").CurrentValue)
+                {
+                    R.Cast(target.Player.Position);
+                }
+            }
+
+            /*
+            var enemiesrange =
+                ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("Rranged").CurrentValue);
+            var enemieinsrange =
+                UltMenu.Get<Slider>("RnearEn").CurrentValue;
             var aliesrange =
                 ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("RrangedA").CurrentValue);
             var aliesinrange =
@@ -692,6 +726,7 @@ namespace Karthus
                     R.Cast(target.Position);
                 }
             }
+            */
         }
 
             private static void Ult2()
