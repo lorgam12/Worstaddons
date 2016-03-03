@@ -103,20 +103,23 @@ namespace Olaf
             UltMenu.AddGroupLabel("Ultimate Settings");
             UltMenu.Add("UseR", new CheckBox("Use R"));
             UltMenu.AddLabel("Use R Settings:");
-            UltMenu.Add("poly", new CheckBox("Use On Polymorph?"));
-            UltMenu.Add("silence", new CheckBox("Use On Silence?"));
+            UltMenu.Add("blind", new CheckBox("Use On Blinds?", false));
             UltMenu.Add("charm", new CheckBox("Use On Charms?"));
+            UltMenu.Add("disarm", new CheckBox("Use On Disarm?", false));
             UltMenu.Add("fear", new CheckBox("Use On Fear?"));
+            UltMenu.Add("frenzy", new CheckBox("Use On Frenzy?", false));
+            UltMenu.Add("silence", new CheckBox("Use On Silence?", false));
             UltMenu.Add("snare", new CheckBox("Use On Snare?"));
             UltMenu.Add("sleep", new CheckBox("Use On Sleep?"));
-            UltMenu.Add("frenzy", new CheckBox("Use On Frenzy?"));
-            UltMenu.Add("disarm", new CheckBox("Use On Disarm?"));
-            UltMenu.Add("nearsight", new CheckBox("Use On NearSight?"));
-            UltMenu.Add("blind", new CheckBox("Use On Blinds?"));
             UltMenu.Add("stun", new CheckBox("Use On Stuns?"));
-            UltMenu.Add("root", new CheckBox("Use On Roots?"));
             UltMenu.Add("supperss", new CheckBox("Use On Supperss?"));
+            UltMenu.Add("slow", new CheckBox("Use On Slows?", false));
+            UltMenu.Add("knockup", new CheckBox("Use On Knock Ups?"));
+            UltMenu.Add("knockback", new CheckBox("Use On Knock Backs?", false));
+            UltMenu.Add("nearsight", new CheckBox("Use On NearSight?", false));
+            UltMenu.Add("root", new CheckBox("Use On Roots?"));
             UltMenu.Add("tunt", new CheckBox("Use On Tunts?"));
+            UltMenu.Add("poly", new CheckBox("Use On Polymorph?"));
             UltMenu.Add("hp", new Slider("Use Only When HP is Under %", 25, 0, 100));
             UltMenu.Add("Rene", new Slider("Enemies Near to Cast R", 1, 0, 5));
             UltMenu.Add("enemydetect", new Slider("Enemies Detect Range", 2000, 50, 5000));
@@ -269,6 +272,9 @@ namespace Olaf
                          || (UltMenu["frenzy"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Frenzy))
                          || (UltMenu["disarm"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Disarm))
                          || (UltMenu["nearsight"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.NearSight))
+                         || (UltMenu["knockback"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Knockback))
+                         || (UltMenu["knockup"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Knockup))
+                         || (UltMenu["slow"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Slow))
                          || (UltMenu["blind"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Blind));
             var enemys = UltMenu["Rene"].Cast<Slider>().CurrentValue;
             var hp = UltMenu["hp"].Cast<Slider>().CurrentValue;
