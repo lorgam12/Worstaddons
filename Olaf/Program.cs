@@ -115,15 +115,16 @@ namespace Olaf
             UltMenu.Add("supperss", new CheckBox("Use On Supperss?"));
             UltMenu.Add("slow", new CheckBox("Use On Slows?", false));
             UltMenu.Add("knockup", new CheckBox("Use On Knock Ups?"));
-            UltMenu.Add("knockback", new CheckBox("Use On Knock Backs?", false));
+            UltMenu.Add("knockback", new CheckBox("Use On Knock Backs?"));
             UltMenu.Add("nearsight", new CheckBox("Use On NearSight?", false));
             UltMenu.Add("root", new CheckBox("Use On Roots?"));
             UltMenu.Add("tunt", new CheckBox("Use On Tunts?"));
             UltMenu.Add("poly", new CheckBox("Use On Polymorph?"));
+            UltMenu.Add("poison", new CheckBox("Use On Poisons?", false));
             UltMenu.Add("hp", new Slider("Use Only When HP is Under %", 25, 0, 100));
-            UltMenu.Add("Rene", new Slider("Enemies Near to Cast R", 1, 0, 5));
-            UltMenu.Add("enemydetect", new Slider("Enemies Detect Range", 2000, 50, 5000));
             UltMenu.Add("human", new Slider("Humanizer Delay", 150, 0, 1500));
+            UltMenu.Add("Rene", new Slider("Enemies Near to Cast R", 1, 0, 5));
+            UltMenu.Add("enemydetect", new Slider("Enemies Detect Range", 1000, 0, 2000));
             UltMenu.AddLabel("Ult logic: It will Cast if you have one of the selected debuffs, HP under selected and Nearby enemies.");
             
 
@@ -163,6 +164,7 @@ namespace Olaf
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.AddGroupLabel("Misc Settings");
             MiscMenu.Add("gapcloser", new CheckBox("Use Q On GapCloser"));
+            MiscMenu.Add("gapclosermana", new Slider("Anti-GapCloser Mana", 25, 0, 100));
 
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
@@ -246,13 +248,14 @@ namespace Olaf
 
         private static void Gapcloser_OnGap(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
-            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || !MiscMenu.Get<CheckBox>("gapcloser").CurrentValue || Sender == null)
+            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || !MiscMenu.Get<CheckBox>("gapcloser").CurrentValue || ObjectManager.Player.ManaPercent < MiscMenu.Get<Slider>("gapclosermana").CurrentValue || Sender == null)
             {
                 return;
             }
+            var predq = Q.GetPrediction(Sender);
             if (Sender.IsValidTarget(Q.Range) && Q.IsReady())
             {
-                Q.Cast(Sender.Position);
+                Q.Cast(predq.CastPosition);
             }
         }
 
@@ -275,12 +278,14 @@ namespace Olaf
                          || (UltMenu["knockback"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Knockback))
                          || (UltMenu["knockup"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Knockup))
                          || (UltMenu["slow"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Slow))
+                         || (UltMenu["poison"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Poison))
                          || (UltMenu["blind"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Blind));
             var enemys = UltMenu["Rene"].Cast<Slider>().CurrentValue;
             var hp = UltMenu["hp"].Cast<Slider>().CurrentValue;
             var enemysrange = UltMenu["enemydetect"].Cast<Slider>().CurrentValue;
             if (R.IsReady() && UltMenu["UseR"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(R.Range))
-                if (debuff && player.HealthPercent <= hp && enemys >= ObjectManager.Player.Position.CountEnemiesInRange(enemysrange))
+                if (debuff && ObjectManager.Player.HealthPercent <= hp
+                    && enemys >= ObjectManager.Player.Position.CountEnemiesInRange(enemysrange))
                 {
                     Core.DelayAction(() => R.Cast(), UltMenu["human"].Cast<Slider>().CurrentValue);
                 }
