@@ -204,7 +204,7 @@ namespace Karthus
                 return;
             }
             var predw = W.GetPrediction(Sender);
-            if (Sender.IsValidTarget(W.Range) && W.IsReady() && !Sender.IsAlly)
+            if (Sender.IsValidTarget(W.Range) && W.IsReady() && !Sender.IsAlly && !Sender.IsMe)
             {
 
                 if (MiscMenu.Get<CheckBox>("SaveR").CurrentValue && player.Level >= 6 && R.IsLearned

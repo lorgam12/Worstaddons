@@ -122,13 +122,13 @@
                 return;
             }
 
-            if (Sender.HasBuff("brandablaze") && _Q.IsReady())
+            if (Sender.HasBuff("brandablaze") && _Q.IsReady() && !Sender.IsAlly && !Sender.IsMe)
             {
                 _Q.Cast(Sender.ServerPosition);
             }
             else
             {
-                if (_E.IsReady() && _Q.IsReady())
+                if (_E.IsReady() && _Q.IsReady() && !Sender.IsAlly && !Sender.IsMe)
                 {
                     _E.Cast(Sender);
                 }
@@ -140,13 +140,13 @@
             if (!menuIni.Get<CheckBox>("Misc").CurrentValue || !MiscMenu.Get<CheckBox>("interrupt").CurrentValue || sender == null)
                 return;
             var pred = _Q.GetPrediction(sender);
-            if (sender.HasBuff("brandablaze") && _Q.IsReady() && pred.HitChance >= HitChance.High)
+            if (sender.HasBuff("brandablaze") && _Q.IsReady() && pred.HitChance >= HitChance.High && !sender.IsAlly && !sender.IsMe)
             {
                 _Q.Cast(pred.CastPosition);
             }
             else
             {
-                if (_E.IsReady() && _Q.IsReady())
+                if (_E.IsReady() && _Q.IsReady() && !sender.IsAlly && !sender.IsMe)
                 {
                     _E.Cast(sender);
                 }
