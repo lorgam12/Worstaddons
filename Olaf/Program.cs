@@ -118,7 +118,7 @@ namespace Olaf
             UltMenu.Add("knockback", new CheckBox("Use On Knock Backs?"));
             UltMenu.Add("nearsight", new CheckBox("Use On NearSight?", false));
             UltMenu.Add("root", new CheckBox("Use On Roots?"));
-            UltMenu.Add("tunt", new CheckBox("Use On Tunts?"));
+            UltMenu.Add("tunt", new CheckBox("Use On Taunts?"));
             UltMenu.Add("poly", new CheckBox("Use On Polymorph?"));
             UltMenu.Add("poison", new CheckBox("Use On Poisons?", false));
             UltMenu.Add("hp", new Slider("Use Only When HP is Under %", 25, 0, 100));
