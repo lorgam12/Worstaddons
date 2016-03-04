@@ -494,7 +494,7 @@ namespace Karthus
             {
                 float i = 0;
                 foreach (
-                    var hero in EntityManager.Heroes.Enemies.Where(hero => hero.IsEnemy && !hero.IsMe && !hero.IsDead))
+                    var hero in EntityManager.Heroes.Enemies.Where(hero => hero != null && hero.IsEnemy && !hero.IsMe && !hero.IsDead))
                 {
                     var champion = hero.ChampionName;
                     if (champion.Length > 12)
@@ -523,15 +523,15 @@ namespace Karthus
                         Drawing.Width * 0.01f, Drawing.Height * 0.1f + i, color, champion);
                     Drawing.DrawText(
                         Drawing.Width * 0.06f, Drawing.Height * 0.1f + i, color,
-                        (" ( " + (int)hero.TotalShieldHealth()) + " / " + (int)hero.TotalShieldMaxHealth() + " | " + percent + "% ) ");
+                        (" ( " + (int)hero.TotalShieldHealth()) + " / " + (int)hero.MaxHealth + " | " + percent + "% ) ");
 
 
                     if (hero.IsVisible
                         || (!hero.IsVisible && Helper.TickCount - Helper.GetPlayerInfo(hero).LastSeen < 3000))
                     {
-                        if (player.GetSpellDamage(hero, SpellSlot.R) >= hero.TotalShieldHealth())
+                        if (player.GetSpellDamage(hero, SpellSlot.R) > hero.TotalShieldHealth())
                         {
-                            Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.1f + i, color, "   ULT = DEAD ");
+                            Drawing.DrawText(Drawing.Width * 0.13f, Drawing.Height * 0.1f + i, color, " ULT = DEAD ");
                         }
                     }
 
