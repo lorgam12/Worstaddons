@@ -109,8 +109,6 @@ namespace Karthus
 
             UltMenu = menuIni.AddSubMenu("Ultimate");
             UltMenu.AddGroupLabel("Ultimate Settings");
-            UltMenu.Add("NotifyUlt", new CheckBox("Ult Notify"));
-            UltMenu.Add("ping", new CheckBox("Ping(Local) on Killable Enemy"));
             UltMenu.Add("UltKS", new CheckBox("Ultimate KillSteal R", false));
             UltMenu.Add("UltMode", new ComboBox("Ult Logic", 1, "Kappa Logic", "Beaving Logic"));
             UltMenu.AddGroupLabel("Kappa Ultimate Logic Settings");
@@ -173,6 +171,8 @@ namespace Karthus
 
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.AddGroupLabel("Misc Settings");
+            MiscMenu.Add("NotifyUlt", new CheckBox("Ult Notify"));
+            MiscMenu.Add("ping", new CheckBox("Ping(Local) on Killable Enemy"));
             MiscMenu.Add("DeadCast", new CheckBox("Dead Cast"));
             MiscMenu.Add("SaveR", new CheckBox("Save Mana for R"));
             MiscMenu.Add("gapcloser", new CheckBox("Anti-GapCloser"));
@@ -184,8 +184,9 @@ namespace Karthus
             DrawMenu.Add("Draw_Q", new CheckBox("Draw Q"));
             DrawMenu.Add("Draw_W", new CheckBox("Draw W"));
             DrawMenu.Add("Draw_E", new CheckBox("Draw E"));
-            DrawMenu.Add("Rranged", new CheckBox("Min Range for enemies to cast R"));
+            DrawMenu.Add("Rranged", new CheckBox("Draw Min Enemies InRange to Cast R"));
             DrawMenu.Add("Rtarget", new CheckBox("Draw R Target"));
+            DrawMenu.Add("Track", new CheckBox("Track Enemies Health"));
 
             Game.OnUpdate += Zigzag;
             Game.OnUpdate += OnUpdate;
@@ -419,8 +420,11 @@ namespace Karthus
                 {
                     Circle.Draw(Color.DarkRed, UltMenu.Get<Slider>("Rranged").CurrentValue, Player.Instance.Position);
                 }
+                if (DrawMenu.Get<CheckBox>("Track").CurrentValue)
+                {
+                    DrawEnemyHealth();
+                }
             }
-            DrawEnemyHealth();
             DrawKillable();
         }
 
@@ -455,7 +459,7 @@ namespace Karthus
                         || (!target.Player.IsVisible && time - Helper.GetPlayerInfo(target.Player).LastSeen < 3000))
                     {
                         killable += target.Player.ChampionName + ", ";
-                        if (UltMenu.Get<CheckBox>("ping").CurrentValue)
+                        if (MiscMenu.Get<CheckBox>("ping").CurrentValue)
                         {
                             Ping(target.Player.Position.To2D());
                         }
@@ -471,7 +475,7 @@ namespace Karthus
 
                         if (killable != string.Empty)
                         {
-                            if (UltMenu.Get<CheckBox>("NotifyUlt").CurrentValue)
+                            if (MiscMenu.Get<CheckBox>("NotifyUlt").CurrentValue)
                             {
                                 Drawing.DrawText(
                                     Drawing.Width * 0.44f,
