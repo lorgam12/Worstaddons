@@ -384,7 +384,7 @@
                     }
                 }
 
-                if (Elane && E.IsReady() && minion.Health <= player.GetSpellDamage(minion, SpellSlot.E) && !minion.IsValidTarget(player.AttackRange))
+                if (Elane && E.IsReady() && minion.Health <= player.GetSpellDamage(minion, SpellSlot.E) && !minion.IsValidTarget(player.AttackRange) && !minion.IsUnderEnemyturret())
                 {
                     E.Cast(minion);
                 }
