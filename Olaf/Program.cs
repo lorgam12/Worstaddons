@@ -253,7 +253,7 @@ namespace Olaf
                 return;
             }
             var predq = Q.GetPrediction(Sender);
-            if (Sender.IsValidTarget(Q.Range) && Q.IsReady())
+            if (Sender.IsValidTarget(Q.Range) && Q.IsReady() && !Sender.IsAlly)
             {
                 Q.Cast(predq.CastPosition);
             }
