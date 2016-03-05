@@ -224,7 +224,7 @@
         {
             var Target = TargetSelector.GetTarget(R.Range, DamageType.Physical);
 
-            if (Target != null && R.IsReady() && Target.IsUnderTurret() && R.IsReady() && !UltMenu["DontUlt" + Target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+            if (Target != null && R.IsReady() && Target.IsUnderTurret() && !Target.IsUnderEnemyturret() && R.IsReady() && !UltMenu["DontUlt" + Target.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.ServerPosition);
                 R.Cast(Target);
