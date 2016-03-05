@@ -76,7 +76,7 @@
 
             if (ObjectManager.Player.ChampionName == "LeeSin")
             {
-                if (LeeSin.LeeMenu["QC"].Cast<CheckBox>().CurrentValue || LeeSin.LeeMenu["EC"].Cast<CheckBox>().CurrentValue)
+                if (LeeSin.LeeMenu["QC"].Cast<CheckBox>().CurrentValue || LeeSin.LeeMenu["EC"].Cast<CheckBox>().CurrentValue || LeeSin.LeeMenu["RC"].Cast<CheckBox>().CurrentValue)
                 {
                     LeeSin.KS();
                 }
