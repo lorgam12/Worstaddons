@@ -81,6 +81,7 @@
             UltMenu.Add("tower", new CheckBox("Auto R Under Ally Tower"));
             UltMenu.Add("R", new CheckBox("R Finisher"));
             UltMenu.Add("Rtower", new CheckBox("Don't Use R Under Enemy Turret"));
+            UltMenu.Add("saveR", new CheckBox("Freeze Champion While Casting R"));
 
 
             ComboMenu = menuIni.AddSubMenu("Combo");
@@ -143,7 +144,7 @@
         /// <param name="gapcloser">The gapcloser.</param>
         private static void AntiGapcloserOnOnEnemyGapcloser(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
-            if (!Sender.IsValidTarget() && !Sender.IsEnemy && Sender.IsAlly)
+            if (!Sender.IsValidTarget() || !Sender.IsEnemy || Sender.IsAlly || IsCastingR())
             {
                 return;
             }
@@ -166,8 +167,9 @@
 
                 if (Sender != null && R.IsReady() && Sender.IsEnemy && Sender.IsValidTarget(R.Range)
                     && UltMenu.Get<CheckBox>("gapcloserR").CurrentValue)
-                {
-                    R.Cast(Sender);
+            {
+                Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.ServerPosition);
+                R.Cast(Sender);
                     return;
                 }
 
@@ -176,6 +178,11 @@
         private static void InterrupterOnOnPossibleToInterrupt(Obj_AI_Base unit,
             Interrupter.InterruptableSpellEventArgs args)
         {
+            if (IsCastingR())
+            {
+                return;
+            }
+
             var predq = Q.GetPrediction(unit);
             if (unit != null && Q.IsReady() && unit.IsEnemy && unit.IsValidTarget(Q.Range) && MiscMenu.Get<CheckBox>("interruptQ").CurrentValue)
             {
@@ -192,6 +199,7 @@
 
                 if (unit.IsEnemy && unit.IsValidTarget(R.Range))
                 {
+                    Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.ServerPosition);
                     R.Cast(unit);
                 }
             }
@@ -206,12 +214,18 @@
 
             if (Target != null && R.IsReady() && Target.IsUnderTurret() && R.IsReady())
             {
+                Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.ServerPosition);
                 R.Cast(Target);
             }
         }
 
         private static void KillSteal()
         {
+            if (IsCastingR())
+            {
+                return;
+            }
+
             var target =
                 ObjectManager.Get<AIHeroClient>()
                     .FirstOrDefault(
@@ -264,6 +278,11 @@
         /// </summary>
         private static void DoCombo()
         {
+            if (IsCastingR())
+            {
+                return;
+            }
+
             var target = TargetSelector.GetTarget(900, DamageType.Magical);
             if (target == null)
             {
@@ -298,6 +317,11 @@
         /// </summary>
         private static void DoHarass()
         {
+            if (IsCastingR())
+            {
+                return;
+            }
+
             var target = TargetSelector.GetTarget(900, DamageType.Magical);
 
             if (target == null)
@@ -323,16 +347,15 @@
                 E.Cast(target);
             }
         }
-        /*
         private static bool IsCastingR()
         {
-            if (ObjectManager.Player.HasBuff("AlZaharNetherGrasp"))
+            if (ObjectManager.Player.HasBuff("AlzaharNetherGraspSound"))
             {
                 return true;
             }
+
             return false;
         }
-        */
 
         /// <summary>
         ///     Fired when the game updates.
@@ -421,7 +444,12 @@
             {
                 KillSteal();
             }
-            Chat.Print(IsCastingR());
+
+            if (UltMenu["saveR"].Cast<CheckBox>().CurrentValue)
+            {
+                Orbwalker.DisableAttacking = IsCastingR();
+                Orbwalker.DisableMovement = IsCastingR();
+            }
         }
         
         /// <summary>
@@ -437,7 +465,8 @@
             }
 
             if (target != null && ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > target.TotalShieldHealth() + 50 && R.IsReady())
-                {
+            {
+                Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.ServerPosition);
                     R.Cast(target);
                 }
         }
