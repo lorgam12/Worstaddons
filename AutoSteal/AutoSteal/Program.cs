@@ -176,15 +176,15 @@
                             && jmob.IsMonster
                             && !jmob.IsDead
                             && !jmob.IsZombie
-                            && (jmob.BaseSkinName == "SRU_Dragon"
-                            || jmob.BaseSkinName == "SRU_Baron"
-                            || jmob.BaseSkinName == "SRU_Gromp"
-                            || jmob.BaseSkinName == "SRU_Krug"
-                            || jmob.BaseSkinName == "SRU_Razorbeak"
-                            || jmob.BaseSkinName == "Sru_Crab"
-                            || jmob.BaseSkinName == "SRU_Murkwolf"
-                            || jmob.BaseSkinName == "SRU_Blue"
-                            || jmob.BaseSkinName == "SRU_Red")))
+                        && ((Start.Junglemobs["drake"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "SRU_Dragon")
+                        || (Start.Junglemobs["baron"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "SRU_Baron")
+                        || (Start.Junglemobs["gromp"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "SRU_Gromp")
+                        || (Start.Junglemobs["krug"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "SRU_Krug")
+                        || (Start.Junglemobs["razorbeak"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "SRU_Razorbeak")
+                        || (Start.Junglemobs["crab"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "Sru_Crab")
+                        || (Start.Junglemobs["murkwolf"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "SRU_Murkwolf")
+                        || (Start.Junglemobs["blue"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "SRU_Blue")
+                        || (Start.Junglemobs["red"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "SRU_Red"))))
                 {
                     if (ObjectManager.Player.GetAutoAttackDamage(mob) > mob.Health
                         && mob.IsInAutoAttackRange(ObjectManager.Player))
