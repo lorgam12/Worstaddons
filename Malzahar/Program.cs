@@ -82,7 +82,17 @@
             UltMenu.Add("R", new CheckBox("R Finisher"));
             UltMenu.Add("Rtower", new CheckBox("Don't Use R Under Enemy Turret"));
             UltMenu.Add("saveR", new CheckBox("Freeze Champion While Casting R"));
-
+            UltMenu.AddSeparator();
+            UltMenu.AddGroupLabel("Don't Use Ult On:");
+            foreach (var enemy in ObjectManager.Get<AIHeroClient>())
+            {
+                CheckBox cb = new CheckBox(enemy.BaseSkinName);
+                cb.CurrentValue = false;
+                if (enemy.Team != Player.Instance.Team)
+                {
+                    UltMenu.Add("DontUlt" + enemy.BaseSkinName, cb);
+                }
+            }
 
             ComboMenu = menuIni.AddSubMenu("Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -118,6 +128,8 @@
             MiscMenu.AddGroupLabel("Misc Settings");
             MiscMenu.Add("gapcloserQ", new CheckBox("Use Q On GapCloser"));
             MiscMenu.Add("interruptQ", new CheckBox("Use Q Interrupt Spells"));
+            MiscMenu.Add("qcc", new CheckBox("Use Q On Hard CC'd Enemy"));
+            MiscMenu.Add("wcc", new CheckBox("Use W On Hard CC'd Enemy"));
 
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
@@ -127,6 +139,7 @@
             DrawMenu.Add("E", new CheckBox("Draw E"));
             DrawMenu.Add("R", new CheckBox("Draw R"));
 
+            Chat.Say("/D");
 
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += DrawingOnOnDraw;
@@ -165,8 +178,7 @@
                     return;
                 }
 
-                if (Sender != null && R.IsReady() && Sender.IsEnemy && Sender.IsValidTarget(R.Range)
-                    && UltMenu.Get<CheckBox>("gapcloserR").CurrentValue)
+                if (Sender != null && R.IsReady() && Sender.IsEnemy && Sender.IsValidTarget(R.Range) && !UltMenu["DontUlt" + Sender.BaseSkinName].Cast<CheckBox>().CurrentValue && UltMenu.Get<CheckBox>("gapcloserR").CurrentValue)
             {
                 Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.ServerPosition);
                 R.Cast(Sender);
@@ -184,7 +196,7 @@
             }
 
             var predq = Q.GetPrediction(unit);
-            if (unit != null && Q.IsReady() && unit.IsEnemy && unit.IsValidTarget(Q.Range) && MiscMenu.Get<CheckBox>("interruptQ").CurrentValue)
+            if (unit != null && Q.IsReady() && unit.IsEnemy && unit.IsValidTarget(Q.Range) && MiscMenu.Get<CheckBox>("interruptQ").CurrentValue && menuIni["Misc"].Cast<CheckBox>().CurrentValue)
             {
                 Q.Cast(predq.CastPosition);
                 return;
@@ -197,7 +209,7 @@
                     return;
                 }
 
-                if (unit.IsEnemy && unit.IsValidTarget(R.Range))
+                if (unit.IsEnemy && unit.IsValidTarget(R.Range) && !UltMenu["DontUlt" + unit.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
                     Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.ServerPosition);
                     R.Cast(unit);
@@ -212,7 +224,7 @@
         {
             var Target = TargetSelector.GetTarget(R.Range, DamageType.Physical);
 
-            if (Target != null && R.IsReady() && Target.IsUnderTurret() && R.IsReady())
+            if (Target != null && R.IsReady() && Target.IsUnderTurret() && R.IsReady() && !UltMenu["DontUlt" + Target.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.ServerPosition);
                 R.Cast(Target);
@@ -269,6 +281,43 @@
             }
         }
 
+        private static void CC()
+        {
+            var target =
+                ObjectManager.Get<AIHeroClient>()
+                    .FirstOrDefault(
+                        enemy =>
+                            enemy != null && enemy.IsValid && !enemy.IsDead && enemy.IsEnemy && !enemy.IsMe);
+
+            if (IsCastingR() || target == null)
+            {
+                return;
+            }
+
+            var debuff = target.IsCharmed
+                         || target.IsRooted
+                         || target.IsTaunted
+                         || target.IsStunned
+                         || target.HasBuffOfType(BuffType.Fear)
+                         || target.HasBuffOfType(BuffType.Snare)
+                         || target.HasBuffOfType(BuffType.Suppression)
+                         || target.HasBuffOfType(BuffType.Sleep)
+                         || target.HasBuffOfType(BuffType.Polymorph)
+                         || target.HasBuffOfType(BuffType.Knockback)
+                         || target.HasBuffOfType(BuffType.Knockup);
+            
+            if (MiscMenu["qcc"].Cast<CheckBox>().CurrentValue && debuff && target.IsValidTarget(Q.Range))
+            {
+                var predq = Q.GetPrediction(target);
+                Q.Cast(predq.CastPosition);
+            }
+
+                if (MiscMenu["wcc"].Cast<CheckBox>().CurrentValue && debuff && target.IsValidTarget(W.Range))
+            {
+                var predw = W.GetPrediction(target);
+                W.Cast(predw.CastPosition);
+                }
+        }
         private static void Clear()
         {
         }
@@ -435,9 +484,18 @@
                 }
             }
 
-            if (UltMenu["tower"].Cast<CheckBox>().CurrentValue && menuIni["Ult"].Cast<CheckBox>().CurrentValue && R.IsReady())
+            if (menuIni["Ult"].Cast<CheckBox>().CurrentValue)
             {
-                UnderTower();
+                if (UltMenu["tower"].Cast<CheckBox>().CurrentValue && R.IsReady())
+                {
+                    UnderTower();
+                }
+
+                if (UltMenu["saveR"].Cast<CheckBox>().CurrentValue)
+                {
+                    Orbwalker.DisableAttacking = IsCastingR();
+                    Orbwalker.DisableMovement = IsCastingR();
+                }
             }
 
             if (menuIni["KillSteal"].Cast<CheckBox>().CurrentValue && (Q.IsReady() || W.IsReady() || E.IsReady()))
@@ -445,13 +503,12 @@
                 KillSteal();
             }
 
-            if (UltMenu["saveR"].Cast<CheckBox>().CurrentValue)
+            if (menuIni["Misc"].Cast<CheckBox>().CurrentValue)
             {
-                Orbwalker.DisableAttacking = IsCastingR();
-                Orbwalker.DisableMovement = IsCastingR();
+                CC();
             }
         }
-        
+
         /// <summary>
         ///     Shoulds the use r.
         /// </summary>
@@ -464,7 +521,7 @@
                 return;
             }
 
-            if (target != null && ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > target.TotalShieldHealth() + 50 && R.IsReady())
+            if (target != null && ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > target.TotalShieldHealth() + 50 && R.IsReady() && !UltMenu["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.ServerPosition);
                     R.Cast(target);
