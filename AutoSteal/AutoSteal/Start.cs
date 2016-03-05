@@ -10,6 +10,7 @@
     class Start
     {
         public static Menu menuIni;
+        public static Menu Junglemobs;
         public static void Startload()
         {
 
@@ -18,6 +19,19 @@
             menuIni.Add("AAC", new CheckBox("Use AA "));
             menuIni.AddGroupLabel("Auto Steal Jungle Mobs");
             menuIni.Add("AAJ", new CheckBox("Use AA "));
+
+            Junglemobs = menuIni.AddSubMenu("Jungle Monsters ", "Jungle Monster");
+            Junglemobs.AddGroupLabel("Select Jungle Monsters");
+            Junglemobs.Add("blue", new CheckBox("Steal Blue "));
+            Junglemobs.Add("red", new CheckBox("Steal Red "));
+            Junglemobs.Add("baron", new CheckBox("Steal Baron "));
+            Junglemobs.Add("drake", new CheckBox("Steal Dragon "));
+            Junglemobs.Add("gromp", new CheckBox("Steal Gromp "));
+            Junglemobs.Add("krug", new CheckBox("Steal Krug "));
+            Junglemobs.Add("razorbeak", new CheckBox("Steal Razorbeak "));
+            Junglemobs.Add("crab", new CheckBox("Steal Crab "));
+            Junglemobs.Add("murkwolf", new CheckBox("Steal Murkwolf "));
+            Junglemobs.AddLabel("If Champion Isn't Supported will only try to AA");
 
 
             if (ObjectManager.Player.ChampionName == "Gragas")
