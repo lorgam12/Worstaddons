@@ -58,10 +58,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Champs\Gragas.cs" />
     <Compile Include="Champs\Jinx.cs" />
     <Compile Include="Champs\Katarina.cs" />
     <Compile Include="Champs\LeeSin.cs" />
     <Compile Include="Champs\Nidalee.cs" />
+    <Compile Include="Champs\Riven.cs" />
+    <Compile Include="Champs\Sivir.cs" />
+    <Compile Include="Champs\Thresh.cs" />
+    <Compile Include="Check.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="Start.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

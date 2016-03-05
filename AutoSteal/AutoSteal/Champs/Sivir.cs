@@ -1,15 +1,16 @@
 ﻿namespace AutoSteal.Champs
 {
-    using System.Linq;
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
+    using System.Linq;
 
-    class Nidalee
+    class Sivir
     {
+
         public static Spell.Skillshot Q { get; set; }
-        public static Menu NidaMenu { get; set; }
+        public static Menu SivMenu { get; set; }
 
         public static void KS()
         {
@@ -19,13 +20,13 @@
                         hero =>
                         hero.IsValidTarget(Q.Range)
                         && !hero.HasBuffOfType(BuffType.Invulnerability)
-                        && hero.IsEnemy 
+                        && hero.IsEnemy
                         && !hero.IsDead
                         && !hero.IsZombie))
             {
-                if (Nidalee.NidaMenu["QC"].Cast<CheckBox>().CurrentValue)
+                if (SivMenu["QC"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (Player.GetSpell(SpellSlot.Q).Name == "JavelinToss"  && ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q) > Check.HealthPrediction.GetHealthPrediction(target, (int)(Q.CastDelay * 1000))
+                    if (ObjectManager.Player.GetAutoAttackDamage(target) + ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q) > Check.HealthPrediction.GetHealthPrediction(target, (int)(Q.CastDelay * 1000))
                         && Q.IsInRange(target) && Q.IsReady())
                     {
                         var pred = Q.GetPrediction(target);
@@ -57,9 +58,9 @@
                         || jmob.BaseSkinName == "SRU_Blue"
                         || jmob.BaseSkinName == "SRU_Red")))
             {
-                if (Nidalee.NidaMenu["QJ"].Cast<CheckBox>().CurrentValue)
+                if (SivMenu["QJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (Player.GetSpell(SpellSlot.Q).Name == "JavelinToss" && ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.Q) > Check.HealthPrediction.GetHealthPrediction(mob, (int)(Q.CastDelay * 1000))
+                    if (ObjectManager.Player.GetAutoAttackDamage(mob) + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.Q) > Check.HealthPrediction.GetHealthPrediction(mob, (int)(Q.CastDelay * 1000))
                         && Q.IsInRange(mob))
                     {
                         Q.Cast(mob.Position);

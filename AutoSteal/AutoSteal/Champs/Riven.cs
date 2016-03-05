@@ -6,12 +6,14 @@
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
 
-    class LeeSin
+    internal class Riven
     {
-        public static Spell.Skillshot Q { get; set; }
-        public static Spell.Active E { get; set; }
-        public static Spell.Targeted R { get; set; }
-        public static Menu LeeMenu { get; set; }
+
+        public static Spell.Active W { get; set; }
+
+        public static Spell.Skillshot R { get; set; }
+
+        public static Menu RivenMenu { get; set; }
 
 
         public static void KS()
@@ -20,40 +22,30 @@
                 ObjectManager.Get<AIHeroClient>()
                     .Where(
                         hero =>
-                        hero.IsValidTarget(Q.Range)
+                        hero.IsValidTarget(R.Range)
                         && !hero.HasBuffOfType(BuffType.Invulnerability)
                         && hero.IsEnemy
                         && !hero.IsDead
                         && !hero.IsZombie))
             {
-
-                if (LeeMenu["QC"].Cast<CheckBox>().CurrentValue)
+                if (RivenMenu["WC"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (Player.GetSpell(SpellSlot.Q).Name == "SonicWave" && ObjectManager.Player.GetAutoAttackDamage(target) + ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q) > Check.HealthPrediction.GetHealthPrediction(target, (int)(Q.CastDelay * 1000))
-                        && Q.IsInRange(target) && Q.IsReady())
+                    if (ObjectManager.Player.GetAutoAttackDamage(target)
+                        + ObjectManager.Player.GetSpellDamage(target, SpellSlot.W) > Check.HealthPrediction.GetHealthPrediction(target, (int)(W.CastDelay * 1000))
+                        && W.IsInRange(target) && W.IsReady())
                     {
-                        var pred = Q.GetPrediction(target);
-                        Q.Cast(pred.CastPosition);
+                        W.Cast();
                         return;
                     }
                 }
 
-                if (LeeMenu["EC"].Cast<CheckBox>().CurrentValue)
-                {
-                    if (ObjectManager.Player.GetAutoAttackDamage(target) + ObjectManager.Player.GetSpellDamage(target, SpellSlot.E) > Check.HealthPrediction.GetHealthPrediction(target, (int)(E.CastDelay * 1000))
-                        && E.IsInRange(target) && E.IsReady())
-                    {
-                        E.Cast();
-                        return;
-                    }
-                }
-
-                if (LeeMenu["RC"].Cast<CheckBox>().CurrentValue)
+                if (RivenMenu["RC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.GetAutoAttackDamage(target) + ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > Check.HealthPrediction.GetHealthPrediction(target, (int)(R.CastDelay * 1000))
                         && R.IsInRange(target) && R.IsReady())
                     {
-                        R.Cast(target);
+                        var pred = R.GetPrediction(target);
+                        R.Cast(pred.CastPosition);
                         return;
                     }
                 }
@@ -62,11 +54,12 @@
 
         public static void JKS()
         {
+
             foreach (Obj_AI_Minion mob in
                 ObjectManager.Get<Obj_AI_Minion>()
                     .Where(
                         jmob =>
-                        jmob.IsValidTarget(Q.Range)
+                        jmob.IsValidTarget(R.Range)
                         && !jmob.HasBuffOfType(BuffType.Invulnerability)
                         && jmob.IsMonster
                         && !jmob.IsDead
@@ -81,22 +74,21 @@
                         || jmob.BaseSkinName == "SRU_Blue"
                         || jmob.BaseSkinName == "SRU_Red")))
             {
-                if (LeeMenu["QJ"].Cast<CheckBox>().CurrentValue)
+                if (RivenMenu["WJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (Player.GetSpell(SpellSlot.Q).Name == "SonicWave" && ObjectManager.Player.GetAutoAttackDamage(mob) + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.Q) > Check.HealthPrediction.GetHealthPrediction(mob, (int)(Q.CastDelay * 1000))
-                        && Q.IsInRange(mob) && Q.IsReady())
+                    if (ObjectManager.Player.GetAutoAttackDamage(mob) + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.W) > Check.HealthPrediction.GetHealthPrediction(mob, (int)(W.CastDelay * 1000))
+                        && W.IsInRange(mob))
                     {
-                        Q.Cast(mob.Position);
+                        W.Cast();
                         return;
                     }
                 }
-
-                if (LeeMenu["EJ"].Cast<CheckBox>().CurrentValue)
+                if (RivenMenu["RJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (ObjectManager.Player.GetAutoAttackDamage(mob) + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.E) > Check.HealthPrediction.GetHealthPrediction(mob, (int)(E.CastDelay * 1000))
-                        && E.IsInRange(mob) && E.IsReady())
+                    if (ObjectManager.Player.GetAutoAttackDamage(mob) + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.R) > Check.HealthPrediction.GetHealthPrediction(mob, (int)(R.CastDelay * 1000))
+                        && R.IsInRange(mob))
                     {
-                        E.Cast();
+                        R.Cast(mob.Position);
                         return;
                     }
                 }

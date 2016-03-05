@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AutoSteal
+﻿namespace AutoSteal
 {
-    using AutoSteal.Champs;
+    using Champs;
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Enumerations;
@@ -24,6 +18,37 @@ namespace AutoSteal
             menuIni.Add("AAC", new CheckBox("Use AA "));
             menuIni.AddGroupLabel("Auto Steal Jungle Mobs");
             menuIni.Add("AAJ", new CheckBox("Use AA "));
+
+
+            if (ObjectManager.Player.ChampionName == "Gragas")
+            {
+                Gragas.GragMenu = menuIni.AddSubMenu("Gragas ");
+                Gragas.GragMenu.AddGroupLabel("Auto Steal Kills");
+                Gragas.GragMenu.Add("QC", new CheckBox("Use Q "));
+                Gragas.GragMenu.Add("EC", new CheckBox("Use E "));
+                Gragas.GragMenu.Add("RC", new CheckBox("Use R "));
+                Gragas.GragMenu.AddSeparator();
+                Gragas.GragMenu.AddGroupLabel("Auto Steal Jungle");
+                Gragas.GragMenu.Add("QJ", new CheckBox("Use Q "));
+                Gragas.GragMenu.Add("EJ", new CheckBox("Use E "));
+                Gragas.GragMenu.Add("RJ", new CheckBox("Use R "));
+
+                Gragas.Q = new Spell.Skillshot(SpellSlot.Q, 775, SkillShotType.Circular, 1, 1000, 100)
+                {
+                    AllowedCollisionCount = int.MaxValue
+                };
+
+                Gragas.E = new Spell.Skillshot(SpellSlot.E, 675, SkillShotType.Linear, 0, 1000, 50)
+                {
+                    AllowedCollisionCount = 0
+                };
+
+                Gragas.R = new Spell.Skillshot(SpellSlot.R, 1100, SkillShotType.Circular, 1, 1000, 500)
+                {
+                    AllowedCollisionCount = int.MaxValue
+                };
+            }
+
             if (ObjectManager.Player.ChampionName == "Jinx")
             {
                 Jinx.JinxMenu = menuIni.AddSubMenu("Jinx ");
@@ -65,6 +90,7 @@ namespace AutoSteal
                 LeeSin.LeeMenu.AddGroupLabel("Auto Steal Kills");
                 LeeSin.LeeMenu.Add("QC", new CheckBox("Use Q "));
                 LeeSin.LeeMenu.Add("EC", new CheckBox("Use E "));
+                LeeSin.LeeMenu.Add("RC", new CheckBox("Use R "));
                 LeeSin.LeeMenu.AddSeparator();
                 LeeSin.LeeMenu.AddGroupLabel("Auto Steal Jungle");
                 LeeSin.LeeMenu.Add("QJ", new CheckBox("Use Q "));
@@ -75,6 +101,7 @@ namespace AutoSteal
                     AllowedCollisionCount = 0
                 };
                 LeeSin.E = new Spell.Active(SpellSlot.E, 350);
+                LeeSin.R = new Spell.Targeted(SpellSlot.R, 375);
             }
 
             if (ObjectManager.Player.ChampionName == "Nidalee")
@@ -90,6 +117,60 @@ namespace AutoSteal
                                 {
                                     AllowedCollisionCount = 0 
                                 };
+            }
+
+            if (ObjectManager.Player.ChampionName == "Riven")
+            {
+                Riven.RivenMenu = menuIni.AddSubMenu("Riven ");
+                Riven.RivenMenu.AddGroupLabel("Auto Steal Kills");
+                Riven.RivenMenu.Add("WC", new CheckBox("Use W "));
+                Riven.RivenMenu.Add("RC", new CheckBox("Use R "));
+                Riven.RivenMenu.AddSeparator();
+                Riven.RivenMenu.AddGroupLabel("Auto Steal Jungle");
+                Riven.RivenMenu.Add("WJ", new CheckBox("Use W "));
+                Riven.RivenMenu.Add("RJ", new CheckBox("Use R "));
+
+                Riven.W = new Spell.Active(SpellSlot.W, 125);
+                Riven.R = new Spell.Skillshot(SpellSlot.R, 875, SkillShotType.Cone, 250, 1600, 150)
+                {
+                    AllowedCollisionCount = int.MaxValue
+                };
+            }
+
+            if (ObjectManager.Player.ChampionName == "Sivir")
+            {
+                Sivir.SivMenu = menuIni.AddSubMenu("Sivir ");
+                Sivir.SivMenu.AddGroupLabel("Auto Steal Kills");
+                Sivir.SivMenu.Add("QC", new CheckBox("Use Q "));
+                Sivir.SivMenu.AddSeparator();
+                Sivir.SivMenu.AddGroupLabel("Auto Steal Jungle");
+                Sivir.SivMenu.Add("QJ", new CheckBox("Use Q "));
+
+                Sivir.Q = new Spell.Skillshot(SpellSlot.Q, 1245, SkillShotType.Linear, (int)0.25, 1030, 90)
+                {
+                    AllowedCollisionCount = int.MaxValue
+                };
+            }
+
+            if (ObjectManager.Player.ChampionName == "Thresh")
+            {
+                Thresh.ThreshMenu = menuIni.AddSubMenu("Thresh ");
+                Thresh.ThreshMenu.AddGroupLabel("Auto Steal Kills");
+                Thresh.ThreshMenu.Add("QC", new CheckBox("Use Q "));
+                Thresh.ThreshMenu.Add("EC", new CheckBox("Use E "));
+                Thresh.ThreshMenu.AddSeparator();
+                Thresh.ThreshMenu.AddGroupLabel("Auto Steal Jungle");
+                Thresh.ThreshMenu.Add("QJ", new CheckBox("Use Q "));
+                Thresh.ThreshMenu.Add("EJ", new CheckBox("Use E "));
+
+                Thresh.Q = new Spell.Skillshot(SpellSlot.Q, 1040, SkillShotType.Linear, 500, 1900, 60)
+                {
+                    AllowedCollisionCount = 0
+                };
+                Thresh.E = new Spell.Skillshot(SpellSlot.E, 480, SkillShotType.Linear, 0, 2000, 110)
+                {
+                    AllowedCollisionCount = int.MaxValue
+                };
             }
         }
     }
