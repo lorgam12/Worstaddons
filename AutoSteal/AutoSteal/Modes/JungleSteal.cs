@@ -27,6 +27,8 @@
                         jmob =>
                         !jmob.HasBuffOfType(BuffType.Invulnerability)
                         && jmob.IsMonster
+                        && jmob.IsValid
+                        && jmob.IsVisible
                         && !jmob.IsDead
                         && !jmob.IsZombie
                         && ((Program.JungleStealMenu["drake"].Cast<CheckBox>().CurrentValue
@@ -45,8 +47,7 @@
                                 && jmob.BaseSkinName == "SRU_Murkwolf")
                             || (Program.JungleStealMenu["blue"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Blue")
-                            || (Program.JungleStealMenu["red"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "SRU_Red")))
-                )
+                            || (Program.JungleStealMenu["red"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "SRU_Red"))))
             {
                 if (Program.JungleStealMenu["AAJ"].Cast<CheckBox>().CurrentValue)
                 {
@@ -76,7 +77,7 @@
                             return;
                         }
 
-                        if (Spells.Q.GetType() == typeof(Spell.Active))
+                        if (Spells.Q.GetType() == typeof(Spell.Targeted))
                         {
                             Spells.Q.Cast(mob);
                             return;
@@ -90,7 +91,13 @@
 
                         if (Spells.Q.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spells.Q.Cast(mob);
+                            Spells.Q.Cast(mob.Position);
+                            return;
+                        }
+
+                        if (Spells.Q.GetType() == typeof(Spell.Ranged))
+                        {
+                            Spells.Q.Cast(mob.Position);
                             return;
                         }
                     }
@@ -127,7 +134,14 @@
 
                         if (Spells.W.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spells.W.Cast(mob);
+                            Spells.W.Cast(mob.Position);
+                            return;
+
+                        }
+
+                        if (Spells.W.GetType() == typeof(Spell.Ranged))
+                        {
+                            Spells.W.Cast(mob.Position);
                             return;
                         }
                     }
@@ -164,7 +178,13 @@
 
                         if (Spells.E.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spells.E.Cast(mob);
+                            Spells.E.Cast(mob.Position);
+                            return;
+                        }
+
+                        if (Spells.E.GetType() == typeof(Spell.Ranged))
+                        {
+                            Spells.E.Cast(mob.Position);
                             return;
                         }
                     }
@@ -201,7 +221,13 @@
 
                         if (Spells.R.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spells.R.Cast(mob);
+                            Spells.R.Cast(mob.Position);
+                            return;
+                        }
+
+                        if (Spells.R.GetType() == typeof(Spell.Ranged))
+                        {
+                            Spells.R.Cast(mob.Position);
                             return;
                         }
                     }

@@ -27,6 +27,8 @@
                         hero =>
                         hero != null
                         && !hero.HasBuffOfType(BuffType.Invulnerability)
+                        && hero.IsValid
+                        && hero.IsVisible
                         && hero.IsEnemy
                         && !hero.IsDead
                         && !hero.IsZombie
@@ -77,6 +79,12 @@
                             Spells.Q.Cast(target);
                             return;
                         }
+
+                        if (Spells.Q.GetType() == typeof(Spell.Ranged))
+                        {
+                            Spells.Q.Cast(target);
+                            return;
+                        }
                     }
                 }
 
@@ -110,6 +118,12 @@
                         }
 
                         if (Spells.W.GetType() == typeof(Spell.Chargeable))
+                        {
+                            Spells.W.Cast(target);
+                            return;
+                        }
+
+                        if (Spells.W.GetType() == typeof(Spell.Ranged))
                         {
                             Spells.W.Cast(target);
                             return;
@@ -148,7 +162,13 @@
 
                         if (Spells.E.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spells.E.Cast(target);
+                            Spells.E.Cast(target.Position);
+                            return;
+                        }
+
+                        if (Spells.E.GetType() == typeof(Spell.Ranged))
+                        {
+                            Spells.E.Cast(target.Position);
                             return;
                         }
                     }
@@ -185,7 +205,13 @@
 
                         if (Spells.R.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spells.R.Cast(target);
+                            Spells.R.Cast(target.Position);
+                            return;
+                        }
+
+                        if (Spells.R.GetType() == typeof(Spell.Ranged))
+                        {
+                            Spells.R.Cast(target.Position);
                             return;
                         }
                     }
