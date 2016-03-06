@@ -28,7 +28,7 @@
                 KillSteal.KS();
             }
 
-            if (Start.KillSteal["EnableJS"].Cast<CheckBox>().CurrentValue)
+            if (Start.JungleSteal["EnableJS"].Cast<CheckBox>().CurrentValue)
             {
                 JungleSteal.JS();
             }
