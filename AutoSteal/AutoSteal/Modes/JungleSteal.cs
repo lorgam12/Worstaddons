@@ -29,26 +29,26 @@
                         && jmob.IsMonster
                         && !jmob.IsDead
                         && !jmob.IsZombie
-                        && ((Start.JungleSteal["drake"].Cast<CheckBox>().CurrentValue
+                        && ((Program.JungleStealMenu["drake"].Cast<CheckBox>().CurrentValue
                              && jmob.BaseSkinName == "SRU_Dragon")
-                            || (Start.JungleSteal["baron"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu["baron"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Baron")
-                            || (Start.JungleSteal["gromp"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu["gromp"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Gromp")
-                            || (Start.JungleSteal["krug"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu["krug"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Krug")
-                            || (Start.JungleSteal["razorbeak"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu["razorbeak"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Razorbeak")
-                            || (Start.JungleSteal["crab"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu["crab"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "Sru_Crab")
-                            || (Start.JungleSteal["murkwolf"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu["murkwolf"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Murkwolf")
-                            || (Start.JungleSteal["blue"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu["blue"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Blue")
-                            || (Start.JungleSteal["red"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "SRU_Red")))
+                            || (Program.JungleStealMenu["red"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "SRU_Red")))
                 )
             {
-                if (Start.JungleSteal["AAJ"].Cast<CheckBox>().CurrentValue)
+                if (Program.JungleStealMenu["AAJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.CanAttack
                         && ObjectManager.Player.GetAutoAttackDamage(mob) > mob.Health
@@ -59,7 +59,7 @@
                     }
                 }
 
-                if (Start.JungleSteal["QJ"].Cast<CheckBox>().CurrentValue)
+                if (Program.JungleStealMenu["QJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetAutoAttackDamage(mob)
@@ -96,7 +96,7 @@
                     }
                 }
 
-                if (Start.JungleSteal["WJ"].Cast<CheckBox>().CurrentValue)
+                if (Program.JungleStealMenu["WJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetAutoAttackDamage(mob)
@@ -133,7 +133,7 @@
                     }
                 }
 
-                if (Start.JungleSteal["EJ"].Cast<CheckBox>().CurrentValue)
+                if (Program.JungleStealMenu["EJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetAutoAttackDamage(mob)
@@ -170,7 +170,7 @@
                     }
                 }
 
-                if (Start.JungleSteal["RJ"].Cast<CheckBox>().CurrentValue)
+                if (Program.JungleStealMenu["RJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetAutoAttackDamage(mob)

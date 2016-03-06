@@ -25,12 +25,14 @@
                 ObjectManager.Get<AIHeroClient>()
                     .Where(
                         hero =>
-                        !hero.HasBuffOfType(BuffType.Invulnerability)
+                        hero != null
+                        && !hero.HasBuffOfType(BuffType.Invulnerability)
                         && hero.IsEnemy
                         && !hero.IsDead
-                        && !hero.IsZombie))
+                        && !hero.IsZombie
+                        && Program.KillStealMenu["Steal" + hero.BaseSkinName].Cast<CheckBox>().CurrentValue))
             {
-                if (Start.KillSteal["AAC"].Cast<CheckBox>().CurrentValue)
+                if (Program.KillStealMenu["AAC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.CanAttack
                         && ObjectManager.Player.GetAutoAttackDamage(target) > target.Health
@@ -41,7 +43,7 @@
                     }
                 }
 
-                if (Start.KillSteal["QC"].Cast<CheckBox>().CurrentValue)
+                if (Program.KillStealMenu["QC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetAutoAttackDamage(target)
@@ -78,7 +80,7 @@
                     }
                 }
 
-                if (Start.KillSteal["WC"].Cast<CheckBox>().CurrentValue)
+                if (Program.KillStealMenu["WC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetAutoAttackDamage(target)
@@ -115,7 +117,7 @@
                     }
                 }
 
-                if (Start.KillSteal["EC"].Cast<CheckBox>().CurrentValue)
+                if (Program.KillStealMenu["EC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetAutoAttackDamage(target)
@@ -152,7 +154,7 @@
                     }
                 }
 
-                if (Start.KillSteal["RC"].Cast<CheckBox>().CurrentValue)
+                if (Program.KillStealMenu["RC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetAutoAttackDamage(target)
