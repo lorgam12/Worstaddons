@@ -370,7 +370,7 @@ namespace Olaf
                     ObjectManager.Get<AIHeroClient>()
                         .FirstOrDefault(
                             enemy =>
-                                enemy.IsValidTarget(Q.Range) && enemy.Health < player.GetSpellDamage(enemy, SpellSlot.Q));
+                                enemy.IsEnemy && enemy.IsValidTarget(Q.Range) && enemy.Health < player.GetSpellDamage(enemy, SpellSlot.Q));
                 if (target.IsValidTarget(Q.Range))
                 {
                     if (target != null)
@@ -387,7 +387,7 @@ namespace Olaf
                     ObjectManager.Get<AIHeroClient>()
                         .FirstOrDefault(
                             enemy =>
-                                enemy.IsValidTarget(E.Range) && enemy.Health < player.GetSpellDamage(enemy, SpellSlot.E));
+                                enemy.IsEnemy && enemy.IsValidTarget(E.Range) && enemy.Health < player.GetSpellDamage(enemy, SpellSlot.E));
                 if (target.IsValidTarget(E.Range) && target != null)
                 {
                     E.Cast(target);
@@ -506,7 +506,9 @@ namespace Olaf
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
             var harassmana = HarassMenu["harassmana"].Cast<Slider>().CurrentValue;
             if (!Q.IsReady() || !menuIni["Harass"].Cast<CheckBox>().CurrentValue
-                || !HarassMenu["hQA"].Cast<CheckBox>().CurrentValue || player.IsRecalling() || target == null
+                || !HarassMenu["hQA"].Cast<CheckBox>().CurrentValue
+                || player.IsRecalling()
+                || target == null
                 || !target.IsValidTarget())
             {
                 return;
