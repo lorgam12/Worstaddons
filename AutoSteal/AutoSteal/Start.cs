@@ -28,7 +28,7 @@
             foreach (var enemy in ObjectManager.Get<AIHeroClient>())
             {
                 CheckBox cb = new CheckBox(enemy.BaseSkinName);
-                cb.CurrentValue = false;
+                cb.CurrentValue = true;
                 if (enemy.Team != Player.Instance.Team)
                 {
                     KillSteal.Add("DontSteal" + enemy.BaseSkinName, cb);
