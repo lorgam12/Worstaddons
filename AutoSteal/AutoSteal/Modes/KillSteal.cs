@@ -28,10 +28,9 @@
                         !hero.HasBuffOfType(BuffType.Invulnerability)
                         && hero.IsEnemy
                         && !hero.IsDead
-                        && !hero.IsZombie
-                        && !Start.KillSteal["DontSteal" + hero.BaseSkinName].Cast<CheckBox>().CurrentValue))
+                        && !hero.IsZombie))
             {
-                if (Start.JungleSteal["AAJ"].Cast<CheckBox>().CurrentValue)
+                if (Start.KillSteal["AAC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.CanAttack
                         && ObjectManager.Player.GetAutoAttackDamage(target) > target.Health
@@ -42,7 +41,7 @@
                     }
                 }
 
-                if (Start.JungleSteal["QJ"].Cast<CheckBox>().CurrentValue)
+                if (Start.KillSteal["QC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetAutoAttackDamage(target)
@@ -79,7 +78,7 @@
                     }
                 }
 
-                if (Start.JungleSteal["WJ"].Cast<CheckBox>().CurrentValue)
+                if (Start.KillSteal["WC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetAutoAttackDamage(target)
@@ -116,7 +115,7 @@
                     }
                 }
 
-                if (Start.JungleSteal["EJ"].Cast<CheckBox>().CurrentValue)
+                if (Start.KillSteal["EC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetAutoAttackDamage(target)
@@ -153,7 +152,7 @@
                     }
                 }
 
-                if (Start.JungleSteal["RJ"].Cast<CheckBox>().CurrentValue)
+                if (Start.KillSteal["RC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetAutoAttackDamage(target)

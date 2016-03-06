@@ -17,6 +17,7 @@
             KillSteal = menuIni.AddSubMenu("Kill Steal ", "Kill Steal");
             KillSteal.AddGroupLabel("Kill Steal Settings");
             KillSteal.Add("EnableKS", new CheckBox("Enable Kill Steal "));
+            JungleSteal.AddSeparator();
             KillSteal.AddGroupLabel(ObjectManager.Player.ChampionName + " Kill Steal Spells");
             KillSteal.Add("AAC", new CheckBox("Use AA "));
             KillSteal.Add("QC", new CheckBox("Use Q "));
