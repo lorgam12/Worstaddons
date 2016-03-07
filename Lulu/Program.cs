@@ -45,6 +45,8 @@
 
         public static Menu DrawMenu { get; private set; }
 
+        public static Menu Saver { get; private set; }
+
         public static Menu menuIni;
 
         public static SpellSlot IgniteSlot;
@@ -75,31 +77,12 @@
             menuIni = MainMenu.AddMenu(ChampionName, ChampionName);
             menuIni.AddGroupLabel("Welcome to the Worst Lulu addon!");
             menuIni.AddGroupLabel("Global Settings");
-            menuIni.Add("Ult", new CheckBox("Use Ultimate?"));
             menuIni.Add("Combo", new CheckBox("Use Combo?"));
             menuIni.Add("Harass", new CheckBox("Use Harass?"));
             menuIni.Add("LaneClear", new CheckBox("Use LaneClear?"));
-            menuIni.Add("KillSteal", new CheckBox("Use Kill Steal?"));
-            menuIni.Add("Misc", new CheckBox("Use Misc?"));
+            menuIni.Add("Saver", new CheckBox("Use Saver?"));
             menuIni.Add("Drawings", new CheckBox("Use Drawings?"));
 
-
-            UltMenu = menuIni.AddSubMenu("Ultimate");
-            UltMenu.AddGroupLabel("Ultimate Settings");
-            UltMenu.Add("gapcloserR", new CheckBox("Use R On GapCloser"));
-            UltMenu.Add("InterruptSpellsR", new CheckBox("Use R Interrupt Spells"));
-            UltMenu.Add("AutoR", new CheckBox("Auto R AoE"));
-            UltMenu.AddSeparator();
-            UltMenu.AddGroupLabel("Don't Use Ult On:");
-            foreach (var ally in ObjectManager.Get<AIHeroClient>())
-            {
-                CheckBox cb = new CheckBox(ally.BaseSkinName);
-                cb.CurrentValue = false;
-                if (ObjectManager.Player.Team == ally.Team)
-                {
-                    UltMenu.Add("DontUlt" + ally.BaseSkinName, cb);
-                }
-            }
 
             ComboMenu = menuIni.AddSubMenu("Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -112,7 +95,7 @@
 
             HarassMenu = menuIni.AddSubMenu("Harass");
             HarassMenu.AddGroupLabel("Harass Settings");
-            HarassMenu.Add("Q", new CheckBox("Use Q", false));
+            HarassMenu.Add("Q", new CheckBox("Use Q"));
             HarassMenu.Add("W", new CheckBox("Use W", false));
             HarassMenu.Add("E", new CheckBox("Use E"));
             HarassMenu.Add("harassmana", new Slider("Harass Mana Manager", 60, 0, 100));
@@ -128,17 +111,33 @@
             LaneMenu.Add("EJ", new CheckBox("Use E"));
 
 
-            KillStealMenu = menuIni.AddSubMenu("Kill Steal");
-            KillStealMenu.AddGroupLabel("Kill Steal Settings");
-            KillStealMenu.Add("Q", new CheckBox("Kill Steal Q"));
-            KillStealMenu.Add("E", new CheckBox("Kill Steal E"));
-
-
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.AddGroupLabel("Misc Settings");
-            MiscMenu.Add("InterruptSpellsW", new CheckBox("Use W Interrupt Spells"));
-            MiscMenu.Add("qcc", new CheckBox("Use Q On Hard CC'd Enemy"));
             MiscMenu.Add("AutoE", new CheckBox("KS Enemy with E"));
+
+            Saver = menuIni.AddSubMenu("Saver");
+            Saver.AddGroupLabel("Saver Settings");
+            Saver.AddGroupLabel("Anti GapCloser");
+            Saver.Add("allywgapclose", new CheckBox("Use W On GapClosing Ally"));
+            Saver.Add("enemywgapclose", new CheckBox("Use W On GapClosing Enemy"));
+            Saver.Add("gapcloserR", new CheckBox("Use R On GapClosing Enemy"));
+            Saver.AddGroupLabel("Interrupter");
+            Saver.Add("InterruptSpellsW", new CheckBox("Use W Interrupt Spells"));
+            Saver.Add("InterruptSpellsR", new CheckBox("Use R Interrupt Spells"));
+            Saver.AddGroupLabel("Auto Sheilds");
+            Saver.Add("AutoES", new CheckBox("Auto E Sheild Allies"));
+            Saver.Add("AutoR", new CheckBox("Auto R AoE || Saver"));
+            Saver.AddSeparator();
+            Saver.AddGroupLabel("Don't Use Saver On:");
+            foreach (var ally in ObjectManager.Get<AIHeroClient>())
+            {
+                CheckBox cb = new CheckBox(ally.BaseSkinName);
+                cb.CurrentValue = false;
+                if (ObjectManager.Player.Team == ally.Team)
+                {
+                    Saver.Add("DontUlt" + ally.BaseSkinName, cb);
+                }
+            }
 
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
@@ -148,37 +147,86 @@
             DrawMenu.Add("W", new CheckBox("Draw W"));
             DrawMenu.Add("E", new CheckBox("Draw E"));
             DrawMenu.Add("R", new CheckBox("Draw R"));
-            
+            DrawMenu.Add("PixP", new CheckBox("Draw Pix Position"));
+
+
             Drawing.OnDraw += OnDraw;
             Game.OnUpdate += Game_OnUpdate;
             Interrupter.OnInterruptableSpell += Interrupter2_OnInterruptableTarget;
+            Gapcloser.OnGapcloser += OnGapClose;
+        }
+
+        private static void OnGapClose(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
+        {
+            if (!menuIni.Get<CheckBox>("Saver").CurrentValue || Sender == null)
+            {
+                return;
+            }
+
+            if (Saver["allywgapclose"].Cast<CheckBox>().CurrentValue && Sender.IsAlly && W.IsInRange(Sender))
+            {
+                W.Cast(Sender);
+            }
+
+            if (Saver["Enemywgapclose"].Cast<CheckBox>().CurrentValue && Sender.IsEnemy && W.IsInRange(Sender))
+            {
+                W.Cast(Sender);
+            }
+
+            if (Saver.Get<CheckBox>("gapcloserR").CurrentValue)
+            {
+                if (R.IsReady())
+                {
+                    foreach (var ally in EntityManager.Heroes.AllHeroes)
+                    {
+                        if (ally.IsValidTarget(R.Range) && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                        {
+                            if (ally.Distance(Sender, true) < 300 * 300)
+                            {
+                                R.Cast(ally);
+                            }
+                        }
+                    }
+
+                    if (Player.Distance(Sender, true) < 300 * 300)
+                    {
+                        R.Cast(Player);
+                    }
+                }
+            }
         }
 
         private static void Interrupter2_OnInterruptableTarget(
             Obj_AI_Base sender,
             Interrupter.InterruptableSpellEventArgs args)
         {
-            if (!sender.IsValidTarget() || !sender.IsEnemy || sender.IsAlly)
+
+            if (!menuIni.Get<CheckBox>("Saver").CurrentValue)
             {
                 return;
             }
 
-            if (MiscMenu.Get<CheckBox>("InterruptSpellsW").CurrentValue)
+            if (!sender.IsValidTarget() || !sender.IsEnemy || sender.IsAlly || sender.IsMe || sender == null)
             {
-                if (W.IsReady() && sender.IsValidTarget(W.Range) && sender.IsEnemy && !sender.IsMe)
+                return;
+            }
+
+            if (Saver.Get<CheckBox>("InterruptSpellsW").CurrentValue)
+            {
+                if (W.IsReady() && sender.IsValidTarget(W.Range))
                 {
                     W.Cast(sender);
                     return;
                 }
             }
 
-            if (UltMenu.Get<CheckBox>("InterruptSpellsR").CurrentValue)
+            if (Saver.Get<CheckBox>("InterruptSpellsR").CurrentValue)
             {
                 if (R.IsReady())
                 {
                     foreach (var ally in EntityManager.Heroes.AllHeroes)
                     {
-                        if (ally.IsValidTarget(R.Range) && sender.IsEnemy && !sender.IsMe)
+                        if (ally.IsValidTarget(R.Range) && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
                             if (ally.Distance(sender, true) < 300 * 300)
                             {
@@ -187,7 +235,7 @@
                         }
                     }
 
-                    if (sender.IsEnemy && !sender.IsMe && Player.Distance(sender, true) < 300 * 300)
+                    if (Player.Distance(sender, true) < 300 * 300)
                     {
                         R.Cast(Player);
                     }
@@ -201,14 +249,6 @@
             if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
             {
                 Combo();
-                if (ComboMenu.Get<CheckBox>("WKite").CurrentValue && W.IsReady())
-                {
-                    var d = ComboMenu.Get<Slider>("WKiteD").CurrentValue;
-                    if (Player != null && Player.CountEnemiesInRange(d) >= 1)
-                    {
-                        W.Cast(Player);
-                    }
-                }
             }
 
             if (ObjectManager.Player.ManaPercent > LaneMenu["lanemana"].Cast<Slider>().CurrentValue)
@@ -233,24 +273,43 @@
                 ImABitch();
             }
 
-            if (UltMenu.Get<CheckBox>("AutoR").CurrentValue)
+            if (menuIni.Get<CheckBox>("Saver").CurrentValue)
             {
-                foreach (var ally in EntityManager.Heroes.Allies)
+                if (Saver.Get<CheckBox>("AutoES").CurrentValue)
                 {
-                    if (ally.IsValidTarget(R.Range) && ally != null)
+                    foreach (var ally in EntityManager.Heroes.Allies)
                     {
-                        var c = ally.CountEnemiesInRange(300);
-                        if (c >= 1 + 1 + 1 || ally.HealthPercent <= 15 && c >= 1)
+                        if (ally.IsValidTarget(E.Range) && ally != null
+                             && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
-                            R.Cast(ally);
+                            var c = ally.CountEnemiesInRange(300);
+                            if (c >= 1 + 1 + 1 || ally.HealthPercent <= 15 && c >= 1)
+                            {
+                                E.Cast(ally);
+                            }
                         }
                     }
                 }
 
-                var ec = Player.CountEnemiesInRange(300);
-                if ((ec >= 1 + 1 + 1 || Player.HealthPercent <= 15 && ec >= 1) && Player != null)
+                if (Saver.Get<CheckBox>("AutoR").CurrentValue)
                 {
-                    R.Cast(Player);
+                    foreach (var ally in EntityManager.Heroes.Allies)
+                    {
+                        if (ally.IsValidTarget(R.Range) && ally != null && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                        {
+                            var c = ally.CountEnemiesInRange(300);
+                            if (c >= 1 + 1 + 1 || ally.HealthPercent <= 15 && c >= 1)
+                            {
+                                R.Cast(ally);
+                            }
+                        }
+                    }
+
+                    var ec = Player.CountEnemiesInRange(300);
+                    if ((ec >= 1 + 1 + 1 || Player.HealthPercent <= 15 && ec >= 1) && Player != null)
+                    {
+                        R.Cast(Player);
+                    }
                 }
             }
         }
@@ -317,6 +376,7 @@
                                 .Where(
                                     t =>
                                     t.IsValidTarget(E.Range)
+                                    && t != null
                                     && t.Distance(eqTarget, true) < Q.RangeSquared
                                     && Player.GetSpellDamage(eqTarget, SpellSlot.E) < eqTarget.TotalShieldHealth())
                                 .FirstOrDefault(t => t.Distance(eqTarget) < 1750);
@@ -354,6 +414,15 @@
                 if (comboDamage > eTarget.Health)
                 {
                     Player.Spellbook.CastSpell(IgniteSlot, eTarget);
+                }
+            }
+
+            if (ComboMenu.Get<CheckBox>("WKite").CurrentValue && W.IsReady())
+            {
+                var d = ComboMenu.Get<Slider>("WKiteD").CurrentValue;
+                if (Player != null && Player.CountEnemiesInRange(d) >= 1)
+                {
+                    W.Cast(Player);
                 }
             }
         }
