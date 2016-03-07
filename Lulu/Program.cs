@@ -96,7 +96,6 @@
             HarassMenu = menuIni.AddSubMenu("Harass");
             HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("Q", new CheckBox("Use Q"));
-            HarassMenu.Add("W", new CheckBox("Use W", false));
             HarassMenu.Add("E", new CheckBox("Use E"));
             HarassMenu.Add("harassmana", new Slider("Harass Mana Manager", 60, 0, 100));
 
@@ -251,6 +250,14 @@
                 Combo();
             }
 
+            if (ObjectManager.Player.ManaPercent > HarassMenu["harassmana"].Cast<Slider>().CurrentValue)
+            {
+                if (flags.HasFlag(Orbwalker.ActiveModes.Harass) && menuIni.Get<CheckBox>("Harass").CurrentValue)
+                {
+                    Harass();
+                }
+            }
+
             if (ObjectManager.Player.ManaPercent > LaneMenu["lanemana"].Cast<Slider>().CurrentValue)
             {
                 if (flags.HasFlag(Orbwalker.ActiveModes.LaneClear) && menuIni.Get<CheckBox>("LaneClear").CurrentValue)
@@ -396,14 +403,40 @@
             }
         }
 
+        private static void Harass()
+        {
+            if (HarassMenu["Q"].Cast<CheckBox>().CurrentValue)
+            {
+                ShootQ();
+            }
+
+            if (HarassMenu["E"].Cast<CheckBox>().CurrentValue)
+            {
+                var eTarget = TargetSelector.GetTarget(E.Range, DamageType.Magical);
+                if (eTarget != null)
+                {
+                    E.Cast(eTarget);
+                }
+
+            var comboDamage = GetComboDamage(eTarget);
+            }
+        }
+
         private static void Combo()
         {
-            ShootQ();
+            if (ComboMenu["Q"].Cast<CheckBox>().CurrentValue)
+            {
+                ShootQ();
+            }
 
             var eTarget = TargetSelector.GetTarget(E.Range, DamageType.Magical);
-            if (eTarget != null)
+
+            if (ComboMenu["E"].Cast<CheckBox>().CurrentValue)
             {
-                E.Cast(eTarget);
+                if (eTarget != null)
+                {
+                    E.Cast(eTarget);
+                }
             }
 
             var comboDamage = GetComboDamage(eTarget);
