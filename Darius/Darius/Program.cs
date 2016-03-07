@@ -1,7 +1,10 @@
-﻿namespace Darius // The Dank Memes Master
+﻿namespace Darius
 {
+    // The Dank Memes Master
+
     using System;
     using System.Linq;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Enumerations;
@@ -9,34 +12,50 @@
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
     using EloBuddy.SDK.Rendering;
-    using SharpDX;
 
-    class Program
+    using SharpDX;
+    
+    internal class Program
     {
         public const string ChampName = "Darius";
+        
         public static readonly Item Cutlass = new Item((int)ItemId.Bilgewater_Cutlass, 550);
+        
         public static readonly Item Botrk = new Item((int)ItemId.Blade_of_the_Ruined_King, 550);
+        
         public static readonly Item Youmuu = new Item((int)ItemId.Youmuus_Ghostblade);
+        
         public static Menu QMenu { get; private set; }
+        
         public static Menu WMenu { get; private set; }
+        
         public static Menu EMenu { get; private set; }
+        
         public static Menu RMenu { get; private set; }
+        
         public static Menu ManaMenu { get; private set; }
+        
         public static Menu ItemsMenu { get; private set; }
+        
         public static Menu DrawMenu { get; private set; }
+        
         private static Menu menuIni;
+        
         public static Spell.Active Q { get; private set; }
+        
         public static Spell.Active W { get; private set; }
+        
         public static Spell.Skillshot E { get; private set; }
+        
         public static Spell.Targeted R { get; private set; }
+        
         private static readonly AIHeroClient player = ObjectManager.Player;
-
-        static void Main(string[] args)
+        
+        private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoad;
         }
-
-
+        
         private static void OnLoad(EventArgs args)
         {
             if (player.ChampionName != ChampName)
@@ -53,7 +72,6 @@
             menuIni.Add("Clear", new CheckBox("Use Clear?"));
             menuIni.Add("Drawings", new CheckBox("Use Drawings?"));
 
-
             QMenu = menuIni.AddSubMenu("Q Settings");
             QMenu.AddGroupLabel("Q Settings");
             QMenu.Add("Combo", new CheckBox("Q Combo"));
@@ -62,16 +80,17 @@
             QMenu.Add("Flee", new CheckBox("Q Flee (Ignores Stick to target)"));
             QMenu.Add("QFlee", new Slider("Cast Q flee When HP is below %", 90, 0, 100));
             QMenu.AddGroupLabel("Extra Settings");
+            QMenu.Add("QE", new CheckBox("Always Q Before E", false));
             QMenu.Add("Stick", new CheckBox("Stick to Target while Casting Q", false));
             QMenu.Add("range", new CheckBox("Dont Cast Q when Enemy in AA range", false));
-
 
             WMenu = menuIni.AddSubMenu("W Settings");
             WMenu.AddGroupLabel("W Settings");
             WMenu.Add("Combo", new CheckBox("W Combo"));
             WMenu.Add("Harass", new CheckBox("W Harass"));
             WMenu.Add("Clear", new CheckBox("W LaneClear"));
-
+            WMenu.AddGroupLabel("Extra Settings");
+            WMenu.Add("AAr", new CheckBox("W AA Reset"));
 
             EMenu = menuIni.AddSubMenu("E Settings");
             EMenu.AddGroupLabel("E Settings");
@@ -79,20 +98,18 @@
             EMenu.Add("Harass", new CheckBox("E Harass"));
             EMenu.Add("Gapclose", new CheckBox("E To Interrupt"));
 
-
             RMenu = menuIni.AddSubMenu("R Settings");
             RMenu.AddGroupLabel("R Settings");
-            RMenu.Add("Combo", new CheckBox("R Combo", false));
+            RMenu.Add("Combo", new CheckBox("R Combo Finisher"));
             RMenu.Add("KillSteal", new CheckBox("R AutoKillSteal"));
+            RMenu.Add("stack", new CheckBox("Use R On Stacks", false));
             RMenu.Add("count", new Slider("Cast R Combo When Passive Count >=", 5, 0, 5));
-
 
             ManaMenu = menuIni.AddSubMenu("Mana Manager");
             ManaMenu.AddGroupLabel("Harass");
             ManaMenu.Add("harassmana", new Slider("Harass Mana %", 75, 0, 100));
             ManaMenu.AddGroupLabel("Lane Clear");
             ManaMenu.Add("lanemana", new Slider("Lane Clear Mana %", 60, 0, 100));
-
 
             ItemsMenu = menuIni.AddSubMenu("Items");
             ItemsMenu.AddGroupLabel("Items Settings");
@@ -102,7 +119,6 @@
             ItemsMenu.Add("UseBilge", new CheckBox("Use Bilgewater Cutlass"));
             ItemsMenu.Add("eL", new Slider("Use On Enemy health", 65, 0, 100));
             ItemsMenu.Add("oL", new Slider("Use On My health", 65, 0, 100));
-
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
             DrawMenu.AddGroupLabel("Drawing Settings");
@@ -120,10 +136,8 @@
             Drawing.OnDraw += OnDraw;
         }
         
-
         private static void OnUpdate(EventArgs args)
         {
-            var target = TargetSelector.GetTarget(500, DamageType.Physical);
             var lanemana = ManaMenu["lanemana"].Cast<Slider>().CurrentValue;
             var harassmana = ManaMenu["harassmana"].Cast<Slider>().CurrentValue;
             if (player.IsDead || MenuGUI.IsChatOpen || player.IsRecalling())
@@ -157,44 +171,20 @@
                 KillSteal();
             }
         }
-        
-
         private static void Combo()
         {
-            var stick = TargetSelector.GetTarget(700, DamageType.Physical);
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
             var rt = TargetSelector.GetTarget(R.Range, DamageType.True);
+            var QE = QMenu["QE"].Cast<CheckBox>().CurrentValue;
             var Qrange = QMenu["range"].Cast<CheckBox>().CurrentValue;
             var Qcombo = QMenu["Combo"].Cast<CheckBox>().CurrentValue && Q.IsReady();
             var Wcombo = WMenu["Combo"].Cast<CheckBox>().CurrentValue;
             var Ecombo = EMenu["Combo"].Cast<CheckBox>().CurrentValue && E.IsReady();
             var Rcombo = RMenu["Combo"].Cast<CheckBox>().CurrentValue && R.IsReady();
+            var Rstack = RMenu["stack"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var buffcount = RMenu["count"].Cast<Slider>().CurrentValue;
-
             if (target != null)
             {
-                if (Ecombo)
-                {
-                    if (target.IsValidTarget(E.Range) && (Q.IsReady() && !target.IsValidTarget(Q.Range)))
-                    {
-                        var pred = E.GetPrediction(target);
-                        E.Cast(pred.CastPosition);
-                    }
-
-                    if (target.IsValidTarget(E.Range) && !player.IsInAutoAttackRange(target))
-                    {
-                        var pred = E.GetPrediction(target);
-                        E.Cast(pred.CastPosition);
-                    }
-                }
-
-                if (QMenu["Stick"].Cast<CheckBox>().CurrentValue)
-                {
-                    if (player.HasBuff("RumbleDangerZone"))
-                    {
-                        Player.IssueOrder(GameObjectOrder.MoveTo, stick.Position);
-                    }
-                }
                 if (Qcombo)
                 {
                     if (Qrange && target.IsValidTarget(Q.Range))
@@ -207,7 +197,7 @@
 
                     if (!Qrange && target.IsValidTarget(Q.Range))
                     {
-                            Q.Cast();
+                        Q.Cast();
                     }
 
                     if (player.GetSpellDamage(target, SpellSlot.Q) > target.TotalShieldHealth())
@@ -216,35 +206,88 @@
                     }
                 }
 
-                if (Wcombo)
+                if (Ecombo)
                 {
-                    if (player.IsInAutoAttackRange(target) && W.IsReady())
+                    if (QE && Q.IsReady())
                     {
-                        Player.IssueOrder(GameObjectOrder.AttackUnit, target);
-                        W.Cast();
+                        return;
                     }
 
-                    if (player.HasBuff("DariusNoxianTacticsActive"))
+                    if (target.IsValidTarget(E.Range) && (Q.IsReady() && !target.IsInRange(player, Q.Range)))
                     {
-                        Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                        var pred = E.GetPrediction(target);
+                        E.Cast(pred.CastPosition);
+                    }
+
+                    if (target.IsValidTarget(E.Range) && !target.IsInRange(player, player.GetAutoAttackRange()))
+                    {
+                        var pred = E.GetPrediction(target);
+                        E.Cast(pred.CastPosition);
+                    }
+                }
+
+                if (QMenu["Stick"].Cast<CheckBox>().CurrentValue)
+                {
+                    if (player.HasBuff("RumbleDangerZone") && !target.IsUnderEnemyturret() && !target.IsUnderHisturret())
+                    {
+                        Player.IssueOrder(GameObjectOrder.MoveTo, target.Position);
                     }
                 }
                 
-                if (Rcombo && rt != null)
+                if (Wcombo)
                 {
-                    if (rt.IsValidTarget(R.Range) && player.GetSpellDamage(rt, SpellSlot.R) > rt.TotalShieldHealth())
+                    if (WMenu["AAr"].Cast<CheckBox>().CurrentValue)
                     {
-                        R.Cast(rt);
+                        Orbwalker.OnPostAttack += delegate
+                            {
+                                if (W.Cast())
+                                {
+                                    Orbwalker.ResetAutoAttack();
+                                }
+                            };
+                    }
+
+                    if (!WMenu["AAr"].Cast<CheckBox>().CurrentValue)
+                    {
+                        if (player.IsInAutoAttackRange(target) && W.IsReady())
+                        {
+                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                            W.Cast();
+                        }
+
+                        if (player.HasBuff("DariusNoxianTacticsActive"))
+                        {
+                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                        }
                     }
                 }
 
-                if (menuIni["Items"].Cast<CheckBox>().CurrentValue)
+                if (rt != null)
                 {
-                    Items();
+                    if (Rcombo)
+                    {
+                        if (rt.IsValidTarget(R.Range) && player.GetSpellDamage(rt, SpellSlot.R) > rt.TotalShieldHealth())
+                        {
+                            R.Cast(rt);
+                        }
+                    }
+
+                    if (Rstack)
+                    {
+                        if (rt.IsValidTarget(R.Range) && rt.GetBuffCount("DariusHemo") >= buffcount)
+                        {
+                            R.Cast(rt);
+                        }
+                    }
                 }
             }
-        }
 
+            if (menuIni["Items"].Cast<CheckBox>().CurrentValue)
+            {
+                Items();
+            }
+        }
+        
         private static void Harass()
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
@@ -262,7 +305,6 @@
                     }
                 }
 
-
                 if (Wharass)
                 {
                     if (target.IsValidTarget(W.Range))
@@ -272,10 +314,11 @@
                     }
                 }
 
-
                 if (Eharass)
                 {
-                    if (target.IsValidTarget(E.Range) && ((Q.IsReady() && !target.IsValidTarget(Q.Range)) || (!Q.IsReady() && target.IsInAutoAttackRange(player))))
+                    if (target.IsValidTarget(E.Range)
+                        && ((Q.IsReady() && !target.IsValidTarget(Q.Range))
+                            || (!Q.IsReady() && target.IsInAutoAttackRange(player))))
                     {
                         var pred = E.GetPrediction(target);
                         E.Cast(pred.CastPosition);
@@ -283,48 +326,48 @@
                 }
             }
         }
-
+        
         private static void Clear()
         {
             var Qclear = QMenu["Clear"].Cast<CheckBox>().CurrentValue;
             var Wclear = WMenu["Clear"].Cast<CheckBox>().CurrentValue;
 
-                var allMinions = EntityManager.MinionsAndMonsters.Get(
-                    EntityManager.MinionsAndMonsters.EntityType.Minion,
-                    EntityManager.UnitTeam.Enemy,
-                    ObjectManager.Player.Position,
-                    Q.Range,
-                    false);
-                if (allMinions == null)
-                {
-                    return;
-                }
-                    foreach (var minion in allMinions)
-                {
-                    if (Qclear)
-                    {
-                        allMinions.Any();
-                        {
-                            var fl = EntityManager.MinionsAndMonsters.GetLineFarmLocation(allMinions, 100, (int)Q.Range);
-                            if (fl.HitNumber >= 1)
-                            {
-                                Q.Cast();
-                            }
-                        }
-                    }
+            var allMinions = EntityManager.MinionsAndMonsters.Get(
+                EntityManager.MinionsAndMonsters.EntityType.Minion, 
+                EntityManager.UnitTeam.Enemy, 
+                ObjectManager.Player.Position, 
+                Q.Range, 
+                false);
+            if (allMinions == null)
+            {
+                return;
+            }
 
-                    if (Wclear)
+            foreach (var minion in allMinions)
+            {
+                if (Qclear)
+                {
+                    allMinions.Any();
                     {
-                        if (minion.IsValidTarget() && W.IsReady()
-                        && player.Distance(minion.ServerPosition) <= 225f)
+                        var fl = EntityManager.MinionsAndMonsters.GetLineFarmLocation(allMinions, 100, (int)Q.Range);
+                        if (fl.HitNumber >= 1)
                         {
-                            W.Cast();
-                            Player.IssueOrder(GameObjectOrder.AttackUnit, minion);
+                            Q.Cast();
                         }
                     }
                 }
+
+                if (Wclear)
+                {
+                    if (minion.IsValidTarget() && W.IsReady() && player.Distance(minion.ServerPosition) <= 225f)
+                    {
+                        W.Cast();
+                        Player.IssueOrder(GameObjectOrder.AttackUnit, minion);
+                    }
+                }
+            }
         }
-
+        
         private static void Flee()
         {
             var hp = QMenu["QFlee"].Cast<Slider>().CurrentValue;
@@ -337,7 +380,7 @@
                 }
             }
         }
-
+        
         private static void KillSteal()
         {
             var Rks = RMenu["KillSteal"].Cast<CheckBox>().CurrentValue;
@@ -348,13 +391,9 @@
                     ObjectManager.Get<AIHeroClient>()
                         .FirstOrDefault(
                             enemy =>
-                                enemy.IsEnemy
-                                && enemy.IsValidTarget(1000)
-                                && !enemy.IsDead
-                                && !enemy.HasBuff("kindredrnodeathbuff")
-                                && !enemy.HasBuff("JudicatorIntervention")
-                                && !enemy.HasBuff("ChronoShift")
-                                && !enemy.HasBuff("UndyingRage"));
+                            enemy.IsEnemy && enemy.IsValidTarget(1000) && !enemy.IsDead
+                            && !enemy.HasBuff("kindredrnodeathbuff") && !enemy.HasBuff("JudicatorIntervention")
+                            && !enemy.HasBuff("ChronoShift") && !enemy.HasBuff("UndyingRage"));
                 if (target != null)
                 {
                     // Credits cancerous
@@ -366,15 +405,18 @@
                             R.Cast(target);
                         }
 
-                        if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range) && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
+                        if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
+                            && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
                         {
                             E.Cast(target.Position);
                         }
                     }
 
-                    if (target.IsValidTarget(R.Range) && target.TotalShieldHealth() < player.GetSpellDamage(target, SpellSlot.R))
+                    if (target.IsValidTarget(R.Range)
+                        && target.TotalShieldHealth() < player.GetSpellDamage(target, SpellSlot.R))
                     {
-                        if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range) && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
+                        if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
+                            && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
                         {
                             E.Cast(target.Position);
                         }
@@ -384,8 +426,6 @@
                 }
             }
         }
-
-
 
         private static void Items()
         {
@@ -405,7 +445,6 @@
             if (Botrk.IsReady() && Botrk.IsOwned(player) && Botrk.IsInRange(target)
                 && target.HealthPercent <= ItemsMenu["oL"].Cast<Slider>().CurrentValue
                 && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
-
             {
                 Botrk.Cast(target);
             }
@@ -423,23 +462,21 @@
                 Youmuu.Cast();
             }
         }
-
-        // Credits cancerous
+        
         public static float RDmg(Obj_AI_Base unit, int stackcount)
         {
-            var bonus =
-                stackcount *
-                    (new[] { 20, 20, 40, 60 }[R.Level] + (0.15 * Player.Instance.FlatPhysicalDamageMod));
+            var bonus = stackcount
+                        * (new[] { 20, 20, 40, 60 }[R.Level] + (0.15 * Player.Instance.FlatPhysicalDamageMod));
 
             return
                 (float)
                 (bonus
                  + Player.Instance.CalculateDamageOnUnit(
-                     unit,
-                     DamageType.True,
+                     unit, 
+                     DamageType.True, 
                      new[] { 100, 100, 200, 300 }[R.Level] + (float)(0.75 * Player.Instance.FlatPhysicalDamageMod)));
         }
-
+        
         public static float PassiveDmg(Obj_AI_Base unit, int stackcount)
         {
             if (stackcount < 1)
@@ -448,12 +485,11 @@
             }
 
             return Player.Instance.CalculateDamageOnUnit(
-                unit,
-                DamageType.Physical,
+                unit, 
+                DamageType.Physical, 
                 (9 + Player.Instance.Level) + (float)(0.3 * Player.Instance.FlatPhysicalDamageMod)) * stackcount;
         }
-
-
+        
         private static void OnDraw(EventArgs args)
         {
             if (!menuIni.Get<CheckBox>("Drawings").CurrentValue)
@@ -506,6 +542,7 @@
                 {
                     Circle.Draw(Color.OrangeRed, R.Range, ObjectManager.Player.Position);
                 }
+
                 if (!R.IsReady())
                 {
                     Circle.Draw(Color.DarkRed, R.Range, ObjectManager.Player.Position);
