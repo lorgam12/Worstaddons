@@ -113,6 +113,8 @@
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.AddGroupLabel("Misc Settings");
             MiscMenu.Add("AutoE", new CheckBox("KS Enemy with E"));
+            MiscMenu.Add("Support", new CheckBox("Support Mode", false));
+
 
             Saver = menuIni.AddSubMenu("Saver");
             Saver.AddGroupLabel("Saver Settings");
@@ -162,12 +164,16 @@
                 return;
             }
 
-            if (Saver["allywgapclose"].Cast<CheckBox>().CurrentValue && Sender.IsAlly && W.IsInRange(Sender))
+            if (Saver["allywgapclose"].Cast<CheckBox>().CurrentValue
+                && Sender.IsAlly
+                && W.IsInRange(Sender))
             {
                 W.Cast(Sender);
             }
 
-            if (Saver["Enemywgapclose"].Cast<CheckBox>().CurrentValue && Sender.IsEnemy && W.IsInRange(Sender))
+            if (Saver["Enemywgapclose"].Cast<CheckBox>().CurrentValue
+                && Sender.IsEnemy
+                && W.IsInRange(Sender))
             {
                 W.Cast(Sender);
             }
@@ -247,6 +253,7 @@
             var flags = Orbwalker.ActiveModesFlags;
             if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
             {
+                Orbwalker.DisableAttacking = false;
                 Combo();
             }
 
@@ -254,6 +261,7 @@
             {
                 if (flags.HasFlag(Orbwalker.ActiveModes.Harass) && menuIni.Get<CheckBox>("Harass").CurrentValue)
                 {
+                    Orbwalker.DisableAttacking = SupportMode();
                     Harass();
                 }
             }
@@ -273,7 +281,12 @@
                     JungleFarm();
                 }
             }
-            
+
+                if (flags.HasFlag(Orbwalker.ActiveModes.None))
+                {
+                    Orbwalker.DisableAttacking = false;
+                }
+
 
             if (MiscMenu.Get<CheckBox>("AutoE").CurrentValue)
             {
@@ -286,11 +299,13 @@
                 {
                     foreach (var ally in EntityManager.Heroes.Allies)
                     {
-                        if (ally.IsValidTarget(E.Range) && ally != null
-                             && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                        if (ally.IsValidTarget(E.Range)
+                            && (ally.PhysicalDamageTaken > 50 || ally.MagicDamageTaken > 50)
+                            && !ally.IsDead
+                            && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
-                            var c = ally.CountEnemiesInRange(300);
-                            if (c >= 1 + 1 + 1 || ally.HealthPercent <= 15 && c >= 1)
+                            var c = ally.CountEnemiesInRange(600);
+                            if (ally.HealthPercent <= 15 && (c >= 1 || ally.IsUnderEnemyturret()))
                             {
                                 E.Cast(ally);
                             }
@@ -302,10 +317,12 @@
                 {
                     foreach (var ally in EntityManager.Heroes.Allies)
                     {
-                        if (ally.IsValidTarget(R.Range) && ally != null && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                        if (ally.IsValidTarget(R.Range)
+                            && ally != null
+                            && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
                             var c = ally.CountEnemiesInRange(300);
-                            if (c >= 1 + 1 + 1 || ally.HealthPercent <= 15 && c >= 1)
+                            if (c >= 1 + 1 + 1 || ally.HealthPercent <= 20 && c >= 1)
                             {
                                 R.Cast(ally);
                             }
@@ -313,12 +330,58 @@
                     }
 
                     var ec = Player.CountEnemiesInRange(300);
-                    if ((ec >= 1 + 1 + 1 || Player.HealthPercent <= 15 && ec >= 1) && Player != null)
+                    if ((ec >= 1 + 1 + 1 || Player.HealthPercent <= 25 && ec >= 1)
+                        && Player != null)
+                    {
+                        R.Cast(Player);
+                    }
+                }
+
+                if (Saver.Get<CheckBox>("AutoR").CurrentValue)
+                {
+                    if (Player.HealthPercent <= 20
+                        && Player.CountEnemiesInRange(1000) >= 1
+                        && (Player.PhysicalDamageTaken >= 50 || Player.MagicDamageTaken >= 50))
                     {
                         R.Cast(Player);
                     }
                 }
             }
+        }
+
+        private static bool SupportMode()
+        {
+            if (!MiscMenu["Support"].Cast<CheckBox>().CurrentValue)
+            {
+                return false;
+            }
+
+            var allMinions = EntityManager.MinionsAndMonsters.Get(
+                EntityManager.MinionsAndMonsters.EntityType.Minion,
+                EntityManager.UnitTeam.Enemy,
+                ObjectManager.Player.Position,
+                E.Range,
+                false);
+
+            if(allMinions != null)
+            {
+                foreach (var minion in allMinions)
+                {
+                    if (minion != null
+                        && !minion.IsDead
+                        && minion.MaxHealth > 5
+                        && minion.IsInRange(Player, Player.GetAutoAttackRange())
+                        && minion.Health <= Player.GetAutoAttackDamage(minion))
+                    {
+                        if (ObjectManager.Player.CountAlliesInRange(1000) >= 1)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
 
         private static void ShootQ(bool useE = true)
@@ -371,7 +434,7 @@
                 return;
             }
 
-            if (qCastState == !Q.IsInRange(target)) //or outofrange
+            if (qCastState == !Q.IsInRange(target) && Q.Handle.SData.Mana + E.Handle.SData.Mana < Player.Mana) // or outofrange
             {
                 if (useE && E.IsReady())
                 {
