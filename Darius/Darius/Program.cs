@@ -49,6 +49,8 @@
         
         public static Spell.Targeted R { get; private set; }
 
+        public static Spell.Targeted Ignite;
+
         private static readonly AIHeroClient player = ObjectManager.Player;
         
         private static void Main(string[] args)
@@ -71,6 +73,7 @@
             menuIni.Add("Harass", new CheckBox("Use Harass?"));
             menuIni.Add("Clear", new CheckBox("Use Clear?"));
             menuIni.Add("Drawings", new CheckBox("Use Drawings?"));
+            menuIni.Add("KillSteal", new CheckBox("Use KillSteal?"));
 
             QMenu = menuIni.AddSubMenu("Q Settings");
             QMenu.AddGroupLabel("Q Settings");
@@ -129,8 +132,9 @@
 
             Q = new Spell.Active(SpellSlot.Q, 400);
             W = new Spell.Active(SpellSlot.W, 300);
-            E = new Spell.Skillshot(SpellSlot.E, 540, SkillShotType.Cone, 250, 100, 120);
+            E = new Spell.Skillshot(SpellSlot.E, 520, SkillShotType.Cone, 250, 100, 120);
             R = new Spell.Targeted(SpellSlot.R, 460);
+            Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 550);
 
             Game.OnUpdate += OnUpdate;
             Drawing.OnDraw += OnDraw;
@@ -199,7 +203,7 @@
                 Flee();
             }
 
-            if (RMenu["KillSteal"].Cast<CheckBox>().CurrentValue)
+            if (menuIni["KillSteal"].Cast<CheckBox>().CurrentValue)
             {
                 KillSteal();
             }
@@ -282,9 +286,6 @@
         private static void KillSteal()
         {
             var Rks = RMenu["KillSteal"].Cast<CheckBox>().CurrentValue;
-
-            if (Rks)
-            {
                 var target =
                     ObjectManager.Get<AIHeroClient>()
                         .FirstOrDefault(
@@ -294,33 +295,47 @@
                             && !enemy.HasBuff("ChronoShift") && !enemy.HasBuff("UndyingRage"));
                 if (target != null)
                 {
-                    // Credits cancerous
-                    int passiveCounter = target.GetBuffCount("DariusHemo") <= 0 ? 0 : target.GetBuffCount("DariusHemo");
-                    if (RDmg(target, passiveCounter) >= target.Health + PassiveDmg(target, 1))
+                    if (Rks)
                     {
-                        if (target.IsValidTarget(R.Range))
+                        // Credits cancerous
+                        int passiveCounter = target.GetBuffCount("DariusHemo") <= 0
+                                                 ? 0
+                                                 : target.GetBuffCount("DariusHemo");
+                        if (RDmg(target, passiveCounter) >= target.Health + PassiveDmg(target, 1))
                         {
+                            if (target.IsValidTarget(R.Range))
+                            {
+                                R.Cast(target);
+                            }
+
+                            if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
+                                && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
+                            {
+                                E.Cast(target.Position);
+                            }
+                        }
+
+                        if (target.IsValidTarget(R.Range)
+                            && target.TotalShieldHealth() < player.GetSpellDamage(target, SpellSlot.R))
+                        {
+                            if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
+                                && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
+                            {
+                                E.Cast(target.Position);
+                            }
+
                             R.Cast(target);
                         }
-
-                        if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
-                            && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
-                        {
-                            E.Cast(target.Position);
-                        }
                     }
-
-                    if (target.IsValidTarget(R.Range)
-                        && target.TotalShieldHealth() < player.GetSpellDamage(target, SpellSlot.R))
-                    {
-                        if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
-                            && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
-                        {
-                            E.Cast(target.Position);
-                        }
-
-                        R.Cast(target);
-                    }
+                if (target.IsValidTarget(Ignite.Range)
+                && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite) + PassiveDmg(target, 5) > target.TotalShieldHealth())
+                {
+                    Ignite.Cast(target);
+                }
+                if (target.IsValidTarget(Ignite.Range)
+                && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite) > target.TotalShieldHealth())
+                {
+                    Ignite.Cast(target);
                 }
             }
         }
@@ -448,8 +463,7 @@
                         }
 
                         if (target.IsValidTarget(E.Range)
-                            && (Q.IsReady() && !target.IsInRange(player, Q.Range)
-                                || !Q.IsReady() && !target.IsInRange(player, player.GetAutoAttackRange())))
+                            && (Q.IsReady() && !target.IsInRange(player, Q.Range) || !Q.IsReady() && !target.IsInRange(player, player.GetAutoAttackRange())))
                         {
                             var pred = E.GetPrediction(target);
                             E.Cast(pred.CastPosition);
