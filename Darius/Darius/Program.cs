@@ -482,19 +482,23 @@
 
             if (rt != null)
             {
-                if (Rcombo)
+                if (!rt.HasBuff("kindredrnodeathbuff") && !rt.HasBuff("JudicatorIntervention")
+                    && !rt.HasBuff("ChronoShift") && !rt.HasBuff("UndyingRage"))
                 {
-                    if (rt.IsValidTarget(R.Range) && player.GetSpellDamage(rt, SpellSlot.R) > rt.TotalShieldHealth())
+                    if (Rcombo)
                     {
-                        R.Cast(rt);
+                        if (rt.IsValidTarget(R.Range) && player.GetSpellDamage(rt, SpellSlot.R) > rt.TotalShieldHealth())
+                        {
+                            R.Cast(rt);
+                        }
                     }
-                }
 
-                if (Rstack)
-                {
-                    if (rt.IsValidTarget(R.Range) && rt.GetBuffCount("DariusHemo") >= buffcount)
+                    if (Rstack)
                     {
-                        R.Cast(rt);
+                        if (rt.IsValidTarget(R.Range) && rt.GetBuffCount("DariusHemo") >= buffcount)
+                        {
+                            R.Cast(rt);
+                        }
                     }
                 }
             }
