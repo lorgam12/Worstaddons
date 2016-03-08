@@ -171,160 +171,25 @@
                 KillSteal();
             }
         }
+
         private static void Combo()
         {
-            var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-            var rt = TargetSelector.GetTarget(R.Range, DamageType.True);
-            var QE = QMenu["QE"].Cast<CheckBox>().CurrentValue;
-            var Qrange = QMenu["range"].Cast<CheckBox>().CurrentValue;
-            var Qcombo = QMenu["Combo"].Cast<CheckBox>().CurrentValue && Q.IsReady();
-            var Wcombo = WMenu["Combo"].Cast<CheckBox>().CurrentValue;
-            var Ecombo = EMenu["Combo"].Cast<CheckBox>().CurrentValue && E.IsReady();
-            var Rcombo = RMenu["Combo"].Cast<CheckBox>().CurrentValue && R.IsReady();
-            var Rstack = RMenu["stack"].Cast<CheckBox>().CurrentValue && R.IsReady();
-            var buffcount = RMenu["count"].Cast<Slider>().CurrentValue;
-            if (target != null)
-            {
-                if (Qcombo)
-                {
-                    if (Qrange && target.IsValidTarget(Q.Range))
-                    {
-                        if (!player.IsInAutoAttackRange(target))
-                        {
-                            Q.Cast();
-                        }
-                    }
-
-                    if (!Qrange && target.IsValidTarget(Q.Range))
-                    {
-                        Q.Cast();
-                    }
-
-                    if (player.GetSpellDamage(target, SpellSlot.Q) > target.TotalShieldHealth())
-                    {
-                        Q.Cast();
-                    }
-                }
-
-                if (Ecombo)
-                {
-                    if (QE && Q.IsReady())
-                    {
-                        return;
-                    }
-
-                    if (target.IsValidTarget(E.Range) && (Q.IsReady() && !target.IsInRange(player, Q.Range)))
-                    {
-                        var pred = E.GetPrediction(target);
-                        E.Cast(pred.CastPosition);
-                    }
-
-                    if (target.IsValidTarget(E.Range) && !target.IsInRange(player, player.GetAutoAttackRange()))
-                    {
-                        var pred = E.GetPrediction(target);
-                        E.Cast(pred.CastPosition);
-                    }
-                }
-
-                if (QMenu["Stick"].Cast<CheckBox>().CurrentValue)
-                {
-                    if (player.HasBuff("RumbleDangerZone") && !target.IsUnderEnemyturret() && !target.IsUnderHisturret())
-                    {
-                        Player.IssueOrder(GameObjectOrder.MoveTo, target.Position);
-                    }
-                }
-                
-                if (Wcombo)
-                {
-                    if (WMenu["AAr"].Cast<CheckBox>().CurrentValue)
-                    {
-                        Orbwalker.OnPostAttack += delegate
-                            {
-                                if (W.Cast())
-                                {
-                                    Orbwalker.ResetAutoAttack();
-                                }
-                            };
-                    }
-
-                    if (!WMenu["AAr"].Cast<CheckBox>().CurrentValue)
-                    {
-                        if (player.IsInAutoAttackRange(target) && W.IsReady())
-                        {
-                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
-                            W.Cast();
-                        }
-
-                        if (player.HasBuff("DariusNoxianTacticsActive"))
-                        {
-                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
-                        }
-                    }
-                }
-
-                if (rt != null)
-                {
-                    if (Rcombo)
-                    {
-                        if (rt.IsValidTarget(R.Range) && player.GetSpellDamage(rt, SpellSlot.R) > rt.TotalShieldHealth())
-                        {
-                            R.Cast(rt);
-                        }
-                    }
-
-                    if (Rstack)
-                    {
-                        if (rt.IsValidTarget(R.Range) && rt.GetBuffCount("DariusHemo") >= buffcount)
-                        {
-                            R.Cast(rt);
-                        }
-                    }
-                }
-            }
+            QCast();
+            WCast();
+            ECast();
+            RCast();
 
             if (menuIni["Items"].Cast<CheckBox>().CurrentValue)
             {
                 Items();
             }
         }
-        
+
         private static void Harass()
         {
-            var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-            var Qharass = QMenu["Harass"].Cast<CheckBox>().CurrentValue;
-            var Wharass = WMenu["Harass"].Cast<CheckBox>().CurrentValue;
-            var Eharass = EMenu["Harass"].Cast<CheckBox>().CurrentValue;
-
-            if (target != null)
-            {
-                if (Qharass)
-                {
-                    if (target.IsValidTarget(Q.Range) && !target.IsInAutoAttackRange(player))
-                    {
-                        Q.Cast();
-                    }
-                }
-
-                if (Wharass)
-                {
-                    if (target.IsValidTarget(W.Range))
-                    {
-                        Player.IssueOrder(GameObjectOrder.AttackUnit, target);
-                        W.Cast();
-                    }
-                }
-
-                if (Eharass)
-                {
-                    if (target.IsValidTarget(E.Range)
-                        && ((Q.IsReady() && !target.IsValidTarget(Q.Range))
-                            || (!Q.IsReady() && target.IsInAutoAttackRange(player))))
-                    {
-                        var pred = E.GetPrediction(target);
-                        E.Cast(pred.CastPosition);
-                    }
-                }
-            }
+            QCast();
+            WCast();
+            ECast();
         }
         
         private static void Clear()
@@ -422,6 +287,169 @@
                         }
 
                         R.Cast(target);
+                    }
+                }
+            }
+        }
+        
+        private static void QCast()
+        {
+            var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
+            var Qrange = QMenu["range"].Cast<CheckBox>().CurrentValue;
+            var Qcombo = QMenu["Combo"].Cast<CheckBox>().CurrentValue && Q.IsReady();
+            var Qharass = QMenu["Harass"].Cast<CheckBox>().CurrentValue;
+
+            if (target != null)
+            {
+                if (Qcombo)
+                {
+                    if (Qrange && target.IsValidTarget(Q.Range))
+                    {
+                        if (!player.IsInAutoAttackRange(target))
+                        {
+                            Q.Cast();
+                        }
+                    }
+
+                    if (!Qrange && target.IsValidTarget(Q.Range))
+                    {
+                        Q.Cast();
+                    }
+
+                    if (player.GetSpellDamage(target, SpellSlot.Q) > target.TotalShieldHealth())
+                    {
+                        Q.Cast();
+                    }
+                }
+
+                if (Qharass)
+                {
+                    if (target.IsValidTarget(Q.Range) && !target.IsInAutoAttackRange(player))
+                    {
+                        Q.Cast();
+                    }
+                }
+
+                if (QMenu["Stick"].Cast<CheckBox>().CurrentValue)
+                {
+                    if (player.HasBuff("RumbleDangerZone") && !target.IsUnderEnemyturret() && !target.IsUnderHisturret())
+                    {
+                        Player.IssueOrder(GameObjectOrder.MoveTo, target.Position);
+                    }
+                }
+            }
+        }
+
+        private static void WCast()
+        {
+            var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
+            var Wcombo = WMenu["Combo"].Cast<CheckBox>().CurrentValue;
+            var Wharass = WMenu["Harass"].Cast<CheckBox>().CurrentValue;
+
+            if (target != null)
+            {
+                if (Wcombo)
+                {
+                    if (WMenu["AAr"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Orbwalker.OnPostAttack += delegate
+                            {
+                                Orbwalker.ResetAutoAttack();
+                                if (W.Cast())
+                                {
+                                    Orbwalker.ResetAutoAttack();
+                                }
+                            };
+                    }
+
+                    if (!WMenu["AAr"].Cast<CheckBox>().CurrentValue)
+                    {
+                        if (player.IsInAutoAttackRange(target) && W.IsReady())
+                        {
+                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                            W.Cast();
+                        }
+
+                        if (player.HasBuff("DariusNoxianTacticsActive"))
+                        {
+                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                        }
+                    }
+                }
+
+                if (Wharass)
+                {
+                    if (target.IsValidTarget(W.Range))
+                    {
+                        Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                        W.Cast();
+                    }
+                }
+            }
+        }
+
+
+        private static void ECast()
+        {
+            var target = TargetSelector.GetTarget(E.Range, DamageType.Physical);
+            var QE = QMenu["QE"].Cast<CheckBox>().CurrentValue;
+            var Ecombo = EMenu["Combo"].Cast<CheckBox>().CurrentValue && E.IsReady();
+            var Eharass = EMenu["Harass"].Cast<CheckBox>().CurrentValue && E.IsReady();
+
+            if (Ecombo)
+            {
+                if (QE && Q.IsReady())
+                {
+                    return;
+                }
+
+                if (target.IsValidTarget(E.Range) && (Q.IsReady() && !target.IsInRange(player, Q.Range)))
+                {
+                    var pred = E.GetPrediction(target);
+                    E.Cast(pred.CastPosition);
+                }
+
+                if (target.IsValidTarget(E.Range) && !target.IsInRange(player, player.GetAutoAttackRange()))
+                {
+                    var pred = E.GetPrediction(target);
+                    E.Cast(pred.CastPosition);
+                }
+            }
+
+            if (Eharass)
+            {
+                if (target.IsValidTarget(E.Range)
+                    && ((Q.IsReady() && !target.IsValidTarget(Q.Range))
+                        || (!Q.IsReady() && target.IsInAutoAttackRange(player))))
+                {
+                    var pred = E.GetPrediction(target);
+                    E.Cast(pred.CastPosition);
+                }
+            }
+        }
+
+        private static void RCast()
+        {
+            var buffcount = RMenu["count"].Cast<Slider>().CurrentValue;
+            var rt = TargetSelector.GetTarget(R.Range, DamageType.True);
+            var Rcombo = RMenu["Combo"].Cast<CheckBox>().CurrentValue && R.IsReady();
+            var Rstack = RMenu["stack"].Cast<CheckBox>().CurrentValue && R.IsReady();
+
+            if (rt != null)
+            {
+                if (Rcombo)
+                {
+                    if (rt.IsValidTarget(R.Range) && player.GetSpellDamage(rt, SpellSlot.R) > rt.TotalShieldHealth())
+                    {
+                        R.Cast(rt);
+                    }
+                }
+
+                if (Rstack)
+                {
+                    if (rt.IsValidTarget(R.Range) && rt.GetBuffCount("DariusHemo") >= buffcount)
+                    {
+                        R.Cast(rt);
                     }
                 }
             }
