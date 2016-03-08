@@ -7,6 +7,7 @@
 
     using EloBuddy;
     using EloBuddy.SDK;
+    using EloBuddy.SDK.Constants;
     using EloBuddy.SDK.Enumerations;
     using EloBuddy.SDK.Events;
     using EloBuddy.SDK.Menu;
@@ -19,11 +20,11 @@
     {
         public const string ChampName = "Darius";
 
-        public static readonly Item Hydra = new Item((int)ItemId.Ravenous_Hydra_Melee_Only, 250);
+        public static readonly Item Hydra = new Item(ItemId.Ravenous_Hydra_Melee_Only, 250f);
 
-        public static readonly Item Titanic = new Item((int)ItemId.Titanic_Hydra, 250);
+        public static readonly Item Titanic = new Item(ItemId.Titanic_Hydra, Player.Instance.GetAutoAttackRange());
 
-        public static readonly Item Timat = new Item((int)ItemId.Tiamat_Melee_Only, 250);
+        public static readonly Item Timat = new Item(ItemId.Tiamat_Melee_Only, 250f);
 
         public static readonly Item Cutlass = new Item((int)ItemId.Bilgewater_Cutlass, 550);
         
@@ -129,7 +130,7 @@
 
             ItemsMenu = menuIni.AddSubMenu("Items");
             ItemsMenu.AddGroupLabel("Items Settings");
-            ItemsMenu.Add("UseHydra", new CheckBox("Use Hydra / Timat / Titanic"));
+            ItemsMenu.Add("Hydra", new CheckBox("Use Hydra / Timat / Titanic"));
             ItemsMenu.Add("useGhostblade", new CheckBox("Use Youmuu's Ghostblade"));
             ItemsMenu.Add("UseBOTRK", new CheckBox("Use Blade of the Ruined King"));
             ItemsMenu.Add("UseBilge", new CheckBox("Use Bilgewater Cutlass"));
@@ -145,14 +146,25 @@
 
             Q = new Spell.Active(SpellSlot.Q, 400);
             W = new Spell.Active(SpellSlot.W, 300);
-            E = new Spell.Skillshot(SpellSlot.E, 520, SkillShotType.Cone, 250, 100, 120);
+            E = new Spell.Skillshot(SpellSlot.E, 560, SkillShotType.Cone, 250, 100, 120);
             R = new Spell.Targeted(SpellSlot.R, 460);
             Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 550);
 
             Game.OnUpdate += OnUpdate;
             Drawing.OnDraw += OnDraw;
             Orbwalker.OnPostAttack += OnAfterAttack;
+            Obj_AI_Base.OnSpellCast += Obj_AI_Base_OnSpellCast;
         }
+
+        private static void Obj_AI_Base_OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        { 
+            
+            if (args.SData.Name.ToLower().Contains("itemtiamatcleave"))
+            {
+                Orbwalker.ResetAutoAttack();
+            }
+                return;
+            }
 
         internal static void OnAfterAttack(AttackableUnit unit, EventArgs args)
         {
@@ -178,29 +190,29 @@
                             {
                                 Orbwalker.ResetAutoAttack();
                                 Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                                
                             }
                         }
                     }
 
-                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Hydra.IsReady() && Hydra.IsOwned(player) && Hydra.IsInRange(target))
+                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Hydra.IsReady() && Hydra.IsOwned(player) && target.IsValidTarget(Hydra.Range))
                     {
-                        Core.DelayAction(() => Hydra.Cast(), 100);
-                        Orbwalker.ResetAutoAttack();
-                        Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                        Hydra.Cast();
                     }
 
-                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Timat.IsReady() && Timat.IsOwned(player) && Timat.IsInRange(target))
+                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Timat.IsReady() && Timat.IsOwned(player)
+                        && target.IsValidTarget(Timat.Range))
                     {
-                        Core.DelayAction(() => Timat.Cast(), 100);
-                        Orbwalker.ResetAutoAttack();
-                        Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                        Timat.Cast();
                     }
 
-                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Titanic.IsReady() && Titanic.IsOwned(player) && Titanic.IsInRange(target))
+                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Titanic.IsReady() && Titanic.IsOwned(player) && target.IsValidTarget(Titanic.Range))
                     {
-                        Core.DelayAction(() => Titanic.Cast(), 100);
-                        Orbwalker.ResetAutoAttack();
-                        Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                        if (Titanic.Cast())
+                        {
+                            Orbwalker.ResetAutoAttack();
+                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                        }
                     }
                 }
             }
@@ -320,8 +332,8 @@
         {
             var IG = KillStealMenu["IG"].Cast<CheckBox>().CurrentValue;
             var IGP = KillStealMenu["IGP"].Cast<CheckBox>().CurrentValue;
-            var Rks = KillStealMenu["Rks"].Cast<CheckBox>().CurrentValue;
-                var target =
+            var Rks = KillStealMenu["Rks"].Cast<CheckBox>().CurrentValue && R.IsReady();
+            var target =
                     ObjectManager.Get<AIHeroClient>()
                         .FirstOrDefault(
                             enemy =>
@@ -331,23 +343,24 @@
                 if (target != null)
                 {
                     if (Rks)
-                    {
-                        // Credits cancerous
-                        int passiveCounter = target.GetBuffCount("DariusHemo") <= 0
+                {
+                    var pred = E.GetPrediction(target);
+                    // Credits cancerous
+                    int passiveCounter = target.GetBuffCount("DariusHemo") <= 0
                                                  ? 0
                                                  : target.GetBuffCount("DariusHemo");
                         if (RDmg(target, passiveCounter) >= target.Health + PassiveDmg(target, 1))
-                        {
-                            if (target.IsValidTarget(R.Range))
+                    {
+                        if (target.IsValidTarget(R.Range))
                             {
                                 R.Cast(target);
                             }
 
                             if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
                                 && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
-                            {
-                                E.Cast(target.Position);
-                            }
+                        {
+                            E.Cast(pred.CastPosition);
+                        }
                         }
 
                         if (target.IsValidTarget(R.Range)
@@ -356,21 +369,25 @@
                             if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
                                 && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
                             {
-                                E.Cast(target.Position);
+                                E.Cast(pred.CastPosition);
                             }
 
                             R.Cast(target);
                         }
                     }
                     
-                if (IGP && target.IsValidTarget(Ignite.Range)
+                if (!R.IsReady() && IGP && target.IsValidTarget(Ignite.Range)
                 && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite) + PassiveDmg(target, 5) > target.TotalShieldHealth())
                 {
-                    Ignite.Cast(target);
+                    if (PassiveDmg(target, 5) < target.TotalShieldHealth()
+                        && !target.IsValidTarget(player.GetAutoAttackRange()))
+                    {
+                        Ignite.Cast(target);
+                    }
                 }
 
-                if (IG && target.IsValidTarget(Ignite.Range)
-                && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite) > target.TotalShieldHealth())
+                    if (!R.IsReady() && IG && target.IsValidTarget(Ignite.Range)
+                && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite) > target.TotalShieldHealth() && !target.IsValidTarget(player.GetAutoAttackRange()))
                 {
                     Ignite.Cast(target);
                 }
@@ -412,13 +429,16 @@
                     }
                 }
 
-                if (Qharass)
+                if (flags.HasFlag(Orbwalker.ActiveModes.Harass))
                 {
-                    if (flags.HasFlag(Orbwalker.ActiveModes.Harass))
+                    if (Qharass)
                     {
-                        if (target.IsValidTarget(Q.Range) && !target.IsInAutoAttackRange(player))
+                        if (flags.HasFlag(Orbwalker.ActiveModes.Harass))
                         {
-                            Q.Cast();
+                            if (target.IsValidTarget(Q.Range) && !target.IsInAutoAttackRange(player))
+                            {
+                                Q.Cast();
+                            }
                         }
                     }
                 }
@@ -557,27 +577,27 @@
 
         private static void Items()
         {
-            var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
+            var target = TargetSelector.GetTarget(W.Range, DamageType.Physical);
             if (target == null || !target.IsValidTarget())
             {
                 return;
             }
 
-            if (Botrk.IsReady() && Botrk.IsOwned(player) && Botrk.IsInRange(target)
+            if (Botrk.IsReady() && Botrk.IsOwned(player) && target.IsValidTarget(Botrk.Range)
                 && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue
                 && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
             {
                 Botrk.Cast(target);
             }
 
-            if (Botrk.IsReady() && Botrk.IsOwned(player) && Botrk.IsInRange(target)
+            if (Botrk.IsReady() && Botrk.IsOwned(player) && target.IsValidTarget(Botrk.Range)
                 && target.HealthPercent <= ItemsMenu["oL"].Cast<Slider>().CurrentValue
                 && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
             {
                 Botrk.Cast(target);
             }
 
-            if (Cutlass.IsReady() && Cutlass.IsOwned(player) && Cutlass.IsInRange(target)
+            if (Cutlass.IsReady() && Cutlass.IsOwned(player) && target.IsValidTarget(Cutlass.Range)
                 && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue
                 && ItemsMenu["UseBilge"].Cast<CheckBox>().CurrentValue)
             {
@@ -588,7 +608,9 @@
                 && ItemsMenu["useGhostblade"].Cast<CheckBox>().CurrentValue)
             {
                 Youmuu.Cast();
+
             }
+            
         }
 
         // Credits cancerous
