@@ -18,7 +18,13 @@
     internal class Program
     {
         public const string ChampName = "Darius";
-        
+
+        public static readonly Item Hydra = new Item((int)ItemId.Ravenous_Hydra_Melee_Only, 250);
+
+        public static readonly Item Titanic = new Item((int)ItemId.Titanic_Hydra, 250);
+
+        public static readonly Item Timat = new Item((int)ItemId.Tiamat_Melee_Only, 250);
+
         public static readonly Item Cutlass = new Item((int)ItemId.Bilgewater_Cutlass, 550);
         
         public static readonly Item Botrk = new Item((int)ItemId.Blade_of_the_Ruined_King, 550);
@@ -36,7 +42,9 @@
         public static Menu ManaMenu { get; private set; }
         
         public static Menu ItemsMenu { get; private set; }
-        
+
+        public static Menu KillStealMenu { get; private set; }
+
         public static Menu DrawMenu { get; private set; }
         
         private static Menu menuIni;
@@ -104,9 +112,14 @@
             RMenu = menuIni.AddSubMenu("R Settings");
             RMenu.AddGroupLabel("R Settings");
             RMenu.Add("Combo", new CheckBox("R Combo Finisher"));
-            RMenu.Add("KillSteal", new CheckBox("R AutoKillSteal"));
             RMenu.Add("stack", new CheckBox("Use R On Stacks", false));
             RMenu.Add("count", new Slider("Cast R Combo When Passive Count >=", 5, 0, 5));
+
+            KillStealMenu = menuIni.AddSubMenu("KillSteal");
+            KillStealMenu.AddGroupLabel("KillSteal Settings");
+            KillStealMenu.Add("Rks", new CheckBox("R KillSteal"));
+            KillStealMenu.Add("IGP", new CheckBox("Ignite + Passive Ks"));
+            KillStealMenu.Add("IG", new CheckBox("Ignite Only", false));
 
             ManaMenu = menuIni.AddSubMenu("Mana Manager");
             ManaMenu.AddGroupLabel("Harass");
@@ -161,13 +174,33 @@
                     {
                         if (WMenu["AAr"].Cast<CheckBox>().CurrentValue)
                         {
-                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                             if (W.Cast())
                             {
                                 Orbwalker.ResetAutoAttack();
                                 Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                             }
                         }
+                    }
+
+                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Hydra.IsReady() && Hydra.IsOwned(player) && Hydra.IsInRange(target))
+                    {
+                        Core.DelayAction(() => Hydra.Cast(), 100);
+                        Orbwalker.ResetAutoAttack();
+                        Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                    }
+
+                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Timat.IsReady() && Timat.IsOwned(player) && Timat.IsInRange(target))
+                    {
+                        Core.DelayAction(() => Timat.Cast(), 100);
+                        Orbwalker.ResetAutoAttack();
+                        Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                    }
+
+                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Titanic.IsReady() && Titanic.IsOwned(player) && Titanic.IsInRange(target))
+                    {
+                        Core.DelayAction(() => Titanic.Cast(), 100);
+                        Orbwalker.ResetAutoAttack();
+                        Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                     }
                 }
             }
@@ -285,7 +318,9 @@
         
         private static void KillSteal()
         {
-            var Rks = RMenu["KillSteal"].Cast<CheckBox>().CurrentValue;
+            var IG = KillStealMenu["IG"].Cast<CheckBox>().CurrentValue;
+            var IGP = KillStealMenu["IGP"].Cast<CheckBox>().CurrentValue;
+            var Rks = KillStealMenu["Rks"].Cast<CheckBox>().CurrentValue;
                 var target =
                     ObjectManager.Get<AIHeroClient>()
                         .FirstOrDefault(
@@ -327,12 +362,14 @@
                             R.Cast(target);
                         }
                     }
-                if (target.IsValidTarget(Ignite.Range)
+                    
+                if (IGP && target.IsValidTarget(Ignite.Range)
                 && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite) + PassiveDmg(target, 5) > target.TotalShieldHealth())
                 {
                     Ignite.Cast(target);
                 }
-                if (target.IsValidTarget(Ignite.Range)
+
+                if (IG && target.IsValidTarget(Ignite.Range)
                 && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite) > target.TotalShieldHealth())
                 {
                     Ignite.Cast(target);
@@ -553,12 +590,13 @@
                 Youmuu.Cast();
             }
         }
-        
+
+        // Credits cancerous
         public static float RDmg(Obj_AI_Base unit, int stackcount)
         {
             var bonus = stackcount
                         * (new[] { 20, 20, 40, 60 }[R.Level] + (0.15 * Player.Instance.FlatPhysicalDamageMod));
-
+                
             return
                 (float)
                 (bonus
