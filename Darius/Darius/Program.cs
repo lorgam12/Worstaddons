@@ -48,7 +48,7 @@
         public static Spell.Skillshot E { get; private set; }
         
         public static Spell.Targeted R { get; private set; }
-        
+
         private static readonly AIHeroClient player = ObjectManager.Player;
         
         private static void Main(string[] args)
@@ -134,8 +134,41 @@
 
             Game.OnUpdate += OnUpdate;
             Drawing.OnDraw += OnDraw;
+            Orbwalker.OnPostAttack += OnAfterAttack;
         }
-        
+
+        internal static void OnAfterAttack(AttackableUnit unit, EventArgs args)
+        {
+            var target = TargetSelector.GetTarget(W.Range, DamageType.True);
+            var hero = unit as AIHeroClient;
+            var Wcombo = WMenu["Combo"].Cast<CheckBox>().CurrentValue;
+            if (hero == null || !hero.IsValid || hero.Type != GameObjectType.AIHeroClient)
+            {
+                return;
+            }
+
+            var flags = Orbwalker.ActiveModesFlags;
+
+            if (target != null)
+            {
+                if (flags.HasFlag(Orbwalker.ActiveModes.Combo))
+                {
+                    if (Wcombo)
+                    {
+                        if (WMenu["AAr"].Cast<CheckBox>().CurrentValue)
+                        {
+                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                            if (W.Cast())
+                            {
+                                Orbwalker.ResetAutoAttack();
+                                Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private static void OnUpdate(EventArgs args)
         {
             var lanemana = ManaMenu["lanemana"].Cast<Slider>().CurrentValue;
@@ -215,7 +248,7 @@
                     allMinions.Any();
                     {
                         var fl = EntityManager.MinionsAndMonsters.GetLineFarmLocation(allMinions, 100, (int)Q.Range);
-                        if (fl.HitNumber >= 1)
+                        if (fl.HitNumber >= 2)
                         {
                             Q.Cast();
                         }
@@ -299,34 +332,42 @@
             var Qcombo = QMenu["Combo"].Cast<CheckBox>().CurrentValue && Q.IsReady();
             var Qharass = QMenu["Harass"].Cast<CheckBox>().CurrentValue;
 
-            if (target != null)
+            var flags = Orbwalker.ActiveModesFlags;
+            
+                if (target != null)
             {
-                if (Qcombo)
+                if (flags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
-                    if (Qrange && target.IsValidTarget(Q.Range))
+                    if (Qcombo)
                     {
-                        if (!player.IsInAutoAttackRange(target))
+                        if (Qrange && target.IsValidTarget(Q.Range))
+                        {
+                            if (!player.IsInAutoAttackRange(target))
+                            {
+                                Q.Cast();
+                            }
+                        }
+
+                        if (!Qrange && target.IsValidTarget(Q.Range))
                         {
                             Q.Cast();
                         }
-                    }
 
-                    if (!Qrange && target.IsValidTarget(Q.Range))
-                    {
-                        Q.Cast();
-                    }
-
-                    if (player.GetSpellDamage(target, SpellSlot.Q) > target.TotalShieldHealth())
-                    {
-                        Q.Cast();
+                        if (player.GetSpellDamage(target, SpellSlot.Q) > target.TotalShieldHealth())
+                        {
+                            Q.Cast();
+                        }
                     }
                 }
 
                 if (Qharass)
                 {
-                    if (target.IsValidTarget(Q.Range) && !target.IsInAutoAttackRange(player))
+                    if (flags.HasFlag(Orbwalker.ActiveModes.Harass))
                     {
-                        Q.Cast();
+                        if (target.IsValidTarget(Q.Range) && !target.IsInAutoAttackRange(player))
+                        {
+                            Q.Cast();
+                        }
                     }
                 }
 
@@ -346,43 +387,40 @@
             var Wcombo = WMenu["Combo"].Cast<CheckBox>().CurrentValue;
             var Wharass = WMenu["Harass"].Cast<CheckBox>().CurrentValue;
 
+            var flags = Orbwalker.ActiveModesFlags;
+
             if (target != null)
             {
-                if (Wcombo)
+                if (flags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
-                    if (WMenu["AAr"].Cast<CheckBox>().CurrentValue)
+                    if (Wcombo)
                     {
-                        Orbwalker.OnPostAttack += delegate
+
+                        if (!WMenu["AAr"].Cast<CheckBox>().CurrentValue)
+                        {
+                            if (player.IsInAutoAttackRange(target) && W.IsReady())
                             {
-                                Orbwalker.ResetAutoAttack();
-                                if (W.Cast())
-                                {
-                                    Orbwalker.ResetAutoAttack();
-                                }
-                            };
-                    }
+                                Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                                W.Cast();
+                            }
 
-                    if (!WMenu["AAr"].Cast<CheckBox>().CurrentValue)
-                    {
-                        if (player.IsInAutoAttackRange(target) && W.IsReady())
-                        {
-                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
-                            W.Cast();
-                        }
-
-                        if (player.HasBuff("DariusNoxianTacticsActive"))
-                        {
-                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                            if (player.HasBuff("DariusNoxianTacticsActive"))
+                            {
+                                Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                            }
                         }
                     }
                 }
 
-                if (Wharass)
+                if (flags.HasFlag(Orbwalker.ActiveModes.Harass))
                 {
-                    if (target.IsValidTarget(W.Range))
+                    if (Wharass)
                     {
-                        Player.IssueOrder(GameObjectOrder.AttackUnit, target);
-                        W.Cast();
+                        if (target.IsValidTarget(W.Range))
+                        {
+                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                            W.Cast();
+                        }
                     }
                 }
             }
@@ -396,34 +434,41 @@
             var Ecombo = EMenu["Combo"].Cast<CheckBox>().CurrentValue && E.IsReady();
             var Eharass = EMenu["Harass"].Cast<CheckBox>().CurrentValue && E.IsReady();
 
-            if (Ecombo)
+            var flags = Orbwalker.ActiveModesFlags;
+
+            if (target != null)
             {
-                if (QE && Q.IsReady())
+                if (flags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
-                    return;
+                    if (Ecombo)
+                    {
+                        if (QE && Q.IsReady())
+                        {
+                            return;
+                        }
+
+                        if (target.IsValidTarget(E.Range)
+                            && (Q.IsReady() && !target.IsInRange(player, Q.Range)
+                                || !Q.IsReady() && !target.IsInRange(player, player.GetAutoAttackRange())))
+                        {
+                            var pred = E.GetPrediction(target);
+                            E.Cast(pred.CastPosition);
+                        }
+                    }
                 }
 
-                if (target.IsValidTarget(E.Range) && (Q.IsReady() && !target.IsInRange(player, Q.Range)))
+                if (flags.HasFlag(Orbwalker.ActiveModes.Harass))
                 {
-                    var pred = E.GetPrediction(target);
-                    E.Cast(pred.CastPosition);
-                }
-
-                if (target.IsValidTarget(E.Range) && !target.IsInRange(player, player.GetAutoAttackRange()))
-                {
-                    var pred = E.GetPrediction(target);
-                    E.Cast(pred.CastPosition);
-                }
-            }
-
-            if (Eharass)
-            {
-                if (target.IsValidTarget(E.Range)
-                    && ((Q.IsReady() && !target.IsValidTarget(Q.Range))
-                        || (!Q.IsReady() && target.IsInAutoAttackRange(player))))
-                {
-                    var pred = E.GetPrediction(target);
-                    E.Cast(pred.CastPosition);
+                    if (Eharass)
+                    {
+                        if (target.IsValidTarget(E.Range)
+                            && ((Q.IsReady() && !target.IsValidTarget(Q.Range))
+                                || (!Q.IsReady() && target.IsInAutoAttackRange(player))))
+                        {
+                            var pred = E.GetPrediction(target);
+                            E.Cast(pred.CastPosition);
+                        }
+                    }
                 }
             }
         }
