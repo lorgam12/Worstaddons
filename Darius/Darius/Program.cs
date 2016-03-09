@@ -3,6 +3,7 @@
     // The Dank Memes Master
 
     using System;
+    using System.Globalization;
     using System.Linq;
 
     using EloBuddy;
@@ -148,6 +149,8 @@
             DrawMenu.Add("E", new CheckBox("Draw E"));
             DrawMenu.Add("R", new CheckBox("Draw R"));
             DrawMenu.Add("DrawD", new CheckBox("Draw R Damage"));
+            DrawMenu.Add("PPx", new Slider("Passive Stacks Position X", 100, 0, 150));
+            DrawMenu.Add("PPy", new Slider("Passive Stacks Position Y", 100, 0, 150));
 
             Q = new Spell.Active(SpellSlot.Q, 400);
             W = new Spell.Active(SpellSlot.W, 300);
@@ -156,8 +159,8 @@
             Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
             Game.OnUpdate += OnUpdate;
-            Drawing.OnEndScene += OnEndScene;
             Drawing.OnDraw += OnDraw;
+            Drawing.OnEndScene += OnEndScene;
             Orbwalker.OnPostAttack += OnAfterAttack;
             Obj_AI_Base.OnSpellCast += Obj_AI_Base_OnSpellCast;
             Interrupter.OnInterruptableSpell += OnInterruptableTarget;
@@ -405,7 +408,7 @@
                     return;
                 }
 
-                    if (IGP && target.IsValidTarget(Ignite.Range)
+                if (IGP && target.IsValidTarget(Ignite.Range)
                     && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
                     + PassiveDmg(target, 5) > target.TotalShieldHealth() + target.HPRegenRate)
                 {
@@ -424,10 +427,10 @@
                     }
                 }
 
-                if (IG
-                    && target.IsValidTarget(Ignite.Range)
+                if (IG && target.IsValidTarget(Ignite.Range)
                     && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
-                    > target.TotalShieldHealth() + target.HPRegenRate && !target.IsValidTarget(player.GetAutoAttackRange()))
+                    > target.TotalShieldHealth() + target.HPRegenRate
+                    && !target.IsValidTarget(player.GetAutoAttackRange()))
                 {
                     Ignite.Cast(target);
                 }
@@ -755,12 +758,23 @@
                     Hpi.unit = enemy;
                     Hpi.drawDmg(RDmg(enemy, passiveCounter), System.Drawing.Color.Goldenrod);
 
-                    if (RDmg(enemy, passiveCounter) > enemy.TotalShieldHealth())
+                    if (RDmg(enemy, passiveCounter) < enemy.TotalShieldHealth())
                     {
-                        Drawing.DrawText(Drawing.WorldToScreen(enemy.Position) - new Vector2(1f, 0.9f),
-                                System.Drawing.Color.Red,
-                                "DUNK = DEAD",
-                                2);
+                        Drawing.DrawText(
+                            Drawing.WorldToScreen(enemy.Position) - new Vector2(-65f, 130f),
+                            System.Drawing.Color.Red,
+                            "DUNK = DEAD",
+                            2);
+                    }
+
+                    if (enemy.GetBuffCount("DariusHemo") > 0)
+                    {
+                        var endTime = Math.Max(0, enemy.GetBuff("DariusHemo").EndTime - Game.Time);
+                        Drawing.DrawText(
+                            Drawing.WorldToScreen(enemy.Position) - new Vector2(DrawMenu["PPx"].Cast<Slider>().CurrentValue, DrawMenu["PPy"].Cast<Slider>().CurrentValue),
+                            System.Drawing.Color.Red,
+                            enemy.GetBuffCount("DariusHemo") + " Stacks " + Convert.ToString(endTime, CultureInfo.InvariantCulture),
+                            2);
                     }
                 }
             }
