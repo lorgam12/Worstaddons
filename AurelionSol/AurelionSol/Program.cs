@@ -44,8 +44,8 @@
             W = new Spell.Active(SpellSlot.W, 1000);
             R = new Spell.Skillshot(SpellSlot.R, 1300, SkillShotType.Linear, 250, 1300, 115);
 
-            menuIni = MainMenu.AddMenu("Karthus", "Karthus");
-            menuIni.AddGroupLabel("Welcome to the Worst Karthus addon!");
+            menuIni = MainMenu.AddMenu("AurelionSol", "AurelionSol");
+            menuIni.AddGroupLabel("Welcome to the Worst AurelionSol addon!");
             menuIni.AddGroupLabel("Global Settings");
             menuIni.Add("Combo", new CheckBox("Use Combo?"));
             menuIni.Add("Harass", new CheckBox("Use Harass?"));
