@@ -194,14 +194,14 @@
                         if (ally.IsValidTarget(R.Range)
                             && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue && Sender.IsEnemy)
                         {
-                            if (ally.Distance(Sender, true) < 300 * 300)
+                            if (ally.Distance(Sender, true) < 300 * 300 && ally.HealthPercent < 25)
                             {
                                 R.Cast(ally);
                             }
                         }
                     }
 
-                    if (Player.Distance(Sender, true) < 300 * 300 && Sender.IsEnemy)
+                    if (Player.Distance(Sender, true) < 300 * 300 && Sender.IsEnemy && Player.HealthPercent < 20)
                     {
                         R.Cast(Player);
                     }
@@ -241,14 +241,14 @@
                         if (ally.IsValidTarget(R.Range)
                             && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
-                            if (ally.Distance(sender, true) < 300 * 300)
+                            if (ally.Distance(sender, true) < 300 * 300 && ally.HealthPercent < 25)
                             {
                                 R.Cast(ally);
                             }
                         }
                     }
 
-                    if (Player.Distance(sender, true) < 300 * 300)
+                    if (Player.Distance(sender, true) < 300 * 300 && Player.HealthPercent < 20)
                     {
                         R.Cast(Player);
                     }
