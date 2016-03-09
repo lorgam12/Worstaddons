@@ -5,7 +5,6 @@
     using System;
     using System.Globalization;
     using System.Linq;
-
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Enumerations;
@@ -13,10 +12,9 @@
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
     using EloBuddy.SDK.Rendering;
-
     using SharpDX;
 
-    internal class Program
+    internal class KappaDarius
     {
         public const string ChampName = "Darius";
 
@@ -76,7 +74,7 @@
                 return;
             }
 
-            menuIni = MainMenu.AddMenu("Darius", "Darius");
+            menuIni = MainMenu.AddMenu("KappaDarius", "KappaDarius");
             menuIni.AddGroupLabel("Darius The Dank Memes Master!");
             menuIni.AddGroupLabel("Global Settings");
             menuIni.Add("Items", new CheckBox("Use Items?"));
@@ -86,19 +84,24 @@
             menuIni.Add("Drawings", new CheckBox("Use Drawings?"));
             menuIni.Add("KillSteal", new CheckBox("Use KillSteal?"));
 
+
             QMenu = menuIni.AddSubMenu("Q Settings");
             QMenu.AddGroupLabel("Q Settings");
             QMenu.Add("Combo", new CheckBox("Q Combo"));
             QMenu.Add("Harass", new CheckBox("Q Harass"));
+            QMenu.AddGroupLabel("Q LaneClear Settings");
             QMenu.Add("Clear", new CheckBox("Q LaneClear"));
-            QMenu.Add("Flee", new CheckBox("Q Flee (Ignores Stick to target)"));
-            QMenu.Add("QFlee", new Slider("Cast Q flee When HP is below %", 90, 0, 100));
-            QMenu.Add("Qaoe", new CheckBox("Auto Q AoE"));
-            QMenu.Add("Qhit", new Slider("Q Aoe Hit >=", 2, 1, 5));
+            QMenu.Add("Qlc", new Slider("Q On Hit Minions >=", 3, 1, 10));
+            QMenu.AddSeparator();
             QMenu.AddGroupLabel("Extra Settings");
             QMenu.Add("QE", new CheckBox("Always Q Before E", false));
-            QMenu.Add("Stick", new CheckBox("Stick to Target while Casting Q", false));
+            QMenu.Add("Stick", new CheckBox("Stick to Target while Casting Q"));
             QMenu.Add("range", new CheckBox("Dont Cast Q when Enemy in AA range", false));
+            QMenu.Add("Flee", new CheckBox("Q On Flee (Ignores Stick to target)"));
+            QMenu.Add("QFlee", new Slider("Cast Q flee When HP is below %", 90, 0, 100));
+            QMenu.Add("Qaoe", new CheckBox("Auto Q AoE"));
+            QMenu.Add("Qhit", new Slider("Q Aoe Hit >=", 3, 1, 5));
+
 
             WMenu = menuIni.AddSubMenu("W Settings");
             WMenu.AddGroupLabel("W Settings");
@@ -108,17 +111,21 @@
             WMenu.AddGroupLabel("Extra Settings");
             WMenu.Add("AAr", new CheckBox("W AA Reset"));
 
+
             EMenu = menuIni.AddSubMenu("E Settings");
             EMenu.AddGroupLabel("E Settings");
             EMenu.Add("Combo", new CheckBox("E Combo"));
             EMenu.Add("Harass", new CheckBox("E Harass"));
+            EMenu.AddGroupLabel("Extra Settings");
             EMenu.Add("Interrupt", new CheckBox("E To Interrupt"));
+
 
             RMenu = menuIni.AddSubMenu("R Settings");
             RMenu.AddGroupLabel("R Settings");
             RMenu.Add("Combo", new CheckBox("R Combo Finisher"));
             RMenu.Add("stack", new CheckBox("Use R On Stacks", false));
-            RMenu.Add("count", new Slider("Cast R Combo When Passive Count >=", 5, 0, 5));
+            RMenu.Add("count", new Slider("Cast R On Stacks >=", 5, 0, 5));
+
 
             KillStealMenu = menuIni.AddSubMenu("KillSteal");
             KillStealMenu.AddGroupLabel("KillSteal Settings");
@@ -127,11 +134,13 @@
             KillStealMenu.Add("IG", new CheckBox("Ignite Only", false));
             KillStealMenu.AddLabel("Iginte + Passive takes in account Max Ignite + Passive dmg");
 
+
             ManaMenu = menuIni.AddSubMenu("Mana Manager");
             ManaMenu.AddGroupLabel("Harass");
             ManaMenu.Add("harassmana", new Slider("Harass Mana %", 75, 0, 100));
             ManaMenu.AddGroupLabel("Lane Clear");
             ManaMenu.Add("lanemana", new Slider("Lane Clear Mana %", 60, 0, 100));
+
 
             ItemsMenu = menuIni.AddSubMenu("Items");
             ItemsMenu.AddGroupLabel("Items Settings");
@@ -139,8 +148,10 @@
             ItemsMenu.Add("useGhostblade", new CheckBox("Use Youmuu's Ghostblade"));
             ItemsMenu.Add("UseBOTRK", new CheckBox("Use Blade of the Ruined King"));
             ItemsMenu.Add("UseBilge", new CheckBox("Use Bilgewater Cutlass"));
+            ItemsMenu.AddSeparator();
             ItemsMenu.Add("eL", new Slider("Use On Enemy health", 65, 0, 100));
             ItemsMenu.Add("oL", new Slider("Use On My health", 65, 0, 100));
+
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
             DrawMenu.AddGroupLabel("Drawing Settings");
@@ -148,12 +159,15 @@
             DrawMenu.Add("W", new CheckBox("Draw W"));
             DrawMenu.Add("E", new CheckBox("Draw E"));
             DrawMenu.Add("R", new CheckBox("Draw R"));
+            DrawMenu.AddSeparator();
+            DrawMenu.AddGroupLabel("Ultimate Drawings");
             DrawMenu.Add("DrawD", new CheckBox("Draw R Damage"));
-            DrawMenu.Add("RHealth", new CheckBox("Draw After R health"));
             DrawMenu.Add("Killable", new CheckBox("Draw Killable"));
             DrawMenu.Add("Stacks", new CheckBox("Draw Passive Stacks"));
             DrawMenu.Add("PPx", new Slider("Passive Stacks Position X", 100, 0, 150));
             DrawMenu.Add("PPy", new Slider("Passive Stacks Position Y", 100, 0, 150));
+            DrawMenu.Add("RHealth", new CheckBox("Draw After R health"));
+            DrawMenu.Add("RHx", new Slider("After R health Position", 135, 0, 150));
 
 
             Q = new Spell.Active(SpellSlot.Q, 400);
@@ -172,13 +186,13 @@
 
         private static void OnInterruptableTarget(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs arg)
         {
-            if (!EMenu.Get<CheckBox>("Interrupt").CurrentValue || sender == null || !sender.IsAlly || !sender.IsMe)
+            if (!EMenu.Get<CheckBox>("Interrupt").CurrentValue || sender == null)
             {
                 return;
             }
 
             var pred = E.GetPrediction(sender);
-            if (E.IsReady() && sender.IsValidTarget(E.Range))
+            if (E.IsReady() && sender.IsValidTarget(E.Range) && sender.IsEnemy && !sender.IsDead)
             {
                 E.Cast(pred.CastPosition);
             }
@@ -330,7 +344,7 @@
                     allMinions.Any();
                     {
                         var fl = EntityManager.MinionsAndMonsters.GetLineFarmLocation(allMinions, 100, (int)Q.Range);
-                        if (fl.HitNumber >= 2)
+                        if (fl.HitNumber >= QMenu["Qlc"].Cast<Slider>().CurrentValue)
                         {
                             Q.Cast();
                         }
@@ -339,7 +353,7 @@
 
                 if (Wclear)
                 {
-                    if (minion.IsValidTarget() && W.IsReady() && player.Distance(minion.ServerPosition) <= 225f)
+                    if (!player.CanAttack && minion.IsValidTarget() && W.IsReady() && player.Distance(minion.ServerPosition) <= 225f && player.GetSpellDamage(minion, SpellSlot.W) + player.GetAutoAttackDamage(minion) >= minion.TotalShieldHealth())
                     {
                         W.Cast();
                         Player.IssueOrder(GameObjectOrder.AttackUnit, minion);
@@ -416,7 +430,7 @@
                     && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
                     + PassiveDmg(target, 5) > target.TotalShieldHealth() + target.HPRegenRate)
                 {
-                    if (PassiveDmg(target, 5) < target.TotalShieldHealth() + target.HPRegenRate
+                    if (PassiveDmg(target, 5) < target.TotalShieldHealth() + (target.HPRegenRate * 4)
                         && !target.IsValidTarget(player.GetAutoAttackRange()))
                     {
                         Ignite.Cast(target);
@@ -433,7 +447,7 @@
 
                 if (IG && target.IsValidTarget(Ignite.Range)
                     && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
-                    > target.TotalShieldHealth() + target.HPRegenRate
+                    > target.TotalShieldHealth() + (target.HPRegenRate * 4)
                     && !target.IsValidTarget(player.GetAutoAttackRange()))
                 {
                     Ignite.Cast(target);
@@ -767,7 +781,7 @@
                     var hpPos = enemy.HPBarPosition;
                     if (DrawMenu["Killable"].Cast<CheckBox>().CurrentValue && enemy.IsVisible)
                     {
-                        if (RDmg(enemy, passiveCounter) < enemy.TotalShieldHealth())
+                        if (RDmg(enemy, passiveCounter) > enemy.TotalShieldHealth())
                         {
                             Drawing.DrawText(
                                 hpPos.X + 135f,
@@ -796,7 +810,7 @@
 
                     if (DrawMenu["RHealth"].Cast<CheckBox>().CurrentValue && enemy.IsVisible)
                     {
-                        Drawing.DrawText(hpPos.X + 135f, hpPos.Y - 20f, System.Drawing.Color.FromArgb(255, 106, 106), Convert.ToString(enemy.TotalShieldHealth() - RDmg(enemy, passiveCounter), CultureInfo.CurrentCulture), 2);
+                        Drawing.DrawText(hpPos.X + DrawMenu["RHx"].Cast<Slider>().CurrentValue, hpPos.Y - 20f, System.Drawing.Color.FromArgb(255, 106, 106), Convert.ToString(enemy.TotalShieldHealth() - RDmg(enemy, passiveCounter), CultureInfo.CurrentCulture), 2);
                     }
                 }
             }

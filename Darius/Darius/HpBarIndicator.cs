@@ -1,10 +1,9 @@
-﻿using System;
-using SharpDX;
-using SharpDX.Direct3D9;
-
-namespace Darius
+﻿namespace Darius
 {
+    using System;
     using EloBuddy;
+    using SharpDX;
+    using SharpDX.Direct3D9;
 
     class HpBarIndicator
     {
@@ -104,8 +103,8 @@ namespace Darius
             dxLine.Draw(
                 new[]
                     {
-                        new Vector2((int)from.X - 12, (int)from.Y - 11),
-                                        new Vector2((int)to.X - 12, (int)to.Y - 11)
+                        new Vector2((int)from.X - 7, (int)from.Y - 11),
+                                        new Vector2((int)to.X - 7, (int)to.Y - 11)
                                     },
                 new ColorBGRA(120, 224, 69, 90));
             // Vector2 sPos = startPosition;
