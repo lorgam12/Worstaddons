@@ -7,7 +7,6 @@
 
     using EloBuddy;
     using EloBuddy.SDK;
-    using EloBuddy.SDK.Constants;
     using EloBuddy.SDK.Enumerations;
     using EloBuddy.SDK.Events;
     using EloBuddy.SDK.Menu;
@@ -15,7 +14,7 @@
     using EloBuddy.SDK.Rendering;
 
     using SharpDX;
-    
+
     internal class Program
     {
         public const string ChampName = "Darius";
@@ -27,46 +26,48 @@
         public static readonly Item Timat = new Item(ItemId.Tiamat_Melee_Only, 250f);
 
         public static readonly Item Cutlass = new Item((int)ItemId.Bilgewater_Cutlass, 550);
-        
+
         public static readonly Item Botrk = new Item((int)ItemId.Blade_of_the_Ruined_King, 550);
-        
+
         public static readonly Item Youmuu = new Item((int)ItemId.Youmuus_Ghostblade);
-        
+
         public static Menu QMenu { get; private set; }
-        
+
         public static Menu WMenu { get; private set; }
-        
+
         public static Menu EMenu { get; private set; }
-        
+
         public static Menu RMenu { get; private set; }
-        
+
         public static Menu ManaMenu { get; private set; }
-        
+
         public static Menu ItemsMenu { get; private set; }
 
         public static Menu KillStealMenu { get; private set; }
 
         public static Menu DrawMenu { get; private set; }
-        
+
         private static Menu menuIni;
-        
+
         public static Spell.Active Q { get; private set; }
-        
+
         public static Spell.Active W { get; private set; }
-        
+
         public static Spell.Skillshot E { get; private set; }
-        
+
         public static Spell.Targeted R { get; private set; }
 
         public static Spell.Targeted Ignite;
 
         private static readonly AIHeroClient player = ObjectManager.Player;
-        
+
+        public static HpBarIndicator Hpi = new HpBarIndicator();
+
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoad;
         }
-        
+
         private static void OnLoad(EventArgs args)
         {
             if (player.ChampionName != ChampName)
@@ -91,6 +92,8 @@
             QMenu.Add("Clear", new CheckBox("Q LaneClear"));
             QMenu.Add("Flee", new CheckBox("Q Flee (Ignores Stick to target)"));
             QMenu.Add("QFlee", new Slider("Cast Q flee When HP is below %", 90, 0, 100));
+            QMenu.Add("Qaoe", new CheckBox("Auto Q AoE"));
+            QMenu.Add("Qhit", new Slider("Q Aoe Hit >=", 2, 1, 5));
             QMenu.AddGroupLabel("Extra Settings");
             QMenu.Add("QE", new CheckBox("Always Q Before E", false));
             QMenu.Add("Stick", new CheckBox("Stick to Target while Casting Q", false));
@@ -108,7 +111,7 @@
             EMenu.AddGroupLabel("E Settings");
             EMenu.Add("Combo", new CheckBox("E Combo"));
             EMenu.Add("Harass", new CheckBox("E Harass"));
-            EMenu.Add("Gapclose", new CheckBox("E To Interrupt"));
+            EMenu.Add("Interrupt", new CheckBox("E To Interrupt"));
 
             RMenu = menuIni.AddSubMenu("R Settings");
             RMenu.AddGroupLabel("R Settings");
@@ -119,8 +122,9 @@
             KillStealMenu = menuIni.AddSubMenu("KillSteal");
             KillStealMenu.AddGroupLabel("KillSteal Settings");
             KillStealMenu.Add("Rks", new CheckBox("R KillSteal"));
-            KillStealMenu.Add("IGP", new CheckBox("Ignite + Passive Ks"));
+            KillStealMenu.Add("IGP", new CheckBox("Ignite + Passive Kill"));
             KillStealMenu.Add("IG", new CheckBox("Ignite Only", false));
+            KillStealMenu.AddLabel("Iginte + Passive takes in account Max Ignite + Passive dmg");
 
             ManaMenu = menuIni.AddSubMenu("Mana Manager");
             ManaMenu.AddGroupLabel("Harass");
@@ -143,28 +147,43 @@
             DrawMenu.Add("W", new CheckBox("Draw W"));
             DrawMenu.Add("E", new CheckBox("Draw E"));
             DrawMenu.Add("R", new CheckBox("Draw R"));
+            DrawMenu.Add("DrawD", new CheckBox("Draw R Damage"));
 
             Q = new Spell.Active(SpellSlot.Q, 400);
             W = new Spell.Active(SpellSlot.W, 300);
-            E = new Spell.Skillshot(SpellSlot.E, 560, SkillShotType.Cone, 250, 100, 120);
+            E = new Spell.Skillshot(SpellSlot.E, 550, SkillShotType.Cone, 250, 100, 120);
             R = new Spell.Targeted(SpellSlot.R, 460);
-            Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 550);
+            Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
             Game.OnUpdate += OnUpdate;
+            Drawing.OnEndScene += OnEndScene;
             Drawing.OnDraw += OnDraw;
             Orbwalker.OnPostAttack += OnAfterAttack;
             Obj_AI_Base.OnSpellCast += Obj_AI_Base_OnSpellCast;
+            Interrupter.OnInterruptableSpell += OnInterruptableTarget;
+        }
+
+        private static void OnInterruptableTarget(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs arg)
+        {
+            if (!EMenu.Get<CheckBox>("Interrupt").CurrentValue || sender == null || !sender.IsAlly || !sender.IsMe)
+            {
+                return;
+            }
+
+            var pred = E.GetPrediction(sender);
+            if (E.IsReady() && sender.IsValidTarget(E.Range))
+            {
+                E.Cast(pred.CastPosition);
+            }
         }
 
         private static void Obj_AI_Base_OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        { 
-            
+        {
             if (args.SData.Name.ToLower().Contains("itemtiamatcleave"))
             {
                 Orbwalker.ResetAutoAttack();
             }
-                return;
-            }
+        }
 
         internal static void OnAfterAttack(AttackableUnit unit, EventArgs args)
         {
@@ -190,12 +209,12 @@
                             {
                                 Orbwalker.ResetAutoAttack();
                                 Player.IssueOrder(GameObjectOrder.AttackUnit, target);
-                                
                             }
                         }
                     }
 
-                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Hydra.IsReady() && Hydra.IsOwned(player) && target.IsValidTarget(Hydra.Range))
+                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Hydra.IsReady() && Hydra.IsOwned(player)
+                        && target.IsValidTarget(Hydra.Range))
                     {
                         Hydra.Cast();
                     }
@@ -206,7 +225,8 @@
                         Timat.Cast();
                     }
 
-                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Titanic.IsReady() && Titanic.IsOwned(player) && target.IsValidTarget(Titanic.Range))
+                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Titanic.IsReady() && Titanic.IsOwned(player)
+                        && target.IsValidTarget(Titanic.Range))
                     {
                         if (Titanic.Cast())
                         {
@@ -252,6 +272,12 @@
             {
                 KillSteal();
             }
+
+            if (QMenu["Qaoe"].Cast<CheckBox>().CurrentValue
+                && player.CountEnemiesInRange(Q.Range) >= QMenu["Qhit"].Cast<Slider>().CurrentValue)
+            {
+                Q.Cast();
+            }
         }
 
         private static void Combo()
@@ -273,17 +299,17 @@
             WCast();
             ECast();
         }
-        
+
         private static void Clear()
         {
             var Qclear = QMenu["Clear"].Cast<CheckBox>().CurrentValue;
             var Wclear = WMenu["Clear"].Cast<CheckBox>().CurrentValue;
 
             var allMinions = EntityManager.MinionsAndMonsters.Get(
-                EntityManager.MinionsAndMonsters.EntityType.Minion, 
-                EntityManager.UnitTeam.Enemy, 
-                ObjectManager.Player.Position, 
-                Q.Range, 
+                EntityManager.MinionsAndMonsters.EntityType.Minion,
+                EntityManager.UnitTeam.Enemy,
+                ObjectManager.Player.Position,
+                Q.Range,
                 false);
             if (allMinions == null)
             {
@@ -314,7 +340,7 @@
                 }
             }
         }
-        
+
         private static void Flee()
         {
             var hp = QMenu["QFlee"].Cast<Slider>().CurrentValue;
@@ -327,73 +353,87 @@
                 }
             }
         }
-        
+
         private static void KillSteal()
         {
             var IG = KillStealMenu["IG"].Cast<CheckBox>().CurrentValue;
             var IGP = KillStealMenu["IGP"].Cast<CheckBox>().CurrentValue;
             var Rks = KillStealMenu["Rks"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var target =
-                    ObjectManager.Get<AIHeroClient>()
-                        .FirstOrDefault(
-                            enemy =>
-                            enemy.IsEnemy && enemy.IsValidTarget(1000) && !enemy.IsDead
-                            && !enemy.HasBuff("kindredrnodeathbuff") && !enemy.HasBuff("JudicatorIntervention")
-                            && !enemy.HasBuff("ChronoShift") && !enemy.HasBuff("UndyingRage"));
-                if (target != null)
-                {
-                    if (Rks)
+                ObjectManager.Get<AIHeroClient>()
+                    .FirstOrDefault(
+                        enemy =>
+                        enemy.IsEnemy && enemy.IsValidTarget(1000) && !enemy.IsDead
+                        && !enemy.HasBuff("kindredrnodeathbuff") && !enemy.HasBuff("JudicatorIntervention")
+                        && !enemy.HasBuff("ChronoShift") && !enemy.HasBuff("UndyingRage"));
+            if (target != null)
+            {
+                if (Rks)
                 {
                     var pred = E.GetPrediction(target);
                     // Credits cancerous
-                    int passiveCounter = target.GetBuffCount("DariusHemo") <= 0
-                                                 ? 0
-                                                 : target.GetBuffCount("DariusHemo");
-                        if (RDmg(target, passiveCounter) >= target.Health + PassiveDmg(target, 1))
+                    int passiveCounter = target.GetBuffCount("DariusHemo") <= 0 ? 0 : target.GetBuffCount("DariusHemo");
+                    if (RDmg(target, passiveCounter) >= target.Health + PassiveDmg(target, 1))
                     {
                         if (target.IsValidTarget(R.Range))
-                            {
-                                R.Cast(target);
-                            }
+                        {
+                            R.Cast(target);
+                        }
 
-                            if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
-                                && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
+                        if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
+                            && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
                         {
                             E.Cast(pred.CastPosition);
                         }
-                        }
-
-                        if (target.IsValidTarget(R.Range)
-                            && target.TotalShieldHealth() < player.GetSpellDamage(target, SpellSlot.R))
-                        {
-                            if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
-                                && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
-                            {
-                                E.Cast(pred.CastPosition);
-                            }
-
-                            R.Cast(target);
-                        }
                     }
-                    
-                if (!R.IsReady() && IGP && target.IsValidTarget(Ignite.Range)
-                && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite) + PassiveDmg(target, 5) > target.TotalShieldHealth())
+
+                    if (target.IsValidTarget(R.Range)
+                        && target.TotalShieldHealth() < player.GetSpellDamage(target, SpellSlot.R))
+                    {
+                        if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
+                            && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
+                        {
+                            E.Cast(pred.CastPosition);
+                        }
+
+                        R.Cast(target);
+                    }
+                }
+
+                if (Rks && R.IsReady())
                 {
-                    if (PassiveDmg(target, 5) < target.TotalShieldHealth()
+                    return;
+                }
+
+                    if (IGP && target.IsValidTarget(Ignite.Range)
+                    && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
+                    + PassiveDmg(target, 5) > target.TotalShieldHealth() + target.HPRegenRate)
+                {
+                    if (PassiveDmg(target, 5) < target.TotalShieldHealth() + target.HPRegenRate
                         && !target.IsValidTarget(player.GetAutoAttackRange()))
                     {
                         Ignite.Cast(target);
                     }
+
+                    if (PassiveDmg(target, 5) < target.TotalShieldHealth())
+                    {
+                        if (target.TotalShieldHealth() > player.TotalShieldHealth())
+                        {
+                            Ignite.Cast(target);
+                        }
+                    }
                 }
 
-                    if (!R.IsReady() && IG && target.IsValidTarget(Ignite.Range)
-                && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite) > target.TotalShieldHealth() && !target.IsValidTarget(player.GetAutoAttackRange()))
+                if (IG
+                    && target.IsValidTarget(Ignite.Range)
+                    && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
+                    > target.TotalShieldHealth() + target.HPRegenRate && !target.IsValidTarget(player.GetAutoAttackRange()))
                 {
                     Ignite.Cast(target);
                 }
             }
         }
-        
+
         private static void QCast()
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
@@ -402,8 +442,8 @@
             var Qharass = QMenu["Harass"].Cast<CheckBox>().CurrentValue;
 
             var flags = Orbwalker.ActiveModesFlags;
-            
-                if (target != null)
+
+            if (target != null)
             {
                 if (flags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
@@ -467,7 +507,6 @@
                 {
                     if (Wcombo)
                     {
-
                         if (!WMenu["AAr"].Cast<CheckBox>().CurrentValue)
                         {
                             if (player.IsInAutoAttackRange(target) && W.IsReady())
@@ -498,10 +537,10 @@
             }
         }
 
-
         private static void ECast()
         {
             var target = TargetSelector.GetTarget(E.Range, DamageType.Physical);
+            var Qcombo = QMenu["Combo"].Cast<CheckBox>().CurrentValue && Q.IsReady();
             var QE = QMenu["QE"].Cast<CheckBox>().CurrentValue;
             var Ecombo = EMenu["Combo"].Cast<CheckBox>().CurrentValue && E.IsReady();
             var Eharass = EMenu["Harass"].Cast<CheckBox>().CurrentValue && E.IsReady();
@@ -519,9 +558,14 @@
                             return;
                         }
 
-                        if (target.IsValidTarget(E.Range)
-                            && (Q.IsReady() && !target.IsInRange(player, Q.Range) || !Q.IsReady() && !target.IsInRange(player, player.GetAutoAttackRange())))
+                        if (target.IsValidTarget(E.Range))
                         {
+                            if (Q.IsReady() && target.IsInRange(player, Q.Range) && Qcombo
+                                || !Q.IsReady() && target.IsInRange(player, player.GetAutoAttackRange()))
+                            {
+                                return;
+                            }
+
                             var pred = E.GetPrediction(target);
                             E.Cast(pred.CastPosition);
                         }
@@ -608,9 +652,7 @@
                 && ItemsMenu["useGhostblade"].Cast<CheckBox>().CurrentValue)
             {
                 Youmuu.Cast();
-
             }
-            
         }
 
         // Credits cancerous
@@ -618,16 +660,16 @@
         {
             var bonus = stackcount
                         * (new[] { 20, 20, 40, 60 }[R.Level] + (0.15 * Player.Instance.FlatPhysicalDamageMod));
-                
+
             return
                 (float)
                 (bonus
                  + Player.Instance.CalculateDamageOnUnit(
-                     unit, 
-                     DamageType.True, 
+                     unit,
+                     DamageType.True,
                      new[] { 100, 100, 200, 300 }[R.Level] + (float)(0.75 * Player.Instance.FlatPhysicalDamageMod)));
         }
-        
+
         public static float PassiveDmg(Obj_AI_Base unit, int stackcount)
         {
             if (stackcount < 1)
@@ -636,11 +678,11 @@
             }
 
             return Player.Instance.CalculateDamageOnUnit(
-                unit, 
-                DamageType.Physical, 
+                unit,
+                DamageType.Physical,
                 (9 + Player.Instance.Level) + (float)(0.3 * Player.Instance.FlatPhysicalDamageMod)) * stackcount;
         }
-        
+
         private static void OnDraw(EventArgs args)
         {
             if (!menuIni.Get<CheckBox>("Drawings").CurrentValue)
@@ -697,6 +739,29 @@
                 if (!R.IsReady())
                 {
                     Circle.Draw(Color.DarkRed, R.Range, ObjectManager.Player.Position);
+                }
+            }
+        }
+
+        private static void OnEndScene(EventArgs args)
+        {
+            if (menuIni["Drawings"].Cast<CheckBox>().CurrentValue && DrawMenu["DrawD"].Cast<CheckBox>().CurrentValue)
+            {
+                foreach (var enemy in
+                    ObjectManager.Get<AIHeroClient>()
+                        .Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsVisible && ene.IsValid))
+                {
+                    int passiveCounter = enemy.GetBuffCount("DariusHemo") <= 0 ? 0 : enemy.GetBuffCount("DariusHemo");
+                    Hpi.unit = enemy;
+                    Hpi.drawDmg(RDmg(enemy, passiveCounter), System.Drawing.Color.Goldenrod);
+
+                    if (RDmg(enemy, passiveCounter) > enemy.TotalShieldHealth())
+                    {
+                        Drawing.DrawText(Drawing.WorldToScreen(enemy.Position) - new Vector2(1f, 0.9f),
+                                System.Drawing.Color.Red,
+                                "DUNK = DEAD",
+                                2);
+                    }
                 }
             }
         }
