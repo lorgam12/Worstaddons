@@ -149,8 +149,12 @@
             DrawMenu.Add("E", new CheckBox("Draw E"));
             DrawMenu.Add("R", new CheckBox("Draw R"));
             DrawMenu.Add("DrawD", new CheckBox("Draw R Damage"));
+            DrawMenu.Add("RHealth", new CheckBox("Draw After R health"));
+            DrawMenu.Add("Killable", new CheckBox("Draw Killable"));
+            DrawMenu.Add("Stacks", new CheckBox("Draw Passive Stacks"));
             DrawMenu.Add("PPx", new Slider("Passive Stacks Position X", 100, 0, 150));
             DrawMenu.Add("PPy", new Slider("Passive Stacks Position Y", 100, 0, 150));
+
 
             Q = new Spell.Active(SpellSlot.Q, 400);
             W = new Spell.Active(SpellSlot.W, 300);
@@ -748,33 +752,51 @@
 
         private static void OnEndScene(EventArgs args)
         {
-            if (menuIni["Drawings"].Cast<CheckBox>().CurrentValue && DrawMenu["DrawD"].Cast<CheckBox>().CurrentValue)
+            if (menuIni["Drawings"].Cast<CheckBox>().CurrentValue)
             {
                 foreach (var enemy in
                     ObjectManager.Get<AIHeroClient>()
-                        .Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsVisible && ene.IsValid))
+                        .Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsVisible && ene.IsValid && ene.IsHPBarRendered))
                 {
                     int passiveCounter = enemy.GetBuffCount("DariusHemo") <= 0 ? 0 : enemy.GetBuffCount("DariusHemo");
-                    Hpi.unit = enemy;
-                    Hpi.drawDmg(RDmg(enemy, passiveCounter), System.Drawing.Color.Goldenrod);
-
-                    if (RDmg(enemy, passiveCounter) < enemy.TotalShieldHealth())
+                    if (DrawMenu["DrawD"].Cast<CheckBox>().CurrentValue && enemy.IsVisible)
                     {
-                        Drawing.DrawText(
-                            Drawing.WorldToScreen(enemy.Position) - new Vector2(-65f, 130f),
-                            System.Drawing.Color.Red,
-                            "DUNK = DEAD",
-                            2);
+                        Hpi.unit = enemy;
+                        Hpi.drawDmg(RDmg(enemy, passiveCounter), System.Drawing.Color.Goldenrod);
+                    }
+                    var hpPos = enemy.HPBarPosition;
+                    if (DrawMenu["Killable"].Cast<CheckBox>().CurrentValue && enemy.IsVisible)
+                    {
+                        if (RDmg(enemy, passiveCounter) < enemy.TotalShieldHealth())
+                        {
+                            Drawing.DrawText(
+                                hpPos.X + 135f,
+                                hpPos.Y,
+                                System.Drawing.Color.FromArgb(255, 106, 106),
+                                "DUNK = DEAD",
+                                2);
+                        }
                     }
 
-                    if (enemy.GetBuffCount("DariusHemo") > 0)
+                    if (DrawMenu["Stacks"].Cast<CheckBox>().CurrentValue)
                     {
-                        var endTime = Math.Max(0, enemy.GetBuff("DariusHemo").EndTime - Game.Time);
-                        Drawing.DrawText(
-                            Drawing.WorldToScreen(enemy.Position) - new Vector2(DrawMenu["PPx"].Cast<Slider>().CurrentValue, DrawMenu["PPy"].Cast<Slider>().CurrentValue),
-                            System.Drawing.Color.Red,
-                            enemy.GetBuffCount("DariusHemo") + " Stacks " + Convert.ToString(endTime, CultureInfo.InvariantCulture),
-                            2);
+                        if (enemy.GetBuffCount("DariusHemo") > 0 && enemy.IsVisible)
+                        {
+                            var endTime = Math.Max(0, enemy.GetBuff("DariusHemo").EndTime - Game.Time);
+                            Drawing.DrawText(Drawing.WorldToScreen(enemy.Position)
+                                             - new Vector2(
+                                                   DrawMenu["PPx"].Cast<Slider>().CurrentValue,
+                                                   DrawMenu["PPy"].Cast<Slider>().CurrentValue),
+                                System.Drawing.Color.FromArgb(255, 106, 106),
+                                enemy.GetBuffCount("DariusHemo") + " Stacks "
+                                + Convert.ToString(endTime, CultureInfo.InvariantCulture),
+                                2);
+                        }
+                    }
+
+                    if (DrawMenu["RHealth"].Cast<CheckBox>().CurrentValue && enemy.IsVisible)
+                    {
+                        Drawing.DrawText(hpPos.X + 135f, hpPos.Y - 20f, System.Drawing.Color.FromArgb(255, 106, 106), Convert.ToString(enemy.TotalShieldHealth() - RDmg(enemy, passiveCounter), CultureInfo.CurrentCulture), 2);
                     }
                 }
             }
