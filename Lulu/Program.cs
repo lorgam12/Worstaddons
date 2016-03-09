@@ -37,7 +37,9 @@
         public static Menu HarassMenu { get; private set; }
         
         public static Menu LaneMenu { get; private set; }
-        
+
+        public static Menu FleeMenu { get; private set; }
+
         public static Menu KillStealMenu { get; private set; }
         
         public static Menu MiscMenu { get; private set; }
@@ -82,8 +84,10 @@
             menuIni.Add("Combo", new CheckBox("Use Combo?"));
             menuIni.Add("Harass", new CheckBox("Use Harass?"));
             menuIni.Add("LaneClear", new CheckBox("Use LaneClear?"));
+            menuIni.Add("Flee", new CheckBox("Use Flee?"));
             menuIni.Add("Saver", new CheckBox("Use Saver?"));
             menuIni.Add("Drawings", new CheckBox("Use Drawings?"));
+
 
             ComboMenu = menuIni.AddSubMenu("Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -93,11 +97,13 @@
             ComboMenu.Add("Wkite", new CheckBox("Use W to Kite"));
             ComboMenu.Add("WkiteD", new Slider("W Kite distance", 300, 0, 500));
 
+
             HarassMenu = menuIni.AddSubMenu("Harass");
             HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("Q", new CheckBox("Use Q"));
             HarassMenu.Add("E", new CheckBox("Use E"));
             HarassMenu.Add("harassmana", new Slider("Harass Mana Manager", 60, 0, 100));
+
 
             LaneMenu = menuIni.AddSubMenu("Farm");
             LaneMenu.AddGroupLabel("LaneCelar Settings");
@@ -108,10 +114,21 @@
             LaneMenu.Add("QJ", new CheckBox("Use Q"));
             LaneMenu.Add("EJ", new CheckBox("Use E"));
 
+
+            FleeMenu = menuIni.AddSubMenu("Flee");
+            FleeMenu.AddGroupLabel("Flee Settings");
+            FleeMenu.Add("Q", new CheckBox("Use Q"));
+            FleeMenu.Add("exQ", new CheckBox("Use Extended Q", false));
+            FleeMenu.Add("Wkite", new CheckBox("Use W to Kite"));
+            FleeMenu.Add("WkiteD", new Slider("W Kite distance", 300, 0, 500));
+            FleeMenu.Add("fleemana", new Slider("Flee Mana Manager", 60, 0, 100));
+
+
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.AddGroupLabel("Misc Settings");
             MiscMenu.Add("AutoE", new CheckBox("KS Enemy with E"));
             MiscMenu.Add("Support", new CheckBox("Support Mode", false));
+
 
             Saver = menuIni.AddSubMenu("Saver");
             Saver.AddGroupLabel("Saver Settings");
@@ -145,6 +162,7 @@
             DrawMenu.Add("E", new CheckBox("Draw E"));
             DrawMenu.Add("R", new CheckBox("Draw R"));
             DrawMenu.Add("PixP", new CheckBox("Draw Pix Position"));
+
 
             Drawing.OnDraw += OnDraw;
             Game.OnUpdate += Game_OnUpdate;
@@ -285,6 +303,15 @@
                 if (flags.HasFlag(Orbwalker.ActiveModes.JungleClear) && menuIni.Get<CheckBox>("LaneClear").CurrentValue)
                 {
                     JungleFarm();
+                }
+            }
+
+
+            if (ObjectManager.Player.ManaPercent > FleeMenu["fleemana"].Cast<Slider>().CurrentValue)
+            {
+                if (flags.HasFlag(Orbwalker.ActiveModes.Flee) && menuIni.Get<CheckBox>("Flee").CurrentValue)
+                {
+                    Flee();
                 }
             }
 
@@ -430,7 +457,35 @@
                 }
             }
         }
-        
+
+
+        private static void Flee()
+        {
+            var target = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
+            if (FleeMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady())
+            {
+                if (target != null)
+                {
+                    var pred = Q.GetPrediction(target);
+                    Q.Cast(pred.CastPosition);
+                }
+            }
+
+            if (FleeMenu["exQ"].Cast<CheckBox>().CurrentValue)
+            {
+                ShootQ();
+            }
+
+            if (FleeMenu.Get<CheckBox>("WKite").CurrentValue && W.IsReady())
+            {
+                var d = FleeMenu.Get<Slider>("WKiteD").CurrentValue;
+                if (Player != null && Player.CountEnemiesInRange(d) >= 1)
+                {
+                    W.Cast(Player);
+                }
+            }
+        }
+
         private static void Harass()
         {
             if (HarassMenu["Q"].Cast<CheckBox>().CurrentValue)
