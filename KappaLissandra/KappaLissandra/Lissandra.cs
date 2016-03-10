@@ -18,17 +18,11 @@
     {
         private static bool _eCreated;
 
-        public static List<AIHeroClient> AoeTargetsHit = new List<AIHeroClient>();
-
-        internal static int _aoeTargetsHitCount;
-
         public static bool jumping;
 
         private static Vector2 MissilePosition;
 
         private static MissileClient LissEMissile;
-
-        private static Dictionary<String, Spell.SpellBase> Spells;
 
         public static Spell.Skillshot Q { get; set; }
 
@@ -180,7 +174,7 @@
             var useRA = UltMenu["RA"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
 
-            if (useRS && Player.CountEnemiesInRange(750) >= 1 && Player.HealthPercent <= shp
+            if (useRS && Player.HealthPercent <= shp
                 && (Player.MagicDamageTaken >= 50 || Player.PhysicalDamageTaken >= 50)
                 && !Player.HasBuff("kindredrnodeathbuff") && !Player.HasBuff("JudicatorIntervention")
                 && !Player.HasBuff("ChronoShift") && !Player.HasBuff("UndyingRage"))
@@ -188,8 +182,8 @@
                 R.Cast(Player);
             }
 
-            if (useRA && ally.CountEnemiesInRange(R.Range) >= 1 && ally.IsValidTarget(R.Range)
-                && ally.HealthPercent <= ahp && (ally.MagicDamageTaken >= 50 || ally.PhysicalDamageTaken >= 50))
+            if (ally != null && (useRA && ally.IsValidTarget(R.Range)
+                                 && ally.HealthPercent <= ahp && (ally.MagicDamageTaken >= 50 || ally.PhysicalDamageTaken >= 50)))
             {
                 R.Cast(ally);
             }
@@ -383,7 +377,7 @@
             }
 
             var target = TargetSelector.GetTarget(W.Range, DamageType.Magical);
-            if (Vector3.Distance(target.ServerPosition, Player.ServerPosition) <= W.Range && target != null)
+            if (Vector3.Distance(target.ServerPosition, Player.ServerPosition) <= W.Range - 5)
             {
                 W.Cast();
                 return;
@@ -429,10 +423,10 @@
             var target =
                 EntityManager.Heroes.Enemies.FirstOrDefault(
                     e =>
-                    e.CountEnemiesInRange(R.Range - 5) >= 1 && !e.IsZombie && !e.IsDead
+                    e.CountEnemiesInRange(R.Range) >= 1 && !e.IsZombie && !e.IsDead
                     && !e.HasBuff("kindredrnodeathbuff") && !e.HasBuff("JudicatorIntervention")
                     && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage"));
-            var ally = EntityManager.Heroes.Allies.FirstOrDefault(a => a.CountEnemiesInRange(R.Range - 5) >= 1);
+            var ally = EntityManager.Heroes.Allies.FirstOrDefault(a => a.CountEnemiesInRange(R.Range) >= 1);
 
             if (target != null && useRE)
             {
