@@ -16,7 +16,6 @@
 
     internal class Lissandra
     {
-
         private static bool _eCreated;
 
         public static List<AIHeroClient> AoeTargetsHit = new List<AIHeroClient>();
@@ -77,7 +76,6 @@
             menuIni.Add("JungleClear", new CheckBox("Use Jungle Clear?"));
             menuIni.Add("Drawings", new CheckBox("Use Drawings?"));
 
-
             UltMenu = menuIni.AddSubMenu("Ultimate");
             UltMenu.AddGroupLabel("Ultimate Settings");
             UltMenu.Add("aoeR", new CheckBox("AoE R Logic"));
@@ -88,7 +86,6 @@
             UltMenu.Add("shp", new Slider("On Self Health to use R", 15, 0, 100));
             UltMenu.Add("ahp", new Slider("On Ally Health to use R", 10, 0, 100));
 
-
             ComboMenu = menuIni.AddSubMenu("Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.Add("Q", new CheckBox("Use Q"));
@@ -96,14 +93,12 @@
             ComboMenu.Add("E", new CheckBox("Use E"));
             ComboMenu.Add("E2", new CheckBox("Use E Engage", false));
 
-
             HarassMenu = menuIni.AddSubMenu("Harass");
             HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("Q", new CheckBox("Use Q"));
             HarassMenu.Add("W", new CheckBox("Use W"));
             HarassMenu.Add("E", new CheckBox("Use E"));
             HarassMenu.Add("Mana", new Slider("Save Mana %", 30, 0, 100));
-
 
             LaneMenu = menuIni.AddSubMenu("Farm");
             LaneMenu.AddGroupLabel("LaneClear Settings");
@@ -116,13 +111,11 @@
             LaneMenu.Add("jW", new CheckBox("Use W"));
             LaneMenu.Add("jE", new CheckBox("Use E"));
 
-
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.AddGroupLabel("Misc Settings");
             MiscMenu.Add("gapcloser", new CheckBox("Anti-GapCloser"));
             MiscMenu.Add("Interrupt", new CheckBox("Interrupt"));
             MiscMenu.Add("gapclosermana", new Slider("Anti-GapCloser Mana", 25, 0, 100));
-
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
             DrawMenu.AddGroupLabel("Drawing Settings");
@@ -130,7 +123,6 @@
             DrawMenu.Add("W", new CheckBox("Draw W"));
             DrawMenu.Add("E", new CheckBox("Draw E"));
             DrawMenu.Add("R", new CheckBox("Draw R"));
-
 
             Q = new Spell.Skillshot(SpellSlot.Q, 715, SkillShotType.Linear, 250, 2200, 75);
             Q2 = new Spell.Skillshot(SpellSlot.Q, 825, SkillShotType.Linear, 250, 2200, 90);
@@ -178,31 +170,30 @@
                 }
             }
 
-            var ally = EntityManager.Heroes.Allies.FirstOrDefault(a => !a.IsDead && !a.IsZombie && !a.IsGhosted
-                        && !a.HasBuff("kindredrnodeathbuff") && !a.HasBuff("JudicatorIntervention")
-                        && !a.HasBuff("ChronoShift") && !a.HasBuff("UndyingRage"));
+            var ally =
+                EntityManager.Heroes.Allies.FirstOrDefault(
+                    a =>
+                    !a.IsDead && !a.IsZombie && !a.IsGhosted && !a.HasBuff("kindredrnodeathbuff")
+                    && !a.HasBuff("JudicatorIntervention") && !a.HasBuff("ChronoShift") && !a.HasBuff("UndyingRage"));
             var shp = UltMenu["shp"].Cast<Slider>().CurrentValue;
             var ahp = UltMenu["ahp"].Cast<Slider>().CurrentValue;
             var useRA = UltMenu["RA"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
 
-            if (useRS && Player.CountEnemiesInRange(750) >= 1
-                && Player.HealthPercent <= shp
+            if (useRS && Player.CountEnemiesInRange(750) >= 1 && Player.HealthPercent <= shp
                 && (Player.MagicDamageTaken >= 50 || Player.PhysicalDamageTaken >= 50)
-                && !Player.HasBuff("kindredrnodeathbuff")
-                && !Player.HasBuff("JudicatorIntervention")
-                && !Player.HasBuff("ChronoShift")
-                && !Player.HasBuff("UndyingRage"))
+                && !Player.HasBuff("kindredrnodeathbuff") && !Player.HasBuff("JudicatorIntervention")
+                && !Player.HasBuff("ChronoShift") && !Player.HasBuff("UndyingRage"))
             {
                 R.Cast(Player);
             }
-            
-            if (useRA && ally.CountEnemiesInRange(R.Range) >= 1 && ally.IsValidTarget(R.Range) && ally.HealthPercent <= ahp && (ally.MagicDamageTaken >= 50 || ally.PhysicalDamageTaken >= 50))
+
+            if (useRA && ally.CountEnemiesInRange(R.Range) >= 1 && ally.IsValidTarget(R.Range)
+                && ally.HealthPercent <= ahp && (ally.MagicDamageTaken >= 50 || ally.PhysicalDamageTaken >= 50))
             {
                 R.Cast(ally);
             }
         }
-
 
         private static void MonitorMissilePosition(EventArgs args)
         {
@@ -210,6 +201,7 @@
             {
                 return;
             }
+
             MissilePosition = LissEMissile.Position.To2D();
             if (jumping)
             {
@@ -238,7 +230,10 @@
         private static void OnDelete(GameObject sender, EventArgs args)
         {
             var miss = sender as MissileClient;
-            if (miss == null || !miss.IsValid) return;
+            if (miss == null || !miss.IsValid)
+            {
+                return;
+            }
             if (miss.SpellCaster is AIHeroClient && miss.SpellCaster.IsValid && miss.SpellCaster.IsMe
                 && miss.SData.Name == "LissandraEMissile")
             {
@@ -248,7 +243,6 @@
             }
         }
 
-
         private static void Combo()
         {
             Player = ObjectManager.Player;
@@ -257,27 +251,26 @@
             var useE = ComboMenu["E"].Cast<CheckBox>().CurrentValue && E.IsReady();
             var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRE = UltMenu["RE"].Cast<CheckBox>().CurrentValue && R.IsReady();
-            
 
-                if (useQ)
-                {
-                    CastQ();
-                }
-                
-                if (useW)
-                {
-                    CastW();
-                }
+            if (useQ)
+            {
+                CastQ();
+            }
 
-                if (useE)
-                {
-                    CastE();
-                }
-                
-                if (useRS || useRE)
-                {
-                    CastR();
-                }
+            if (useE)
+            {
+                CastE();
+            }
+
+            if (useW)
+            {
+                CastW();
+            }
+
+            if (useRS || useRE)
+            {
+                CastR();
+            }
         }
 
         private static void Harass()
@@ -286,7 +279,6 @@
             var useQ = HarassMenu["Q"].Cast<CheckBox>().CurrentValue;
             var useW = HarassMenu["W"].Cast<CheckBox>().CurrentValue;
             var useE = HarassMenu["E"].Cast<CheckBox>().CurrentValue;
-
 
             var Target = TargetSelector.GetTarget(E.Range * 0.94f, DamageType.Magical);
 
@@ -301,7 +293,6 @@
 
             if (Target != null && !Target.IsInvulnerable)
             {
-
                 if (useQ)
                 {
                     CastQ();
@@ -335,7 +326,6 @@
             var useE = LaneMenu["jE"].Cast<CheckBox>().CurrentValue;
         }
 
-
         private static void CastQ()
         {
             if (!Q.IsReady())
@@ -363,7 +353,8 @@
             }
 
             var pred = Q2.GetPrediction(target2);
-            var collisions = EntityManager.MinionsAndMonsters.EnemyMinions.Where(it => it.IsValidTarget(Q.Range)).ToList();
+            var collisions =
+                EntityManager.MinionsAndMonsters.EnemyMinions.Where(it => it.IsValidTarget(Q.Range)).ToList();
 
             if (!collisions.Any())
             {
@@ -372,7 +363,10 @@
 
             foreach (var minion in collisions)
             {
-                var poly = new Geometry.Polygon.Rectangle((Vector2)Player.ServerPosition, Player.ServerPosition.Extend(minion.ServerPosition, Q2.Range), Q2.Width);
+                var poly = new Geometry.Polygon.Rectangle(
+                    (Vector2)Player.ServerPosition,
+                    Player.ServerPosition.Extend(minion.ServerPosition, Q2.Range),
+                    Q2.Width);
 
                 if (poly.IsInside(pred.UnitPosition))
                 {
@@ -380,7 +374,6 @@
                 }
             }
         }
-
 
         private static void CastW()
         {
@@ -399,8 +392,8 @@
             if (
                 EntityManager.Heroes.Enemies.Any(
                     h =>
-                    h.IsValidTarget() && h != null && (Vector3.Distance(h.ServerPosition, Player.ServerPosition) < W.Range)
-                    && !h.IsZombie))
+                    h.IsValidTarget() && h != null
+                    && (Vector3.Distance(h.ServerPosition, Player.ServerPosition) < W.Range) && !h.IsZombie))
             {
                 W.Cast();
             }
@@ -425,38 +418,36 @@
                 E.Cast(Game.CursorPos);
             }
         }
-        
 
-    static void CastR()
+        private static void CastR()
         {
             var aoeR = UltMenu["aeoR"].Cast<CheckBox>().CurrentValue;
             var useRA = UltMenu["RA"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRE = UltMenu["RE"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var hitR = UltMenu["hitR"].Cast<Slider>().CurrentValue;
-            var target = EntityManager.Heroes.Enemies.FirstOrDefault(e => e.CountEnemiesInRange(R.Range - 5) >= 1
-                && !e.IsZombie
-                && !e.IsDead
-                && !e.HasBuff("kindredrnodeathbuff")
-                && !e.HasBuff("JudicatorIntervention")
-                && !e.HasBuff("ChronoShift")
-                && !e.HasBuff("UndyingRage"));
+            var target =
+                EntityManager.Heroes.Enemies.FirstOrDefault(
+                    e =>
+                    e.CountEnemiesInRange(R.Range - 5) >= 1 && !e.IsZombie && !e.IsDead
+                    && !e.HasBuff("kindredrnodeathbuff") && !e.HasBuff("JudicatorIntervention")
+                    && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage"));
             var ally = EntityManager.Heroes.Allies.FirstOrDefault(a => a.CountEnemiesInRange(R.Range - 5) >= 1);
 
             if (target != null && useRE)
-        {
-            if (aoeR && target.CountEnemiesInRange(R.Range) >= hitR && target.IsValidTarget(R.Range))
             {
-                R.Cast(target);
+                if (aoeR && target.CountEnemiesInRange(R.Range) >= hitR && target.IsValidTarget(R.Range))
+                {
+                    R.Cast(target);
+                }
             }
-        }
 
-        if (useRA && ally != null)
-        {
-            if (aoeR && ally.CountEnemiesInRange(R.Range) >= hitR && ally.IsValidTarget(R.Range))
+            if (useRA && ally != null)
             {
-                R.Cast(ally);
-            }
+                if (aoeR && ally.CountEnemiesInRange(R.Range) >= hitR && ally.IsValidTarget(R.Range))
+                {
+                    R.Cast(ally);
+                }
             }
 
             if (useRS)
