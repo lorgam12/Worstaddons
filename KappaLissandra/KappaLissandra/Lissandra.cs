@@ -163,7 +163,6 @@
                     jClear();
                 }
             }
-
             var ally =
                 EntityManager.Heroes.Allies.FirstOrDefault(
                     a =>
@@ -173,9 +172,7 @@
             var ahp = UltMenu["ahp"].Cast<Slider>().CurrentValue;
             var useRA = UltMenu["RA"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
-
-            if (useRS && Player.HealthPercent <= shp
-                && (Player.MagicDamageTaken >= 50 || Player.PhysicalDamageTaken >= 50)
+            if (Player.CountEnemiesInRange(750) >= 1 && useRS && Player.HealthPercent <= shp
                 && !Player.HasBuff("kindredrnodeathbuff") && !Player.HasBuff("JudicatorIntervention")
                 && !Player.HasBuff("ChronoShift") && !Player.HasBuff("UndyingRage"))
             {
@@ -183,7 +180,7 @@
             }
 
             if (ally != null && (useRA && ally.IsValidTarget(R.Range)
-                                 && ally.HealthPercent <= ahp && (ally.MagicDamageTaken >= 50 || ally.PhysicalDamageTaken >= 50)))
+                                 && ally.HealthPercent <= ahp && ally.CountEnemiesInRange(750) >= 1))
             {
                 R.Cast(ally);
             }
@@ -415,7 +412,7 @@
 
         private static void CastR()
         {
-            var aoeR = UltMenu["aeoR"].Cast<CheckBox>().CurrentValue;
+            var aoeR = UltMenu["aoeR"].Cast<CheckBox>().CurrentValue;
             var useRA = UltMenu["RA"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRE = UltMenu["RE"].Cast<CheckBox>().CurrentValue && R.IsReady();
@@ -423,10 +420,10 @@
             var target =
                 EntityManager.Heroes.Enemies.FirstOrDefault(
                     e =>
-                    e.CountEnemiesInRange(R.Range) >= 1 && !e.IsZombie && !e.IsDead
+                    !e.IsZombie && !e.IsDead
                     && !e.HasBuff("kindredrnodeathbuff") && !e.HasBuff("JudicatorIntervention")
                     && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage"));
-            var ally = EntityManager.Heroes.Allies.FirstOrDefault(a => a.CountEnemiesInRange(R.Range) >= 1);
+            var ally = EntityManager.Heroes.Allies.FirstOrDefault(a => a.IsValidTarget(R.Range));
 
             if (target != null && useRE)
             {
