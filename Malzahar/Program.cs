@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Enumerations;
@@ -9,6 +10,7 @@
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
     using EloBuddy.SDK.Rendering;
+
     using SharpDX;
 
     /// <summary>
@@ -23,18 +25,31 @@
         /// </summary>
         /// 
         public static Spell.Skillshot Q { get; private set; }
+
         public static Spell.Skillshot W { get; private set; }
+
         public static Spell.Targeted E { get; private set; }
+
         public static Spell.Targeted R { get; private set; }
+
         public static Menu UltMenu { get; private set; }
+
         public static Menu ComboMenu { get; private set; }
+
         public static Menu HarassMenu { get; private set; }
+
         public static Menu LaneMenu { get; private set; }
+
         public static Menu KillStealMenu { get; private set; }
+
         public static Menu MiscMenu { get; private set; }
+
         public static Menu ItemsMenu { get; private set; }
+
         public static Menu DrawMenu { get; private set; }
+
         private static Menu menuIni;
+
         #endregion
 
         #region Constructors and Destructors
@@ -73,7 +88,6 @@
             menuIni.Add("Misc", new CheckBox("Use Misc?"));
             menuIni.Add("Drawings", new CheckBox("Use Drawings?"));
 
-
             UltMenu = menuIni.AddSubMenu("Ultimate");
             UltMenu.AddGroupLabel("Ultimate Settings");
             UltMenu.Add("gapcloserR", new CheckBox("Use R On GapCloser"));
@@ -100,14 +114,12 @@
             ComboMenu.Add("W", new CheckBox("Use W"));
             ComboMenu.Add("E", new CheckBox("Use E"));
 
-
             HarassMenu = menuIni.AddSubMenu("Harass");
             HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("Q", new CheckBox("Use Q", false));
             HarassMenu.Add("W", new CheckBox("Use W", false));
             HarassMenu.Add("E", new CheckBox("Use E"));
             HarassMenu.Add("harassmana", new Slider("Harass Mana Manager", 60, 0, 100));
-
 
             LaneMenu = menuIni.AddSubMenu("Farm");
             LaneMenu.AddGroupLabel("Farm Settings");
@@ -116,13 +128,11 @@
             LaneMenu.Add("E", new CheckBox("Use E"));
             LaneMenu.Add("lanemana", new Slider("Farm Mana Manager", 80, 0, 100));
 
-
             KillStealMenu = menuIni.AddSubMenu("Kill Steal");
             KillStealMenu.AddGroupLabel("Kill Steal Settings");
             KillStealMenu.Add("Q", new CheckBox("Kill Steal Q"));
             KillStealMenu.Add("W", new CheckBox("Kill Steal W"));
             KillStealMenu.Add("E", new CheckBox("Kill Steal E"));
-
 
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.AddGroupLabel("Misc Settings");
@@ -130,7 +140,6 @@
             MiscMenu.Add("interruptQ", new CheckBox("Use Q Interrupt Spells"));
             MiscMenu.Add("qcc", new CheckBox("Use Q On Hard CC'd Enemy"));
             MiscMenu.Add("wcc", new CheckBox("Use W On Hard CC'd Enemy"));
-
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
             DrawMenu.AddGroupLabel("Drawing Settings");
@@ -149,7 +158,7 @@
         }
 
         #endregion
-        
+
         #region Methods
 
         /// <summary>
@@ -158,11 +167,11 @@
         /// <param name="gapcloser">The gapcloser.</param>
         private static void AntiGapcloserOnOnEnemyGapcloser(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
-            if (!Sender.IsValidTarget() || !Sender.IsEnemy || Sender.IsAlly || ObjectManager.Player.Spellbook.IsChanneling)
+            if (!Sender.IsValidTarget() || !Sender.IsEnemy || Sender.IsAlly
+                || ObjectManager.Player.Spellbook.IsChanneling)
             {
                 return;
             }
-            
 
             if (menuIni["Misc"].Cast<CheckBox>().CurrentValue)
             {
@@ -176,27 +185,31 @@
             }
 
             if (UltMenu["Rtower"].Cast<CheckBox>().CurrentValue && ObjectManager.Player.IsUnderEnemyturret())
-                {
-                    return;
-                }
+            {
+                return;
+            }
 
-                if (Sender != null && R.IsReady() && Sender.IsEnemy && Sender.IsValidTarget(R.Range) && !UltMenu["DontUlt" + Sender.BaseSkinName].Cast<CheckBox>().CurrentValue && UltMenu.Get<CheckBox>("gapcloserR").CurrentValue)
+            if (Sender != null && R.IsReady() && Sender.IsEnemy && Sender.IsValidTarget(R.Range)
+                && !UltMenu["DontUlt" + Sender.BaseSkinName].Cast<CheckBox>().CurrentValue
+                && UltMenu.Get<CheckBox>("gapcloserR").CurrentValue)
             {
                 R.Cast(Sender);
                 return;
-                }
-
+            }
         }
 
         private static void PlayerIssue(Obj_AI_Base sender, PlayerIssueOrderEventArgs args)
         {
-            if (sender.IsMe && ObjectManager.Player.Spellbook.IsChanneling && (args.Order == GameObjectOrder.MoveTo || args.Order == GameObjectOrder.AttackUnit || args.Order == GameObjectOrder.AutoAttack))
+            if (sender.IsMe && ObjectManager.Player.Spellbook.IsChanneling
+                && (args.Order == GameObjectOrder.MoveTo || args.Order == GameObjectOrder.AttackUnit
+                    || args.Order == GameObjectOrder.AutoAttack))
             {
                 args.Process = false;
             }
         }
 
-        private static void InterrupterOnOnPossibleToInterrupt(Obj_AI_Base unit,
+        private static void InterrupterOnOnPossibleToInterrupt(
+            Obj_AI_Base unit,
             Interrupter.InterruptableSpellEventArgs args)
         {
             if (ObjectManager.Player.Spellbook.IsChanneling)
@@ -205,7 +218,8 @@
             }
 
             var predq = Q.GetPrediction(unit);
-            if (unit != null && Q.IsReady() && unit.IsEnemy && unit.IsValidTarget(Q.Range) && MiscMenu.Get<CheckBox>("interruptQ").CurrentValue && menuIni["Misc"].Cast<CheckBox>().CurrentValue)
+            if (unit != null && Q.IsReady() && unit.IsEnemy && unit.IsValidTarget(Q.Range)
+                && MiscMenu.Get<CheckBox>("interruptQ").CurrentValue && menuIni["Misc"].Cast<CheckBox>().CurrentValue)
             {
                 Q.Cast(predq.CastPosition);
                 return;
@@ -222,23 +236,22 @@
                 {
                     return;
                 }
-                
-                if (unit.IsEnemy && unit.IsValidTarget(R.Range) && !UltMenu["DontUlt" + unit.BaseSkinName].Cast<CheckBox>().CurrentValue)
+
+                if (unit.IsEnemy && unit.IsValidTarget(R.Range)
+                    && !UltMenu["DontUlt" + unit.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
                     R.Cast(unit);
                 }
             }
-            
-
         }
-
 
         private static void UnderTower()
         {
-
             var Target = TargetSelector.GetTarget(R.Range, DamageType.Physical);
 
-            if (Target != null && R.IsReady() && Target.IsUnderTurret() && !Target.IsUnderHisturret() && !ObjectManager.Player.IsUnderEnemyturret() && R.IsReady() && !UltMenu["DontUlt" + Target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+            if (Target != null && R.IsReady() && Target.IsUnderTurret() && !Target.IsUnderHisturret()
+                && !ObjectManager.Player.IsUnderEnemyturret() && R.IsReady()
+                && !UltMenu["DontUlt" + Target.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 R.Cast(Target);
             }
@@ -254,12 +267,10 @@
             var target =
                 ObjectManager.Get<AIHeroClient>()
                     .FirstOrDefault(
-                        enemy =>
-                            enemy.IsValid && enemy.IsEnemy && enemy.IsVisible && !enemy.IsDead && enemy != null);
+                        enemy => enemy.IsValid && enemy.IsEnemy && enemy.IsVisible && !enemy.IsDead && enemy != null);
 
             if (KillStealMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
-
                 if (ObjectManager.Player.Spellbook.IsChanneling)
                 {
                     return;
@@ -305,38 +316,32 @@
             var target =
                 ObjectManager.Get<AIHeroClient>()
                     .FirstOrDefault(
-                        enemy =>
-                            enemy != null && enemy.IsValid && !enemy.IsDead && enemy.IsEnemy && !enemy.IsMe);
+                        enemy => enemy != null && enemy.IsValid && !enemy.IsDead && enemy.IsEnemy && !enemy.IsMe);
 
             if (ObjectManager.Player.Spellbook.IsChanneling || target == null)
             {
                 return;
             }
 
-            var debuff = target.IsCharmed
-                         || target.IsRooted
-                         || target.IsTaunted
-                         || target.IsStunned
-                         || target.HasBuffOfType(BuffType.Fear)
-                         || target.HasBuffOfType(BuffType.Snare)
-                         || target.HasBuffOfType(BuffType.Suppression)
-                         || target.HasBuffOfType(BuffType.Sleep)
-                         || target.HasBuffOfType(BuffType.Polymorph)
-                         || target.HasBuffOfType(BuffType.Knockback)
+            var debuff = target.IsCharmed || target.IsRooted || target.IsTaunted || target.IsStunned
+                         || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Snare)
+                         || target.HasBuffOfType(BuffType.Suppression) || target.HasBuffOfType(BuffType.Sleep)
+                         || target.HasBuffOfType(BuffType.Polymorph) || target.HasBuffOfType(BuffType.Knockback)
                          || target.HasBuffOfType(BuffType.Knockup);
-            
+
             if (MiscMenu["qcc"].Cast<CheckBox>().CurrentValue && debuff && target.IsValidTarget(Q.Range))
             {
                 var predq = Q.GetPrediction(target);
                 Q.Cast(predq.CastPosition);
             }
 
-                if (MiscMenu["wcc"].Cast<CheckBox>().CurrentValue && debuff && target.IsValidTarget(W.Range))
+            if (MiscMenu["wcc"].Cast<CheckBox>().CurrentValue && debuff && target.IsValidTarget(W.Range))
             {
                 var predw = W.GetPrediction(target);
                 W.Cast(predw.CastPosition);
-                }
+            }
         }
+
         private static void Clear()
         {
         }
@@ -374,7 +379,8 @@
                 E.Cast(target);
             }
 
-            if (UltMenu["R"].Cast<CheckBox>().CurrentValue && menuIni["Ult"].Cast<CheckBox>().CurrentValue && ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > target.TotalShieldHealth() + 50)
+            if (UltMenu["R"].Cast<CheckBox>().CurrentValue && menuIni["Ult"].Cast<CheckBox>().CurrentValue
+                && ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > target.TotalShieldHealth() + 50)
             {
                 ShouldUseR(target);
             }
@@ -431,7 +437,9 @@
                 else
                 {
                     if (DrawMenu["Q"].Cast<CheckBox>().CurrentValue)
+                    {
                         Circle.Draw(Color.Red, Q.Range, Player.Instance.Position);
+                    }
                 }
 
                 if (DrawMenu["W"].Cast<CheckBox>().CurrentValue && W.IsReady())
@@ -441,7 +449,9 @@
                 else
                 {
                     if (DrawMenu["W"].Cast<CheckBox>().CurrentValue)
+                    {
                         Circle.Draw(Color.Red, W.Range, Player.Instance.Position);
+                    }
                 }
 
                 if (DrawMenu["E"].Cast<CheckBox>().CurrentValue && E.IsReady())
@@ -451,7 +461,9 @@
                 else
                 {
                     if (DrawMenu["E"].Cast<CheckBox>().CurrentValue)
+                    {
                         Circle.Draw(Color.Red, E.Range, Player.Instance.Position);
+                    }
                 }
 
                 if (DrawMenu["R"].Cast<CheckBox>().CurrentValue && R.IsReady())
@@ -460,8 +472,10 @@
                 }
                 else
                 {
-                    if(DrawMenu["R"].Cast<CheckBox>().CurrentValue)
-                    Circle.Draw(Color.Red, R.Range, Player.Instance.Position);
+                    if (DrawMenu["R"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Circle.Draw(Color.Red, R.Range, Player.Instance.Position);
+                    }
                 }
             }
         }
@@ -530,7 +544,6 @@
 
             if (menuIni["KillSteal"].Cast<CheckBox>().CurrentValue && (Q.IsReady() || W.IsReady() || E.IsReady()))
             {
-
                 if (ObjectManager.Player.Spellbook.IsChanneling)
                 {
                     return;
@@ -541,7 +554,6 @@
 
             if (menuIni["Misc"].Cast<CheckBox>().CurrentValue)
             {
-
                 if (ObjectManager.Player.Spellbook.IsChanneling)
                 {
                     return;
@@ -563,10 +575,12 @@
                 return;
             }
 
-            if (target != null && ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > target.TotalShieldHealth() + 50 && R.IsReady() && !UltMenu["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+            if (target != null
+                && ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > target.TotalShieldHealth() + 50
+                && R.IsReady() && !UltMenu["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 R.Cast(target);
-                }
+            }
         }
 
         #endregion
