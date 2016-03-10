@@ -4,12 +4,12 @@
     using System.Linq;
     using EloBuddy;
     using EloBuddy.SDK;
-    using SharpDX;
-    using EloBuddy.SDK.Menu;
-    using EloBuddy.SDK.Menu.Values;
     using EloBuddy.SDK.Enumerations;
     using EloBuddy.SDK.Events;
+    using EloBuddy.SDK.Menu;
+    using EloBuddy.SDK.Menu.Values;
     using EloBuddy.SDK.Rendering;
+    using SharpDX;
 
     /// <summary>
     ///     A plugin for Malzahar.
@@ -145,6 +145,7 @@
             Drawing.OnDraw += DrawingOnOnDraw;
             Gapcloser.OnGapcloser += AntiGapcloserOnOnEnemyGapcloser;
             Interrupter.OnInterruptableSpell += InterrupterOnOnPossibleToInterrupt;
+            Player.OnIssueOrder += PlayerIssue;
         }
 
         #endregion
@@ -157,10 +158,11 @@
         /// <param name="gapcloser">The gapcloser.</param>
         private static void AntiGapcloserOnOnEnemyGapcloser(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
-            if (!Sender.IsValidTarget() || !Sender.IsEnemy || Sender.IsAlly || IsCastingR())
+            if (!Sender.IsValidTarget() || !Sender.IsEnemy || Sender.IsAlly || ObjectManager.Player.Spellbook.IsChanneling)
             {
                 return;
             }
+            
 
             if (menuIni["Misc"].Cast<CheckBox>().CurrentValue)
             {
@@ -180,17 +182,24 @@
 
                 if (Sender != null && R.IsReady() && Sender.IsEnemy && Sender.IsValidTarget(R.Range) && !UltMenu["DontUlt" + Sender.BaseSkinName].Cast<CheckBox>().CurrentValue && UltMenu.Get<CheckBox>("gapcloserR").CurrentValue)
             {
-                Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.ServerPosition);
                 R.Cast(Sender);
-                    return;
+                return;
                 }
 
+        }
+
+        private static void PlayerIssue(Obj_AI_Base sender, PlayerIssueOrderEventArgs args)
+        {
+            if (sender.IsMe && ObjectManager.Player.Spellbook.IsChanneling && (args.Order == GameObjectOrder.MoveTo || args.Order == GameObjectOrder.AttackUnit || args.Order == GameObjectOrder.AutoAttack))
+            {
+                args.Process = false;
+            }
         }
 
         private static void InterrupterOnOnPossibleToInterrupt(Obj_AI_Base unit,
             Interrupter.InterruptableSpellEventArgs args)
         {
-            if (IsCastingR())
+            if (ObjectManager.Player.Spellbook.IsChanneling)
             {
                 return;
             }
@@ -201,17 +210,21 @@
                 Q.Cast(predq.CastPosition);
                 return;
             }
-            
+
             if (unit != null && R.IsReady() && UltMenu.Get<CheckBox>("interruptR").CurrentValue)
             {
-                if (UltMenu["Rtower"].Cast<CheckBox>().CurrentValue && ObjectManager.Player.IsUnderEnemyturret())
+                if (ObjectManager.Player.Spellbook.IsChanneling)
                 {
                     return;
                 }
 
+                if (UltMenu["Rtower"].Cast<CheckBox>().CurrentValue && ObjectManager.Player.IsUnderEnemyturret())
+                {
+                    return;
+                }
+                
                 if (unit.IsEnemy && unit.IsValidTarget(R.Range) && !UltMenu["DontUlt" + unit.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
-                    Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.ServerPosition);
                     R.Cast(unit);
                 }
             }
@@ -222,18 +235,18 @@
 
         private static void UnderTower()
         {
+
             var Target = TargetSelector.GetTarget(R.Range, DamageType.Physical);
 
-            if (Target != null && R.IsReady() && Target.IsUnderTurret() && !Target.IsUnderEnemyturret() && R.IsReady() && !UltMenu["DontUlt" + Target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+            if (Target != null && R.IsReady() && Target.IsUnderTurret() && !Target.IsUnderHisturret() && !ObjectManager.Player.IsUnderEnemyturret() && R.IsReady() && !UltMenu["DontUlt" + Target.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
-                Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.ServerPosition);
                 R.Cast(Target);
             }
         }
 
         private static void KillSteal()
         {
-            if (IsCastingR())
+            if (ObjectManager.Player.Spellbook.IsChanneling)
             {
                 return;
             }
@@ -242,10 +255,16 @@
                 ObjectManager.Get<AIHeroClient>()
                     .FirstOrDefault(
                         enemy =>
-                            enemy.IsValid && enemy.IsVisible && !enemy.IsDead && enemy != null);
+                            enemy.IsValid && enemy.IsEnemy && enemy.IsVisible && !enemy.IsDead && enemy != null);
 
             if (KillStealMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
+
+                if (ObjectManager.Player.Spellbook.IsChanneling)
+                {
+                    return;
+                }
+
                 if (target.IsValidTarget(Q.Range)
                     && ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q) > target.TotalShieldHealth())
                 {
@@ -289,7 +308,7 @@
                         enemy =>
                             enemy != null && enemy.IsValid && !enemy.IsDead && enemy.IsEnemy && !enemy.IsMe);
 
-            if (IsCastingR() || target == null)
+            if (ObjectManager.Player.Spellbook.IsChanneling || target == null)
             {
                 return;
             }
@@ -327,7 +346,7 @@
         /// </summary>
         private static void DoCombo()
         {
-            if (IsCastingR())
+            if (ObjectManager.Player.Spellbook.IsChanneling)
             {
                 return;
             }
@@ -366,7 +385,7 @@
         /// </summary>
         private static void DoHarass()
         {
-            if (IsCastingR())
+            if (ObjectManager.Player.Spellbook.IsChanneling)
             {
                 return;
             }
@@ -395,15 +414,6 @@
             {
                 E.Cast(target);
             }
-        }
-        private static bool IsCastingR()
-        {
-            if (ObjectManager.Player.HasBuff("AlzaharNetherGraspSound"))
-            {
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -465,6 +475,12 @@
             var flags = Orbwalker.ActiveModesFlags;
             if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
             {
+                Orbwalker.DisableAttacking = ObjectManager.Player.Spellbook.IsChanneling;
+                Orbwalker.DisableMovement = ObjectManager.Player.Spellbook.IsChanneling;
+                if (ObjectManager.Player.Spellbook.IsChanneling)
+                {
+                    return;
+                }
                 DoCombo();
             }
 
@@ -472,6 +488,12 @@
             {
                 if (flags.HasFlag(Orbwalker.ActiveModes.LaneClear) && menuIni.Get<CheckBox>("LaneClear").CurrentValue)
                 {
+                    Orbwalker.DisableAttacking = ObjectManager.Player.Spellbook.IsChanneling;
+                    Orbwalker.DisableMovement = ObjectManager.Player.Spellbook.IsChanneling;
+                    if (ObjectManager.Player.Spellbook.IsChanneling)
+                    {
+                        return;
+                    }
                     Clear();
                 }
             }
@@ -480,6 +502,12 @@
             {
                 if (flags.HasFlag(Orbwalker.ActiveModes.Harass) && menuIni.Get<CheckBox>("Harass").CurrentValue)
                 {
+                    Orbwalker.DisableAttacking = ObjectManager.Player.Spellbook.IsChanneling;
+                    Orbwalker.DisableMovement = ObjectManager.Player.Spellbook.IsChanneling;
+                    if (ObjectManager.Player.Spellbook.IsChanneling)
+                    {
+                        return;
+                    }
                     DoHarass();
                 }
             }
@@ -493,18 +521,32 @@
 
                 if (UltMenu["saveR"].Cast<CheckBox>().CurrentValue)
                 {
-                    Orbwalker.DisableAttacking = IsCastingR();
-                    Orbwalker.DisableMovement = IsCastingR();
+                    if (ObjectManager.Player.Spellbook.IsChanneling)
+                    {
+                        return;
+                    }
                 }
             }
 
             if (menuIni["KillSteal"].Cast<CheckBox>().CurrentValue && (Q.IsReady() || W.IsReady() || E.IsReady()))
             {
+
+                if (ObjectManager.Player.Spellbook.IsChanneling)
+                {
+                    return;
+                }
+
                 KillSteal();
             }
 
             if (menuIni["Misc"].Cast<CheckBox>().CurrentValue)
             {
+
+                if (ObjectManager.Player.Spellbook.IsChanneling)
+                {
+                    return;
+                }
+
                 CC();
             }
         }
@@ -523,8 +565,7 @@
 
             if (target != null && ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > target.TotalShieldHealth() + 50 && R.IsReady() && !UltMenu["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
-                Player.IssueOrder(GameObjectOrder.Stop, Player.Instance.ServerPosition);
-                    R.Cast(target);
+                R.Cast(target);
                 }
         }
 
