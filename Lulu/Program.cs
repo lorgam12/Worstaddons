@@ -139,8 +139,8 @@
             Saver.AddGroupLabel("Interrupter");
             Saver.Add("InterruptSpellsW", new CheckBox("Use W Interrupt Spells"));
             Saver.Add("InterruptSpellsR", new CheckBox("Use R Interrupt Spells"));
-            Saver.AddGroupLabel("Auto Sheilds");
-            Saver.Add("AutoES", new CheckBox("Auto E Sheild Allies"));
+            Saver.AddGroupLabel("Auto Shields");
+            Saver.Add("AutoES", new CheckBox("Auto E Shields Allies"));
             Saver.Add("AutoR", new CheckBox("Auto R AoE || Saver"));
             Saver.AddSeparator();
             Saver.AddGroupLabel("Don't Use Saver On:");
