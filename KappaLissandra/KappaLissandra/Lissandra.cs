@@ -77,30 +77,16 @@
             UltMenu.Add("aoeR", new CheckBox("AoE R Logic"));
             UltMenu.Add("RF", new CheckBox("Use R Finisher"));
             UltMenu.Add("RS", new CheckBox("Use R On Self"));
-            UltMenu.Add("RA", new CheckBox("Use R On Ally"));
             UltMenu.Add("RE", new CheckBox("Use R On Enemy"));
             UltMenu.Add("hitR", new Slider("R AoE Hit >=", 2, 1, 5));
             UltMenu.Add("shp", new Slider("On Self Health to use R", 15, 0, 100));
-            UltMenu.Add("ahp", new Slider("On Ally Health to use R", 10, 0, 100));
             UltMenu.AddGroupLabel("Don't Use Ult On: Enemy");
-
             foreach (var enemy in ObjectManager.Get<AIHeroClient>())
             {
                 CheckBox cb = new CheckBox(enemy.BaseSkinName) { CurrentValue = false };
                 if (enemy.Team != ObjectManager.Player.Team)
                 {
                     UltMenu.Add("DontUltenemy" + enemy.BaseSkinName, cb);
-                }
-            }
-
-            UltMenu.AddGroupLabel("Don't Use Ult On: Ally");
-            foreach (var ally in ObjectManager.Get<AIHeroClient>())
-            {
-                CheckBox cba = new CheckBox(ally.BaseSkinName);
-                cba.CurrentValue = false;
-                if (ally.Team == ObjectManager.Player.Team)
-                {
-                    UltMenu.Add("DontUltally" + ally.BaseSkinName, cba);
                 }
             }
 
@@ -210,14 +196,7 @@
 
         public static void OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
         {
-            var ally =
-                EntityManager.Heroes.Allies.FirstOrDefault(
-                    a =>
-                    !a.IsDead && !a.IsZombie && !a.IsGhosted && !a.HasBuff("kindredrnodeathbuff")
-                    && !a.HasBuff("JudicatorIntervention") && !a.HasBuff("ChronoShift") && !a.HasBuff("UndyingRage"));
             var shp = UltMenu["shp"].Cast<Slider>().CurrentValue;
-            var ahp = UltMenu["ahp"].Cast<Slider>().CurrentValue;
-            var useRA = UltMenu["RA"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
             if (sender == null || sender.IsAlly || sender.IsMe)
             {
@@ -231,12 +210,6 @@
                     && !Player.HasBuff("UndyingRage"))
                 {
                     R.Cast(Player);
-                }
-
-                if (ally != null && (useRA && ally.IsValidTarget(R.Range) && ally.HealthPercent <= ahp)
-                    && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                {
-                    R.Cast(ally);
                 }
             }
         }
@@ -654,15 +627,6 @@
                 }
             }
 
-            if (useRA && ally != null)
-            {
-                if (aoeR && ally.CountEnemiesInRange(R.Range) >= hitR && ally.IsValidTarget(R.Range)
-                    && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                {
-                    R.Cast(ally);
-                }
-            }
-
             if (target != null && useRF)
             {
                 if (target.TotalShieldHealth() < Player.GetSpellDamage(target, SpellSlot.R)
@@ -671,13 +635,6 @@
                     if (target.IsValidTarget(R.Range))
                     {
                         R.Cast(target);
-                    }
-
-                    if (ally != null
-                        && (target.IsInRange(ally, R.Range)
-                            && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue))
-                    {
-                        R.Cast(ally);
                     }
 
                     if (target.IsInRange(Player, R.Range)
@@ -756,28 +713,13 @@
                         !e.IsZombie && !e.IsDead && !e.HasBuff("kindredrnodeathbuff")
                         && !e.HasBuff("JudicatorIntervention") && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage")
                         && e.IsHPBarRendered && e.IsEnemy);
-                var ally =
-                    EntityManager.Heroes.Allies.FirstOrDefault(
-                        a => a.IsValidTarget(R.Range) && a.IsHPBarRendered && a.IsAlly && !a.IsDead);
 
                 if (LissEMissile != null)
                 {
                     Circle.Draw(Color.DarkBlue, W.Range, LissEMissile.Position);
                     Circle.Draw(Color.DarkBlue, W.Range, LissEMissile.EndPosition);
                 }
-
-                if (ally != null)
-                {
-                    var hpPos = ally.HPBarPosition;
-                    Circle.Draw(Color.White, R.Range, ally.Position);
-                    Drawing.DrawText(
-                        hpPos.X + 135f,
-                        hpPos.Y,
-                        System.Drawing.Color.White,
-                        "Enemies in Range " + ally.CountEnemiesInRange(R.Range),
-                        10);
-                }
-
+                
                 if (Player != null)
                 {
                     var hpPosp = Player.HPBarPosition;
