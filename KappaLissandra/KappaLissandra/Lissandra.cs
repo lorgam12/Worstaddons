@@ -16,9 +16,6 @@
 
     internal class Lissandra
     {
-        private static bool _eCreated;
-
-        public static bool jumping;
 
         private static Vector2 MissilePosition;
 
@@ -134,7 +131,6 @@
             Game.OnUpdate += OnUpdate;
             GameObject.OnCreate += OnCreate;
             GameObject.OnDelete += OnDelete;
-            Game.OnUpdate += MonitorMissilePosition;
             Drawing.OnDraw += OnDraw;
             AttackableUnit.OnDamage += OnDamage;
         }
@@ -203,25 +199,7 @@
                 }
             }
         }
-
-        private static void MonitorMissilePosition(EventArgs args)
-        {
-            if (LissEMissile == null || Player.IsDead)
-            {
-                return;
-            }
-
-            MissilePosition = LissEMissile.Position.To2D();
-            if (jumping)
-            {
-                if ((Vector2.Distance(MissilePosition, LissEMissile.EndPosition.To2D()) < 40))
-                {
-                    E.Cast(Player);
-                    jumping = false;
-                }
-                Core.DelayAction(delegate { jumping = false; }, 2000);
-            }
-        }
+        
 
         private static void OnCreate(GameObject sender, EventArgs args)
         {
@@ -231,7 +209,6 @@
                 if (miss.SpellCaster.IsMe && miss.SpellCaster.IsValid && miss.SData.Name == "LissandraEMissile")
                 {
                     LissEMissile = miss;
-                    _eCreated = true;
                 }
             }
         }
@@ -248,7 +225,6 @@
             {
                 LissEMissile = null;
                 MissilePosition = new Vector2(0, 0);
-                _eCreated = false;
             }
         }
 
