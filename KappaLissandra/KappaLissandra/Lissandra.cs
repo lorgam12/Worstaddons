@@ -76,12 +76,34 @@
             UltMenu = menuIni.AddSubMenu("Ultimate");
             UltMenu.AddGroupLabel("Ultimate Settings");
             UltMenu.Add("aoeR", new CheckBox("AoE R Logic"));
+            UltMenu.Add("RF", new CheckBox("Use R Finisher"));
             UltMenu.Add("RS", new CheckBox("Use R On Self"));
             UltMenu.Add("RA", new CheckBox("Use R On Ally"));
             UltMenu.Add("RE", new CheckBox("Use R On Enemy"));
             UltMenu.Add("hitR", new Slider("R AoE Hit >=", 2, 1, 5));
             UltMenu.Add("shp", new Slider("On Self Health to use R", 15, 0, 100));
             UltMenu.Add("ahp", new Slider("On Ally Health to use R", 10, 0, 100));
+            UltMenu.AddGroupLabel("Don't Use Ult On: Enemy");
+
+            foreach (var enemy in ObjectManager.Get<AIHeroClient>())
+            {
+                CheckBox cb = new CheckBox(enemy.BaseSkinName) { CurrentValue = false };
+                if (enemy.Team != ObjectManager.Player.Team)
+                {
+                    UltMenu.Add("DontUltenemy" + enemy.BaseSkinName, cb);
+                }
+            }
+
+            UltMenu.AddGroupLabel("Don't Use Ult On: Ally");
+            foreach (var ally in ObjectManager.Get<AIHeroClient>())
+            {
+                CheckBox cba = new CheckBox(ally.BaseSkinName);
+                cba.CurrentValue = false;
+                if (ally.Team == ObjectManager.Player.Team)
+                {
+                    UltMenu.Add("DontUltally" + ally.BaseSkinName, cba);
+                }
+            }
 
 
             ComboMenu = menuIni.AddSubMenu("Combo");
@@ -172,7 +194,7 @@
                 return;
             }
 
-            if (R.IsReady() && sender.IsValidTarget(R.Range) && MiscMenu.Get<CheckBox>("gapcloserR").CurrentValue)
+            if (R.IsReady() && sender.IsValidTarget(R.Range) && MiscMenu.Get<CheckBox>("gapcloserR").CurrentValue && !UltMenu["DontUltenemy" + sender.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 R.Cast(sender);
                 return;
@@ -191,7 +213,7 @@
             Chat.Print(Sender.BaseSkinName);
 
 
-            if (R.IsReady() && Sender.IsValidTarget(R.Range) && MiscMenu.Get<CheckBox>("Interruptr").CurrentValue)
+            if (R.IsReady() && Sender.IsValidTarget(R.Range) && MiscMenu.Get<CheckBox>("Interruptr").CurrentValue && !UltMenu["DontUltenemy" + Sender.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 R.Cast(Sender);
             }
@@ -222,7 +244,7 @@
                     R.Cast(Player);
                 }
 
-                if (ally != null && (useRA && ally.IsValidTarget(R.Range) && ally.HealthPercent <= ahp))
+                if (ally != null && (useRA && ally.IsValidTarget(R.Range) && ally.HealthPercent <= ahp) && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
                     R.Cast(ally);
                 }
@@ -619,6 +641,7 @@
             var useRA = UltMenu["RA"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRE = UltMenu["RE"].Cast<CheckBox>().CurrentValue && R.IsReady();
+            var useRF = UltMenu["RF"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var hitR = UltMenu["hitR"].Cast<Slider>().CurrentValue;
             var target =
                 EntityManager.Heroes.Enemies.FirstOrDefault(
@@ -630,7 +653,7 @@
 
             if (target != null && useRE)
             {
-                if (aoeR && target.CountEnemiesInRange(R.Range) >= hitR && target.IsValidTarget(R.Range))
+                if (aoeR && target.CountEnemiesInRange(R.Range) >= hitR && target.IsValidTarget(R.Range) && !UltMenu["DontUltenemy" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
                     R.Cast(target);
                 }
@@ -638,7 +661,7 @@
             
             if (useRS)
             {
-                if (aoeR && Player.CountEnemiesInRange(R.Range) >= hitR)
+                if (aoeR && Player.CountEnemiesInRange(R.Range) >= hitR && !UltMenu["DontUltally" + Player.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
                     R.Cast(Player);
                 }
@@ -646,9 +669,31 @@
 
             if (useRA && ally != null)
             {
-                if (aoeR && ally.CountEnemiesInRange(R.Range) >= hitR && ally.IsValidTarget(R.Range))
+                if (aoeR && ally.CountEnemiesInRange(R.Range) >= hitR && ally.IsValidTarget(R.Range) && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
                     R.Cast(ally);
+                }
+            }
+
+            if (target != null && useRF)
+            {
+                if (target.TotalShieldHealth() < Player.GetSpellDamage(target, SpellSlot.R)
+                    && !UltMenu["DontUltenemy" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                {
+                    if (target.IsValidTarget(R.Range))
+                    {
+                        R.Cast(target);
+                    }
+
+                    if (target.IsInRange(ally, R.Range) && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    {
+                        R.Cast(ally);
+                    }
+
+                    if (target.IsInRange(Player, R.Range) && !UltMenu["DontUltally" + Player.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    {
+                        R.Cast(Player);
+                    }
                 }
             }
         }
