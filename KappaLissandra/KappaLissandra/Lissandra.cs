@@ -161,7 +161,7 @@
 
         private static void OnGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
-            if (menuIni.Get<CheckBox>("Misc").CurrentValue || sender == null || sender.IsAlly || sender.IsMe)
+            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || sender == null || sender.IsAlly || sender.IsMe)
             {
                 return;
             }
@@ -182,7 +182,7 @@
 
         private static void OnInterruptableSpell(Obj_AI_Base Sender, Interrupter.InterruptableSpellEventArgs args)
         {
-            if (menuIni.Get<CheckBox>("Misc").CurrentValue || Sender == null || Sender.IsAlly || Sender.IsMe
+            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || Sender == null || Sender.IsAlly || Sender.IsMe
                 || !Sender.IsEnemy)
             {
                 return;
