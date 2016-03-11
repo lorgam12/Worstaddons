@@ -209,9 +209,7 @@
             {
                 return;
             }
-
-            Chat.Print(Sender.BaseSkinName);
-
+            
 
             if (R.IsReady() && Sender.IsValidTarget(R.Range) && MiscMenu.Get<CheckBox>("Interruptr").CurrentValue && !UltMenu["DontUltenemy" + Sender.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
