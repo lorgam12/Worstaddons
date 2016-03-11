@@ -72,7 +72,6 @@
             menuIni.Add("Misc", new CheckBox("Use Misc?"));
             menuIni.Add("Drawings", new CheckBox("Use Drawings?"));
 
-
             UltMenu = menuIni.AddSubMenu("Ultimate");
             UltMenu.AddGroupLabel("Ultimate Settings");
             UltMenu.Add("aoeR", new CheckBox("AoE R Logic"));
@@ -105,7 +104,6 @@
                 }
             }
 
-
             ComboMenu = menuIni.AddSubMenu("Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.Add("Q", new CheckBox("Use Q"));
@@ -117,14 +115,12 @@
             ComboMenu.Add("EHP", new Slider("Use E2 Safe if HP <= %", 30, 0, 100));
             ComboMenu.Add("ESE", new Slider("Use E2 Safe if Enemies are <=", 2, 1, 5));
 
-
             HarassMenu = menuIni.AddSubMenu("Harass");
             HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("Q", new CheckBox("Use Q"));
             HarassMenu.Add("W", new CheckBox("Use W"));
             HarassMenu.Add("E", new CheckBox("Use E", false));
             HarassMenu.Add("Mana", new Slider("Save Mana %", 30, 0, 100));
-
 
             LaneMenu = menuIni.AddSubMenu("Farm");
             LaneMenu.AddGroupLabel("LaneClear Settings");
@@ -137,7 +133,6 @@
             LaneMenu.Add("jW", new CheckBox("Use W"));
             LaneMenu.Add("jE", new CheckBox("Use E", false));
 
-
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.AddGroupLabel("Misc Settings");
             MiscMenu.Add("gapcloserW", new CheckBox("Anti-GapCloser W"));
@@ -146,13 +141,11 @@
             MiscMenu.Add("WTower", new CheckBox("Auto W Under Tower"));
             MiscMenu.Add("AutoW", new Slider("Auto W On Hit >=", 2, 1, 5));
 
-
             FleeMenu = menuIni.AddSubMenu("Flee");
             FleeMenu.AddGroupLabel("Flee Settings");
             FleeMenu.Add("Q", new CheckBox("Use Q"));
             FleeMenu.Add("W", new CheckBox("Use W"));
             FleeMenu.Add("E", new CheckBox("Use E"));
-
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
             DrawMenu.AddGroupLabel("Drawing Settings");
@@ -161,7 +154,6 @@
             DrawMenu.Add("E", new CheckBox("Draw E"));
             DrawMenu.Add("R", new CheckBox("Draw R"));
             DrawMenu.Add("debug", new CheckBox("debug", false));
-
 
             Q = new Spell.Skillshot(SpellSlot.Q, 715, SkillShotType.Linear, 250, 2200, 75);
             Q2 = new Spell.Skillshot(SpellSlot.Q, 825, SkillShotType.Linear, 250, 2200, 90);
@@ -180,7 +172,6 @@
             Gapcloser.OnGapcloser += OnGapcloser;
         }
 
-
         private static void OnGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
             if (!menuIni.Get<CheckBox>("Misc").CurrentValue || sender == null || sender.IsAlly || sender.IsMe)
@@ -194,13 +185,13 @@
                 return;
             }
 
-            if (R.IsReady() && sender.IsValidTarget(R.Range) && MiscMenu.Get<CheckBox>("gapcloserR").CurrentValue && !UltMenu["DontUltenemy" + sender.BaseSkinName].Cast<CheckBox>().CurrentValue)
+            if (R.IsReady() && sender.IsValidTarget(R.Range) && MiscMenu.Get<CheckBox>("gapcloserR").CurrentValue
+                && !UltMenu["DontUltenemy" + sender.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 R.Cast(sender);
                 return;
             }
         }
-
 
         private static void OnInterruptableSpell(Obj_AI_Base Sender, Interrupter.InterruptableSpellEventArgs args)
         {
@@ -209,9 +200,9 @@
             {
                 return;
             }
-            
 
-            if (R.IsReady() && Sender.IsValidTarget(R.Range) && MiscMenu.Get<CheckBox>("Interruptr").CurrentValue && !UltMenu["DontUltenemy" + Sender.BaseSkinName].Cast<CheckBox>().CurrentValue)
+            if (R.IsReady() && Sender.IsValidTarget(R.Range) && MiscMenu.Get<CheckBox>("Interruptr").CurrentValue
+                && !UltMenu["DontUltenemy" + Sender.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 R.Cast(Sender);
             }
@@ -242,7 +233,8 @@
                     R.Cast(Player);
                 }
 
-                if (ally != null && (useRA && ally.IsValidTarget(R.Range) && ally.HealthPercent <= ahp) && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                if (ally != null && (useRA && ally.IsValidTarget(R.Range) && ally.HealthPercent <= ahp)
+                    && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
                     R.Cast(ally);
                 }
@@ -300,7 +292,6 @@
             }
         }
 
-
         private static void OnCreate(GameObject sender, EventArgs args)
         {
             var miss = sender as MissileClient;
@@ -348,7 +339,6 @@
             {
                 E.Cast(Game.CursorPos);
             }
-
 
             if (useE && LissEMissile != null && LissEMissile.Position.IsInRange(LissEMissile.EndPosition, 50))
             {
@@ -429,7 +419,6 @@
             var useQ = LaneMenu["Q"].Cast<CheckBox>().CurrentValue;
             var useW = LaneMenu["W"].Cast<CheckBox>().CurrentValue;
             var useE = LaneMenu["E"].Cast<CheckBox>().CurrentValue;
-
 
             var allMinions = EntityManager.MinionsAndMonsters.Get(
                 EntityManager.MinionsAndMonsters.EntityType.Minion,
@@ -514,14 +503,15 @@
                     W.Cast();
                 }
 
-                if (useE && E.IsReady() && jmob.IsValidTarget(E.Range) && LissEMissile == null && E.Handle.ToggleState == 1)
+                if (useE && E.IsReady() && jmob.IsValidTarget(E.Range) && LissEMissile == null
+                    && E.Handle.ToggleState == 1)
                 {
                     E.Cast(jmob.Position);
                 }
             }
         }
 
-    private static void CastQ()
+        private static void CastQ()
         {
             if (!Q.IsReady())
             {
@@ -614,18 +604,16 @@
                 E.Cast(pred.CastPosition);
             }
 
-
-            if (useES && LissEMissile != null && LissEMissile.Position.CountEnemiesInRange(W.Range - 50) <= ESE && Player.HealthPercent <= EHP)
+            if (useES && LissEMissile != null && LissEMissile.Position.CountEnemiesInRange(W.Range - 50) <= ESE
+                && Player.HealthPercent <= EHP)
             {
                 E.Cast(Game.CursorPos);
             }
-
 
             if (useET && LissEMissile != null && LissEMissile.Position.IsInRange(target, 250))
             {
                 E.Cast(Game.CursorPos);
             }
-
 
             if (useE2 && LissEMissile != null && LissEMissile.Position.IsInRange(LissEMissile.EndPosition, 50))
             {
@@ -644,24 +632,23 @@
             var target =
                 EntityManager.Heroes.Enemies.FirstOrDefault(
                     e =>
-                    !e.IsZombie
-                    && !e.IsInvulnerable
-                    && !e.IsDead
-                    && !e.HasBuff("kindredrnodeathbuff") && !e.HasBuff("JudicatorIntervention")
-                    && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage"));
+                    !e.IsZombie && !e.IsInvulnerable && !e.IsDead && !e.HasBuff("kindredrnodeathbuff")
+                    && !e.HasBuff("JudicatorIntervention") && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage"));
             var ally = EntityManager.Heroes.Allies.FirstOrDefault(a => a.IsValidTarget(R.Range));
 
             if (target != null && useRE)
             {
-                if (aoeR && target.CountEnemiesInRange(R.Range) >= hitR && target.IsValidTarget(R.Range) && !UltMenu["DontUltenemy" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                if (aoeR && target.CountEnemiesInRange(R.Range) >= hitR && target.IsValidTarget(R.Range)
+                    && !UltMenu["DontUltenemy" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
                     R.Cast(target);
                 }
             }
-            
+
             if (useRS)
             {
-                if (aoeR && Player.CountEnemiesInRange(R.Range) >= hitR && !UltMenu["DontUltally" + Player.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                if (aoeR && Player.CountEnemiesInRange(R.Range) >= hitR
+                    && !UltMenu["DontUltally" + Player.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
                     R.Cast(Player);
                 }
@@ -669,7 +656,8 @@
 
             if (useRA && ally != null)
             {
-                if (aoeR && ally.CountEnemiesInRange(R.Range) >= hitR && ally.IsValidTarget(R.Range) && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                if (aoeR && ally.CountEnemiesInRange(R.Range) >= hitR && ally.IsValidTarget(R.Range)
+                    && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
                     R.Cast(ally);
                 }
@@ -685,12 +673,15 @@
                         R.Cast(target);
                     }
 
-                    if (ally != null && (target.IsInRange(ally, R.Range) && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue))
+                    if (ally != null
+                        && (target.IsInRange(ally, R.Range)
+                            && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue))
                     {
                         R.Cast(ally);
                     }
 
-                    if (target.IsInRange(Player, R.Range) && !UltMenu["DontUltally" + Player.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    if (target.IsInRange(Player, R.Range)
+                        && !UltMenu["DontUltally" + Player.BaseSkinName].Cast<CheckBox>().CurrentValue)
                     {
                         R.Cast(Player);
                     }
@@ -757,16 +748,17 @@
                 }
             }
 
-
             if (DrawMenu["debug"].Cast<CheckBox>().CurrentValue)
             {
                 var target =
-                EntityManager.Heroes.Enemies.FirstOrDefault(
-                    e =>
-                    !e.IsZombie && !e.IsDead
-                    && !e.HasBuff("kindredrnodeathbuff") && !e.HasBuff("JudicatorIntervention")
-                    && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage") && e.IsHPBarRendered && e.IsEnemy);
-            var ally = EntityManager.Heroes.Allies.FirstOrDefault(a => a.IsValidTarget(R.Range) && a.IsHPBarRendered && a.IsAlly && !a.IsDead);
+                    EntityManager.Heroes.Enemies.FirstOrDefault(
+                        e =>
+                        !e.IsZombie && !e.IsDead && !e.HasBuff("kindredrnodeathbuff")
+                        && !e.HasBuff("JudicatorIntervention") && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage")
+                        && e.IsHPBarRendered && e.IsEnemy);
+                var ally =
+                    EntityManager.Heroes.Allies.FirstOrDefault(
+                        a => a.IsValidTarget(R.Range) && a.IsHPBarRendered && a.IsAlly && !a.IsDead);
 
                 if (LissEMissile != null)
                 {
