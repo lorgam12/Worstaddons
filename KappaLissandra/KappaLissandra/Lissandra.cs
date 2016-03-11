@@ -16,9 +16,6 @@
 
     internal class Lissandra
     {
-
-        private static Vector2 MissilePosition;
-
         private static MissileClient LissEMissile;
 
         public static Spell.Skillshot Q { get; set; }
@@ -67,6 +64,7 @@
             menuIni.Add("JungleClear", new CheckBox("Use Jungle Clear?"));
             menuIni.Add("Drawings", new CheckBox("Use Drawings?"));
 
+
             UltMenu = menuIni.AddSubMenu("Ultimate");
             UltMenu.AddGroupLabel("Ultimate Settings");
             UltMenu.Add("aoeR", new CheckBox("AoE R Logic"));
@@ -76,6 +74,7 @@
             UltMenu.Add("hitR", new Slider("R AoE Hit >=", 2, 1, 5));
             UltMenu.Add("shp", new Slider("On Self Health to use R", 15, 0, 100));
             UltMenu.Add("ahp", new Slider("On Ally Health to use R", 10, 0, 100));
+
 
             ComboMenu = menuIni.AddSubMenu("Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -88,12 +87,14 @@
             ComboMenu.Add("EHP", new Slider("Use E2 Safe if HP <= %", 25, 0, 100));
             ComboMenu.Add("ESE", new Slider("Use E2 Safe if Enemies are <=", 2, 1, 5));
 
+
             HarassMenu = menuIni.AddSubMenu("Harass");
             HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("Q", new CheckBox("Use Q"));
             HarassMenu.Add("W", new CheckBox("Use W"));
             HarassMenu.Add("E", new CheckBox("Use E"));
             HarassMenu.Add("Mana", new Slider("Save Mana %", 30, 0, 100));
+
 
             LaneMenu = menuIni.AddSubMenu("Farm");
             LaneMenu.AddGroupLabel("LaneClear Settings");
@@ -106,11 +107,15 @@
             LaneMenu.Add("jW", new CheckBox("Use W"));
             LaneMenu.Add("jE", new CheckBox("Use E"));
 
+
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.AddGroupLabel("Misc Settings");
-            MiscMenu.Add("gapcloser", new CheckBox("Anti-GapCloser"));
-            MiscMenu.Add("Interrupt", new CheckBox("Interrupt"));
-            MiscMenu.Add("gapclosermana", new Slider("Anti-GapCloser Mana", 25, 0, 100));
+            MiscMenu.Add("gapcloserW", new CheckBox("Anti-GapCloser W"));
+            MiscMenu.Add("gapcloserR", new CheckBox("Anti-GapCloser R"));
+            MiscMenu.Add("Interruptr", new CheckBox("Interrupt R"));
+            MiscMenu.Add("WTower", new CheckBox("Auto W Under Tower"));
+            MiscMenu.Add("AutoW", new Slider("Auto W On Hit >=", 2, 1, 5));
+
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
             DrawMenu.AddGroupLabel("Drawing Settings");
@@ -120,10 +125,13 @@
             DrawMenu.Add("R", new CheckBox("Draw R"));
             DrawMenu.Add("debug", new CheckBox("debug"));
 
+
             Q = new Spell.Skillshot(SpellSlot.Q, 715, SkillShotType.Linear, 250, 2200, 75);
             Q2 = new Spell.Skillshot(SpellSlot.Q, 825, SkillShotType.Linear, 250, 2200, 90);
             Qtest = new Spell.Skillshot(SpellSlot.Q, 715, SkillShotType.Linear, 250, 2200, 75)
-                        { AllowedCollisionCount = int.MaxValue };
+                        {
+                            AllowedCollisionCount = int.MaxValue 
+                        };
             W = new Spell.Active(SpellSlot.W, 450);
             E = new Spell.Skillshot(SpellSlot.E, 1000, SkillShotType.Linear, 250, 850, 125);
             R = new Spell.Targeted(SpellSlot.R, 400);
@@ -133,6 +141,44 @@
             GameObject.OnDelete += OnDelete;
             Drawing.OnDraw += OnDraw;
             AttackableUnit.OnDamage += OnDamage;
+            Interrupter.OnInterruptableSpell += OnInterruptableSpell;
+            Gapcloser.OnGapcloser += OnGapcloser;
+        }
+
+
+        private static void OnGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
+        {
+            if (sender == null || sender.IsAlly || sender.IsMe)
+            {
+                return;
+            }
+            
+            if (W.IsReady() && sender.IsValidTarget(W.Range - 5) && MiscMenu.Get<CheckBox>("gapcloserW").CurrentValue)
+            {
+                W.Cast();
+            }
+
+            if (R.IsReady() && sender.IsValidTarget(R.Range) && MiscMenu.Get<CheckBox>("gapcloserR").CurrentValue)
+            {
+                R.Cast(sender);
+            }
+        }
+        
+
+        private static void OnInterruptableSpell(Obj_AI_Base Sender, Interrupter.InterruptableSpellEventArgs args)
+        {
+            if (Sender == null || Sender.IsAlly || Sender.IsMe || !Sender.IsEnemy)
+            {
+                return;
+            }
+
+            Chat.Print(Sender.BaseSkinName);
+
+
+            if (R.IsReady() && Sender.IsValidTarget(R.Range) && MiscMenu.Get<CheckBox>("Interruptr").CurrentValue )
+            {
+                R.Cast(Sender);
+            }
         }
 
         public static void OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
@@ -198,6 +244,18 @@
                     jClear();
                 }
             }
+            if (W.IsReady())
+            {
+                if (MiscMenu.Get<CheckBox>("WTower").CurrentValue && Player.IsUnderHisturret() && Player.IsUnderTurret() && !Player.IsUnderEnemyturret())
+                {
+                    W.Cast();
+                }
+
+                if (Player.CountEnemiesInRange(W.Range) >= MiscMenu.Get<Slider>("AutoW").CurrentValue)
+                {
+                    W.Cast();
+                }
+            }
         }
         
 
@@ -224,7 +282,6 @@
                 && miss.SData.Name == "LissandraEMissile")
             {
                 LissEMissile = null;
-                MissilePosition = new Vector2(0, 0);
             }
         }
 
