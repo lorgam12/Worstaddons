@@ -169,8 +169,70 @@
             Interrupter.OnInterruptableSpell += Interrupter2_OnInterruptableTarget;
             Gapcloser.OnGapcloser += OnGapClose;
             Orbwalker.OnPreAttack += OnBeforeAttack;
+            AttackableUnit.OnDamage += OnDamage;
         }
-        
+
+        public static void OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
+        {
+            if (sender == null || sender.IsAlly || sender.IsMe)
+            {
+                return;
+            }
+
+            if (sender.IsEnemy || sender is Obj_AI_Turret)
+            {
+                if (menuIni.Get<CheckBox>("Saver").CurrentValue)
+                {
+                    if (Saver.Get<CheckBox>("AutoES").CurrentValue)
+                    {
+                        foreach (var ally in EntityManager.Heroes.Allies)
+                        {
+                            if (ally.IsValidTarget(E.Range)
+                                && !ally.IsDead
+                                && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                            {
+                                var c = ally.CountEnemiesInRange(600);
+                                if (ally.HealthPercent <= 15 && (c >= 1 || ally.IsUnderEnemyturret()))
+                                {
+                                    E.Cast(ally);
+                                }
+                            }
+                        }
+                    }
+
+                    if (Saver.Get<CheckBox>("AutoR").CurrentValue)
+                    {
+                        foreach (var ally in EntityManager.Heroes.Allies)
+                        {
+                            if (ally.IsValidTarget(R.Range) && ally != null
+                                && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                            {
+                                var c = ally.CountEnemiesInRange(300);
+                                if (c >= 1 + 1 + 1 || ally.HealthPercent <= 20 && c >= 1)
+                                {
+                                    R.Cast(ally);
+                                }
+                            }
+                        }
+
+                        var ec = Player.CountEnemiesInRange(300);
+                        if ((ec >= 1 + 1 + 1 || Player.HealthPercent <= 25 && ec >= 1) && Player != null)
+                        {
+                            R.Cast(Player);
+                        }
+                    }
+
+                    if (Saver.Get<CheckBox>("AutoR").CurrentValue)
+                    {
+                        if (Player.HealthPercent <= 20 && Player.CountEnemiesInRange(1000) >= 1)
+                        {
+                            R.Cast(Player);
+                        }
+                    }
+                }
+            }
+        }
+
         private static void OnBeforeAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
         {
             if (MiscMenu["Support"].Cast<CheckBox>().CurrentValue)
@@ -323,56 +385,6 @@
             if (MiscMenu.Get<CheckBox>("AutoE").CurrentValue)
             {
                 ImABitch();
-            }
-
-            if (menuIni.Get<CheckBox>("Saver").CurrentValue)
-            {
-                if (Saver.Get<CheckBox>("AutoES").CurrentValue)
-                {
-                    foreach (var ally in EntityManager.Heroes.Allies)
-                    {
-                        if (ally.IsValidTarget(E.Range) && (ally.PhysicalDamageTaken > 50 || ally.MagicDamageTaken > 50)
-                            && !ally.IsDead && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                        {
-                            var c = ally.CountEnemiesInRange(600);
-                            if (ally.HealthPercent <= 15 && (c >= 1 || ally.IsUnderEnemyturret()))
-                            {
-                                E.Cast(ally);
-                            }
-                        }
-                    }
-                }
-
-                if (Saver.Get<CheckBox>("AutoR").CurrentValue)
-                {
-                    foreach (var ally in EntityManager.Heroes.Allies)
-                    {
-                        if (ally.IsValidTarget(R.Range) && ally != null
-                            && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                        {
-                            var c = ally.CountEnemiesInRange(300);
-                            if (c >= 1 + 1 + 1 || ally.HealthPercent <= 20 && c >= 1)
-                            {
-                                R.Cast(ally);
-                            }
-                        }
-                    }
-
-                    var ec = Player.CountEnemiesInRange(300);
-                    if ((ec >= 1 + 1 + 1 || Player.HealthPercent <= 25 && ec >= 1) && Player != null)
-                    {
-                        R.Cast(Player);
-                    }
-                }
-
-                if (Saver.Get<CheckBox>("AutoR").CurrentValue)
-                {
-                    if (Player.HealthPercent <= 20 && Player.CountEnemiesInRange(1000) >= 1
-                        && (Player.PhysicalDamageTaken >= 50 || Player.MagicDamageTaken >= 50))
-                    {
-                        R.Cast(Player);
-                    }
-                }
             }
         }
         
