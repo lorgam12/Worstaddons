@@ -646,7 +646,9 @@
             var target =
                 EntityManager.Heroes.Enemies.FirstOrDefault(
                     e =>
-                    !e.IsZombie && !e.IsDead
+                    !e.IsZombie
+                    && !e.IsInvulnerable
+                    && !e.IsDead
                     && !e.HasBuff("kindredrnodeathbuff") && !e.HasBuff("JudicatorIntervention")
                     && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage"));
             var ally = EntityManager.Heroes.Allies.FirstOrDefault(a => a.IsValidTarget(R.Range));
@@ -685,7 +687,7 @@
                         R.Cast(target);
                     }
 
-                    if (target.IsInRange(ally, R.Range) && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    if (ally != null && (target.IsInRange(ally, R.Range) && !UltMenu["DontUltally" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue))
                     {
                         R.Cast(ally);
                     }
