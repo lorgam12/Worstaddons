@@ -85,7 +85,11 @@
             ComboMenu.Add("Q", new CheckBox("Use Q"));
             ComboMenu.Add("W", new CheckBox("Use W"));
             ComboMenu.Add("E", new CheckBox("Use E"));
-            ComboMenu.Add("E2", new CheckBox("Use E Engage", false));
+            ComboMenu.Add("ET", new CheckBox("Use E2 If hit target"));
+            ComboMenu.Add("E2", new CheckBox("Always E2 Max", false));
+            ComboMenu.Add("ES", new CheckBox("Use E2 Safe", false));
+            ComboMenu.Add("EHP", new Slider("Use E2 Safe if HP <= %", 25, 0, 100));
+            ComboMenu.Add("ESE", new Slider("Use E2 Safe if Enemies are <=", 2, 1, 5));
 
             HarassMenu = menuIni.AddSubMenu("Harass");
             HarassMenu.AddGroupLabel("Harass Settings");
@@ -117,6 +121,7 @@
             DrawMenu.Add("W", new CheckBox("Draw W"));
             DrawMenu.Add("E", new CheckBox("Draw E"));
             DrawMenu.Add("R", new CheckBox("Draw R"));
+            DrawMenu.Add("debug", new CheckBox("debug"));
 
             Q = new Spell.Skillshot(SpellSlot.Q, 715, SkillShotType.Linear, 250, 2200, 75);
             Q2 = new Spell.Skillshot(SpellSlot.Q, 825, SkillShotType.Linear, 250, 2200, 90);
@@ -124,13 +129,47 @@
                         { AllowedCollisionCount = int.MaxValue };
             W = new Spell.Active(SpellSlot.W, 450);
             E = new Spell.Skillshot(SpellSlot.E, 1000, SkillShotType.Linear, 250, 850, 125);
-            R = new Spell.Targeted(SpellSlot.R, 550);
+            R = new Spell.Targeted(SpellSlot.R, 400);
 
             Game.OnUpdate += OnUpdate;
             GameObject.OnCreate += OnCreate;
             GameObject.OnDelete += OnDelete;
             Game.OnUpdate += MonitorMissilePosition;
             Drawing.OnDraw += OnDraw;
+            AttackableUnit.OnDamage += OnDamage;
+        }
+
+        public static void OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
+        {
+            var ally =
+                EntityManager.Heroes.Allies.FirstOrDefault(
+                    a =>
+                    !a.IsDead && !a.IsZombie && !a.IsGhosted && !a.HasBuff("kindredrnodeathbuff")
+                    && !a.HasBuff("JudicatorIntervention") && !a.HasBuff("ChronoShift") && !a.HasBuff("UndyingRage"));
+            var shp = UltMenu["shp"].Cast<Slider>().CurrentValue;
+            var ahp = UltMenu["ahp"].Cast<Slider>().CurrentValue;
+            var useRA = UltMenu["RA"].Cast<CheckBox>().CurrentValue && R.IsReady();
+            var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
+            if (sender == null || sender.IsAlly || sender.IsMe)
+            {
+                return;
+            }
+
+            if (sender.IsEnemy || sender is Obj_AI_Turret)
+            {
+                if (useRS && Player.HealthPercent <= shp
+                    && !Player.HasBuff("kindredrnodeathbuff") && !Player.HasBuff("JudicatorIntervention")
+                    && !Player.HasBuff("ChronoShift") && !Player.HasBuff("UndyingRage"))
+                {
+                    R.Cast(Player);
+                }
+
+                if (ally != null
+                    && (useRA && ally.IsValidTarget(R.Range) && ally.HealthPercent <= ahp))
+                {
+                    R.Cast(ally);
+                }
+            }
         }
 
         private static void OnUpdate(EventArgs args)
@@ -162,27 +201,6 @@
                 {
                     jClear();
                 }
-            }
-            var ally =
-                EntityManager.Heroes.Allies.FirstOrDefault(
-                    a =>
-                    !a.IsDead && !a.IsZombie && !a.IsGhosted && !a.HasBuff("kindredrnodeathbuff")
-                    && !a.HasBuff("JudicatorIntervention") && !a.HasBuff("ChronoShift") && !a.HasBuff("UndyingRage"));
-            var shp = UltMenu["shp"].Cast<Slider>().CurrentValue;
-            var ahp = UltMenu["ahp"].Cast<Slider>().CurrentValue;
-            var useRA = UltMenu["RA"].Cast<CheckBox>().CurrentValue && R.IsReady();
-            var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
-            if (Player.CountEnemiesInRange(750) >= 1 && useRS && Player.HealthPercent <= shp
-                && !Player.HasBuff("kindredrnodeathbuff") && !Player.HasBuff("JudicatorIntervention")
-                && !Player.HasBuff("ChronoShift") && !Player.HasBuff("UndyingRage"))
-            {
-                R.Cast(Player);
-            }
-
-            if (ally != null && (useRA && ally.IsValidTarget(R.Range)
-                                 && ally.HealthPercent <= ahp && ally.CountEnemiesInRange(750) >= 1))
-            {
-                R.Cast(ally);
             }
         }
 
@@ -242,6 +260,11 @@
             var useE = ComboMenu["E"].Cast<CheckBox>().CurrentValue && E.IsReady();
             var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRE = UltMenu["RE"].Cast<CheckBox>().CurrentValue && R.IsReady();
+            
+            if (useW)
+            {
+                CastW();
+            }
 
             if (useQ)
             {
@@ -251,11 +274,6 @@
             if (useE)
             {
                 CastE();
-            }
-
-            if (useW)
-            {
-                CastW();
             }
 
             if (useRS || useRE)
@@ -374,7 +392,7 @@
             }
 
             var target = TargetSelector.GetTarget(W.Range, DamageType.Magical);
-            if (Vector3.Distance(target.ServerPosition, Player.ServerPosition) <= W.Range - 5)
+            if (target != null && Vector3.Distance(target.ServerPosition, Player.ServerPosition) <= W.Range - 5)
             {
                 W.Cast();
                 return;
@@ -392,19 +410,38 @@
 
         private static void CastE()
         {
+            var useE = ComboMenu["E"].Cast<CheckBox>().CurrentValue && E.IsReady();
+            var EHP = ComboMenu["EHP"].Cast<Slider>().CurrentValue;
+            var ESE = ComboMenu["ESE"].Cast<Slider>().CurrentValue;
+            var useET = ComboMenu["ET"].Cast<CheckBox>().CurrentValue && E.IsReady();
+            var useE2 = ComboMenu["E2"].Cast<CheckBox>().CurrentValue && E.IsReady();
+            var useES = ComboMenu["ES"].Cast<CheckBox>().CurrentValue && E.IsReady();
             if (!E.IsReady())
             {
                 return;
             }
 
             var target = TargetSelector.GetTarget(E.Range + 100, DamageType.Magical);
-            if (LissEMissile == null && !Player.HasBuff("LissandraE") && target != null)
+            if (LissEMissile == null && !Player.HasBuff("LissandraE") && target != null && useE)
             {
                 var pred = E.GetPrediction(target);
                 E.Cast(pred.CastPosition);
             }
 
-            if (LissEMissile != null && LissEMissile.Position.CountEnemiesInRange(W.Range - 50) >= 1)
+
+            if (useES && LissEMissile != null && LissEMissile.Position.CountEnemiesInRange(W.Range - 50) <= ESE && Player.HealthPercent <= EHP)
+            {
+                E.Cast(Game.CursorPos);
+            }
+
+
+            if (useET && LissEMissile != null && LissEMissile.Position.IsInRange(target, 250))
+            {
+                E.Cast(Game.CursorPos);
+            }
+
+
+            if (useE2 && LissEMissile != null && LissEMissile.Position.IsInRange(LissEMissile.EndPosition, 50))
             {
                 E.Cast(Game.CursorPos);
             }
@@ -432,20 +469,20 @@
                     R.Cast(target);
                 }
             }
+            
+            if (useRS)
+            {
+                if (aoeR && Player.CountEnemiesInRange(R.Range) >= hitR)
+                {
+                    R.Cast(Player);
+                }
+            }
 
             if (useRA && ally != null)
             {
                 if (aoeR && ally.CountEnemiesInRange(R.Range) >= hitR && ally.IsValidTarget(R.Range))
                 {
                     R.Cast(ally);
-                }
-            }
-
-            if (useRS)
-            {
-                if (aoeR && Player.CountEnemiesInRange(R.Range) >= hitR)
-                {
-                    R.Cast(Player);
                 }
             }
         }
@@ -456,12 +493,56 @@
             {
                 return;
             }
+            
 
-            if (LissEMissile != null)
+            var target =
+                EntityManager.Heroes.Enemies.FirstOrDefault(
+                    e =>
+                    !e.IsZombie && !e.IsDead
+                    && !e.HasBuff("kindredrnodeathbuff") && !e.HasBuff("JudicatorIntervention")
+                    && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage") && e.IsHPBarRendered && e.IsEnemy);
+            var ally = EntityManager.Heroes.Allies.FirstOrDefault(a => a.IsValidTarget(R.Range) && a.IsHPBarRendered && a.IsAlly && !a.IsDead);
+            if (DrawMenu["debug"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(Color.MediumPurple, W.Range, LissEMissile.Position);
-                Circle.Draw(Color.MediumPurple, W.Range, LissEMissile.EndPosition);
-                Circle.Draw(Color.MediumPurple, W.Range, Player.Position);
+                if (LissEMissile != null)
+                {
+                    Circle.Draw(Color.DarkBlue, W.Range, LissEMissile.Position);
+                    Circle.Draw(Color.DarkBlue, W.Range, LissEMissile.EndPosition);
+                }
+
+                var hpPosp = ally.HPBarPosition;
+                Circle.Draw(Color.DarkBlue, R.Range, Player.Position);
+                Drawing.DrawText(
+                    hpPosp.X + 135f,
+                    hpPosp.Y,
+                    System.Drawing.Color.White,
+                    "Enemies in Range " + Player.CountEnemiesInRange(R.Range).ToString(),
+                    10);
+                {
+                    if (ally != null)
+                    {
+                        var hpPos = ally.HPBarPosition;
+                        Circle.Draw(Color.White, R.Range, ally.Position);
+                        Drawing.DrawText(
+                            hpPos.X + 135f,
+                            hpPos.Y,
+                            System.Drawing.Color.White,
+                            "Enemies in Range " + ally.CountEnemiesInRange(R.Range).ToString(),
+                            10);
+                    }
+                }
+
+                if (target != null)
+                {
+                    var hpPos = target.HPBarPosition;
+                    Circle.Draw(Color.White, R.Range, target.Position);
+                    Drawing.DrawText(
+                        hpPos.X + 135f,
+                        hpPos.Y,
+                        System.Drawing.Color.White,
+                        "Enemies in Range " + target.CountEnemiesInRange(R.Range).ToString(),
+                        10);
+                }
             }
         }
     }
