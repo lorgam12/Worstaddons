@@ -25,7 +25,7 @@
                 ObjectManager.Get<AIHeroClient>()
                     .Where(
                         hero =>
-                        hero != null && !hero.HasBuffOfType(BuffType.Invulnerability) && hero.IsValid && hero.IsVisible
+                        hero != null && hero.IsHPBarRendered && !hero.HasBuffOfType(BuffType.Invulnerability) && hero.IsValid && hero.IsVisible
                         && hero.IsEnemy && !hero.IsDead && !hero.IsZombie
                         && Program.KillStealMenu["Steal" + hero.BaseSkinName].Cast<CheckBox>().CurrentValue))
             {

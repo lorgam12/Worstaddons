@@ -25,7 +25,7 @@
                 ObjectManager.Get<Obj_AI_Minion>()
                     .Where(
                         jmob =>
-                        !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsMonster && jmob.IsValid
+                        !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsHPBarRendered && jmob.IsMonster && jmob.IsValid
                         && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie
                         && ((Program.JungleStealMenu["drake"].Cast<CheckBox>().CurrentValue
                              && jmob.BaseSkinName == "SRU_Dragon")
