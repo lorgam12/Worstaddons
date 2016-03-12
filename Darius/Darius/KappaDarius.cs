@@ -132,7 +132,7 @@
             KillStealMenu.Add("Rks", new CheckBox("R KillSteal"));
             KillStealMenu.Add("IGP", new CheckBox("Ignite + Passive Kill"));
             KillStealMenu.Add("IG", new CheckBox("Ignite Only", false));
-            KillStealMenu.Add("SR", new Slider("Dont Use Ult if target can be kill With X AA", 2, 0, 6));
+            KillStealMenu.Add("SR", new Slider("Dont Use Ult if target can be kill With X AA", 1, 0, 6));
             KillStealMenu.AddLabel("Iginte + Passive takes in account Max Ignite + Passive dmg");
 
 
@@ -395,7 +395,10 @@
                 {
                     if (ObjectManager.Player.GetAutoAttackDamage(target) * SR > target.TotalShieldHealth() && target.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
                     {
-                        return;
+                        if (target.TotalShieldHealth() <= ObjectManager.Player.TotalShieldHealth())
+                        {
+                            return;
+                        }
                     }
                     var pred = E.GetPrediction(target);
                     // Credits cancerous
@@ -630,8 +633,12 @@
                 {
                     if (ObjectManager.Player.GetAutoAttackDamage(rt) * SR > rt.TotalShieldHealth() && rt.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
                     {
-                        return;
+                        if (rt.TotalShieldHealth() <= ObjectManager.Player.TotalShieldHealth())
+                        {
+                            return;
+                        }
                     }
+
                     if (Rcombo)
                     {
                         if (rt.IsValidTarget(R.Range) && player.GetSpellDamage(rt, SpellSlot.R) > rt.TotalShieldHealth())
