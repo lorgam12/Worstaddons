@@ -132,6 +132,7 @@
             KillStealMenu.Add("Rks", new CheckBox("R KillSteal"));
             KillStealMenu.Add("IGP", new CheckBox("Ignite + Passive Kill"));
             KillStealMenu.Add("IG", new CheckBox("Ignite Only", false));
+            KillStealMenu.Add("SR", new Slider("Dont Use Ult if target can be kill With X AA", 2, 0, 6));
             KillStealMenu.AddLabel("Iginte + Passive takes in account Max Ignite + Passive dmg");
 
 
@@ -377,6 +378,7 @@
 
         private static void KillSteal()
         {
+            var SR = KillStealMenu["SR"].Cast<Slider>().CurrentValue;
             var IG = KillStealMenu["IG"].Cast<CheckBox>().CurrentValue;
             var IGP = KillStealMenu["IGP"].Cast<CheckBox>().CurrentValue;
             var Rks = KillStealMenu["Rks"].Cast<CheckBox>().CurrentValue && R.IsReady();
@@ -391,6 +393,10 @@
             {
                 if (Rks)
                 {
+                    if (ObjectManager.Player.GetAutoAttackDamage(target) * SR > target.TotalShieldHealth() && target.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
+                    {
+                        return;
+                    }
                     var pred = E.GetPrediction(target);
                     // Credits cancerous
                     int passiveCounter = target.GetBuffCount("DariusHemo") <= 0 ? 0 : target.GetBuffCount("DariusHemo");
@@ -611,6 +617,7 @@
 
         private static void RCast()
         {
+            var SR = KillStealMenu["SR"].Cast<Slider>().CurrentValue;
             var buffcount = RMenu["count"].Cast<Slider>().CurrentValue;
             var rt = TargetSelector.GetTarget(R.Range, DamageType.True);
             var Rcombo = RMenu["Combo"].Cast<CheckBox>().CurrentValue && R.IsReady();
@@ -621,6 +628,10 @@
                 if (!rt.HasBuff("kindredrnodeathbuff") && !rt.HasBuff("JudicatorIntervention")
                     && !rt.HasBuff("ChronoShift") && !rt.HasBuff("UndyingRage"))
                 {
+                    if (ObjectManager.Player.GetAutoAttackDamage(rt) * SR > rt.TotalShieldHealth() && rt.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
+                    {
+                        return;
+                    }
                     if (Rcombo)
                     {
                         if (rt.IsValidTarget(R.Range) && player.GetSpellDamage(rt, SpellSlot.R) > rt.TotalShieldHealth())
