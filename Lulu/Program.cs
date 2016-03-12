@@ -170,6 +170,100 @@
             Gapcloser.OnGapcloser += OnGapClose;
             Orbwalker.OnPreAttack += OnBeforeAttack;
             AttackableUnit.OnDamage += OnDamage;
+            Obj_AI_Base.OnBasicAttack += OnBasicAttack;
+            Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
+        }
+
+        private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!sender.IsValid && !E.IsReady() || !E.IsInRange(sender) || sender.IsAlly || !args.Target.IsValid
+                || args.Target.IsEnemy || sender is Obj_AI_Minion)
+            {
+                return;
+            }
+
+            var caster = sender;
+            var target = (AIHeroClient)args.Target;
+
+            if (!target.IsAlly || !target.IsMe || !caster.IsEnemy)
+            {
+                return;
+            }
+
+            if (menuIni.Get<CheckBox>("Saver").CurrentValue)
+            {
+                if (Saver.Get<CheckBox>("AutoES").CurrentValue)
+                {
+                    if (target.IsValidTarget(E.Range) && !target.IsDead
+                        && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    {
+                        var c = target.CountEnemiesInRange(750);
+                        if (target.HealthPercent <= 25 && (c >= 1 || target.IsUnderEnemyturret()))
+                        {
+                            E.Cast(target);
+                        }
+                    }
+                }
+
+                if (Saver.Get<CheckBox>("AutoR").CurrentValue)
+                {
+                    if (target.IsValidTarget(R.Range) && target != null
+                        && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    {
+                        var c = target.CountEnemiesInRange(300);
+                        if (c >= 1 + 1 + 1 || target.HealthPercent <= 20 && c >= 1)
+                        {
+                            R.Cast(target);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!sender.IsValid && !E.IsReady() || !E.IsInRange(sender) || sender.IsAlly || !args.Target.IsValid
+                || args.Target.IsEnemy || sender is Obj_AI_Minion)
+            {
+                return;
+            }
+
+            var caster = sender;
+            var target = (AIHeroClient)args.Target;
+
+            if (!target.IsAlly || !target.IsMe || !caster.IsEnemy)
+            {
+                return;
+            }
+
+            if (menuIni.Get<CheckBox>("Saver").CurrentValue)
+            {
+                if (Saver.Get<CheckBox>("AutoES").CurrentValue)
+                {
+                    if (target.IsValidTarget(E.Range) && !target.IsDead
+                        && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    {
+                        var c = target.CountEnemiesInRange(600);
+                        if (target.HealthPercent <= 25 && (c >= 1 || target.IsUnderEnemyturret()))
+                        {
+                            E.Cast(target);
+                        }
+                    }
+                }
+
+                if (Saver.Get<CheckBox>("AutoR").CurrentValue)
+                {
+                    if (target.IsValidTarget(R.Range) && target != null
+                        && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    {
+                        var c = target.CountEnemiesInRange(300);
+                        if (c >= 1 + 1 + 1 || target.HealthPercent <= 20 && c >= 1)
+                        {
+                            R.Cast(target);
+                        }
+                    }
+                }
+            }
         }
 
         public static void OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
@@ -220,11 +314,8 @@
                         {
                             R.Cast(Player);
                         }
-                    }
 
-                    if (Saver.Get<CheckBox>("AutoR").CurrentValue)
-                    {
-                        if (Player.HealthPercent <= 20 && Player.CountEnemiesInRange(1000) >= 1)
+                        if (ObjectManager.Player.HealthPercent <= 15)
                         {
                             R.Cast(Player);
                         }
@@ -274,14 +365,14 @@
                         if (ally.IsValidTarget(R.Range)
                             && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue && Sender.IsEnemy)
                         {
-                            if (ally.Distance(Sender, true) < 300 * 300 && ally.HealthPercent < 25)
+                            if (ally.Distance(Sender, true) < 300 * 300 && ally.HealthPercent <= 25)
                             {
                                 R.Cast(ally);
                             }
                         }
                     }
 
-                    if (Player.Distance(Sender, true) < 300 * 300 && Sender.IsEnemy && Player.HealthPercent < 20)
+                    if (Player.Distance(Sender, true) < 300 * 300 && Sender.IsEnemy && Player.HealthPercent <= 20)
                     {
                         R.Cast(Player);
                     }
@@ -385,6 +476,33 @@
             if (MiscMenu.Get<CheckBox>("AutoE").CurrentValue)
             {
                 ImABitch();
+            }
+
+            if (Saver.Get<CheckBox>("AutoR").CurrentValue)
+            {
+                foreach (var ally in EntityManager.Heroes.Allies)
+                {
+                    if (ally.IsValidTarget(R.Range) && ally != null
+                        && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    {
+                        var c = ally.CountEnemiesInRange(300);
+                        if (c >= 1 + 1 + 1 || ally.HealthPercent <= 20 && c >= 1)
+                        {
+                            R.Cast(ally);
+                        }
+                    }
+                }
+
+                var ec = Player.CountEnemiesInRange(300);
+                if ((ec >= 1 + 1 + 1 || Player.HealthPercent <= 25 && ec >= 1) && Player != null)
+                {
+                    R.Cast(Player);
+                }
+
+                if (ObjectManager.Player.HealthPercent <= 10 && Player.CountEnemiesInRange(1000) >= 1)
+                {
+                    R.Cast(Player);
+                }
             }
         }
         
