@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 using EloBuddy;
 using EloBuddy.SDK;
+
 using GenesisSpellLibrary.Spells;
 
 namespace GenesisSpellLibrary
@@ -15,6 +17,7 @@ namespace GenesisSpellLibrary
         }
 
         public static SpellBase CurrentSpells { get; set; }
+
         public static Dictionary<AIHeroClient, SpellBase> SpellsDictionary { get; set; }
 
         public static float GetRange(SpellSlot slot, AIHeroClient sender)
@@ -33,6 +36,7 @@ namespace GenesisSpellLibrary
                     return 0;
             }
         }
+
         public static void Initialize()
         {
             EntityManager.Heroes.AllHeroes.ForEach(PrepareSpells);
@@ -43,10 +47,9 @@ namespace GenesisSpellLibrary
             SpellBase spells = SpellLibrary.GetSpells(hero.Hero);
             //This only needs to be called once per champion, anymore is a memory leak.
             if (spells != null)
-                SpellManager.SpellsDictionary.Add(hero, spells);
+            {
+                SpellsDictionary.Add(hero, spells);
+            }
         }
-
-
     }
-
 }

@@ -1,16 +1,16 @@
 ﻿namespace AutoSteal.Modes
 {
     using System.Linq;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu.Values;
+
     using GenesisSpellLibrary;
     using GenesisSpellLibrary.Spells;
 
     internal class JungleSteal
     {
-
-
         protected static SpellBase Spells
         {
             get
@@ -25,12 +25,8 @@
                 ObjectManager.Get<Obj_AI_Minion>()
                     .Where(
                         jmob =>
-                        !jmob.HasBuffOfType(BuffType.Invulnerability)
-                        && jmob.IsMonster
-                        && jmob.IsValid
-                        && jmob.IsVisible
-                        && !jmob.IsDead
-                        && !jmob.IsZombie
+                        !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsMonster && jmob.IsValid
+                        && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie
                         && ((Program.JungleStealMenu["drake"].Cast<CheckBox>().CurrentValue
                              && jmob.BaseSkinName == "SRU_Dragon")
                             || (Program.JungleStealMenu["baron"].Cast<CheckBox>().CurrentValue
@@ -47,12 +43,12 @@
                                 && jmob.BaseSkinName == "SRU_Murkwolf")
                             || (Program.JungleStealMenu["blue"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Blue")
-                            || (Program.JungleStealMenu["red"].Cast<CheckBox>().CurrentValue && jmob.BaseSkinName == "SRU_Red"))))
+                            || (Program.JungleStealMenu["red"].Cast<CheckBox>().CurrentValue
+                                && jmob.BaseSkinName == "SRU_Red"))))
             {
                 if (Program.JungleStealMenu["AAJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (ObjectManager.Player.CanAttack
-                        && ObjectManager.Player.GetAutoAttackDamage(mob) > mob.Health
+                    if (ObjectManager.Player.CanAttack && ObjectManager.Player.GetAutoAttackDamage(mob) > mob.Health
                         && mob.IsInAutoAttackRange(ObjectManager.Player))
                     {
                         Player.IssueOrder(GameObjectOrder.AutoAttack, mob);
@@ -62,12 +58,15 @@
 
                 if (Program.JungleStealMenu["QJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (ObjectManager.Player.BaseAbilityDamage
-                        + ObjectManager.Player.GetAutoAttackDamage(mob)
+                    if (Spells.QisToggle)
+                    {
+                        return;
+                    }
+
+                    if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.Q)
                         > Check.HealthPrediction.GetHealthPrediction(mob, (int)(Spells.Q.CastDelay * 1000))
-                        && Spells.Q.IsInRange(mob)
-                        && Spells.Q.IsReady())
+                        && Spells.Q.IsInRange(mob) && Spells.Q.IsReady())
                     {
                         if (Spells.Q.GetType() == typeof(Spell.Skillshot))
                         {
@@ -91,7 +90,16 @@
 
                         if (Spells.Q.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spells.Q.Cast(mob.Position);
+                            Spell.Chargeable Qx = Spells.Q as Spell.Chargeable;
+                            if (Qx != null && !Qx.IsCharging)
+                            {
+                                Qx.StartCharging();
+                            }
+
+                            if (Qx.Range == Qx.MaximumRange)
+                            {
+                                Qx.Cast(mob.Position);
+                            }
                             return;
                         }
 
@@ -105,12 +113,14 @@
 
                 if (Program.JungleStealMenu["WJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (ObjectManager.Player.BaseAbilityDamage
-                        + ObjectManager.Player.GetAutoAttackDamage(mob)
+                    if (Spells.WisToggle)
+                    {
+                        return;
+                    }
+                    if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.W)
                         > Check.HealthPrediction.GetHealthPrediction(mob, (int)(Spells.W.CastDelay * 1000))
-                        && Spells.W.IsInRange(mob)
-                        && Spells.W.IsReady())
+                        && Spells.W.IsInRange(mob) && Spells.W.IsReady())
                     {
                         if (Spells.W.GetType() == typeof(Spell.Skillshot))
                         {
@@ -134,9 +144,17 @@
 
                         if (Spells.W.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spells.W.Cast(mob.Position);
-                            return;
+                            Spell.Chargeable Wx = Spells.W as Spell.Chargeable;
+                            if (Wx != null && !Wx.IsCharging)
+                            {
+                                Wx.StartCharging();
+                            }
 
+                            if (Wx.Range == Wx.MaximumRange)
+                            {
+                                Wx.Cast(mob.Position);
+                            }
+                            return;
                         }
 
                         if (Spells.W.GetType() == typeof(Spell.Ranged))
@@ -149,12 +167,14 @@
 
                 if (Program.JungleStealMenu["EJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (ObjectManager.Player.BaseAbilityDamage
-                        + ObjectManager.Player.GetAutoAttackDamage(mob)
+                    if (Spells.EisToggle)
+                    {
+                        return;
+                    }
+                    if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.E)
                         > Check.HealthPrediction.GetHealthPrediction(mob, (int)(Spells.E.CastDelay * 1000))
-                        && Spells.E.IsInRange(mob)
-                        && Spells.E.IsReady())
+                        && Spells.E.IsInRange(mob) && Spells.E.IsReady())
                     {
                         if (Spells.E.GetType() == typeof(Spell.Skillshot))
                         {
@@ -178,7 +198,16 @@
 
                         if (Spells.E.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spells.E.Cast(mob.Position);
+                            Spell.Chargeable Ex = Spells.E as Spell.Chargeable;
+                            if (Ex != null && !Ex.IsCharging)
+                            {
+                                Ex.StartCharging();
+                            }
+
+                            if (Ex.Range == Ex.MaximumRange)
+                            {
+                                Ex.Cast(mob.Position);
+                            }
                             return;
                         }
 
@@ -192,12 +221,14 @@
 
                 if (Program.JungleStealMenu["RJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (ObjectManager.Player.BaseAbilityDamage
-                        + ObjectManager.Player.GetAutoAttackDamage(mob)
+                    if (Spells.RisToggle)
+                    {
+                        return;
+                    }
+                    if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.R)
                         > Check.HealthPrediction.GetHealthPrediction(mob, (int)(Spells.R.CastDelay * 1000))
-                        && Spells.R.IsInRange(mob)
-                        && Spells.R.IsReady())
+                        && Spells.R.IsInRange(mob) && Spells.R.IsReady())
                     {
                         if (Spells.R.GetType() == typeof(Spell.Skillshot))
                         {
@@ -216,12 +247,21 @@
                         if (Spells.R.GetType() == typeof(Spell.Active))
                         {
                             Spells.R.Cast();
-                        return;
+                            return;
                         }
 
                         if (Spells.R.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spells.R.Cast(mob.Position);
+                            Spell.Chargeable Rx = Spells.R as Spell.Chargeable;
+                            if (Rx != null && !Rx.IsCharging)
+                            {
+                                Rx.StartCharging();
+                            }
+
+                            if (Rx.Range == Rx.MaximumRange)
+                            {
+                                Rx.Cast(mob.Position);
+                            }
                             return;
                         }
 

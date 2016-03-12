@@ -1,7 +1,6 @@
 ﻿namespace AutoSteal
 {
     using System;
-    
 
     using EloBuddy;
     using EloBuddy.SDK.Events;
@@ -12,15 +11,16 @@
 
     public class Program
     {
-
         public static Menu menuIni;
+
         public static Menu KillStealMenu;
+
         public static Menu JungleStealMenu;
+
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoad;
         }
-
 
         public static void OnLoad(EventArgs args)
         {
@@ -28,7 +28,8 @@
 
             KillStealMenu = menuIni.AddSubMenu("Kill Steal ", "Kill Steal");
             KillStealMenu.AddGroupLabel("Kill Steal Settings");
-            KillStealMenu.Add("EnableKS", new CheckBox("Enable Kill Steal "));
+            KillStealMenu.Add("EnableKST", new KeyBind("Enable Kill Steal Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
+            KillStealMenu.Add("EnableKSA", new KeyBind("Enable Kill Steal Active", false, KeyBind.BindTypes.HoldActive));
             KillStealMenu.AddSeparator();
             KillStealMenu.AddGroupLabel(ObjectManager.Player.ChampionName + " Kill Steal Spells");
             KillStealMenu.Add("AAC", new CheckBox("Use AA "));
@@ -48,10 +49,10 @@
                 }
             }
 
-
             JungleStealMenu = menuIni.AddSubMenu("Jungle Steal ", "Jungle Steal");
             JungleStealMenu.AddGroupLabel("Jungle Steal Settings");
-            JungleStealMenu.Add("EnableJS", new CheckBox("Enable Jungle Steal "));
+            JungleStealMenu.Add("EnableJST", new KeyBind("Enable Jungle Steal Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
+            JungleStealMenu.Add("EnableJSA", new KeyBind("Enable Jungle Steal Active", false, KeyBind.BindTypes.HoldActive));
             JungleStealMenu.AddSeparator();
             JungleStealMenu.AddGroupLabel(ObjectManager.Player.ChampionName + " Jungle Steal Spells");
             JungleStealMenu.Add("AAJ", new CheckBox("Use AA "));
@@ -72,7 +73,6 @@
             JungleStealMenu.Add("crab", new CheckBox("Steal Crab "));
             JungleStealMenu.Add("murkwolf", new CheckBox("Steal Murkwolf "));
 
-
             SpellManager.Initialize();
             SpellLibrary.Initialize();
 
@@ -81,15 +81,15 @@
 
         private static void OnUpdate(EventArgs args)
         {
-            if (KillStealMenu["EnableKS"].Cast<CheckBox>().CurrentValue)
+            if (KillStealMenu["EnableKST"].Cast<KeyBind>().CurrentValue || KillStealMenu["EnableKSA"].Cast<KeyBind>().CurrentValue)
             {
                 Modes.KillSteal.KS();
             }
 
-            if (JungleStealMenu["EnableJS"].Cast<CheckBox>().CurrentValue)
+            if (JungleStealMenu["EnableJST"].Cast<KeyBind>().CurrentValue || JungleStealMenu["EnableJSA"].Cast<KeyBind>().CurrentValue)
             {
                 Modes.JungleSteal.JS();
             }
         }
-        }
     }
+}
