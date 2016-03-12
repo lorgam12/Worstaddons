@@ -233,7 +233,7 @@ namespace Karthus
 
         private static void SimplePing()
         {
-            TacticalMap.SendPing(PingCategory.Fallback, PingLocation);
+            TacticalMap.ShowPing(PingCategory.Danger, PingLocation);
         }
 
         private static void Zigzag(EventArgs args)
