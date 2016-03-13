@@ -21,32 +21,33 @@
 
         public static void JS()
         {
+            var champion = ObjectManager.Player.ChampionName;
             foreach (Obj_AI_Minion mob in
                 ObjectManager.Get<Obj_AI_Minion>()
                     .Where(
                         jmob =>
                         !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsHPBarRendered && jmob.IsMonster && jmob.IsValid
                         && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie
-                        && ((Program.JungleStealMenu["drake"].Cast<CheckBox>().CurrentValue
+                        && ((Program.JungleStealMenu[champion + "drake"].Cast<CheckBox>().CurrentValue
                              && jmob.BaseSkinName == "SRU_Dragon")
-                            || (Program.JungleStealMenu["baron"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu[champion + "baron"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Baron")
-                            || (Program.JungleStealMenu["gromp"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu[champion + "gromp"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Gromp")
-                            || (Program.JungleStealMenu["krug"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu[champion + "krug"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Krug")
-                            || (Program.JungleStealMenu["razorbeak"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu[champion + "razorbeak"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Razorbeak")
-                            || (Program.JungleStealMenu["crab"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu[champion + "crab"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "Sru_Crab")
-                            || (Program.JungleStealMenu["murkwolf"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu[champion + "murkwolf"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Murkwolf")
-                            || (Program.JungleStealMenu["blue"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu[champion + "blue"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Blue")
-                            || (Program.JungleStealMenu["red"].Cast<CheckBox>().CurrentValue
+                            || (Program.JungleStealMenu[champion + "red"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Red"))))
             {
-                if (Program.JungleStealMenu["AAJ"].Cast<CheckBox>().CurrentValue)
+                if (Program.JungleStealMenu[champion + "AAJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.CanAttack && ObjectManager.Player.GetAutoAttackDamage(mob) > mob.Health
                         && mob.IsInAutoAttackRange(ObjectManager.Player))
@@ -56,7 +57,7 @@
                     }
                 }
 
-                if (Program.JungleStealMenu["QJ"].Cast<CheckBox>().CurrentValue)
+                if (Program.JungleStealMenu[champion + "QJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (Spells.QisToggle)
                     {
@@ -65,7 +66,7 @@
 
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.Q)
-                        > Check.HealthPrediction.GetHealthPrediction(mob, (int)(Spells.Q.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(mob, (int)(Spells.Q.CastDelay * 1000))
                         && Spells.Q.IsInRange(mob) && Spells.Q.IsReady())
                     {
                         if (Spells.Q.GetType() == typeof(Spell.Skillshot))
@@ -96,7 +97,7 @@
                                 Qx.StartCharging();
                             }
 
-                            if (Qx.Range == Qx.MaximumRange)
+                            if (Qx != null && Qx.Range == Qx.MaximumRange)
                             {
                                 Qx.Cast(mob.Position);
                             }
@@ -111,7 +112,7 @@
                     }
                 }
 
-                if (Program.JungleStealMenu["WJ"].Cast<CheckBox>().CurrentValue)
+                if (Program.JungleStealMenu[champion + "WJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (Spells.WisToggle)
                     {
@@ -119,7 +120,7 @@
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.W)
-                        > Check.HealthPrediction.GetHealthPrediction(mob, (int)(Spells.W.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(mob, (int)(Spells.W.CastDelay * 1000))
                         && Spells.W.IsInRange(mob) && Spells.W.IsReady())
                     {
                         if (Spells.W.GetType() == typeof(Spell.Skillshot))
@@ -150,7 +151,7 @@
                                 Wx.StartCharging();
                             }
 
-                            if (Wx.Range == Wx.MaximumRange)
+                            if (Wx != null && Wx.Range == Wx.MaximumRange)
                             {
                                 Wx.Cast(mob.Position);
                             }
@@ -165,7 +166,7 @@
                     }
                 }
 
-                if (Program.JungleStealMenu["EJ"].Cast<CheckBox>().CurrentValue)
+                if (Program.JungleStealMenu[champion + "EJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (Spells.EisToggle)
                     {
@@ -173,7 +174,7 @@
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.E)
-                        > Check.HealthPrediction.GetHealthPrediction(mob, (int)(Spells.E.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(mob, (int)(Spells.E.CastDelay * 1000))
                         && Spells.E.IsInRange(mob) && Spells.E.IsReady())
                     {
                         if (Spells.E.GetType() == typeof(Spell.Skillshot))
@@ -204,7 +205,7 @@
                                 Ex.StartCharging();
                             }
 
-                            if (Ex.Range == Ex.MaximumRange)
+                            if (Ex != null && Ex.Range == Ex.MaximumRange)
                             {
                                 Ex.Cast(mob.Position);
                             }
@@ -219,7 +220,7 @@
                     }
                 }
 
-                if (Program.JungleStealMenu["RJ"].Cast<CheckBox>().CurrentValue)
+                if (Program.JungleStealMenu[champion + "RJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (Spells.RisToggle)
                     {
@@ -227,7 +228,7 @@
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.R)
-                        > Check.HealthPrediction.GetHealthPrediction(mob, (int)(Spells.R.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(mob, (int)(Spells.R.CastDelay * 1000))
                         && Spells.R.IsInRange(mob) && Spells.R.IsReady())
                     {
                         if (Spells.R.GetType() == typeof(Spell.Skillshot))
@@ -258,7 +259,7 @@
                                 Rx.StartCharging();
                             }
 
-                            if (Rx.Range == Rx.MaximumRange)
+                            if (Rx != null && Rx.Range == Rx.MaximumRange)
                             {
                                 Rx.Cast(mob.Position);
                             }

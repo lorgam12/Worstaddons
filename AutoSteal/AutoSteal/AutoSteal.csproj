@@ -14,7 +14,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -62,8 +62,6 @@
     <Compile Include="Library\Spells\SpellBase.cs" />
     <Compile Include="Library\SpellManager.cs" />
     <Compile Include="Library\SpellLibrary.cs" />
-    <Compile Include="Check.cs" />
-    <Compile Include="Helper.cs" />
     <Compile Include="Modes\JungleSteal.cs" />
     <Compile Include="Modes\KillSteal.cs" />
     <Compile Include="Program.cs" />

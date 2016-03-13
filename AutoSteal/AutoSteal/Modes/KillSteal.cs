@@ -21,15 +21,16 @@
 
         public static void KS()
         {
+            var champion = ObjectManager.Player.ChampionName;
             foreach (AIHeroClient target in
                 ObjectManager.Get<AIHeroClient>()
                     .Where(
                         hero =>
                         hero != null && hero.IsHPBarRendered && !hero.HasBuffOfType(BuffType.Invulnerability) && hero.IsValid && hero.IsVisible
                         && hero.IsEnemy && !hero.IsDead && !hero.IsZombie
-                        && Program.KillStealMenu["Steal" + hero.BaseSkinName].Cast<CheckBox>().CurrentValue))
+                        && Program.KillStealMenu[champion + "Steal" + hero.BaseSkinName].Cast<CheckBox>().CurrentValue))
             {
-                if (Program.KillStealMenu["AAC"].Cast<CheckBox>().CurrentValue)
+                if (Program.KillStealMenu[champion + "AAC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.CanAttack
                         && ObjectManager.Player.GetAutoAttackDamage(target) > target.Health
@@ -40,7 +41,7 @@
                     }
                 }
 
-                if (Program.KillStealMenu["QC"].Cast<CheckBox>().CurrentValue)
+                if (Program.KillStealMenu[champion + "QC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (Spells.QisToggle)
                     {
@@ -48,7 +49,7 @@
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(target)
                         + ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)
-                        > Check.HealthPrediction.GetHealthPrediction(target, (int)(Spells.Q.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(target, (int)(Spells.Q.CastDelay * 1000))
                         && Spells.Q.IsInRange(target) && Spells.Q.IsReady())
                     {
                         if (Spells.Q.GetType() == typeof(Spell.Skillshot))
@@ -88,7 +89,7 @@
                     }
                 }
 
-                if (Program.KillStealMenu["WC"].Cast<CheckBox>().CurrentValue)
+                if (Program.KillStealMenu[champion + "WC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (Spells.WisToggle)
                     {
@@ -96,7 +97,7 @@
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(target)
                         + ObjectManager.Player.GetSpellDamage(target, SpellSlot.W)
-                        > Check.HealthPrediction.GetHealthPrediction(target, (int)(Spells.W.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(target, (int)(Spells.W.CastDelay * 1000))
                         && Spells.W.IsInRange(target) && Spells.W.IsReady())
                     {
                         if (Spells.W.GetType() == typeof(Spell.Skillshot))
@@ -142,7 +143,7 @@
                     }
                 }
 
-                if (Program.KillStealMenu["EC"].Cast<CheckBox>().CurrentValue)
+                if (Program.KillStealMenu[champion + "EC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (Spells.EisToggle)
                     {
@@ -150,7 +151,7 @@
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(target)
                         + ObjectManager.Player.GetSpellDamage(target, SpellSlot.E)
-                        > Check.HealthPrediction.GetHealthPrediction(target, (int)(Spells.E.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(target, (int)(Spells.E.CastDelay * 1000))
                         && Spells.E.IsInRange(target) && Spells.E.IsReady())
                     {
                         if (Spells.E.GetType() == typeof(Spell.Skillshot))
@@ -196,7 +197,7 @@
                     }
                 }
 
-                if (Program.KillStealMenu["RC"].Cast<CheckBox>().CurrentValue)
+                if (Program.KillStealMenu[champion + "RC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (Spells.RisToggle)
                     {
@@ -204,7 +205,7 @@
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(target)
                         + ObjectManager.Player.GetSpellDamage(target, SpellSlot.R)
-                        > Check.HealthPrediction.GetHealthPrediction(target, (int)(Spells.R.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(target, (int)(Spells.R.CastDelay * 1000))
                         && Spells.R.IsInRange(target) && Spells.R.IsReady())
                     {
                         if (Spells.R.GetType() == typeof(Spell.Skillshot))
