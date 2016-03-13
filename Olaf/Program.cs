@@ -216,33 +216,29 @@ namespace Olaf
 
         private static void Ult()
         {
-            var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-            var debuff = (UltMenu["charm"].Cast<CheckBox>().CurrentValue && player.IsCharmed)
-                         || (UltMenu["root"].Cast<CheckBox>().CurrentValue && player.IsRooted)
-                         || (UltMenu["tunt"].Cast<CheckBox>().CurrentValue && player.IsTaunted)
-                         || (UltMenu["stun"].Cast<CheckBox>().CurrentValue && player.IsStunned)
-                         || (UltMenu["fear"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Fear))
-                         || (UltMenu["silence"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Silence))
-                         || (UltMenu["snare"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Snare))
-                         || (UltMenu["supperss"].Cast<CheckBox>().CurrentValue
-                             && player.HasBuffOfType(BuffType.Suppression))
-                         || (UltMenu["sleep"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Sleep))
-                         || (UltMenu["poly"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Polymorph))
-                         || (UltMenu["frenzy"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Frenzy))
-                         || (UltMenu["disarm"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Disarm))
-                         || (UltMenu["nearsight"].Cast<CheckBox>().CurrentValue
-                             && player.HasBuffOfType(BuffType.NearSight))
-                         || (UltMenu["knockback"].Cast<CheckBox>().CurrentValue
-                             && player.HasBuffOfType(BuffType.Knockback))
-                         || (UltMenu["knockup"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Knockup))
-                         || (UltMenu["slow"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Slow))
-                         || (UltMenu["poison"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Poison))
-                         || (UltMenu["blind"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Blind));
-            var enemys = UltMenu["Rene"].Cast<Slider>().CurrentValue;
-            var hp = UltMenu["hp"].Cast<Slider>().CurrentValue;
-            var enemysrange = UltMenu["enemydetect"].Cast<Slider>().CurrentValue;
-            if (R.IsReady() && UltMenu["UseR"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(R.Range))
+            if (R.IsReady() && UltMenu["UseR"].Cast<CheckBox>().CurrentValue)
             {
+                var debuff = (UltMenu["charm"].Cast<CheckBox>().CurrentValue && player.IsCharmed)
+                             || (UltMenu["root"].Cast<CheckBox>().CurrentValue && player.IsRooted)
+                             || (UltMenu["tunt"].Cast<CheckBox>().CurrentValue && player.IsTaunted)
+                             || (UltMenu["stun"].Cast<CheckBox>().CurrentValue && player.IsStunned)
+                             || (UltMenu["fear"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Fear))
+                             || (UltMenu["silence"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Silence))
+                             || (UltMenu["snare"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Snare))
+                             || (UltMenu["supperss"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Suppression))
+                             || (UltMenu["sleep"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Sleep))
+                             || (UltMenu["poly"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Polymorph))
+                             || (UltMenu["frenzy"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Frenzy))
+                             || (UltMenu["disarm"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Disarm))
+                             || (UltMenu["nearsight"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.NearSight))
+                             || (UltMenu["knockback"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Knockback))
+                             || (UltMenu["knockup"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Knockup))
+                             || (UltMenu["slow"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Slow))
+                             || (UltMenu["poison"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Poison))
+                             || (UltMenu["blind"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Blind));
+                var enemys = UltMenu["Rene"].Cast<Slider>().CurrentValue;
+                var hp = UltMenu["hp"].Cast<Slider>().CurrentValue;
+                var enemysrange = UltMenu["enemydetect"].Cast<Slider>().CurrentValue;
                 if (debuff && ObjectManager.Player.HealthPercent <= hp
                     && enemys >= ObjectManager.Player.Position.CountEnemiesInRange(enemysrange))
                 {
@@ -290,38 +286,6 @@ namespace Olaf
             {
                 items();
             }
-        }
-
-        private static float GetComboDamage(AIHeroClient Target)
-        {
-            if (Target != null)
-            {
-                float ComboDamage = new float();
-
-                ComboDamage = Q.IsReady() ? ObjectManager.Player.GetSpellDamage(Target, SpellSlot.Q) : 0;
-                ComboDamage += W.IsReady() ? ObjectManager.Player.GetSpellDamage(Target, SpellSlot.W) : 0;
-                ComboDamage += E.IsReady() ? ObjectManager.Player.GetSpellDamage(Target, SpellSlot.E) : 0;
-                ComboDamage += player.TotalAttackDamage;
-                return ComboDamage;
-            }
-            return 0;
-        }
-
-        private static float[] GetLength()
-        {
-            var Target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-            if (Target != null)
-            {
-                float[] Length =
-                    {
-                        GetComboDamage(Target) > Target.Health
-                            ? 0
-                            : (Target.Health - GetComboDamage(Target)) / Target.MaxHealth,
-                        Target.Health / Target.MaxHealth
-                    };
-                return Length;
-            }
-            return new float[] { 0, 0 };
         }
 
         private static void Killsteal()
