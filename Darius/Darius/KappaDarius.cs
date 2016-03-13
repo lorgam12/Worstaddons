@@ -227,11 +227,9 @@
                     {
                         if (WMenu["AAr"].Cast<CheckBox>().CurrentValue)
                         {
-                            if (W.Cast())
-                            {
-                                Orbwalker.ResetAutoAttack();
-                                Player.IssueOrder(GameObjectOrder.AttackUnit, target);
-                            }
+                            W.Cast();
+                            Orbwalker.ResetAutoAttack();
+                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                         }
                     }
 
@@ -324,8 +322,8 @@
 
         private static void Clear()
         {
-            var Qclear = QMenu["Clear"].Cast<CheckBox>().CurrentValue;
-            var Wclear = WMenu["Clear"].Cast<CheckBox>().CurrentValue;
+            var Qclear = QMenu["Clear"].Cast<CheckBox>().CurrentValue && Q.IsReady();
+            var Wclear = WMenu["Clear"].Cast<CheckBox>().CurrentValue && W.IsReady();
 
             var allMinions = EntityManager.MinionsAndMonsters.Get(
                 EntityManager.MinionsAndMonsters.EntityType.Minion,
@@ -366,7 +364,7 @@
         private static void Flee()
         {
             var hp = QMenu["QFlee"].Cast<Slider>().CurrentValue;
-            var Qflee = QMenu["Flee"].Cast<CheckBox>().CurrentValue;
+            var Qflee = QMenu["Flee"].Cast<CheckBox>().CurrentValue && Q.IsReady();
             if (Qflee && player.HealthPercent < hp)
             {
                 if (player.CountEnemiesInRange(Q.Range) >= 1)
@@ -430,7 +428,7 @@
                     }
                 }
 
-                if (Rks && R.IsReady())
+                if (Rks)
                 {
                     return;
                 }
@@ -469,7 +467,7 @@
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
             var Qrange = QMenu["range"].Cast<CheckBox>().CurrentValue;
             var Qcombo = QMenu["Combo"].Cast<CheckBox>().CurrentValue && Q.IsReady();
-            var Qharass = QMenu["Harass"].Cast<CheckBox>().CurrentValue;
+            var Qharass = QMenu["Harass"].Cast<CheckBox>().CurrentValue && Q.IsReady();
 
             var flags = Orbwalker.ActiveModesFlags;
 
@@ -526,8 +524,8 @@
         private static void WCast()
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-            var Wcombo = WMenu["Combo"].Cast<CheckBox>().CurrentValue;
-            var Wharass = WMenu["Harass"].Cast<CheckBox>().CurrentValue;
+            var Wcombo = WMenu["Combo"].Cast<CheckBox>().CurrentValue && W.IsReady();
+            var Wharass = WMenu["Harass"].Cast<CheckBox>().CurrentValue && W.IsReady();
 
             var flags = Orbwalker.ActiveModesFlags;
 
