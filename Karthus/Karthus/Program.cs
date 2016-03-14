@@ -110,7 +110,7 @@ namespace Karthus
             UltMenu = menuIni.AddSubMenu("Ultimate");
             UltMenu.AddGroupLabel("Ultimate Settings");
             UltMenu.Add("UltKS", new CheckBox("Ultimate KillSteal R", false));
-            UltMenu.Add("UltMode", new ComboBox("Ult Logic", 1, "Kappa Logic", "Beaving Logic"));
+            UltMenu.Add("UltMode", new ComboBox("Ult Logic", 0, "Kappa Logic", "Beaving Logic"));
             UltMenu.AddGroupLabel("Kappa Ultimate Logic Settings");
             UltMenu.Add("RnearE", new CheckBox("Block Ult when Enemies Near My Champion?"));
             UltMenu.Add("RnearEn", new Slider("Min Enemies Near to block Cast R", 1, 1, 5));
