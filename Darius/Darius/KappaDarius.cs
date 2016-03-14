@@ -227,9 +227,11 @@
                     {
                         if (WMenu["AAr"].Cast<CheckBox>().CurrentValue)
                         {
-                            W.Cast();
-                            Orbwalker.ResetAutoAttack();
-                            Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                            if (W.Cast())
+                            {
+                                Orbwalker.ResetAutoAttack();
+                                Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                            }
                         }
                     }
 
