@@ -11,18 +11,28 @@
     {
         public static void Start()
         {
+            var Rk = Menu.ComboMenu["Rk"].Cast<CheckBox>().CurrentValue;
             var useQ = Menu.ComboMenu["Q"].Cast<CheckBox>().CurrentValue;
             var useW = Menu.ComboMenu["W"].Cast<CheckBox>().CurrentValue;
             var useWpred = Menu.ComboMenu["Wpred"].Cast<CheckBox>().CurrentValue;
+            var Whit = Menu.ComboMenu["Whit"].Cast<Slider>().CurrentValue;
             var useE = Menu.ComboMenu["E"].Cast<CheckBox>().CurrentValue;
             var Emode = Menu.ComboMenu["Emode"].Cast<ComboBox>().CurrentValue;
             var useR = Menu.ComboMenu["R"].Cast<CheckBox>().CurrentValue;
             var Qtarget = TargetSelector.GetTarget(Spells.Q.Range, DamageType.Magical);
             var Wtarget = TargetSelector.GetTarget(Spells.W.Range, DamageType.Magical);
 
-            if (useR && Spells.R.IsReady())
+            if (Spells.R.IsReady() && Spells.EkkoREmitter != null)
             {
-                Rlogic.Combo();
+                if (useR)
+                {
+                    Rlogic.Combo();
+                }
+
+                if (Rk)
+                {
+                    Rlogic.Rk();
+                }
             }
 
             if (Wtarget != null && Wtarget.IsValidTarget(Spells.W.Range) && Spells.W.IsReady())
@@ -30,13 +40,13 @@
                 if (useWpred)
                 {
                     var pred = Spells.W.GetPrediction(Wtarget);
-                    if (pred.HitChance >= HitChance.High)
+                    if (pred.HitChance >= HitChance.High && pred.CastPosition.CountEnemiesInRange(500) >= Whit)
                     {
                         Spells.W.Cast(pred.CastPosition);
                     }
                 }
 
-                if (useW)
+                if (useW && Wtarget.Position.CountEnemiesInRange(500) >= Whit)
                 {
                     if (useWpred)
                     {
@@ -53,15 +63,21 @@
                 {
                     if (Emode == 0)
                     {
-                        Spells.E.Cast(Qtarget.Position);
-                        Orbwalker.ResetAutoAttack();
-                        Player.IssueOrder(GameObjectOrder.AttackUnit, Qtarget);
+                        if (Spells.E.Cast(Qtarget.Position))
+                        {
+                            Orbwalker.ResetAutoAttack();
+                            Player.IssueOrder(GameObjectOrder.AttackUnit, Qtarget);
+                            return;
+                        }
                     }
                     else
                     {
-                        Spells.E.Cast(Game.CursorPos);
-                        Orbwalker.ResetAutoAttack();
-                        Player.IssueOrder(GameObjectOrder.AttackUnit, Qtarget);
+                        if (Spells.E.Cast(Game.CursorPos))
+                        {
+                            Orbwalker.ResetAutoAttack();
+                            Player.IssueOrder(GameObjectOrder.AttackUnit, Qtarget);
+                            return;
+                        }
                     }
                 }
 

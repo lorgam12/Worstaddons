@@ -5,23 +5,23 @@
 
     internal class Menu
     {
-        public static EloBuddy.SDK.Menu.Menu UltMenu { get; private set; }
+        private static EloBuddy.SDK.Menu.Menu menuIni;
 
         public static EloBuddy.SDK.Menu.Menu ComboMenu { get; private set; }
 
-        public static EloBuddy.SDK.Menu.Menu HarassMenu { get; private set; }
+        public static EloBuddy.SDK.Menu.Menu DrawMenu { get; private set; }
 
-        public static EloBuddy.SDK.Menu.Menu LaneMenu { get; private set; }
+        public static EloBuddy.SDK.Menu.Menu HarassMenu { get; private set; }
 
         public static EloBuddy.SDK.Menu.Menu JungleMenu { get; private set; }
 
-        public static EloBuddy.SDK.Menu.Menu MiscMenu { get; private set; }
-
-        public static EloBuddy.SDK.Menu.Menu DrawMenu { get; private set; }
+        public static EloBuddy.SDK.Menu.Menu LaneMenu { get; private set; }
 
         public static EloBuddy.SDK.Menu.Menu ManaMenu { get; private set; }
 
-        private static EloBuddy.SDK.Menu.Menu menuIni;
+        public static EloBuddy.SDK.Menu.Menu MiscMenu { get; private set; }
+
+        public static EloBuddy.SDK.Menu.Menu UltMenu { get; private set; }
 
         public static void Load()
         {
@@ -45,6 +45,7 @@
             ComboMenu.Add("Whit", new Slider("W On Hit X Enemies", 1, 1, 5));
             ComboMenu.Add("E", new CheckBox("Use E"));
             ComboMenu.Add("Emode", new ComboBox("E Mode", 0, "To Target", "To Mouse"));
+            ComboMenu.Add("Rk", new CheckBox("Use R On Killable"));
             ComboMenu.Add("R", new CheckBox("Use R"));
             ComboMenu.Add("Rhit", new Slider("Use R Hit", 2, 1, 5));
 
@@ -76,6 +77,7 @@
             DrawMenu.Add("W", new CheckBox("Draw W"));
             DrawMenu.Add("E", new CheckBox("Draw E"));
             DrawMenu.Add("R", new CheckBox("Draw R"));
+            DrawMenu.Add("debug", new CheckBox("debug", false));
         }
     }
 }

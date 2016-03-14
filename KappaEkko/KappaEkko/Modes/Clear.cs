@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KappaEkko.Modes
+﻿namespace KappaEkko.Modes
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu.Values;
@@ -14,8 +11,8 @@ namespace KappaEkko.Modes
     {
         public static void Start()
         {
-            var useQ = Menu.LaneMenu["Q"].Cast<CheckBox>().CurrentValue;
-            var useE = Menu.LaneMenu["E"].Cast<CheckBox>().CurrentValue;
+            var useQ = Menu.LaneMenu["Q"].Cast<CheckBox>().CurrentValue && Spells.Q.IsReady();
+            var useE = Menu.LaneMenu["E"].Cast<CheckBox>().CurrentValue && Spells.E.IsReady();
 
             var allMinions = EntityManager.MinionsAndMonsters.Get(
                 EntityManager.MinionsAndMonsters.EntityType.Minion,
@@ -48,11 +45,14 @@ namespace KappaEkko.Modes
                     if (useE
                         && minion.TotalShieldHealth()
                         <= ObjectManager.Player.GetSpellDamage(minion, SpellSlot.E)
-                        + ObjectManager.Player.GetAutoAttackDamage(minion))
+                        + ObjectManager.Player.GetAutoAttackDamage(minion)
+                        && !minion.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
                     {
-                        Spells.E.Cast(minion.Position);
-                        Orbwalker.ResetAutoAttack();
-                        Player.IssueOrder(GameObjectOrder.AttackUnit, minion);
+                        if (Spells.E.Cast(minion.Position))
+                        {
+                            Orbwalker.ResetAutoAttack();
+                            Player.IssueOrder(GameObjectOrder.AttackUnit, minion);
+                        }
                     }
                 }
             }

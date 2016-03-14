@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KappaEkko.Modes
+﻿namespace KappaEkko.Modes
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu.Values;
@@ -14,8 +11,8 @@ namespace KappaEkko.Modes
     {
         public static void Start()
         {
-            var useQ = Menu.JungleMenu["Q"].Cast<CheckBox>().CurrentValue;
-            var useE = Menu.JungleMenu["E"].Cast<CheckBox>().CurrentValue;
+            var useQ = Menu.JungleMenu["Q"].Cast<CheckBox>().CurrentValue && Spells.Q.IsReady();
+            var useE = Menu.JungleMenu["E"].Cast<CheckBox>().CurrentValue && Spells.E.IsReady();
 
             var jmobs =
                 ObjectManager.Get<Obj_AI_Minion>()
@@ -26,14 +23,12 @@ namespace KappaEkko.Modes
             {
                 if (useQ && jmob.IsValidTarget(Spells.Q.Range) && objAiMinions.Count() > 1)
                 {
-                    Spells.Q.Cast(jmob);
+                    Spells.Q.Cast(jmob.Position);
                 }
 
                 if (useE && jmob.IsValidTarget(Spells.E.Range))
                 {
-                    Spells.E.Cast(jmob);
-                    Orbwalker.ResetAutoAttack();
-                    Player.IssueOrder(GameObjectOrder.AttackUnit, jmob);
+                    Spells.E.Cast(jmob.Position);
                 }
             }
         }
