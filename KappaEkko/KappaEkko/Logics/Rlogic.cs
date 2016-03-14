@@ -32,7 +32,7 @@
         {
             var REscapeh = Menu.UltMenu["REscapeh"].Cast<Slider>().CurrentValue;
             var Health = ObjectManager.Player.HealthPercent;
-            var Enemies = Spells.EkkoREmitter.Position.CountEnemiesInRange(400);
+            var Enemies = Spells.EkkoREmitter.Position.CountEnemiesInRange(450);
             var EnemiesMy = ObjectManager.Player.Position.CountEnemiesInRange(800);
 
             if (REscapeh >= Health && Enemies < EnemiesMy)

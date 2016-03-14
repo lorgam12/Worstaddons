@@ -1,6 +1,7 @@
 ﻿namespace KappaEkko.Events
 {
     using EloBuddy;
+    using EloBuddy.SDK;
     using EloBuddy.SDK.Menu.Values;
 
     internal class OnBasicAttack
@@ -18,14 +19,17 @@
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if (caster.IsValid && target.IsMe)
+            if (caster.IsValid && target.IsMe && Rsave && Spells.R.IsReady()
+                && ObjectManager.Player.CountEnemiesInRange(1000) >= 1)
             {
-                if (Rsave && Spells.R.IsReady())
+                if (Rsaveh >= Health)
                 {
-                    if (Rsaveh >= Health)
-                    {
-                        Spells.R.Cast();
-                    }
+                    Spells.R.Cast();
+                }
+
+                if (caster.GetAutoAttackDamage(ObjectManager.Player) >= ObjectManager.Player.Health)
+                {
+                    Spells.R.Cast();
                 }
             }
         }

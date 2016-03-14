@@ -15,6 +15,7 @@
             var useW = Menu.ComboMenu["W"].Cast<CheckBox>().CurrentValue;
             var useWpred = Menu.ComboMenu["Wpred"].Cast<CheckBox>().CurrentValue;
             var useE = Menu.ComboMenu["E"].Cast<CheckBox>().CurrentValue;
+            var Emode = Menu.ComboMenu["Emode"].Cast<ComboBox>().CurrentValue;
             var useR = Menu.ComboMenu["R"].Cast<CheckBox>().CurrentValue;
             var Qtarget = TargetSelector.GetTarget(Spells.Q.Range, DamageType.Magical);
             var Wtarget = TargetSelector.GetTarget(Spells.W.Range, DamageType.Magical);
@@ -50,8 +51,18 @@
             {
                 if (useE && Spells.E.IsReady())
                 {
-                    Spells.E.Cast(Qtarget.Position);
-                    Orbwalker.ResetAutoAttack();
+                    if (Emode == 0)
+                    {
+                        Spells.E.Cast(Qtarget.Position);
+                        Orbwalker.ResetAutoAttack();
+                        Player.IssueOrder(GameObjectOrder.AttackUnit, Qtarget);
+                    }
+                    else
+                    {
+                        Spells.E.Cast(Game.CursorPos);
+                        Orbwalker.ResetAutoAttack();
+                        Player.IssueOrder(GameObjectOrder.AttackUnit, Qtarget);
+                    }
                 }
 
                 if (useQ && Spells.Q.IsReady())

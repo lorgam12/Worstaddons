@@ -24,43 +24,17 @@
                 return;
             }
 
-            Chat.Print(caster.BaseSkinName);
-            if (caster.IsValid && args.Target.IsMe && Spells.R.IsReady())
+            if (caster.IsValid && args.Target.IsMe && Spells.R.IsReady()
+                && ObjectManager.Player.CountEnemiesInRange(1000) >= 1)
             {
-                if (sender.GetAutoAttackDamage(ObjectManager.Player) >= ObjectManager.Player.Health)
+                if (Rsave)
                 {
-                    if (Rsave)
+                    if (Rsaveh >= Health)
                     {
-                        if (Rsaveh >= Health)
-                        {
-                            Spells.R.Cast();
-                        }
+                        Spells.R.Cast();
                     }
                 }
             }
         }
-
-        /*
-        public static void Spell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            var Rsave = Menu.UltMenu["Rsave"].Cast<CheckBox>().CurrentValue;
-            var Rsaveh = Menu.UltMenu["Rsaveh"].Cast<Slider>().CurrentValue;
-            var Health = ObjectManager.Player.HealthPercent;
-            if ((sender.IsValid && (sender is AIHeroClient || sender is Obj_AI_Turret)) && sender.IsEnemy && args.Target.IsMe)
-            {
-                if (sender.GetAutoAttackDamage(ObjectManager.Player) >= ObjectManager.Player.Health
-                     && args.SData.IsAutoAttack())
-                {
-                    if (Rsave)
-                    {
-                        if (Rsaveh >= Health)
-                        {
-                            Spells.R.Cast();
-                        }
-                    }
-                }
-            }
-        }
-        */
     }
 }
