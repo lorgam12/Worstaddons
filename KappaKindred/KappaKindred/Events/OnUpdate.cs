@@ -18,7 +18,7 @@ namespace KappaKindred.Events
             var lanemana = Menu.ManaMenu["lanemana"].Cast<Slider>().CurrentValue;
             var harassmana = Menu.ManaMenu["harassmana"].Cast<Slider>().CurrentValue;
             var target = TargetSelector.GetTarget(Spells.Q.Range, DamageType.Physical);
-            if (Player.Instance.IsDead || MenuGUI.IsChatOpen || Player.Instance.IsRecalling() || target.HasBuff("kindredrnodeathbuff"))
+            if (Player.Instance.IsDead || MenuGUI.IsChatOpen || Player.Instance.IsRecalling() || (target != null && target.HasBuff("kindredrnodeathbuff")))
             {
                 return;
             }

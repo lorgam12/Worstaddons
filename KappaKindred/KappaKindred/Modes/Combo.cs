@@ -12,7 +12,6 @@
             var qmode = Menu.ComboMenu["Qmode"].Cast<ComboBox>().CurrentValue;
             var useW = Menu.ComboMenu["W"].Cast<CheckBox>().CurrentValue && Spells.W.IsReady();
             var useE = Menu.ComboMenu["E"].Cast<CheckBox>().CurrentValue && Spells.E.IsReady();
-            var Qaf = Menu.ComboMenu["Qaf"].Cast<CheckBox>().CurrentValue && Spells.Q.IsReady();
             var target = TargetSelector.GetTarget(Spells.E.Range, DamageType.Physical);
             var qtarget = TargetSelector.GetTarget(Spells.Q.Range, DamageType.Physical);
 
@@ -31,7 +30,7 @@
 
             if (qtarget != null)
             {
-                if (useQ && !Qaf)
+                if (useQ && !qtarget.IsValidTarget(Player.Instance.GetAutoAttackRange()))
                 {
                     Spells.Q.Cast(qmode == 0 ? qtarget.Position : Game.CursorPos);
                 }

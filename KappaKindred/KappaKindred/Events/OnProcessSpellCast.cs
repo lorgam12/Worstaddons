@@ -9,7 +9,7 @@
         public static void OnSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!sender.IsValid && !Spells.R.IsReady() || sender.IsAlly || !args.Target.IsValid
-                || args.Target.IsEnemy || sender is Obj_AI_Minion || args.Target is Obj_AI_Minion || args.Target == null)
+                || args.Target.IsEnemy || sender is Obj_AI_Minion || args.Target is Obj_AI_Minion || args.Target == null || sender.IsMe)
             {
                 return;
             }
@@ -19,7 +19,7 @@
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if (!target.IsAlly || !target.IsMe || !caster.IsEnemy)
+            if (!target.IsAlly || !target.IsMe || !caster.IsEnemy || caster.IsMinion || target.IsMinion)
             {
                 return;
             }

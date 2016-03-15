@@ -23,8 +23,8 @@
             Game.OnUpdate += OnUpdate.Update;
             Drawing.OnDraw += OnDraw.Draw;
             Orbwalker.OnPostAttack += OnPostAttack.PostAttack;
-            Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast.OnSpell;
-            Obj_AI_Base.OnBasicAttack += OnBasicAttack.OnAttack;
+            AIHeroClient.OnProcessSpellCast += OnProcessSpellCast.OnSpell;
+            AIHeroClient.OnBasicAttack += OnBasicAttack.OnAttack;
             AttackableUnit.OnDamage += OnDamage.Damage;
         }
     }

@@ -12,7 +12,7 @@
         {
             var qtarget = TargetSelector.GetTarget(Spells.Q.Range, DamageType.True);
             var hero = target as AIHeroClient;
-            var Qaf = Menu.ComboMenu["Qaf"].Cast<CheckBox>().CurrentValue && Spells.Q.IsReady();
+            var useQ = Menu.ComboMenu["Q"].Cast<CheckBox>().CurrentValue && Spells.Q.IsReady();
             var qmode = Menu.ComboMenu["Qmode"].Cast<ComboBox>().CurrentValue;
 
             if (qtarget == null || hero == null || !hero.IsValid || hero.Type != GameObjectType.AIHeroClient || qtarget.HasBuff("kindredrnodeathbuff"))
@@ -21,7 +21,7 @@
             }
 
             var flags = Orbwalker.ActiveModesFlags;
-            if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && Qaf)
+            if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && useQ)
             {
                 if (qmode == 0)
                 {

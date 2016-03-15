@@ -35,8 +35,7 @@
 
             ComboMenu = menuIni.AddSubMenu("Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
-            ComboMenu.Add("Q", new CheckBox("Use Q", false));
-            ComboMenu.Add("Qaf", new CheckBox("Use Q After Attack"));
+            ComboMenu.Add("Q", new CheckBox("Use Q"));
             ComboMenu.Add("W", new CheckBox("Use W"));
             ComboMenu.Add("E", new CheckBox("Use E"));
             ComboMenu.AddGroupLabel("Extra Settings");
