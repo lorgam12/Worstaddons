@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KappaKindred.Events
+﻿namespace KappaKindred.Events
 {
     using EloBuddy;
     using EloBuddy.SDK;
@@ -18,6 +13,7 @@ namespace KappaKindred.Events
             {
                 return;
             }
+
             var Rally = Menu.UltMenu.Get<CheckBox>("Rally").CurrentValue;
             var Rallyh = Menu.UltMenu.Get<Slider>("Rallyh").CurrentValue;
             var caster = sender;
@@ -28,13 +24,18 @@ namespace KappaKindred.Events
                 return;
             }
 
-            if(target.IsValidTarget(Spells.R.Range))
+            if (target.IsValidTarget(Spells.R.Range))
             {
                 if (Rally && target.HealthPercent < Rallyh)
                 {
                     Spells.R.Cast(target);
                 }
-            }
+
+                if (caster.BaseAttackDamage > target.TotalShieldHealth() || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                {
+                    Spells.R.Cast(target);
+                }
+        }
         }
     }
 }

@@ -5,6 +5,7 @@
     using System;
     using System.Globalization;
     using System.Linq;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Enumerations;
@@ -12,6 +13,7 @@
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
     using EloBuddy.SDK.Rendering;
+
     using SharpDX;
 
     internal class KappaDarius
@@ -84,7 +86,6 @@
             menuIni.Add("Drawings", new CheckBox("Use Drawings?"));
             menuIni.Add("KillSteal", new CheckBox("Use KillSteal?"));
 
-
             QMenu = menuIni.AddSubMenu("Q Settings");
             QMenu.AddGroupLabel("Q Settings");
             QMenu.Add("Combo", new CheckBox("Q Combo"));
@@ -102,7 +103,6 @@
             QMenu.Add("Qaoe", new CheckBox("Auto Q AoE"));
             QMenu.Add("Qhit", new Slider("Q Aoe Hit >=", 3, 1, 5));
 
-
             WMenu = menuIni.AddSubMenu("W Settings");
             WMenu.AddGroupLabel("W Settings");
             WMenu.Add("Combo", new CheckBox("W Combo"));
@@ -111,7 +111,6 @@
             WMenu.AddGroupLabel("Extra Settings");
             WMenu.Add("AAr", new CheckBox("W AA Reset"));
 
-
             EMenu = menuIni.AddSubMenu("E Settings");
             EMenu.AddGroupLabel("E Settings");
             EMenu.Add("Combo", new CheckBox("E Combo"));
@@ -119,15 +118,13 @@
             EMenu.AddGroupLabel("Extra Settings");
             EMenu.Add("Interrupt", new CheckBox("E To Interrupt"));
 
-
             RMenu = menuIni.AddSubMenu("R Settings");
             RMenu.AddGroupLabel("R Settings");
             RMenu.Add("Combo", new CheckBox("R Combo Finisher"));
-            RMenu.Add("Rrebirth", new CheckBox("Dont R Champion has Rebirth buff", false));
             RMenu.Add("stack", new CheckBox("Use R On Stacks", false));
             RMenu.Add("count", new Slider("Cast R On Stacks >=", 5, 0, 5));
-            RMenu.Add("SR", new Slider("Dont Use Ult if target can be kill With X AA", 0, 0, 6));
-
+            RMenu.Add("SaveR", new CheckBox("Dont Ult if target killable with AA", false));
+            RMenu.Add("SR", new Slider("Dont Use Ult if target can be kill With X AA", 1, 0, 6));
 
             KillStealMenu = menuIni.AddSubMenu("KillSteal");
             KillStealMenu.AddGroupLabel("KillSteal Settings");
@@ -136,13 +133,11 @@
             KillStealMenu.Add("IG", new CheckBox("Ignite Only", false));
             KillStealMenu.AddLabel("Iginte + Passive takes in account Max Ignite + Passive dmg");
 
-
             ManaMenu = menuIni.AddSubMenu("Mana Manager");
             ManaMenu.AddGroupLabel("Harass");
             ManaMenu.Add("harassmana", new Slider("Harass Mana %", 75, 0, 100));
             ManaMenu.AddGroupLabel("Lane Clear");
             ManaMenu.Add("lanemana", new Slider("Lane Clear Mana %", 60, 0, 100));
-
 
             ItemsMenu = menuIni.AddSubMenu("Items");
             ItemsMenu.AddGroupLabel("Items Settings");
@@ -153,7 +148,6 @@
             ItemsMenu.AddSeparator();
             ItemsMenu.Add("eL", new Slider("Use On Enemy health", 65, 0, 100));
             ItemsMenu.Add("oL", new Slider("Use On My health", 65, 0, 100));
-
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
             DrawMenu.AddGroupLabel("Drawing Settings");
@@ -170,7 +164,6 @@
             DrawMenu.Add("PPy", new Slider("Passive Stacks Position Y", 100, 0, 150));
             DrawMenu.Add("RHealth", new CheckBox("Draw After R health"));
             DrawMenu.Add("RHx", new Slider("After R health Position", 135, 0, 150));
-
 
             Q = new Spell.Active(SpellSlot.Q, 400);
             W = new Spell.Active(SpellSlot.W, 300);
@@ -355,7 +348,10 @@
 
                 if (Wclear)
                 {
-                    if (!player.CanAttack && minion.IsValidTarget() && W.IsReady() && player.Distance(minion.ServerPosition) <= 225f && player.GetSpellDamage(minion, SpellSlot.W) + player.GetAutoAttackDamage(minion) >= minion.TotalShieldHealth())
+                    if (!player.CanAttack && minion.IsValidTarget() && W.IsReady()
+                        && player.Distance(minion.ServerPosition) <= 225f
+                        && player.GetSpellDamage(minion, SpellSlot.W) + player.GetAutoAttackDamage(minion)
+                        >= minion.TotalShieldHealth())
                     {
                         W.Cast();
                         Player.IssueOrder(GameObjectOrder.AttackUnit, minion);
@@ -379,7 +375,7 @@
 
         private static void KillSteal()
         {
-            var RR = RMenu["Rrebirth"].Cast<CheckBox>().CurrentValue;
+            var SaveR = RMenu["SaveR"].Cast<CheckBox>().CurrentValue;
             var SR = RMenu["SR"].Cast<Slider>().CurrentValue;
             var IG = KillStealMenu["IG"].Cast<CheckBox>().CurrentValue;
             var IGP = KillStealMenu["IGP"].Cast<CheckBox>().CurrentValue;
@@ -390,28 +386,20 @@
                         enemy =>
                         enemy.IsEnemy && enemy.IsValidTarget(1000) && !enemy.IsDead
                         && !enemy.HasBuff("kindredrnodeathbuff") && !enemy.HasBuff("JudicatorIntervention")
-                        && !enemy.HasBuff("ChronoShift") && !enemy.HasBuff("UndyingRage")
-                        && !enemy.IsInvulnerable
-                        && !enemy.IsZombie
-                        && !enemy.HasUndyingBuff()
-                        && !enemy.HasBuffOfType(BuffType.Counter));
-
-            if (RR && (target.ChampionName == "Anivia" && !target.HasBuff("rebirthcooldown")) || (target.ChampionName == "Aatrox" && !target.HasBuff("AatroxPassiveActivate")))
-            {
-                return;
-            }
+                        && !enemy.HasBuff("ChronoShift") && !enemy.HasBuff("UndyingRage") && !enemy.IsInvulnerable
+                        && !enemy.IsZombie && !enemy.HasUndyingBuff() && !enemy.HasBuff("AatroxPassiveActivate") && !enemy.HasBuff("rebirthcooldown"));
+            
 
             if (target != null)
             {
                 if (Rks)
                 {
-                    if (ObjectManager.Player.GetAutoAttackDamage(target) * SR > target.TotalShieldHealth() && target.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
+                    if (SaveR && ObjectManager.Player.GetAutoAttackDamage(target) * SR > target.TotalShieldHealth()
+                        && target.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
                     {
-                        if (target.TotalShieldHealth() <= ObjectManager.Player.TotalShieldHealth())
-                        {
                             return;
-                        }
                     }
+
                     var pred = E.GetPrediction(target);
                     // Credits cancerous
                     int passiveCounter = target.GetBuffCount("DariusHemo") <= 0 ? 0 : target.GetBuffCount("DariusHemo");
@@ -442,22 +430,22 @@
                     }
                 }
 
-                if (Rks)
+                if (Rks && target.IsValidTarget(R.Range))
                 {
                     return;
                 }
 
                 if (IGP && target.IsValidTarget(Ignite.Range)
                     && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
-                    + PassiveDmg(target, 5) > target.TotalShieldHealth() + target.HPRegenRate)
+                    + PassiveDmg(target, target.GetBuffCount("DariusHemo")) > target.TotalShieldHealth() + target.HPRegenRate)
                 {
-                    if (PassiveDmg(target, 5) < target.TotalShieldHealth() + (target.HPRegenRate * 4)
+                    if (PassiveDmg(target, target.GetBuffCount("DariusHemo")) < target.TotalShieldHealth() + (target.HPRegenRate * 4)
                         && !target.IsValidTarget(player.GetAutoAttackRange()))
                     {
                         Ignite.Cast(target);
                     }
 
-                    if (PassiveDmg(target, 5) < target.TotalShieldHealth())
+                    if (PassiveDmg(target, target.GetBuffCount("DariusHemo")) < target.TotalShieldHealth())
                     {
                         if (target.TotalShieldHealth() > player.TotalShieldHealth())
                         {
@@ -632,7 +620,7 @@
 
         private static void RCast()
         {
-            var RR = RMenu["Rrebirth"].Cast<CheckBox>().CurrentValue;
+            var SaveR = RMenu["SaveR"].Cast<CheckBox>().CurrentValue;
             var SR = RMenu["SR"].Cast<Slider>().CurrentValue;
             var buffcount = RMenu["count"].Cast<Slider>().CurrentValue;
             var rt = TargetSelector.GetTarget(R.Range, DamageType.True);
@@ -642,24 +630,14 @@
             if (rt != null)
             {
                 if (!rt.HasBuff("kindredrnodeathbuff") && !rt.HasBuff("JudicatorIntervention")
-                    && !rt.HasBuff("ChronoShift") && !rt.HasBuff("UndyingRage")
-                        && !rt.IsInvulnerable
-                        && !rt.IsZombie
-                        && !rt.HasUndyingBuff()
-                        && !rt.HasBuffOfType(BuffType.Counter))
+                    && !rt.HasBuff("ChronoShift") && !rt.HasBuff("UndyingRage") && !rt.IsInvulnerable && !rt.IsZombie
+                    && !rt.HasUndyingBuff() && !rt.HasBuff("AatroxPassiveActivate") && !rt.HasBuff("rebirthcooldown"))
                 {
 
-                    if (RR && (rt.ChampionName == "Anivia" && !rt.HasBuff("rebirthcooldown")) || (rt.ChampionName == "Aatrox" && !rt.HasBuff("AatroxPassiveActivate")))
+                    if (SaveR && ObjectManager.Player.GetAutoAttackDamage(rt) * SR > rt.TotalShieldHealth()
+                        && rt.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
                     {
-                        return;
-                    }
-
-                    if (ObjectManager.Player.GetAutoAttackDamage(rt) * SR > rt.TotalShieldHealth() && rt.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
-                    {
-                        if (rt.TotalShieldHealth() <= ObjectManager.Player.TotalShieldHealth())
-                        {
                             return;
-                        }
                     }
 
                     if (Rcombo)
@@ -811,7 +789,10 @@
             {
                 foreach (var enemy in
                     ObjectManager.Get<AIHeroClient>()
-                        .Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsVisible && ene.IsValid && ene.IsHPBarRendered))
+                        .Where(
+                            ene =>
+                            ene != null && !ene.IsDead && ene.IsEnemy && ene.IsVisible && ene.IsValid
+                            && ene.IsHPBarRendered))
                 {
                     int passiveCounter = enemy.GetBuffCount("DariusHemo") <= 0 ? 0 : enemy.GetBuffCount("DariusHemo");
                     if (DrawMenu["DrawD"].Cast<CheckBox>().CurrentValue && enemy.IsVisible)
@@ -838,10 +819,11 @@
                         if (enemy.GetBuffCount("DariusHemo") > 0 && enemy.IsVisible)
                         {
                             var endTime = Math.Max(0, enemy.GetBuff("DariusHemo").EndTime - Game.Time);
-                            Drawing.DrawText(Drawing.WorldToScreen(enemy.Position)
-                                             - new Vector2(
-                                                   DrawMenu["PPx"].Cast<Slider>().CurrentValue,
-                                                   DrawMenu["PPy"].Cast<Slider>().CurrentValue),
+                            Drawing.DrawText(
+                                Drawing.WorldToScreen(enemy.Position)
+                                - new Vector2(
+                                      DrawMenu["PPx"].Cast<Slider>().CurrentValue,
+                                      DrawMenu["PPy"].Cast<Slider>().CurrentValue),
                                 System.Drawing.Color.FromArgb(255, 106, 106),
                                 enemy.GetBuffCount("DariusHemo") + " Stacks "
                                 + Convert.ToString(endTime, CultureInfo.InvariantCulture),
@@ -851,7 +833,14 @@
 
                     if (DrawMenu["RHealth"].Cast<CheckBox>().CurrentValue && enemy.IsVisible)
                     {
-                        Drawing.DrawText(hpPos.X + DrawMenu["RHx"].Cast<Slider>().CurrentValue, hpPos.Y - 20f, System.Drawing.Color.FromArgb(255, 106, 106), Convert.ToString(enemy.TotalShieldHealth() - RDmg(enemy, passiveCounter), CultureInfo.CurrentCulture), 2);
+                        Drawing.DrawText(
+                            hpPos.X + DrawMenu["RHx"].Cast<Slider>().CurrentValue,
+                            hpPos.Y - 20f,
+                            System.Drawing.Color.FromArgb(255, 106, 106),
+                            Convert.ToString(
+                                enemy.TotalShieldHealth() - RDmg(enemy, passiveCounter),
+                                CultureInfo.CurrentCulture),
+                            2);
                     }
                 }
             }

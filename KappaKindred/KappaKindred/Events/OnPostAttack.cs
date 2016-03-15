@@ -15,32 +15,28 @@
             var Qaf = Menu.ComboMenu["Qaf"].Cast<CheckBox>().CurrentValue && Spells.Q.IsReady();
             var qmode = Menu.ComboMenu["Qmode"].Cast<ComboBox>().CurrentValue;
 
-            if (qtarget == null || hero == null || !hero.IsValid || hero.Type != GameObjectType.AIHeroClient)
+            if (qtarget == null || hero == null || !hero.IsValid || hero.Type != GameObjectType.AIHeroClient || qtarget.HasBuff("kindredrnodeathbuff"))
             {
                 return;
             }
 
             var flags = Orbwalker.ActiveModesFlags;
-
-            if (flags.HasFlag(Orbwalker.ActiveModes.Combo))
+            if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && Qaf)
             {
-                if (Qaf)
+                if (qmode == 0)
                 {
-                    if (qmode == 0)
+                    if (Spells.Q.Cast(qtarget.Position))
                     {
-                        if (Spells.Q.Cast(qtarget.Position))
-                        {
-                            Orbwalker.ResetAutoAttack();
-                            Player.IssueOrder(GameObjectOrder.AttackUnit, qtarget);
-                        }
+                        Orbwalker.ResetAutoAttack();
+                        Player.IssueOrder(GameObjectOrder.AttackUnit, qtarget);
                     }
-                    else
+                }
+                else
+                {
+                    if (Spells.Q.Cast(Game.CursorPos))
                     {
-                        if (Spells.Q.Cast(Game.CursorPos))
-                        {
-                            Orbwalker.ResetAutoAttack();
-                            Player.IssueOrder(GameObjectOrder.AttackUnit, qtarget);
-                        }
+                        Orbwalker.ResetAutoAttack();
+                        Player.IssueOrder(GameObjectOrder.AttackUnit, qtarget);
                     }
                 }
             }
