@@ -65,6 +65,10 @@
             JungleMenu.Add("Q", new CheckBox("Use Q"));
             JungleMenu.Add("E", new CheckBox("Use E"));
 
+            MiscMenu = menuIni.AddSubMenu("Misc");
+            MiscMenu.AddGroupLabel("Misc Settings");
+            MiscMenu.Add("Qstacks", new CheckBox("Auto Q On Enemy with 2 Stacks"));
+
             ManaMenu = menuIni.AddSubMenu("Mana Manager");
             ManaMenu.AddGroupLabel("Harass");
             ManaMenu.Add("harassmana", new Slider("Harass Mana %", 75, 0, 100));

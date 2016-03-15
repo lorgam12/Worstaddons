@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -6,12 +7,12 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("KappaEkko")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyDescription("Kappa")]
+[assembly: AssemblyConfiguration("Kappa")]
+[assembly: AssemblyCompany("Kappa")]
 [assembly: AssemblyProduct("KappaEkko")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Kappa")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

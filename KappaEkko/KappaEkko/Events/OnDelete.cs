@@ -16,6 +16,18 @@
                     Spells.EkkoREmitter = null;
                 }
             }
+
+            var miss = sender as MissileClient;
+            if (miss == null || !miss.IsValid)
+            {
+                return;
+            }
+
+            if (miss.SpellCaster is AIHeroClient && miss.SpellCaster.IsValid && miss.SpellCaster.IsMe
+                && (miss.SData.Name == "EkkoQMis" || miss.SData.Name == "EkkoQReturn"))
+            {
+                Spells.EkkoQMissile = null;
+            }
         }
     }
 }

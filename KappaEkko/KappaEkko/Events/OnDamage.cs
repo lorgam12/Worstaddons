@@ -15,7 +15,7 @@
             var Rsave = Menu.UltMenu["Rsave"].Cast<CheckBox>().CurrentValue;
             var Rsaveh = Menu.UltMenu["Rsaveh"].Cast<Slider>().CurrentValue;
             var Health = ObjectManager.Player.HealthPercent;
-            
+
             if (Rsave)
             {
                 if (sender.IsEnemy || sender is Obj_AI_Turret)

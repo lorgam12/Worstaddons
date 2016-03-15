@@ -33,16 +33,14 @@
         public static void Rk()
         {
             var Rks =
-                 ObjectManager.Get<AIHeroClient>()
-                     .FirstOrDefault(
-                         enemy =>
-                         enemy != null && !enemy.IsZombie
-                         && enemy.IsEnemy
-                         && enemy.IsInRange(Spells.EkkoREmitter.Position, Spells.R.Range)
-                         && !enemy.IsDead
-                         && !enemy.HasBuff("kindredrnodeathbuff") && !enemy.HasBuff("JudicatorIntervention")
-                         && !enemy.HasBuff("ChronoShift") && !enemy.HasBuff("UndyingRage")
-                         && enemy.TotalShieldHealth() < ObjectManager.Player.GetSpellDamage(enemy, SpellSlot.R));
+                ObjectManager.Get<AIHeroClient>()
+                    .FirstOrDefault(
+                        enemy =>
+                        enemy != null && !enemy.IsZombie && enemy.IsEnemy
+                        && enemy.IsInRange(Spells.EkkoREmitter.Position, Spells.R.Range) && !enemy.IsDead
+                        && !enemy.HasBuff("kindredrnodeathbuff") && !enemy.HasBuff("JudicatorIntervention")
+                        && !enemy.HasBuff("ChronoShift") && !enemy.HasBuff("UndyingRage")
+                        && enemy.TotalShieldHealth() < ObjectManager.Player.GetSpellDamage(enemy, SpellSlot.R));
             if (Rks != null)
             {
                 Spells.R.Cast();

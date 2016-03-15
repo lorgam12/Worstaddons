@@ -56,12 +56,12 @@
                 }
 
                 if (Menu.ComboMenu.Get<CheckBox>("W").CurrentValue
-                    && !Menu.ComboMenu.Get<CheckBox>("Wpred").CurrentValue && Wtarget != null)
+                    && !Menu.ComboMenu.Get<CheckBox>("Wpred").CurrentValue && Wtarget != null && Spells.W.IsReady())
                 {
                     Circle.Draw(Color.Purple, Spells.W.Radius, Wtarget.Position);
                     Drawing.DrawText(
                         hpPos.X + 140f,
-                        hpPos.Y - 10,
+                        hpPos.Y - 15,
                         System.Drawing.Color.White,
                         "W Will Hit " + Wtarget.Position.CountEnemiesInRange(Spells.W.Radius),
                         10);

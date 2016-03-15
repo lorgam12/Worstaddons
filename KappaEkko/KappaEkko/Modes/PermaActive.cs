@@ -8,15 +8,11 @@
     {
         public static void Active()
         {
+            var Qstacks = Menu.MiscMenu["Qstacks"].Cast<CheckBox>().CurrentValue;
             var RAoe = Menu.UltMenu["RAoe"].Cast<CheckBox>().CurrentValue;
             var REscape = Menu.UltMenu["REscape"].Cast<CheckBox>().CurrentValue;
 
-            if (Spells.EkkoREmitter == null)
-            {
-                return;
-            }
-
-            if (Spells.R.IsReady())
+            if (Spells.R.IsReady() && Spells.EkkoREmitter != null)
             {
                 if (RAoe)
                 {
@@ -26,6 +22,14 @@
                 if (REscape)
                 {
                     Rlogic.Escape();
+                }
+            }
+
+            if (Spells.Q.IsReady())
+            {
+                if (Qstacks)
+                {
+                    Qlogic.OnStacks();
                 }
             }
         }

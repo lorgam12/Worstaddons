@@ -16,6 +16,16 @@
                     Spells.EkkoREmitter = particle;
                 }
             }
+
+            var miss = sender as MissileClient;
+            if (miss != null && miss.IsValid)
+            {
+                if (miss.SpellCaster.IsMe && miss.SpellCaster.IsValid
+                    && (miss.SData.Name == "EkkoQMis" || miss.SData.Name == "EkkoQReturn"))
+                {
+                    Spells.EkkoQMissile = miss;
+                }
+            }
         }
     }
 }
