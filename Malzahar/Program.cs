@@ -486,15 +486,20 @@
         /// <param name="args">The <see cref="EventArgs" /> instance containing the event data.</param>
         private static void Game_OnGameUpdate(EventArgs args)
         {
-            var flags = Orbwalker.ActiveModesFlags;
-            if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
+            if (UltMenu["saveR"].Cast<CheckBox>().CurrentValue)
             {
                 Orbwalker.DisableAttacking = ObjectManager.Player.Spellbook.IsChanneling;
                 Orbwalker.DisableMovement = ObjectManager.Player.Spellbook.IsChanneling;
-                if (ObjectManager.Player.Spellbook.IsChanneling)
-                {
-                    return;
-                }
+            }
+
+            if (ObjectManager.Player.Spellbook.IsChanneling)
+            {
+                return;
+            }
+
+            var flags = Orbwalker.ActiveModesFlags;
+            if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
+            {
                 DoCombo();
             }
 
@@ -502,12 +507,6 @@
             {
                 if (flags.HasFlag(Orbwalker.ActiveModes.LaneClear) && menuIni.Get<CheckBox>("LaneClear").CurrentValue)
                 {
-                    Orbwalker.DisableAttacking = ObjectManager.Player.Spellbook.IsChanneling;
-                    Orbwalker.DisableMovement = ObjectManager.Player.Spellbook.IsChanneling;
-                    if (ObjectManager.Player.Spellbook.IsChanneling)
-                    {
-                        return;
-                    }
                     Clear();
                 }
             }
@@ -516,12 +515,6 @@
             {
                 if (flags.HasFlag(Orbwalker.ActiveModes.Harass) && menuIni.Get<CheckBox>("Harass").CurrentValue)
                 {
-                    Orbwalker.DisableAttacking = ObjectManager.Player.Spellbook.IsChanneling;
-                    Orbwalker.DisableMovement = ObjectManager.Player.Spellbook.IsChanneling;
-                    if (ObjectManager.Player.Spellbook.IsChanneling)
-                    {
-                        return;
-                    }
                     DoHarass();
                 }
             }
@@ -532,33 +525,15 @@
                 {
                     UnderTower();
                 }
-
-                if (UltMenu["saveR"].Cast<CheckBox>().CurrentValue)
-                {
-                    if (ObjectManager.Player.Spellbook.IsChanneling)
-                    {
-                        return;
-                    }
-                }
             }
 
             if (menuIni["KillSteal"].Cast<CheckBox>().CurrentValue && (Q.IsReady() || W.IsReady() || E.IsReady()))
             {
-                if (ObjectManager.Player.Spellbook.IsChanneling)
-                {
-                    return;
-                }
-
                 KillSteal();
             }
 
             if (menuIni["Misc"].Cast<CheckBox>().CurrentValue)
             {
-                if (ObjectManager.Player.Spellbook.IsChanneling)
-                {
-                    return;
-                }
-
                 CC();
             }
         }
