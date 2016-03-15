@@ -1,5 +1,7 @@
 ﻿namespace KappaKindred.Events
 {
+    using System;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu.Values;
@@ -8,8 +10,8 @@
     {
         public static void OnSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!sender.IsValid && !Spells.R.IsReady() || sender.IsAlly || !args.Target.IsValid
-                || args.Target.IsEnemy || sender is Obj_AI_Minion || args.Target is Obj_AI_Minion || args.Target == null || sender.IsMe)
+            if (!Spells.R.IsReady() || sender.IsAlly || args.Target == null || sender == null
+                || args.Target.IsEnemy || sender is Obj_AI_Minion || args.Target is Obj_AI_Minion || sender.IsMe)
             {
                 return;
             }

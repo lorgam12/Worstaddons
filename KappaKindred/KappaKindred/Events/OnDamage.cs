@@ -13,7 +13,7 @@ namespace KappaKindred.Events
     {
         public static void Damage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
         {
-            if (!sender.IsValid && !Spells.R.IsReady() || sender.IsAlly || !args.Target.IsValid
+            if (!Spells.R.IsReady() || sender.IsAlly || sender == null
                 || args.Target.IsEnemy || sender is Obj_AI_Minion || args.Target == null || args.Target is Obj_AI_Minion)
             {
                 return;
