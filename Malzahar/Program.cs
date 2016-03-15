@@ -167,8 +167,9 @@
         /// <param name="gapcloser">The gapcloser.</param>
         private static void AntiGapcloserOnOnEnemyGapcloser(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
+            var castingR = Player.Instance.Spellbook.IsChanneling && !Player.Instance.IsRecalling();
             if (!Sender.IsValidTarget() || !Sender.IsEnemy || Sender.IsAlly
-                || ObjectManager.Player.Spellbook.IsChanneling)
+                || castingR)
             {
                 return;
             }
@@ -200,7 +201,8 @@
 
         private static void PlayerIssue(Obj_AI_Base sender, PlayerIssueOrderEventArgs args)
         {
-            if (sender.IsMe && ObjectManager.Player.Spellbook.IsChanneling
+            var castingR = Player.Instance.Spellbook.IsChanneling && !Player.Instance.IsRecalling();
+            if (sender.IsMe && castingR
                 && (args.Order == GameObjectOrder.MoveTo || args.Order == GameObjectOrder.AttackUnit
                     || args.Order == GameObjectOrder.AutoAttack))
             {
@@ -212,7 +214,8 @@
             Obj_AI_Base unit,
             Interrupter.InterruptableSpellEventArgs args)
         {
-            if (ObjectManager.Player.Spellbook.IsChanneling)
+            var castingR = Player.Instance.Spellbook.IsChanneling && !Player.Instance.IsRecalling();
+            if (castingR)
             {
                 return;
             }
@@ -227,10 +230,6 @@
 
             if (unit != null && R.IsReady() && UltMenu.Get<CheckBox>("interruptR").CurrentValue)
             {
-                if (ObjectManager.Player.Spellbook.IsChanneling)
-                {
-                    return;
-                }
 
                 if (UltMenu["Rtower"].Cast<CheckBox>().CurrentValue && ObjectManager.Player.IsUnderEnemyturret())
                 {
@@ -271,10 +270,6 @@
 
             if (KillStealMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
-                if (ObjectManager.Player.Spellbook.IsChanneling)
-                {
-                    return;
-                }
 
                 if (target.IsValidTarget(Q.Range)
                     && ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q) > target.TotalShieldHealth())
@@ -351,7 +346,8 @@
         /// </summary>
         private static void DoCombo()
         {
-            if (ObjectManager.Player.Spellbook.IsChanneling)
+            var castingR = Player.Instance.Spellbook.IsChanneling && !Player.Instance.IsRecalling();
+            if (castingR)
             {
                 return;
             }
@@ -391,10 +387,6 @@
         /// </summary>
         private static void DoHarass()
         {
-            if (ObjectManager.Player.Spellbook.IsChanneling)
-            {
-                return;
-            }
 
             var target = TargetSelector.GetTarget(900, DamageType.Magical);
 
@@ -486,13 +478,14 @@
         /// <param name="args">The <see cref="EventArgs" /> instance containing the event data.</param>
         private static void Game_OnGameUpdate(EventArgs args)
         {
+            var castingR = Player.Instance.Spellbook.IsChanneling && !Player.Instance.IsRecalling();
             if (UltMenu["saveR"].Cast<CheckBox>().CurrentValue)
             {
-                Orbwalker.DisableAttacking = ObjectManager.Player.Spellbook.IsChanneling;
-                Orbwalker.DisableMovement = ObjectManager.Player.Spellbook.IsChanneling;
+                Orbwalker.DisableAttacking = castingR;
+                Orbwalker.DisableMovement = castingR;
             }
 
-            if (ObjectManager.Player.Spellbook.IsChanneling)
+            if (castingR)
             {
                 return;
             }
