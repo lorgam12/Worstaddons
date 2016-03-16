@@ -17,6 +17,11 @@
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
+            if (Player.Instance.ChampionName != "Kindred")
+            {
+                return;
+            }
+
             Menu.Load();
             Spells.Load();
 
