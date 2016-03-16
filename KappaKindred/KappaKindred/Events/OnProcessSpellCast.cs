@@ -19,7 +19,8 @@
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if (!target.IsAlly || !target.IsMe || !caster.IsEnemy || caster.IsMinion || target.IsMinion)
+            if (!target.IsAlly || !target.IsMe || !caster.IsEnemy || caster.IsMinion || target.IsMinion
+                || Menu.UltMenu["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 return;
             }

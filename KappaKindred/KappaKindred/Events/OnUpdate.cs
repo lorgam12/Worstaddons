@@ -33,7 +33,6 @@
                 Clear.Start();
             }
 
-
             if (flags.HasFlag(Orbwalker.ActiveModes.JungleClear))
             {
                 Jungle.Start();

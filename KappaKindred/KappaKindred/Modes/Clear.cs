@@ -64,7 +64,6 @@
                         Spells.Q.Speed)
                         .OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length)
                         .FirstOrDefault();
-
                 if (location != null && location.CollisionObjects.Length >= 2)
                 {
                     Spells.Q.Cast(Game.CursorPos);

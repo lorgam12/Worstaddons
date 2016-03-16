@@ -1,5 +1,6 @@
 ﻿namespace KappaKindred
 {
+    using EloBuddy;
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
 
@@ -32,6 +33,15 @@
             UltMenu.AddGroupLabel("Ultimate Settings");
             UltMenu.Add("Rally", new CheckBox("R Save Ally / Self"));
             UltMenu.Add("Rallyh", new Slider("R Ally Health %", 20, 0, 100));
+            UltMenu.AddGroupLabel("Don't Use Ult On: ");
+            foreach (var ally in ObjectManager.Get<AIHeroClient>())
+            {
+                CheckBox cb = new CheckBox(ally.BaseSkinName) { CurrentValue = false };
+                if (ally.Team == ObjectManager.Player.Team)
+                {
+                    UltMenu.Add("DontUlt" + ally.BaseSkinName, cb);
+                }
+            }
 
             ComboMenu = menuIni.AddSubMenu("Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
