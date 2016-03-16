@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KappaKindred.Events
+﻿namespace KappaKindred.Events
 {
     using EloBuddy;
     using EloBuddy.SDK;
@@ -13,8 +8,9 @@ namespace KappaKindred.Events
     {
         public static void OnAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!Spells.R.IsReady() || sender.IsAlly || !args.Target.IsValid || sender == null
-                || args.Target.IsEnemy || sender is Obj_AI_Minion || args.Target is Obj_AI_Minion || args.Target.Distance(Player.Instance) > Spells.R.Range || args.Target == null)
+            if (!Spells.R.IsReady() || sender.IsAlly || !args.Target.IsValid || sender == null || args.Target.IsEnemy
+                || sender is Obj_AI_Minion || args.Target is Obj_AI_Minion
+                || args.Target.Distance(Player.Instance) > Spells.R.Range || args.Target == null)
             {
                 return;
             }

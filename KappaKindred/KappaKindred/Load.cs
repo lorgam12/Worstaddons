@@ -8,7 +8,7 @@
 
     using Events;
 
-    internal class Program
+    internal class Load
     {
         private static void Main(string[] args)
         {
@@ -23,8 +23,8 @@
             Game.OnUpdate += OnUpdate.Update;
             Drawing.OnDraw += OnDraw.Draw;
             Orbwalker.OnPostAttack += OnPostAttack.PostAttack;
-            AIHeroClient.OnProcessSpellCast += OnProcessSpellCast.OnSpell;
-            AIHeroClient.OnBasicAttack += OnBasicAttack.OnAttack;
+            Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast.OnSpell;
+            Obj_AI_Base.OnBasicAttack += OnBasicAttack.OnAttack;
             AttackableUnit.OnDamage += OnDamage.Damage;
         }
     }

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KappaKindred.Events
+﻿namespace KappaKindred.Events
 {
+    using System;
+
     using EloBuddy;
     using EloBuddy.SDK.Menu.Values;
     using EloBuddy.SDK.Rendering;

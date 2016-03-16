@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KappaKindred.Events
+﻿namespace KappaKindred.Events
 {
     using EloBuddy;
     using EloBuddy.SDK;
@@ -13,8 +8,8 @@ namespace KappaKindred.Events
     {
         public static void Damage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
         {
-            if (!Spells.R.IsReady() || sender.IsAlly || sender == null
-                || args.Target.IsEnemy || sender is Obj_AI_Minion || args.Target == null || args.Target is Obj_AI_Minion)
+            if (!Spells.R.IsReady() || sender.IsAlly || sender == null || args.Target.IsEnemy || sender is Obj_AI_Minion
+                || args.Target == null || args.Target is Obj_AI_Minion)
             {
                 return;
             }

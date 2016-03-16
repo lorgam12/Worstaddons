@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KappaKindred.Modes
+﻿namespace KappaKindred.Modes
 {
     using EloBuddy;
     using EloBuddy.SDK;

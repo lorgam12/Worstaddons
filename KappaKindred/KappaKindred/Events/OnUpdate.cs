@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KappaKindred.Events
+﻿namespace KappaKindred.Events
 {
+    using System;
+    using System.Linq;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu.Values;
@@ -18,7 +16,8 @@ namespace KappaKindred.Events
             var lanemana = Menu.ManaMenu["lanemana"].Cast<Slider>().CurrentValue;
             var harassmana = Menu.ManaMenu["harassmana"].Cast<Slider>().CurrentValue;
             var target = TargetSelector.GetTarget(Spells.Q.Range, DamageType.Physical);
-            if (Player.Instance.IsDead || MenuGUI.IsChatOpen || Player.Instance.IsRecalling() || (target != null && target.HasBuff("kindredrnodeathbuff")))
+            if (Player.Instance.IsDead || MenuGUI.IsChatOpen || Player.Instance.IsRecalling()
+                || (target != null && target.HasBuff("kindredrnodeathbuff")))
             {
                 return;
             }
@@ -34,6 +33,12 @@ namespace KappaKindred.Events
                 Clear.Start();
             }
 
+
+            if (flags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+            {
+                Jungle.Start();
+            }
+
             if (flags.HasFlag(Orbwalker.ActiveModes.Harass) && Player.Instance.ManaPercent >= harassmana)
             {
                 Harass.Start();
@@ -42,6 +47,32 @@ namespace KappaKindred.Events
             if (flags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee.Start();
+            }
+
+            if (Menu.ComboMenu["Emark"].Cast<CheckBox>().CurrentValue)
+            {
+                var Etarget =
+                    ObjectManager.Get<AIHeroClient>()
+                        .Where(enemy => !enemy.IsDead && enemy.IsValidTarget(Player.Instance.GetAutoAttackRange()))
+                        .FirstOrDefault(
+                            enemy => enemy.Buffs.Any(buff => buff.Name == "KindredERefresher" && buff.Count > 0));
+                if (Etarget != null)
+                {
+                    TargetSelector.GetPriority(Etarget);
+                }
+            }
+
+            if (Menu.ComboMenu["Pmark"].Cast<CheckBox>().CurrentValue)
+            {
+                var Ptarget =
+                    ObjectManager.Get<AIHeroClient>()
+                        .Where(enemy => !enemy.IsDead && enemy.IsValidTarget(Player.Instance.GetAutoAttackRange()))
+                        .FirstOrDefault(enemy => enemy.Buffs.Any(buff => buff.Name == "KindredHitTracker"));
+
+                if (Ptarget != null)
+                {
+                    TargetSelector.GetPriority(Ptarget);
+                }
             }
         }
     }

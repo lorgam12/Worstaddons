@@ -16,7 +16,7 @@
 
         public static void Load()
         {
-            Q = new Spell.Skillshot(SpellSlot.Q, 800, SkillShotType.Linear, 250, 2200, 60);
+            Q = new Spell.Skillshot(SpellSlot.Q, 750, SkillShotType.Linear, 250, 1000, 250);
             W = new Spell.Active(SpellSlot.W, 800);
             E = new Spell.Targeted(SpellSlot.E, 450);
             R = new Spell.Targeted(SpellSlot.R, 500);

@@ -59,8 +59,7 @@
     <Compile Include="Modes\Flee.cs" />
     <Compile Include="Modes\Harass.cs" />
     <Compile Include="Modes\Jungle.cs" />
-    <Compile Include="Modes\PermaActive.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Load.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
