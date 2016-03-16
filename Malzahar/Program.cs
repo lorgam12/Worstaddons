@@ -168,8 +168,7 @@
         private static void AntiGapcloserOnOnEnemyGapcloser(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
             var castingR = Player.Instance.Spellbook.IsChanneling && !Player.Instance.IsRecalling();
-            if (!Sender.IsValidTarget() || !Sender.IsEnemy || Sender.IsAlly
-                || castingR)
+            if (!Sender.IsValidTarget() || !Sender.IsEnemy || Sender.IsAlly || castingR)
             {
                 return;
             }
@@ -230,7 +229,6 @@
 
             if (unit != null && R.IsReady() && UltMenu.Get<CheckBox>("interruptR").CurrentValue)
             {
-
                 if (UltMenu["Rtower"].Cast<CheckBox>().CurrentValue && ObjectManager.Player.IsUnderEnemyturret())
                 {
                     return;
@@ -270,7 +268,6 @@
 
             if (KillStealMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
-
                 if (target.IsValidTarget(Q.Range)
                     && ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q) > target.TotalShieldHealth())
                 {
@@ -339,6 +336,64 @@
 
         private static void Clear()
         {
+            if (LaneMenu.Get<CheckBox>("W").CurrentValue && W.IsReady())
+            {
+                var minions1 = EntityManager.MinionsAndMonsters.EnemyMinions;
+                if (minions1 == null || !minions1.Any())
+                {
+                    return;
+                }
+
+                var location =
+                    Prediction.Position.PredictCircularMissileAoe(
+                        minions1.Cast<Obj_AI_Base>().ToArray(),
+                        W.Range,
+                        W.Radius + 50,
+                        W.CastDelay,
+                        W.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
+
+                if (location != null && location.CollisionObjects.Length >= 3)
+                {
+                    W.Cast(location.CastPosition);
+                }
+            }
+            if (LaneMenu.Get<CheckBox>("E").CurrentValue && E.IsReady())
+            {
+                var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(
+                    EntityManager.UnitTeam.Enemy,
+                    Player.Instance.Position,
+                    E.Range + 20,
+                    false);
+                foreach (var minion in minions)
+                {
+                    if (minion != null)
+                    {
+                        E.Cast(minion);
+                    }
+                }
+            }
+
+            if (LaneMenu.Get<CheckBox>("Q").CurrentValue && Q.IsReady())
+            {
+                var minions1 = EntityManager.MinionsAndMonsters.GetLaneMinions(
+                    EntityManager.UnitTeam.Enemy,
+                    Player.Instance.Position,
+                    Q.Range + 50,
+                    false);
+
+                var location =
+                    Prediction.Position.PredictCircularMissileAoe(
+                        minions1.Cast<Obj_AI_Base>().ToArray(),
+                        Q.Range,
+                        Q.Radius + 50,
+                        Q.CastDelay,
+                        Q.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
+
+                if (location != null && location.CollisionObjects.Length >= 2)
+                {
+                    Q.Cast(location.CastPosition);
+                }
+            }
         }
 
         /// <summary>
@@ -387,7 +442,6 @@
         /// </summary>
         private static void DoHarass()
         {
-
             var target = TargetSelector.GetTarget(900, DamageType.Magical);
 
             if (target == null)
