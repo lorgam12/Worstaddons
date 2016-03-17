@@ -1,4 +1,4 @@
-﻿namespace KappaUtility
+﻿namespace KappaUtility.Summoners
 {
     using System.Linq;
 
@@ -28,7 +28,7 @@
             Game.OnUpdate += Game_OnUpdate;
 
             SummMenu = Load.UtliMenu.AddSubMenu("Summoner Spells");
-            SummMenu.AddGroupLabel("Summoners Settings");
+            SummMenu.AddGroupLabel("Summoner Spells Settings");
 
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerDot")) != null)
             {
@@ -177,7 +177,7 @@
         public static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (sender == null || sender.IsAlly || sender is Obj_AI_Minion || args.Target is Obj_AI_Minion
-                || args.Target == null)
+                || args.Target == null || args.Target is Obj_AI_Turret)
             {
                 return;
             }
@@ -261,7 +261,7 @@
         public static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (sender.IsAlly || !args.Target.IsValid || args.Target.IsEnemy || sender is Obj_AI_Minion
-                || args.Target is Obj_AI_Minion || args.Target == null)
+                || args.Target is Obj_AI_Minion || args.Target == null || args.Target is Obj_AI_Turret)
             {
                 return;
             }

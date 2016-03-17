@@ -8,6 +8,12 @@
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
 
+    using Items;
+
+    using Summoners;
+
+    using Trackers;
+
     internal class Load
     {
         public static Menu UtliMenu;
@@ -20,6 +26,7 @@
         private static void OnLoad(EventArgs args)
         {
             UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
+            Tracker.OnLoad();
             Spells.OnLoad();
             Potions.OnLoad();
             Offensive.OnLoad();
@@ -44,7 +51,7 @@
         public static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (sender.IsAlly || !args.Target.IsValid || args.Target.IsEnemy || sender is Obj_AI_Minion
-                || args.Target is Obj_AI_Minion || args.Target == null)
+                || args.Target is Obj_AI_Minion || args.Target == null || args.Target is Obj_AI_Turret)
             {
                 return;
             }
@@ -226,7 +233,7 @@
         public static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (sender.IsAlly || !args.Target.IsValid || args.Target.IsEnemy || sender is Obj_AI_Minion
-                || args.Target is Obj_AI_Minion || args.Target == null)
+                || args.Target is Obj_AI_Minion || args.Target == null || args.Target is Obj_AI_Turret)
             {
                 return;
             }

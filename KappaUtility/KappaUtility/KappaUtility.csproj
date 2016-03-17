@@ -66,13 +66,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Summoners\Smite.cs" />
     <Compile Include="Summoners\Spells.cs" />
+    <Compile Include="Trackers\Tracker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Trackers\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

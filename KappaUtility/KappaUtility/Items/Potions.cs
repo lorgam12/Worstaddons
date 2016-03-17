@@ -1,4 +1,4 @@
-﻿namespace KappaUtility
+﻿namespace KappaUtility.Items
 {
     using EloBuddy;
     using EloBuddy.SDK;

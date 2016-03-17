@@ -1,4 +1,4 @@
-﻿namespace KappaUtility
+﻿namespace KappaUtility.Summoners
 {
     using System.Linq;
 
