@@ -7,12 +7,12 @@
     using EloBuddy.SDK.Events;
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
-    
-    class Load
+
+    internal class Load
     {
         public static Menu UtliMenu;
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoad;
         }
@@ -41,7 +41,6 @@
             Smite.Smiteopepi();
         }
 
-
         public static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (sender.IsAlly || !args.Target.IsValid || args.Target.IsEnemy || sender is Obj_AI_Minion
@@ -60,33 +59,39 @@
             var Hunters = Potions.Hunters;
             var Refillable = Potions.Refillable;
             var Biscuit = Potions.Biscuit;
-            
-            var Corruptingc = Potions.PotMenu["CP"].Cast<CheckBox>().CurrentValue && Corrupting.IsOwned() && Corrupting.IsReady();
+
+            var Corruptingc = Potions.PotMenu["CP"].Cast<CheckBox>().CurrentValue && Corrupting.IsOwned()
+                              && Corrupting.IsReady();
             var Corruptingh = Potions.PotMenu["CPH"].Cast<Slider>().CurrentValue;
 
             var Healthc = Potions.PotMenu["HP"].Cast<CheckBox>().CurrentValue && Health.IsOwned() && Health.IsReady();
             var Healthh = Potions.PotMenu["HPH"].Cast<Slider>().CurrentValue;
 
-            var Huntersc = Potions.PotMenu["HPS"].Cast<CheckBox>().CurrentValue && Hunters.IsOwned() && Hunters.IsReady();
+            var Huntersc = Potions.PotMenu["HPS"].Cast<CheckBox>().CurrentValue && Hunters.IsOwned()
+                           && Hunters.IsReady();
             var Huntersh = Potions.PotMenu["HPSH"].Cast<Slider>().CurrentValue;
 
-            var Refillablec = Potions.PotMenu["RP"].Cast<CheckBox>().CurrentValue && Refillable.IsOwned() && Refillable.IsReady();
+            var Refillablec = Potions.PotMenu["RP"].Cast<CheckBox>().CurrentValue && Refillable.IsOwned()
+                              && Refillable.IsReady();
             var Refillableh = Potions.PotMenu["RPH"].Cast<Slider>().CurrentValue;
 
             var Biscuitc = Potions.PotMenu["BP"].Cast<CheckBox>().CurrentValue && Biscuit.IsOwned() && Biscuit.IsReady();
             var Biscuith = Potions.PotMenu["BPH"].Cast<Slider>().CurrentValue;
 
-            var Seraphc = Defensive.DefMenu["Seraph"].Cast<CheckBox>().CurrentValue && Seraph.IsOwned() && Seraph.IsReady();
+            var Seraphc = Defensive.DefMenu["Seraph"].Cast<CheckBox>().CurrentValue && Seraph.IsOwned()
+                          && Seraph.IsReady();
             var Seraphh = Defensive.DefMenu["Seraphh"].Cast<Slider>().CurrentValue;
-            
-            var Solaric = Defensive.DefMenu["Solari"].Cast<CheckBox>().CurrentValue && Solari.IsOwned() && Solari.IsReady();
+
+            var Solaric = Defensive.DefMenu["Solari"].Cast<CheckBox>().CurrentValue && Solari.IsOwned()
+                          && Solari.IsReady();
             var Solarih = Defensive.DefMenu["Solarih"].Cast<Slider>().CurrentValue;
-            
-            var FaceOfTheMountainc = Defensive.DefMenu["FaceOfTheMountain"].Cast<CheckBox>().CurrentValue && FOTM.IsOwned()
-                                     && FOTM.IsReady();
+
+            var FaceOfTheMountainc = Defensive.DefMenu["FaceOfTheMountain"].Cast<CheckBox>().CurrentValue
+                                     && FOTM.IsOwned() && FOTM.IsReady();
             var FaceOfTheMountainh = Defensive.DefMenu["FaceOfTheMountainh"].Cast<Slider>().CurrentValue;
-            
-            var Zhonyasc = Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue && Zhonyas.IsOwned() && Zhonyas.IsReady();
+
+            var Zhonyasc = Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue && Zhonyas.IsOwned()
+                           && Zhonyas.IsReady();
             var Zhonyash = Defensive.DefMenu["Zhonyash"].Cast<Slider>().CurrentValue;
 
             var caster = sender;
@@ -164,7 +169,6 @@
                     }
                 }
 
-
                 if (Biscuitc)
                 {
                     if (target.HealthPercent < Biscuith)
@@ -233,36 +237,42 @@
             var Refillable = Potions.Refillable;
             var Biscuit = Potions.Biscuit;
 
-            var Corruptingc = Potions.PotMenu["CP"].Cast<CheckBox>().CurrentValue && Corrupting.IsOwned() && Corrupting.IsReady();
+            var Corruptingc = Potions.PotMenu["CP"].Cast<CheckBox>().CurrentValue && Corrupting.IsOwned()
+                              && Corrupting.IsReady();
             var Corruptingh = Potions.PotMenu["CPH"].Cast<Slider>().CurrentValue;
 
             var Healthc = Potions.PotMenu["HP"].Cast<CheckBox>().CurrentValue && Health.IsOwned() && Health.IsReady();
             var Healthh = Potions.PotMenu["HPH"].Cast<Slider>().CurrentValue;
 
-            var Huntersc = Potions.PotMenu["HPS"].Cast<CheckBox>().CurrentValue && Hunters.IsOwned() && Hunters.IsReady();
+            var Huntersc = Potions.PotMenu["HPS"].Cast<CheckBox>().CurrentValue && Hunters.IsOwned()
+                           && Hunters.IsReady();
             var Huntersh = Potions.PotMenu["HPSH"].Cast<Slider>().CurrentValue;
 
-            var Refillablec = Potions.PotMenu["RP"].Cast<CheckBox>().CurrentValue && Refillable.IsOwned() && Refillable.IsReady();
+            var Refillablec = Potions.PotMenu["RP"].Cast<CheckBox>().CurrentValue && Refillable.IsOwned()
+                              && Refillable.IsReady();
             var Refillableh = Potions.PotMenu["RPH"].Cast<Slider>().CurrentValue;
 
             var Biscuitc = Potions.PotMenu["BP"].Cast<CheckBox>().CurrentValue && Biscuit.IsOwned() && Biscuit.IsReady();
             var Biscuith = Potions.PotMenu["BPH"].Cast<Slider>().CurrentValue;
 
             var Seraph = Defensive.Seraph;
-            var Seraphc = Defensive.DefMenu["Seraph"].Cast<CheckBox>().CurrentValue && Seraph.IsOwned() && Seraph.IsReady();
+            var Seraphc = Defensive.DefMenu["Seraph"].Cast<CheckBox>().CurrentValue && Seraph.IsOwned()
+                          && Seraph.IsReady();
             var Seraphh = Defensive.DefMenu["Seraphh"].Cast<Slider>().CurrentValue;
 
             var Solari = Defensive.Solari;
-            var Solaric = Defensive.DefMenu["Solari"].Cast<CheckBox>().CurrentValue && Solari.IsOwned() && Solari.IsReady();
+            var Solaric = Defensive.DefMenu["Solari"].Cast<CheckBox>().CurrentValue && Solari.IsOwned()
+                          && Solari.IsReady();
             var Solarih = Defensive.DefMenu["Solarih"].Cast<Slider>().CurrentValue;
 
             var FOTM = Defensive.FOTM;
-            var FaceOfTheMountainc = Defensive.DefMenu["FaceOfTheMountain"].Cast<CheckBox>().CurrentValue && FOTM.IsOwned()
-                                     && FOTM.IsReady();
+            var FaceOfTheMountainc = Defensive.DefMenu["FaceOfTheMountain"].Cast<CheckBox>().CurrentValue
+                                     && FOTM.IsOwned() && FOTM.IsReady();
             var FaceOfTheMountainh = Defensive.DefMenu["FaceOfTheMountainh"].Cast<Slider>().CurrentValue;
 
             var Zhonyas = Defensive.Zhonyas;
-            var Zhonyasc = Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue && Zhonyas.IsOwned() && Zhonyas.IsReady();
+            var Zhonyasc = Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue && Zhonyas.IsOwned()
+                           && Zhonyas.IsReady();
             var Zhonyash = Defensive.DefMenu["Zhonyash"].Cast<Slider>().CurrentValue;
 
             var caster = sender;
@@ -344,7 +354,6 @@
                         Hunters.Cast();
                     }
                 }
-
 
                 if (Biscuitc)
                 {

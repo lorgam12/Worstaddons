@@ -19,6 +19,8 @@
 
         public static readonly Item Youmuu = new Item((int)ItemId.Youmuus_Ghostblade);
 
+        protected static readonly Item Gunblade = new Item(ItemId.Hextech_Gunblade, 700f);
+
         public static Menu OffMenu { get; private set; }
 
         internal static void OnLoad()
@@ -29,9 +31,40 @@
             OffMenu.Add("useGhostblade", new CheckBox("Use Youmuu's Ghostblade"));
             OffMenu.Add("UseBOTRK", new CheckBox("Use Blade of the Ruined King"));
             OffMenu.Add("UseBilge", new CheckBox("Use Bilgewater Cutlass"));
+            OffMenu.Add("UseGunblade", new CheckBox("Use Hextech Gunblade"));
             OffMenu.AddSeparator();
             OffMenu.Add("eL", new Slider("Use On Enemy health", 65, 0, 100));
             OffMenu.Add("oL", new Slider("Use On My health", 65, 0, 100));
+
+            Orbwalker.OnPostAttack += Orbwalker_OnPostAttack;
+        }
+
+        private static void Orbwalker_OnPostAttack(AttackableUnit target, System.EventArgs args)
+        {
+            if (target.IsMe || target.IsAlly || !target.IsEnemy)
+            {
+                return;
+            }
+
+            var useHydra = OffMenu["Hydra"].Cast<CheckBox>().CurrentValue;
+            var flags = Orbwalker.ActiveModesFlags;
+            if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && useHydra)
+            {
+                if (Hydra.Cast())
+                {
+                    Orbwalker.ResetAutoAttack();
+                }
+
+                if (Timat.Cast())
+                {
+                    Orbwalker.ResetAutoAttack();
+                }
+
+                if (Titanic.Cast())
+                {
+                    Orbwalker.ResetAutoAttack();
+                }
+            }
         }
 
         internal static void Items()
@@ -42,6 +75,20 @@
                 return;
             }
 
+            if (Gunblade.IsReady() && Gunblade.IsOwned(Player.Instance) && target.IsValidTarget(Gunblade.Range)
+                && target.HealthPercent <= OffMenu["eL"].Cast<Slider>().CurrentValue
+                && OffMenu["UseGunblade"].Cast<CheckBox>().CurrentValue)
+            {
+                Gunblade.Cast(target);
+            }
+
+            if (Gunblade.IsReady() && Gunblade.IsOwned(Player.Instance) && target.IsValidTarget(Gunblade.Range)
+                && Player.Instance.HealthPercent <= OffMenu["oL"].Cast<Slider>().CurrentValue
+                && OffMenu["UseGunblade"].Cast<CheckBox>().CurrentValue)
+            {
+                Gunblade.Cast(target);
+            }
+
             if (Botrk.IsReady() && Botrk.IsOwned(Player.Instance) && target.IsValidTarget(Botrk.Range)
                 && target.HealthPercent <= OffMenu["eL"].Cast<Slider>().CurrentValue
                 && OffMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
@@ -50,7 +97,7 @@
             }
 
             if (Botrk.IsReady() && Botrk.IsOwned(Player.Instance) && target.IsValidTarget(Botrk.Range)
-                && target.HealthPercent <= OffMenu["oL"].Cast<Slider>().CurrentValue
+                && Player.Instance.HealthPercent <= OffMenu["oL"].Cast<Slider>().CurrentValue
                 && OffMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
             {
                 Botrk.Cast(target);
@@ -58,6 +105,13 @@
 
             if (Cutlass.IsReady() && Cutlass.IsOwned(Player.Instance) && target.IsValidTarget(Cutlass.Range)
                 && target.HealthPercent <= OffMenu["eL"].Cast<Slider>().CurrentValue
+                && OffMenu["UseBilge"].Cast<CheckBox>().CurrentValue)
+            {
+                Cutlass.Cast(target);
+            }
+
+            if (Cutlass.IsReady() && Cutlass.IsOwned(Player.Instance) && target.IsValidTarget(Cutlass.Range)
+                && Player.Instance.HealthPercent <= OffMenu["oL"].Cast<Slider>().CurrentValue
                 && OffMenu["UseBilge"].Cast<CheckBox>().CurrentValue)
             {
                 Cutlass.Cast(target);

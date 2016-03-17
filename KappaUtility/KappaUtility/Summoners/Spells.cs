@@ -26,7 +26,7 @@
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Obj_AI_Base.OnBasicAttack += OnBasicAttack;
             Game.OnUpdate += Game_OnUpdate;
-            
+
             SummMenu = Load.UtliMenu.AddSubMenu("Summoner Spells");
             SummMenu.AddGroupLabel("Summoners Settings");
 
@@ -80,7 +80,7 @@
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerExhaust")) != null)
             {
                 SummMenu.AddGroupLabel("Exhaust Settings");
-                SummMenu.Add("exhaust", new CheckBox("Exhaust"));
+                SummMenu.Add("Exhaust", new CheckBox("Exhaust"));
                 SummMenu.Add("exhaustally", new Slider("Use When Ally/Self Health %", 35, 0, 100));
                 SummMenu.Add("exhaustenemy", new Slider("Use When Enemy Health %", 40, 0, 100));
                 SummMenu.AddGroupLabel("Don't Use Exhaust On:");
@@ -129,18 +129,46 @@
 
         private static void Game_OnUpdate(System.EventArgs args)
         {
+            var target =
+                ObjectManager.Get<AIHeroClient>()
+                    .FirstOrDefault(enemy => enemy.IsValid && enemy.IsEnemy && enemy.IsVisible);
+
+            var ally = ObjectManager.Get<AIHeroClient>().FirstOrDefault(a => a.IsValid && a.IsAlly && a.IsVisible);
+
             if (Ignite != null)
             {
                 var ignitec = SummMenu["ignite"].Cast<CheckBox>().CurrentValue && Ignite.IsReady();
-                var target = ObjectManager.Get<AIHeroClient>()
-                        .FirstOrDefault(
-                            enemy => enemy.IsValid && enemy.IsEnemy && enemy.IsVisible);
 
-                if (ignitec && target != null && Player.Instance.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite) >= target.TotalShieldHealth() + (target.HPRegenRate * 4))
+                if (ignitec && target != null
+                    && Player.Instance.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
+                    >= target.TotalShieldHealth() + (target.HPRegenRate * 4))
                 {
-                    if (target.IsValidTarget(Ignite.Range) && !target.IsDead && !SummMenu["DontIgnite" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    if (target.IsValidTarget(Ignite.Range) && !target.IsDead
+                        && !SummMenu["DontIgnite" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                     {
                         Ignite.Cast(target);
+                    }
+                }
+            }
+
+            if (Exhaust != null)
+            {
+                var exhaustc = SummMenu["Exhaust"].Cast<CheckBox>().CurrentValue && Exhaust.IsReady();
+                var Exhaustally = SummMenu["exhaustally"].Cast<Slider>().CurrentValue;
+                var Exhaustenemy = SummMenu["exhaustenemy"].Cast<Slider>().CurrentValue;
+
+                if (exhaustc && target != null
+                    && (target.IsValidTarget(Exhaust.Range)
+                        && !SummMenu["DontExhaust" + target.BaseSkinName].Cast<CheckBox>().CurrentValue))
+                {
+                    if (target.TotalShieldHealth() <= Exhaustenemy)
+                    {
+                        Exhaust.Cast(target);
+                    }
+
+                    if (ally.TotalShieldHealth() <= Exhaustally)
+                    {
+                        Exhaust.Cast(target);
                     }
                 }
             }
@@ -166,7 +194,6 @@
             {
                 if (Exhaust != null && !SummMenu["DontExhaust" + caster.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
-                    
                 }
 
                 if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
@@ -183,7 +210,7 @@
                             }
 
                             if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
-                            { 
+                            {
                                 Heal.Cast();
                             }
                         }
@@ -238,7 +265,6 @@
             {
                 return;
             }
-
 
             var caster = sender;
             var target = (AIHeroClient)args.Target;
