@@ -21,7 +21,7 @@
                         .Where(
                             jmob =>
                             !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsHPBarRendered && jmob.IsMonster
-                            && jmob.IsValid && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie
+                            && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie
                             && ((Spells.SummMenu["drake"].Cast<CheckBox>().CurrentValue
                                  && jmob.BaseSkinName == "SRU_Dragon")
                                 || (Spells.SummMenu["baron"].Cast<CheckBox>().CurrentValue

@@ -8,8 +8,11 @@ namespace KappaUtility.Trackers
 {
     using EloBuddy;
     using EloBuddy.SDK;
+    using EloBuddy.SDK.Enumerations;
+    using EloBuddy.SDK.Events;
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
+    using EloBuddy.SDK.Notifications;
 
     internal class Tracker
     {
@@ -20,9 +23,37 @@ namespace KappaUtility.Trackers
             TrackMenu = Load.UtliMenu.AddSubMenu("Tracker");
             TrackMenu.AddGroupLabel("Tracker Settings");
             TrackMenu.Add("Track", new CheckBox("Track Enemies"));
+            TrackMenu.Add("Trackrecall", new CheckBox("Track Enemies Recall"));
             TrackMenu.Add("trackx", new Slider("Tracker Position X", 0, 0, 100));
             TrackMenu.Add("tracky", new Slider("Tracker Position Y", 0, 0, 100));
             Drawing.OnDraw += OnDraw;
+            Teleport.OnTeleport += OnTeleport;
+        }
+
+        private static void OnTeleport(Obj_AI_Base sender, Teleport.TeleportEventArgs args)
+        {
+            if (sender.IsAlly || sender.IsMe)
+            {
+                return;
+            }
+
+            if (TrackMenu["Trackrecall"].Cast<CheckBox>().CurrentValue)
+            {
+                if (args.Status == TeleportStatus.Start)
+                {
+                    Notifications.Show(new SimpleNotification(sender.BaseSkinName + " Is Recalling", "KappaTracker"));
+                }
+
+                if (args.Status == TeleportStatus.Abort)
+                {
+                    Notifications.Show(new SimpleNotification(sender.BaseSkinName + " Recall Aborted", "KappaTracker"));
+                }
+
+                if (args.Status == TeleportStatus.Finish)
+                {
+                    Notifications.Show(new SimpleNotification(sender.BaseSkinName + " Recall Finished", "KappaTracker"));
+                }
+            }
         }
 
         private static void OnDraw(EventArgs args)
@@ -32,10 +63,9 @@ namespace KappaUtility.Trackers
                 var trackx = TrackMenu["trackx"].Cast<Slider>().CurrentValue;
                 var tracky = TrackMenu["tracky"].Cast<Slider>().CurrentValue;
                 float i = 0;
-                foreach (
-                    var hero in
-                        EntityManager.Heroes.Enemies.Where(
-                            hero => hero != null && hero.IsEnemy && !hero.IsMe && !hero.IsDead))
+                foreach (var hero in
+                    EntityManager.Heroes.Enemies.Where(
+                        hero => hero != null && hero.IsEnemy && !hero.IsMe && !hero.IsDead))
                 {
                     var champion = hero.ChampionName;
                     if (champion.Length > 12)
@@ -77,7 +107,7 @@ namespace KappaUtility.Trackers
                             (Drawing.Width * 0.13f) + (trackx * 20),
                             (Drawing.Height * 0.1f) + (tracky * 10) + i,
                             color,
-                            "   Visible ");
+                            "    Visible ");
                     }
                     else
                     {
@@ -85,7 +115,7 @@ namespace KappaUtility.Trackers
                             (Drawing.Width * 0.13f) + (trackx * 20),
                             (Drawing.Height * 0.1f) + (tracky * 10) + i,
                             color,
-                            "   Not Visible ");
+                            "    Not Visible ");
                     }
 
                     i += 20f;

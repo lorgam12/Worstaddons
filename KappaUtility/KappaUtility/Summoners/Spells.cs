@@ -161,12 +161,12 @@
                     && (target.IsValidTarget(Exhaust.Range)
                         && !SummMenu["DontExhaust" + target.BaseSkinName].Cast<CheckBox>().CurrentValue))
                 {
-                    if (target.TotalShieldHealth() <= Exhaustenemy)
+                    if (target.HealthPercent <= Exhaustenemy)
                     {
                         Exhaust.Cast(target);
                     }
 
-                    if (ally.TotalShieldHealth() <= Exhaustally)
+                    if (ally != null && ally.HealthPercent <= Exhaustally)
                     {
                         Exhaust.Cast(target);
                     }
@@ -176,8 +176,7 @@
 
         public static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender == null || sender.IsAlly || sender is Obj_AI_Minion || args.Target is Obj_AI_Minion
-                || args.Target == null || args.Target is Obj_AI_Turret)
+            if (!(args.Target is AIHeroClient))
             {
                 return;
             }
@@ -185,26 +184,46 @@
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if (!caster.IsEnemy || target == null)
+            if ((caster is AIHeroClient || caster is Obj_AI_Turret) && caster != null && target != null)
             {
-                return;
-            }
-
-            if (target.IsAlly && !target.IsMe)
-            {
-                if (Exhaust != null && !SummMenu["DontExhaust" + caster.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                if (target.IsAlly && !target.IsMe)
                 {
+                    if (Exhaust != null && !SummMenu["DontExhaust" + caster.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    {
+                    }
+
+                    if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    {
+                        var healc = SummMenu["Heal"].Cast<CheckBox>().CurrentValue && Heal.IsReady();
+                        var healally = SummMenu["Healally"].Cast<Slider>().CurrentValue;
+                        if (healc)
+                        {
+                            if (target.IsInRange(Player.Instance, Heal.Range))
+                            {
+                                Chat.Print(target.BaseSkinName + " hueb");
+                                if (target.HealthPercent <= healally)
+                                {
+                                    Heal.Cast();
+                                }
+
+                                if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
+                                {
+                                    Heal.Cast();
+                                }
+                            }
+                        }
+                    }
                 }
 
-                if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                if (target.IsMe)
                 {
-                    var healc = SummMenu["Heal"].Cast<CheckBox>().CurrentValue && Heal.IsReady();
-                    var healally = SummMenu["Healally"].Cast<Slider>().CurrentValue;
-                    if (healc)
+                    if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                     {
-                        if (target.IsValidTarget(Heal.Range))
+                        var healc = SummMenu["Heal"].Cast<CheckBox>().CurrentValue;
+                        var healme = SummMenu["Healme"].Cast<Slider>().CurrentValue;
+                        if (healc)
                         {
-                            if (target.TotalShieldHealth() <= healally)
+                            if (target.HealthPercent <= healme)
                             {
                                 Heal.Cast();
                             }
@@ -215,43 +234,22 @@
                             }
                         }
                     }
-                }
-            }
 
-            if (target.IsMe)
-            {
-                if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                {
-                    var healc = SummMenu["Heal"].Cast<CheckBox>().CurrentValue && Heal.IsReady();
-                    var healme = SummMenu["Healme"].Cast<Slider>().CurrentValue;
-                    if (healc)
+                    if (Barrier != null)
                     {
-                        if (target.TotalShieldHealth() <= healme)
+                        var barrierc = SummMenu["barrier"].Cast<CheckBox>().CurrentValue && Barrier.IsReady();
+                        var barrierme = SummMenu["barrierme"].Cast<Slider>().CurrentValue;
+                        if (barrierc)
                         {
-                            Heal.Cast();
-                        }
+                            if (target.HealthPercent <= barrierme)
+                            {
+                                Barrier.Cast();
+                            }
 
-                        if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
-                        {
-                            Heal.Cast();
-                        }
-                    }
-                }
-
-                if (Barrier != null)
-                {
-                    var barrierc = SummMenu["barrier"].Cast<CheckBox>().CurrentValue && Barrier.IsReady();
-                    var barrierme = SummMenu["barrierme"].Cast<Slider>().CurrentValue;
-                    if (barrierc)
-                    {
-                        if (target.TotalShieldHealth() <= barrierme)
-                        {
-                            Barrier.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
-                        {
-                            Barrier.Cast();
+                            if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
+                            {
+                                Barrier.Cast();
+                            }
                         }
                     }
                 }
@@ -260,8 +258,7 @@
 
         public static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsAlly || !args.Target.IsValid || args.Target.IsEnemy || sender is Obj_AI_Minion
-                || args.Target is Obj_AI_Minion || args.Target == null || args.Target is Obj_AI_Turret)
+            if (!(args.Target is AIHeroClient))
             {
                 return;
             }
@@ -269,72 +266,71 @@
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if (!caster.IsEnemy || target == null)
+            if ((caster is AIHeroClient || caster is Obj_AI_Turret) && caster != null && target != null)
             {
-                return;
-            }
-
-            if (target.IsAlly && !target.IsMe)
-            {
-                if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                if (target.IsAlly && !target.IsMe)
                 {
-                    var healc = SummMenu["Heal"].Cast<CheckBox>().CurrentValue && Heal.IsReady();
-                    var healally = SummMenu["Healally"].Cast<Slider>().CurrentValue;
-                    if (healc)
+                    if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                     {
-                        if (target.IsValidTarget(Heal.Range))
+                        var healc = SummMenu["Heal"].Cast<CheckBox>().CurrentValue && Heal.IsReady();
+                        var healally = SummMenu["Healally"].Cast<Slider>().CurrentValue;
+                        if (healc)
                         {
-                            if (target.TotalShieldHealth() <= healally)
+                            Chat.Print(target.BaseSkinName);
+                            if (target.IsInRange(Player.Instance, Heal.Range))
+                            {
+                                if (target.HealthPercent <= healally)
+                                {
+                                    Heal.Cast();
+                                }
+
+                                if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                                    || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                                {
+                                    Heal.Cast();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (target.IsMe)
+                {
+                    if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    {
+                        var healc = SummMenu["Heal"].Cast<CheckBox>().CurrentValue && Heal.IsReady();
+                        var healme = SummMenu["Healme"].Cast<Slider>().CurrentValue;
+                        if (healc)
+                        {
+                            if (target.HealthPercent <= healme)
+                            {
+                                Heal.Cast();
+                            }
+
+                            if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                                || caster.BaseAbilityDamage > target.TotalShieldHealth())
                             {
                                 Heal.Cast();
                             }
                         }
-
-                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                        {
-                            Heal.Cast();
-                        }
                     }
-                }
-            }
 
-            if (target.IsMe)
-            {
-                if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                {
-                    var healc = SummMenu["Heal"].Cast<CheckBox>().CurrentValue && Heal.IsReady();
-                    var healme = SummMenu["Healme"].Cast<Slider>().CurrentValue;
-                    if (healc)
+                    if (Barrier != null)
                     {
-                        if (target.TotalShieldHealth() <= healme)
+                        var barrierc = SummMenu["barrier"].Cast<CheckBox>().CurrentValue && Barrier.IsReady();
+                        var barrierme = SummMenu["barrierme"].Cast<Slider>().CurrentValue;
+                        if (barrierc)
                         {
-                            Heal.Cast();
-                        }
+                            if (target.HealthPercent <= barrierme)
+                            {
+                                Barrier.Cast();
+                            }
 
-                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                        {
-                            Heal.Cast();
-                        }
-                    }
-                }
-
-                if (Barrier != null)
-                {
-                    var barrierc = SummMenu["barrier"].Cast<CheckBox>().CurrentValue && Barrier.IsReady();
-                    var barrierme = SummMenu["barrierme"].Cast<Slider>().CurrentValue;
-                    if (barrierc)
-                    {
-                        if (target.TotalShieldHealth() <= barrierme)
-                        {
-                            Barrier.Cast();
-                        }
-
-                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                        {
-                            Barrier.Cast();
+                            if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                                || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                            {
+                                Barrier.Cast();
+                            }
                         }
                     }
                 }

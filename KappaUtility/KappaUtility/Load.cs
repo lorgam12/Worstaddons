@@ -45,17 +45,12 @@
                 Offensive.Items();
                 Defensive.Items();
             }
+
             Smite.Smiteopepi();
         }
 
         public static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsAlly || !args.Target.IsValid || args.Target.IsEnemy || sender is Obj_AI_Minion
-                || args.Target is Obj_AI_Minion || args.Target == null || args.Target is Obj_AI_Turret)
-            {
-                return;
-            }
-
             var Seraph = Defensive.Seraph;
             var Solari = Defensive.Solari;
             var FOTM = Defensive.FOTM;
@@ -101,10 +96,15 @@
                            && Zhonyas.IsReady();
             var Zhonyash = Defensive.DefMenu["Zhonyash"].Cast<Slider>().CurrentValue;
 
+            if (!(args.Target is AIHeroClient))
+            {
+                return;
+            }
+
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if (!target.IsAlly || !target.IsMe || !caster.IsEnemy || target.IsEnemy || target.IsMinion)
+            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null || target == null)
             {
                 return;
             }
@@ -232,12 +232,6 @@
 
         public static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsAlly || !args.Target.IsValid || args.Target.IsEnemy || sender is Obj_AI_Minion
-                || args.Target is Obj_AI_Minion || args.Target == null || args.Target is Obj_AI_Turret)
-            {
-                return;
-            }
-
             var Corrupting = Potions.Corrupting;
             var Health = Potions.Health;
             var Hunters = Potions.Hunters;
@@ -282,139 +276,142 @@
                            && Zhonyas.IsReady();
             var Zhonyash = Defensive.DefMenu["Zhonyash"].Cast<Slider>().CurrentValue;
 
-            var caster = sender;
-            var target = (AIHeroClient)args.Target;
-
-            if (!target.IsAlly || !target.IsMe || !caster.IsEnemy || target.IsEnemy || target.IsMinion)
+            if (!(args.Target is AIHeroClient))
             {
                 return;
             }
 
-            if (target.IsValidTarget(FOTM.Range))
+            var caster = sender;
+            var target = (AIHeroClient)args.Target;
+
+            if ((caster is AIHeroClient || caster is Obj_AI_Turret) && caster != null && target != null)
             {
-                if (FaceOfTheMountainc && target.HealthPercent < FaceOfTheMountainh)
+                if (target.IsValidTarget(FOTM.Range))
                 {
-                    FOTM.Cast(target);
-                }
-
-                if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                    || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                {
-                    FOTM.Cast(target);
-                }
-            }
-
-            if (target.IsValidTarget(Solari.Range) && Solaric)
-            {
-                if (target.HealthPercent < Solarih)
-                {
-                    Solari.Cast();
-                }
-
-                if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                    || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                {
-                    Solari.Cast();
-                }
-            }
-
-            if (target.IsMe)
-            {
-                if (Refillablec)
-                {
-                    if (target.HealthPercent < Refillableh)
+                    if (FaceOfTheMountainc && target.HealthPercent < FaceOfTheMountainh)
                     {
-                        Refillable.Cast();
+                        FOTM.Cast(target);
                     }
 
                     if (caster.BaseAttackDamage > target.TotalShieldHealth()
                         || caster.BaseAbilityDamage > target.TotalShieldHealth())
                     {
-                        Refillable.Cast();
+                        FOTM.Cast(target);
                     }
                 }
 
-                if (Healthc)
+                if (target.IsValidTarget(Solari.Range) && Solaric)
                 {
-                    if (target.HealthPercent < Healthh)
+                    if (target.HealthPercent < Solarih)
                     {
-                        Health.Cast();
+                        Solari.Cast();
                     }
 
                     if (caster.BaseAttackDamage > target.TotalShieldHealth()
                         || caster.BaseAbilityDamage > target.TotalShieldHealth())
                     {
-                        Health.Cast();
+                        Solari.Cast();
                     }
                 }
 
-                if (Huntersc)
+                if (target.IsMe)
                 {
-                    if (target.HealthPercent < Huntersh)
+                    if (Refillablec)
                     {
-                        Hunters.Cast();
+                        if (target.HealthPercent < Refillableh)
+                        {
+                            Refillable.Cast();
+                        }
+
+                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                        {
+                            Refillable.Cast();
+                        }
                     }
 
-                    if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                        || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                    if (Healthc)
                     {
-                        Hunters.Cast();
-                    }
-                }
+                        if (target.HealthPercent < Healthh)
+                        {
+                            Health.Cast();
+                        }
 
-                if (Biscuitc)
-                {
-                    if (target.HealthPercent < Biscuith)
-                    {
-                        Biscuit.Cast();
-                    }
-
-                    if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                        || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                    {
-                        Biscuit.Cast();
-                    }
-                }
-
-                if (Corruptingc)
-                {
-                    if (target.HealthPercent < Corruptingh)
-                    {
-                        Corrupting.Cast();
+                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                        {
+                            Health.Cast();
+                        }
                     }
 
-                    if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                        || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                    if (Huntersc)
                     {
-                        Corrupting.Cast();
-                    }
-                }
+                        if (target.HealthPercent < Huntersh)
+                        {
+                            Hunters.Cast();
+                        }
 
-                if (Seraphc)
-                {
-                    if (target.HealthPercent < Seraphh)
-                    {
-                        Seraph.Cast();
-                    }
-
-                    if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                        || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                    {
-                        Seraph.Cast();
-                    }
-                }
-
-                if (Zhonyasc)
-                {
-                    if (target.HealthPercent < Zhonyash)
-                    {
-                        Zhonyas.Cast();
+                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                        {
+                            Hunters.Cast();
+                        }
                     }
 
-                    if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                        || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                    if (Biscuitc)
                     {
-                        Zhonyas.Cast();
+                        if (target.HealthPercent < Biscuith)
+                        {
+                            Biscuit.Cast();
+                        }
+
+                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                        {
+                            Biscuit.Cast();
+                        }
+                    }
+
+                    if (Corruptingc)
+                    {
+                        if (target.HealthPercent < Corruptingh)
+                        {
+                            Corrupting.Cast();
+                        }
+
+                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                        {
+                            Corrupting.Cast();
+                        }
+                    }
+
+                    if (Seraphc)
+                    {
+                        if (target.HealthPercent < Seraphh)
+                        {
+                            Seraph.Cast();
+                        }
+
+                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                        {
+                            Seraph.Cast();
+                        }
+                    }
+
+                    if (Zhonyasc)
+                    {
+                        if (target.HealthPercent < Zhonyash)
+                        {
+                            Zhonyas.Cast();
+                        }
+
+                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                        {
+                            Zhonyas.Cast();
+                        }
                     }
                 }
             }
