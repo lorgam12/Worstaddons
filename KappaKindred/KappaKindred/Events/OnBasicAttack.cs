@@ -30,9 +30,9 @@
                 return;
             }
 
-            if (target.IsValidTarget(Spells.R.Range))
+            if (target.IsValidTarget(Spells.R.Range) && Rally)
             {
-                if (Rally && target.HealthPercent <= Rallyh)
+                if (target.HealthPercent <= Rallyh)
                 {
                     Spells.R.Cast(target);
                 }
