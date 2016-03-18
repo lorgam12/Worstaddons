@@ -17,6 +17,10 @@
 
     internal class Tracker
     {
+        private static Vector2 PingLocation;
+
+        private static int LastPingT = 0;
+
         public static Menu TrackMenu { get; private set; }
 
         internal static void OnLoad()
@@ -25,13 +29,52 @@
             TrackMenu.AddGroupLabel("Tracker Settings");
             TrackMenu.Add("Trackrecall", new CheckBox("Track Enemies Recall"));
             TrackMenu.Add("Tracktraps", new CheckBox("Track Enemy Traps [BETA]"));
+            TrackMenu.Add("Trackping", new CheckBox("Ping On Killable Enemies (Local)"));
             TrackMenu.AddSeparator();
             TrackMenu.Add("Track", new CheckBox("Track Enemies"));
             TrackMenu.Add("trackx", new Slider("Tracker Position X", 0, 0, 100));
             TrackMenu.Add("tracky", new Slider("Tracker Position Y", 0, 0, 100));
+
             Drawing.OnDraw += OnDraw;
             Drawing.OnEndScene += Drawing_OnEndScene;
             Teleport.OnTeleport += OnTeleport;
+            Game.OnUpdate += Game_OnUpdate;
+        }
+
+        private static void Game_OnUpdate(EventArgs args)
+        {
+            foreach (var enemy in
+                ObjectManager.Get<AIHeroClient>()
+                    .Where(
+                        ene =>
+                        ene != null && !ene.IsDead && ene.IsEnemy && ene.IsVisible && ene.IsValid && ene.IsHPBarRendered)
+                    .Where(enemy => DamageInd.CalcDamage(enemy) >= enemy.TotalShieldHealth()))
+            {
+                if (TrackMenu.Get<CheckBox>("Trackping").CurrentValue)
+                {
+                    Ping(enemy.Position.To2D());
+                }
+            }
+        }
+
+        private static void Ping(Vector2 position)
+        {
+            if (Environment.TickCount - LastPingT < 30 * 1000)
+            {
+                return;
+            }
+
+            LastPingT = Environment.TickCount;
+            PingLocation = position;
+            SimplePing();
+            Core.DelayAction(SimplePing, 150);
+            Core.DelayAction(SimplePing, 250);
+            Core.DelayAction(SimplePing, 350);
+        }
+
+        private static void SimplePing()
+        {
+            TacticalMap.ShowPing(PingCategory.Danger, PingLocation);
         }
 
         private static void Drawing_OnEndScene(EventArgs args)

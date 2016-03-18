@@ -10,55 +10,56 @@
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
     using EloBuddy.SDK.Rendering;
+
     using SharpDX;
-    
+
     internal class Program
     {
         private const string ChampionName = "Lulu";
-        
+
         private static AIHeroClient Player;
-        
+
         public static Menu Config;
-        
+
         public static Spell.Skillshot Q { get; private set; }
-        
+
         public static Spell.Skillshot Q2 { get; private set; }
-        
+
         public static Spell.Targeted W { get; private set; }
-        
+
         public static Spell.Targeted E { get; private set; }
-        
+
         public static Spell.Targeted R { get; private set; }
-        
+
         public static Menu UltMenu { get; private set; }
 
         public static Menu ComboMenu { get; private set; }
-        
+
         public static Menu HarassMenu { get; private set; }
-        
+
         public static Menu LaneMenu { get; private set; }
 
         public static Menu FleeMenu { get; private set; }
 
         public static Menu KillStealMenu { get; private set; }
-        
+
         public static Menu MiscMenu { get; private set; }
-        
+
         public static Menu ItemsMenu { get; private set; }
-        
+
         public static Menu DrawMenu { get; private set; }
-        
+
         public static Menu Saver { get; private set; }
-        
+
         public static Menu menuIni;
-        
+
         public static SpellSlot IgniteSlot;
-        
+
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += GameOnOnStart;
         }
-        
+
         private static void GameOnOnStart(EventArgs args)
         {
             Player = ObjectManager.Player;
@@ -88,7 +89,6 @@
             menuIni.Add("Saver", new CheckBox("Use Saver?"));
             menuIni.Add("Drawings", new CheckBox("Use Drawings?"));
 
-
             ComboMenu = menuIni.AddSubMenu("Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.Add("Q", new CheckBox("Use Q"));
@@ -97,13 +97,11 @@
             ComboMenu.Add("Wkite", new CheckBox("Use W to Kite"));
             ComboMenu.Add("WkiteD", new Slider("W Kite distance", 300, 0, 500));
 
-
             HarassMenu = menuIni.AddSubMenu("Harass");
             HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("Q", new CheckBox("Use Q"));
             HarassMenu.Add("E", new CheckBox("Use E"));
             HarassMenu.Add("harassmana", new Slider("Harass Mana Manager", 60, 0, 100));
-
 
             LaneMenu = menuIni.AddSubMenu("Farm");
             LaneMenu.AddGroupLabel("LaneCelar Settings");
@@ -114,7 +112,6 @@
             LaneMenu.Add("QJ", new CheckBox("Use Q"));
             LaneMenu.Add("EJ", new CheckBox("Use E"));
 
-
             FleeMenu = menuIni.AddSubMenu("Flee");
             FleeMenu.AddGroupLabel("Flee Settings");
             FleeMenu.Add("Q", new CheckBox("Use Q"));
@@ -123,12 +120,10 @@
             FleeMenu.Add("WkiteD", new Slider("W Kite distance", 300, 0, 500));
             FleeMenu.Add("fleemana", new Slider("Flee Mana Manager", 60, 0, 100));
 
-
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.AddGroupLabel("Misc Settings");
             MiscMenu.Add("AutoE", new CheckBox("KS Enemy with E"));
             MiscMenu.Add("Support", new CheckBox("Support Mode", false));
-
 
             Saver = menuIni.AddSubMenu("Saver");
             Saver.AddGroupLabel("Saver Settings");
@@ -163,21 +158,18 @@
             DrawMenu.Add("R", new CheckBox("Draw R"));
             DrawMenu.Add("PixP", new CheckBox("Draw Pix Position"));
 
-
             Drawing.OnDraw += OnDraw;
             Game.OnUpdate += Game_OnUpdate;
             Interrupter.OnInterruptableSpell += Interrupter2_OnInterruptableTarget;
             Gapcloser.OnGapcloser += OnGapClose;
             Orbwalker.OnPreAttack += OnBeforeAttack;
-            AttackableUnit.OnDamage += OnDamage;
             Obj_AI_Base.OnBasicAttack += OnBasicAttack;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
         }
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!sender.IsValid && !E.IsReady() || !E.IsInRange(sender) || sender.IsAlly || !args.Target.IsValid
-                || args.Target.IsEnemy || sender is Obj_AI_Minion)
+            if (!(args.Target is AIHeroClient))
             {
                 return;
             }
@@ -185,35 +177,50 @@
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if (!target.IsAlly || !target.IsMe || !caster.IsEnemy)
+            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null || target == null)
             {
                 return;
             }
 
-            if (menuIni.Get<CheckBox>("Saver").CurrentValue)
+            if (target.IsAlly || target.IsMe)
             {
-                if (Saver.Get<CheckBox>("AutoES").CurrentValue)
+                if (menuIni.Get<CheckBox>("Saver").CurrentValue)
                 {
-                    if (target.IsValidTarget(E.Range) && !target.IsDead
-                        && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    if (Saver.Get<CheckBox>("AutoES").CurrentValue)
                     {
-                        var c = target.CountEnemiesInRange(750);
-                        if (target.HealthPercent <= 25 && (c >= 1 || target.IsUnderEnemyturret()))
+                        if (target.IsValidTarget(E.Range) && !target.IsDead
+                            && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
-                            E.Cast(target);
+                            var c = target.CountEnemiesInRange(750);
+                            if (target.HealthPercent <= 25 && (c >= 1 || target.IsUnderEnemyturret()))
+                            {
+                                E.Cast(target);
+                            }
+
+                            if (target.HealthPercent <= 15 || caster.GetAutoAttackDamage(target) > Game.Time / 9
+                                || caster.BaseAbilityDamage > Game.Time / 10 || caster.BaseAttackDamage > Game.Time / 9)
+                            {
+                                E.Cast(target);
+                            }
                         }
                     }
-                }
 
-                if (Saver.Get<CheckBox>("AutoR").CurrentValue)
-                {
-                    if (target.IsValidTarget(R.Range) && target != null
-                        && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    if (Saver.Get<CheckBox>("AutoR").CurrentValue)
                     {
-                        var c = target.CountEnemiesInRange(300);
-                        if (c >= 1 + 1 + 1 || target.HealthPercent <= 20 && c >= 1)
+                        if (target.IsValidTarget(R.Range) && target != null
+                            && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
-                            R.Cast(target);
+                            var c = target.CountEnemiesInRange(300);
+                            if (c >= 1 + 1 + 1 || target.HealthPercent <= 20 && c >= 1)
+                            {
+                                R.Cast(target);
+                            }
+
+                            if (target.HealthPercent <= 15 || caster.GetAutoAttackDamage(target) > target.Health
+                                || caster.BaseAbilityDamage > target.Health || caster.BaseAttackDamage > target.Health)
+                            {
+                                R.Cast(target);
+                            }
                         }
                     }
                 }
@@ -222,8 +229,7 @@
 
         private static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!sender.IsValid && !E.IsReady() || !E.IsInRange(sender) || sender.IsAlly || !args.Target.IsValid
-                || args.Target.IsEnemy || sender is Obj_AI_Minion)
+            if (!(args.Target is AIHeroClient))
             {
                 return;
             }
@@ -231,93 +237,49 @@
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if (!target.IsAlly || !target.IsMe || !caster.IsEnemy)
+            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null || target == null)
             {
                 return;
             }
 
-            if (menuIni.Get<CheckBox>("Saver").CurrentValue)
-            {
-                if (Saver.Get<CheckBox>("AutoES").CurrentValue)
-                {
-                    if (target.IsValidTarget(E.Range) && !target.IsDead
-                        && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                    {
-                        var c = target.CountEnemiesInRange(600);
-                        if (target.HealthPercent <= 25 && (c >= 1 || target.IsUnderEnemyturret()))
-                        {
-                            E.Cast(target);
-                        }
-                    }
-                }
-
-                if (Saver.Get<CheckBox>("AutoR").CurrentValue)
-                {
-                    if (target.IsValidTarget(R.Range) && target != null
-                        && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                    {
-                        var c = target.CountEnemiesInRange(300);
-                        if (c >= 1 + 1 + 1 || target.HealthPercent <= 20 && c >= 1)
-                        {
-                            R.Cast(target);
-                        }
-                    }
-                }
-            }
-        }
-
-        public static void OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
-        {
-            if (sender == null || sender.IsAlly || sender.IsMe)
-            {
-                return;
-            }
-
-            if (sender.IsEnemy || sender is Obj_AI_Turret)
+            if (target.IsAlly || target.IsMe)
             {
                 if (menuIni.Get<CheckBox>("Saver").CurrentValue)
                 {
                     if (Saver.Get<CheckBox>("AutoES").CurrentValue)
                     {
-                        foreach (var ally in EntityManager.Heroes.Allies)
+                        if (target.IsValidTarget(E.Range) && !target.IsDead
+                            && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
-                            if (ally.IsValidTarget(E.Range)
-                                && !ally.IsDead
-                                && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                            var c = target.CountEnemiesInRange(600);
+                            if (target.HealthPercent <= 25 && (c >= 1 || target.IsUnderEnemyturret()))
                             {
-                                var c = ally.CountEnemiesInRange(600);
-                                if (ally.HealthPercent <= 15 && (c >= 1 || ally.IsUnderEnemyturret()))
-                                {
-                                    E.Cast(ally);
-                                }
+                                E.Cast(target);
+                            }
+
+                            if (target.HealthPercent <= 15 || caster.GetAutoAttackDamage(target) > Game.Time / 9
+                                || caster.BaseAbilityDamage > Game.Time / 10 || caster.BaseAttackDamage > Game.Time / 9)
+                            {
+                                E.Cast(target);
                             }
                         }
                     }
 
                     if (Saver.Get<CheckBox>("AutoR").CurrentValue)
                     {
-                        foreach (var ally in EntityManager.Heroes.Allies)
+                        if (target.IsValidTarget(R.Range) && target != null
+                            && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
-                            if (ally.IsValidTarget(R.Range) && ally != null
-                                && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                            var c = target.CountEnemiesInRange(300);
+                            if (c >= 1 + 1 + 1 || target.HealthPercent <= 20 && c >= 1)
                             {
-                                var c = ally.CountEnemiesInRange(300);
-                                if (c >= 1 + 1 + 1 || ally.HealthPercent <= 20 && c >= 1)
-                                {
-                                    R.Cast(ally);
-                                }
+                                R.Cast(target);
                             }
-                        }
-
-                        var ec = Player.CountEnemiesInRange(300);
-                        if ((ec >= 1 + 1 + 1 || Player.HealthPercent <= 25 && ec >= 1) && Player != null)
-                        {
-                            R.Cast(Player);
-                        }
-
-                        if (ObjectManager.Player.HealthPercent <= 15)
-                        {
-                            R.Cast(Player);
+                            if (target.HealthPercent <= 15 || caster.GetAutoAttackDamage(target) > target.Health
+                                || caster.BaseAbilityDamage > target.Health || caster.BaseAttackDamage > target.Health)
+                            {
+                                R.Cast(target);
+                            }
                         }
                     }
                 }
@@ -338,7 +300,7 @@
                 }
             }
         }
-        
+
         private static void OnGapClose(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
             if (!menuIni.Get<CheckBox>("Saver").CurrentValue || Sender == null)
@@ -379,9 +341,9 @@
                 }
             }
         }
-        
+
         private static void Interrupter2_OnInterruptableTarget(
-            Obj_AI_Base sender, 
+            Obj_AI_Base sender,
             Interrupter.InterruptableSpellEventArgs args)
         {
             if (!menuIni.Get<CheckBox>("Saver").CurrentValue)
@@ -426,7 +388,7 @@
                 }
             }
         }
-        
+
         private static void Game_OnUpdate(EventArgs args)
         {
             var flags = Orbwalker.ActiveModesFlags;
@@ -458,7 +420,6 @@
                     JungleFarm();
                 }
             }
-
 
             if (ObjectManager.Player.ManaPercent > FleeMenu["fleemana"].Cast<Slider>().CurrentValue)
             {
@@ -498,14 +459,9 @@
                 {
                     R.Cast(Player);
                 }
-
-                if (ObjectManager.Player.HealthPercent <= 10 && Player.CountEnemiesInRange(1000) >= 1)
-                {
-                    R.Cast(Player);
-                }
             }
         }
-        
+
         private static void ShootQ(bool useE = true)
         {
             if (!Q.IsReady())
@@ -588,7 +544,6 @@
             }
         }
 
-
         private static void Flee()
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
@@ -634,7 +589,7 @@
                 var comboDamage = GetComboDamage(eTarget);
             }
         }
-        
+
         private static void Combo()
         {
             if (ComboMenu["Q"].Cast<CheckBox>().CurrentValue)
@@ -672,17 +627,17 @@
                 }
             }
         }
-        
+
         private static void Farm()
         {
             var useQ = LaneMenu["Q"].Cast<CheckBox>().CurrentValue;
             var useE = LaneMenu["E"].Cast<CheckBox>().CurrentValue;
 
             var allMinions = EntityManager.MinionsAndMonsters.Get(
-                EntityManager.MinionsAndMonsters.EntityType.Minion, 
-                EntityManager.UnitTeam.Enemy, 
-                ObjectManager.Player.Position, 
-                Q.Range, 
+                EntityManager.MinionsAndMonsters.EntityType.Minion,
+                EntityManager.UnitTeam.Enemy,
+                ObjectManager.Player.Position,
+                Q.Range,
                 false);
             if (allMinions == null)
             {
@@ -709,18 +664,17 @@
 
             if (useE)
             {
-                foreach (
-                    var minion in
-                        allMinions.Where(
-                            m =>
-                            m.BaseSkinName.EndsWith("MinionSiege")
-                            && Player.GetSpellDamage(m, SpellSlot.E) > m.TotalShieldHealth()))
+                foreach (var minion in
+                    allMinions.Where(
+                        m =>
+                        m.BaseSkinName.EndsWith("MinionSiege")
+                        && Player.GetSpellDamage(m, SpellSlot.E) > m.TotalShieldHealth()))
                 {
                     E.Cast(minion);
                 }
             }
         }
-        
+
         private static void JungleFarm()
         {
             var useQ = LaneMenu["QJ"].Cast<CheckBox>().CurrentValue;
@@ -742,7 +696,7 @@
                 }
             }
         }
-        
+
         private static void ImABitch()
         {
             foreach (var enemy in
@@ -754,7 +708,7 @@
                 E.Cast(enemy);
             }
         }
-        
+
         public static float GetComboDamage(AIHeroClient target)
         {
             var result = 0f;
@@ -778,7 +732,7 @@
 
             return result;
         }
-        
+
         private static void OnDraw(EventArgs args)
         {
             if (!menuIni.Get<CheckBox>("Drawings").CurrentValue)

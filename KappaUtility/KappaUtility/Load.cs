@@ -14,6 +14,8 @@
 
     using Trackers;
 
+    using Misc;
+
     internal class Load
     {
         public static Menu UtliMenu;
@@ -28,6 +30,7 @@
             UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
             DamageInd.OnLoad();
             Tracker.OnLoad();
+            SkinHax.OnLoad();
             Spells.OnLoad();
             Potions.OnLoad();
             Offensive.OnLoad();

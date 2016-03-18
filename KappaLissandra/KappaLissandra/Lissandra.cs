@@ -145,7 +145,7 @@
             Q2 = new Spell.Skillshot(SpellSlot.Q, 825, SkillShotType.Linear, 250, 2200, 90);
             Qtest = new Spell.Skillshot(SpellSlot.Q, 715, SkillShotType.Linear, 250, 2200, 75)
                         { AllowedCollisionCount = int.MaxValue };
-            W = new Spell.Active(SpellSlot.W, 450);
+            W = new Spell.Active(SpellSlot.W, 425);
             E = new Spell.Skillshot(SpellSlot.E, 1000, SkillShotType.Linear, 250, 850, 125);
             R = new Spell.Targeted(SpellSlot.R, 400);
 
@@ -153,9 +153,81 @@
             GameObject.OnCreate += OnCreate;
             GameObject.OnDelete += OnDelete;
             Drawing.OnDraw += OnDraw;
-            AttackableUnit.OnDamage += OnDamage;
+            Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
+            Obj_AI_Base.OnBasicAttack += OnBasicAttack;
             Interrupter.OnInterruptableSpell += OnInterruptableSpell;
             Gapcloser.OnGapcloser += OnGapcloser;
+        }
+
+        public static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!(args.Target is AIHeroClient))
+            {
+                return;
+            }
+
+            var caster = sender;
+            var target = (AIHeroClient)args.Target;
+
+            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null || target == null)
+            {
+                return;
+            }
+            if (target.IsMe)
+            {
+                var shp = UltMenu["shp"].Cast<Slider>().CurrentValue;
+                var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
+                if (sender == null || sender.IsAlly || sender.IsMe)
+                {
+                    return;
+                }
+
+                if (sender.IsEnemy || sender is Obj_AI_Turret)
+                {
+                    if (useRS && Player.HealthPercent <= shp && !Player.HasBuff("kindredrnodeathbuff")
+                        && !Player.HasBuff("JudicatorIntervention") && !Player.HasBuff("ChronoShift")
+                        && !Player.HasBuff("UndyingRage"))
+                    {
+                        R.Cast(Player);
+                    }
+                }
+            }
+        }
+
+        public static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!(args.Target is AIHeroClient))
+            {
+                return;
+            }
+
+            var caster = sender;
+            var target = (AIHeroClient)args.Target;
+
+            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null || target == null)
+            {
+                return;
+            }
+
+            if (target.IsMe)
+            {
+                var shp = UltMenu["shp"].Cast<Slider>().CurrentValue;
+                var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
+                if (sender == null || sender.IsAlly || sender.IsMe)
+                {
+                    return;
+                }
+
+                if (sender.IsEnemy || sender is Obj_AI_Turret)
+                {
+                    if (useRS && Player.HealthPercent <= shp && !Player.HasBuff("kindredrnodeathbuff")
+                        && !Player.HasBuff("JudicatorIntervention") && !Player.HasBuff("ChronoShift")
+                        && !Player.HasBuff("UndyingRage"))
+                    {
+                        R.Cast(Player);
+                    }
+                }
+            }
         }
 
         private static void OnGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
@@ -165,7 +237,7 @@
                 return;
             }
 
-            if (W.IsReady() && sender.IsValidTarget(W.Range - 5) && MiscMenu.Get<CheckBox>("gapcloserW").CurrentValue)
+            if (W.IsReady() && sender.IsValidTarget(W.Range - 15) && MiscMenu.Get<CheckBox>("gapcloserW").CurrentValue)
             {
                 W.Cast();
                 return;
@@ -175,7 +247,6 @@
                 && !UltMenu["DontUltenemy" + sender.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 R.Cast(sender);
-                return;
             }
         }
 
@@ -191,26 +262,6 @@
                 && !UltMenu["DontUltenemy" + Sender.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 R.Cast(Sender);
-            }
-        }
-
-        public static void OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
-        {
-            var shp = UltMenu["shp"].Cast<Slider>().CurrentValue;
-            var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
-            if (sender == null || sender.IsAlly || sender.IsMe)
-            {
-                return;
-            }
-
-            if (sender.IsEnemy || sender is Obj_AI_Turret)
-            {
-                if (useRS && Player.HealthPercent <= shp && !Player.HasBuff("kindredrnodeathbuff")
-                    && !Player.HasBuff("JudicatorIntervention") && !Player.HasBuff("ChronoShift")
-                    && !Player.HasBuff("UndyingRage"))
-                {
-                    R.Cast(Player);
-                }
             }
         }
 
@@ -406,49 +457,28 @@
 
             if (useQ)
             {
-                foreach (var minion in allMinions)
+                var fl = EntityManager.MinionsAndMonsters.GetLineFarmLocation(allMinions, Q.Width, (int)Q.Range);
+                if (fl.HitNumber >= 1)
                 {
-                    allMinions.Any();
-                    {
-                        var fl = EntityManager.MinionsAndMonsters.GetLineFarmLocation(allMinions, Q.Width, (int)Q.Range);
-                        if (fl.HitNumber >= 1)
-                        {
-                            Q.Cast(fl.CastPosition);
-                        }
-                    }
+                    Q.Cast(fl.CastPosition);
                 }
-
-                Q.SourcePosition = Player.ServerPosition;
-                Q.RangeCheckSource = Player.ServerPosition;
             }
 
             if (useW)
             {
-                foreach (var minion in allMinions)
+                var fl = EntityManager.MinionsAndMonsters.GetLineFarmLocation(allMinions, 100, (int)W.Range);
+                if (fl.HitNumber >= 2)
                 {
-                    allMinions.Any();
-                    {
-                        var fl = EntityManager.MinionsAndMonsters.GetLineFarmLocation(allMinions, 100, (int)W.Range);
-                        if (fl.HitNumber >= 2)
-                        {
-                            W.Cast();
-                        }
-                    }
+                    W.Cast();
                 }
             }
 
             if (useE && LissEMissile == null && E.Handle.ToggleState == 1)
             {
-                foreach (var minion in allMinions)
+                var fl = EntityManager.MinionsAndMonsters.GetLineFarmLocation(allMinions, E.Width, (int)E.Range);
+                if (fl.HitNumber >= 1)
                 {
-                    allMinions.Any();
-                    {
-                        var fl = EntityManager.MinionsAndMonsters.GetLineFarmLocation(allMinions, E.Width, (int)E.Range);
-                        if (fl.HitNumber >= 1)
-                        {
-                            E.Cast(fl.CastPosition);
-                        }
-                    }
+                    E.Cast(fl.CastPosition);
                 }
             }
         }
@@ -544,7 +574,6 @@
             if (target != null && Vector3.Distance(target.ServerPosition, Player.ServerPosition) <= W.Range - 5)
             {
                 W.Cast();
-                return;
             }
 
             if (
@@ -597,7 +626,6 @@
         private static void CastR()
         {
             var aoeR = UltMenu["aoeR"].Cast<CheckBox>().CurrentValue;
-            var useRA = UltMenu["RA"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRS = UltMenu["RS"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRE = UltMenu["RE"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var useRF = UltMenu["RF"].Cast<CheckBox>().CurrentValue && R.IsReady();
@@ -607,7 +635,6 @@
                     e =>
                     !e.IsZombie && !e.IsInvulnerable && !e.IsDead && !e.HasBuff("kindredrnodeathbuff")
                     && !e.HasBuff("JudicatorIntervention") && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage"));
-            var ally = EntityManager.Heroes.Allies.FirstOrDefault(a => a.IsValidTarget(R.Range));
 
             if (target != null && useRE)
             {
@@ -719,7 +746,7 @@
                     Circle.Draw(Color.DarkBlue, W.Range, LissEMissile.Position);
                     Circle.Draw(Color.DarkBlue, W.Range, LissEMissile.EndPosition);
                 }
-                
+
                 if (Player != null)
                 {
                     var hpPosp = Player.HPBarPosition;

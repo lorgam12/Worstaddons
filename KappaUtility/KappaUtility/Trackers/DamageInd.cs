@@ -1,6 +1,7 @@
 ﻿namespace KappaUtility.Trackers
 {
     using System;
+    using System.Drawing;
     using System.Linq;
 
     using EloBuddy;
@@ -10,20 +11,31 @@
 
     internal class DamageInd
     {
+        private static readonly string[] notsupported = { "TahmKench", "Kindred", "Illaoi", "Jhin" };
+
         public static Menu DmgMenu { get; private set; }
 
         public static HpBarIndicator Hpi = new HpBarIndicator();
 
+        private static string champion;
+
         internal static void OnLoad()
         {
-            DmgMenu = Load.UtliMenu.AddSubMenu("Tracker");
-            DmgMenu.AddGroupLabel("Tracker Settings");
-            DmgMenu.Add("dmg", new CheckBox("Draw Damage Indicator"));
-            DmgMenu.Add("Q", new CheckBox("Draw Q Damage"));
-            DmgMenu.Add("W", new CheckBox("Draw W Damage"));
-            DmgMenu.Add("E", new CheckBox("Draw E Damage"));
-            DmgMenu.Add("R", new CheckBox("Draw R Damage"));
-            DmgMenu.Add("Killable", new CheckBox("Draw Killable"));
+            champion = Player.Instance.ChampionName;
+            DmgMenu = Load.UtliMenu.AddSubMenu("DamageIndicator");
+            DmgMenu.AddGroupLabel("Damage Indicator Settings");
+            if (notsupported.Contains(champion))
+            {
+                DmgMenu.AddLabel(champion + " Is Not Supported From The DamageLibrary :(");
+                return;
+            }
+
+            DmgMenu.Add(champion + "dmg", new CheckBox("Draw Damage Indicator"));
+            DmgMenu.Add(champion + "Q", new CheckBox("Draw Q Damage"));
+            DmgMenu.Add(champion + "W", new CheckBox("Draw W Damage"));
+            DmgMenu.Add(champion + "E", new CheckBox("Draw E Damage"));
+            DmgMenu.Add(champion + "R", new CheckBox("Draw R Damage"));
+            DmgMenu.Add(champion + "Killable", new CheckBox("Draw Killable"));
             DmgMenu.AddGroupLabel("Don't Draw On:");
             foreach (var enemy in ObjectManager.Get<AIHeroClient>())
             {
@@ -46,53 +58,53 @@
                         ene != null && !ene.IsDead && ene.IsEnemy && ene.IsVisible && ene.IsValid && ene.IsHPBarRendered
                         && !DmgMenu["DontDraw" + ene.BaseSkinName].Cast<CheckBox>().CurrentValue))
             {
-                if (DmgMenu["dmg"].Cast<CheckBox>().CurrentValue)
+                if (DmgMenu[champion + "dmg"].Cast<CheckBox>().CurrentValue)
                 {
                     Hpi.unit = enemy;
-                    Hpi.drawDmg(CalcDamage(enemy), System.Drawing.Color.Goldenrod);
+                    Hpi.drawDmg(CalcDamage(enemy), Color.FromArgb(214, 164, 39));
                 }
-                if (DmgMenu["Killable"].Cast<CheckBox>().CurrentValue)
+
+                if (DmgMenu[champion + "Killable"].Cast<CheckBox>().CurrentValue)
                 {
                     var hpPos = enemy.HPBarPosition;
                     if (CalcDamage(enemy) > enemy.TotalShieldHealth())
                     {
-                        Drawing.DrawText(
-                            hpPos.X + 135f,
-                            hpPos.Y,
-                            System.Drawing.Color.FromArgb(231, 21, 21),
-                            "Killable",
-                            2);
+                        Drawing.DrawText(hpPos.X + 135f, hpPos.Y, Color.FromArgb(231, 21, 21), "Killable", 2);
                     }
                 }
             }
         }
 
-        private static int CalcDamage(Obj_AI_Base target)
+        public static int CalcDamage(Obj_AI_Base target)
         {
             var aa = ObjectManager.Player.GetAutoAttackDamage(target, true);
             var damage = aa;
 
-            if (Player.Instance.Spellbook.GetSpell(SpellSlot.R).IsReady && DmgMenu["R"].Cast<CheckBox>().CurrentValue)
-                // R damage
+            if (Player.Instance.Spellbook.GetSpell(SpellSlot.R).IsReady
+                && DmgMenu[champion + "R"].Cast<CheckBox>().CurrentValue)
             {
+                // R damage
                 damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.R);
             }
 
-            if (Player.Instance.Spellbook.GetSpell(SpellSlot.Q).IsReady && DmgMenu["Q"].Cast<CheckBox>().CurrentValue)
-                // Q damage
+            if (Player.Instance.Spellbook.GetSpell(SpellSlot.Q).IsReady
+                && DmgMenu[champion + "Q"].Cast<CheckBox>().CurrentValue)
             {
+                // Q damage
                 damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q);
             }
 
-            if (Player.Instance.Spellbook.GetSpell(SpellSlot.E).IsReady && DmgMenu["E"].Cast<CheckBox>().CurrentValue)
-                // E damage
+            if (Player.Instance.Spellbook.GetSpell(SpellSlot.E).IsReady
+                && DmgMenu[champion + "E"].Cast<CheckBox>().CurrentValue)
             {
+                // E damage
                 damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.E);
             }
 
-            if (Player.Instance.Spellbook.GetSpell(SpellSlot.W).IsReady && DmgMenu["W"].Cast<CheckBox>().CurrentValue)
-                // W damage
+            if (Player.Instance.Spellbook.GetSpell(SpellSlot.W).IsReady
+                && DmgMenu[champion + "W"].Cast<CheckBox>().CurrentValue)
             {
+                // W damage
                 damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.W);
             }
 

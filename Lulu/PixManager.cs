@@ -8,15 +8,15 @@
     using EloBuddy.SDK.Rendering;
 
     using SharpDX;
-    
+
     public static class PixManager
     {
         public static bool DrawPix { get; set; }
-        
+
         private static Obj_AI_Base _pix = null;
-        
+
         public const string PixObjectName = "RobotBuddy";
-        
+
         public static Obj_AI_Base Pix
         {
             get
@@ -29,7 +29,7 @@
                 return null;
             }
         }
-        
+
         static PixManager()
         {
             Game.OnUpdate += Game_OnUpdate;
@@ -41,7 +41,7 @@
                 return;
             }
         }
-        
+
         private static void Game_OnUpdate(EventArgs args)
         {
             if (Pix == null)
@@ -49,7 +49,7 @@
                 _pix = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(o => o.IsAlly && o.Name == PixObjectName);
             }
         }
-        
+
         private static void Drawing_OnEndScene(EventArgs args)
         {
             if (!Program.menuIni.Get<CheckBox>("Drawings").CurrentValue)

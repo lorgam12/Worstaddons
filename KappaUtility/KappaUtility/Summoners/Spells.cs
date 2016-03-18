@@ -188,8 +188,26 @@
             {
                 if (target.IsAlly && !target.IsMe)
                 {
-                    if (Exhaust != null && !SummMenu["DontExhaust" + caster.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    if (Exhaust != null)
                     {
+                        var exhaustc = SummMenu["Exhaust"].Cast<CheckBox>().CurrentValue && Exhaust.IsReady();
+                        var Exhaustally = SummMenu["exhaustally"].Cast<Slider>().CurrentValue;
+                        var Exhaustenemy = SummMenu["exhaustenemy"].Cast<Slider>().CurrentValue;
+
+                        if (exhaustc
+                            && (target.IsValidTarget(Exhaust.Range)
+                                && !SummMenu["DontExhaust" + caster.BaseSkinName].Cast<CheckBox>().CurrentValue))
+                        {
+                            if (target.HealthPercent <= Exhaustenemy)
+                            {
+                                Exhaust.Cast(caster);
+                            }
+
+                            if (target.HealthPercent <= Exhaustally)
+                            {
+                                Exhaust.Cast(caster);
+                            }
+                        }
                     }
 
                     if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
@@ -200,7 +218,6 @@
                         {
                             if (target.IsInRange(Player.Instance, Heal.Range))
                             {
-                                Chat.Print(target.BaseSkinName + " hueb");
                                 if (target.HealthPercent <= healally)
                                 {
                                     Heal.Cast();
@@ -231,6 +248,25 @@
                             if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
                             {
                                 Heal.Cast();
+                            }
+                        }
+                    }
+
+                    if (Exhaust != null)
+                    {
+                        var exhaustc = SummMenu["Exhaust"].Cast<CheckBox>().CurrentValue && Exhaust.IsReady();
+                        var Exhaustally = SummMenu["exhaustally"].Cast<Slider>().CurrentValue;
+                        var Exhaustenemy = SummMenu["exhaustenemy"].Cast<Slider>().CurrentValue;
+                        if (exhaustc && !SummMenu["DontExhaust" + caster.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                        {
+                            if (target.HealthPercent <= Exhaustenemy)
+                            {
+                                Exhaust.Cast(caster);
+                            }
+
+                            if (target.HealthPercent <= Exhaustally)
+                            {
+                                Exhaust.Cast(caster);
                             }
                         }
                     }
@@ -276,7 +312,6 @@
                         var healally = SummMenu["Healally"].Cast<Slider>().CurrentValue;
                         if (healc)
                         {
-                            Chat.Print(target.BaseSkinName);
                             if (target.IsInRange(Player.Instance, Heal.Range))
                             {
                                 if (target.HealthPercent <= healally)
@@ -289,6 +324,25 @@
                                 {
                                     Heal.Cast();
                                 }
+                            }
+                        }
+                    }
+
+                    if (Exhaust != null)
+                    {
+                        var exhaustc = SummMenu["Exhaust"].Cast<CheckBox>().CurrentValue && Exhaust.IsReady();
+                        var Exhaustally = SummMenu["exhaustally"].Cast<Slider>().CurrentValue;
+                        var Exhaustenemy = SummMenu["exhaustenemy"].Cast<Slider>().CurrentValue;
+                        if (exhaustc && !SummMenu["DontExhaust" + caster.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                        {
+                            if (target.HealthPercent <= Exhaustenemy)
+                            {
+                                Exhaust.Cast(caster);
+                            }
+
+                            if (target.HealthPercent <= Exhaustally)
+                            {
+                                Exhaust.Cast(caster);
                             }
                         }
                     }
@@ -311,6 +365,25 @@
                                 || caster.BaseAbilityDamage > target.TotalShieldHealth())
                             {
                                 Heal.Cast();
+                            }
+                        }
+
+                        if (Exhaust != null)
+                        {
+                            var exhaustc = SummMenu["Exhaust"].Cast<CheckBox>().CurrentValue && Exhaust.IsReady();
+                            var Exhaustally = SummMenu["exhaustally"].Cast<Slider>().CurrentValue;
+                            var Exhaustenemy = SummMenu["exhaustenemy"].Cast<Slider>().CurrentValue;
+                            if (exhaustc && !SummMenu["DontExhaust" + caster.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                            {
+                                if (target.HealthPercent <= Exhaustenemy)
+                                {
+                                    Exhaust.Cast(caster);
+                                }
+
+                                if (target.HealthPercent <= Exhaustally)
+                                {
+                                    Exhaust.Cast(caster);
+                                }
                             }
                         }
                     }

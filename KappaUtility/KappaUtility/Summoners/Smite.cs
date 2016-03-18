@@ -49,15 +49,6 @@
                             Spells.Smite.Cast(mob);
                         }
                     }
-
-                    if (smitemob)
-                    {
-                        if (Player.Instance.GetSummonerSpellDamage(mob, DamageLibrary.SummonerSpells.Smite)
-                            >= mob.Health)
-                        {
-                            Spells.Smite.Cast(mob);
-                        }
-                    }
                 }
 
                 foreach (AIHeroClient target in
