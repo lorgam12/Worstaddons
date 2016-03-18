@@ -8,15 +8,21 @@
     {
         public static void Damage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
         {
-            if (!Spells.R.IsReady() || sender.IsAlly || sender == null || args.Target.IsEnemy || sender is Obj_AI_Minion
-                || args.Target == null || args.Target is Obj_AI_Minion)
+            if (!(args.Target is AIHeroClient))
             {
                 return;
             }
-            var Rally = Menu.UltMenu.Get<CheckBox>("Rally").CurrentValue;
-            var Rallyh = Menu.UltMenu.Get<Slider>("Rallyh").CurrentValue;
+
             var caster = sender;
             var target = (AIHeroClient)args.Target;
+
+            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null || target == null)
+            {
+                return;
+            }
+
+            var Rally = Menu.UltMenu.Get<CheckBox>("Rally").CurrentValue && Spells.R.IsReady();
+            var Rallyh = Menu.UltMenu.Get<Slider>("Rallyh").CurrentValue;
 
             if (!target.IsAlly || !target.IsMe || !caster.IsEnemy || target.IsEnemy
                 || Menu.UltMenu["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
@@ -26,7 +32,7 @@
 
             if (target.IsValidTarget(Spells.R.Range))
             {
-                if (Rally && target.HealthPercent < Rallyh)
+                if (Rally && target.HealthPercent <= Rallyh)
                 {
                     Spells.R.Cast(target);
                 }
