@@ -26,6 +26,7 @@
         private static void OnLoad(EventArgs args)
         {
             UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
+            DamageInd.OnLoad();
             Tracker.OnLoad();
             Spells.OnLoad();
             Potions.OnLoad();
