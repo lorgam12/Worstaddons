@@ -27,7 +27,7 @@
             if (notsupported.Contains(champion))
             {
                 DmgMenu.AddLabel(champion + " Is Not Supported From The DamageLibrary :(");
-                return;
+                DmgMenu.AddSeparator();
             }
 
             DmgMenu.Add(champion + "dmg", new CheckBox("Draw Damage Indicator"));

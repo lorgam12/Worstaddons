@@ -68,8 +68,8 @@
             PingLocation = position;
             SimplePing();
             Core.DelayAction(SimplePing, 150);
-            Core.DelayAction(SimplePing, 250);
-            Core.DelayAction(SimplePing, 350);
+            Core.DelayAction(SimplePing, 450);
+            Core.DelayAction(SimplePing, 950);
         }
 
         private static void SimplePing()

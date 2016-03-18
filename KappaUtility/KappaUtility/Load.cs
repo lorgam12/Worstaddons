@@ -10,11 +10,11 @@
 
     using Items;
 
+    using Misc;
+
     using Summoners;
 
     using Trackers;
-
-    using Misc;
 
     internal class Load
     {
@@ -25,9 +25,15 @@
             Loading.OnLoadingComplete += OnLoad;
         }
 
+        private static void Loading_OnLoadingCompleteSpectatorMode(EventArgs args)
+        {
+            AutoReveal.OnLoad();
+        }
+
         private static void OnLoad(EventArgs args)
         {
             UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
+            AutoReveal.OnLoad();
             DamageInd.OnLoad();
             Tracker.OnLoad();
             SkinHax.OnLoad();
