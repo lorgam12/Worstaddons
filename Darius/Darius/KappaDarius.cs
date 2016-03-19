@@ -129,11 +129,16 @@
             KillStealMenu = menuIni.AddSubMenu("KillSteal");
             KillStealMenu.AddGroupLabel("KillSteal Settings");
             KillStealMenu.Add("Rks", new CheckBox("R KillSteal"));
-            KillStealMenu.Add("IGP", new CheckBox("Ignite + Passive Kill"));
-            KillStealMenu.Add("IG", new CheckBox("Ignite Only", false));
-            KillStealMenu.AddLabel("Iginte + Passive takes in account Max Ignite + Passive dmg");
 
-            ManaMenu = menuIni.AddSubMenu("Mana Manager");
+            if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerDot")) != null)
+            {
+                KillStealMenu.Add("IGP", new CheckBox("Ignite + Passive Kill"));
+                KillStealMenu.Add("IG", new CheckBox("Ignite Only", false));
+                KillStealMenu.AddLabel("Iginte + Passive takes in account Max Ignite + Passive dmg");
+                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
+            }
+
+           ManaMenu = menuIni.AddSubMenu("Mana Manager");
             ManaMenu.AddGroupLabel("Harass");
             ManaMenu.Add("harassmana", new Slider("Harass Mana %", 75, 0, 100));
             ManaMenu.AddGroupLabel("Lane Clear");
@@ -169,7 +174,6 @@
             W = new Spell.Active(SpellSlot.W, 300);
             E = new Spell.Skillshot(SpellSlot.E, 550, SkillShotType.Cone, 250, 100, 120);
             R = new Spell.Targeted(SpellSlot.R, 460);
-            Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
             Game.OnUpdate += OnUpdate;
             Drawing.OnDraw += OnDraw;
@@ -289,8 +293,7 @@
                 KillSteal();
             }
 
-            if (QMenu["Qaoe"].Cast<CheckBox>().CurrentValue
-                && player.CountEnemiesInRange(Q.Range) >= QMenu["Qhit"].Cast<Slider>().CurrentValue)
+            if (QMenu["Qaoe"].Cast<CheckBox>().CurrentValue && player.CountEnemiesInRange(Q.Range) >= QMenu["Qhit"].Cast<Slider>().CurrentValue)
             {
                 Q.Cast();
             }
@@ -377,8 +380,6 @@
         {
             var SaveR = RMenu["SaveR"].Cast<CheckBox>().CurrentValue;
             var SR = RMenu["SR"].Cast<Slider>().CurrentValue;
-            var IG = KillStealMenu["IG"].Cast<CheckBox>().CurrentValue;
-            var IGP = KillStealMenu["IGP"].Cast<CheckBox>().CurrentValue;
             var Rks = KillStealMenu["Rks"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var target =
                 ObjectManager.Get<AIHeroClient>()
@@ -435,31 +436,38 @@
                     return;
                 }
 
-                if (IGP && target.IsValidTarget(Ignite.Range)
-                    && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
-                    + PassiveDmg(target, target.GetBuffCount("DariusHemo")) > target.TotalShieldHealth() + target.HPRegenRate)
+                if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerDot")) != null)
                 {
-                    if (PassiveDmg(target, target.GetBuffCount("DariusHemo")) < target.TotalShieldHealth() + (target.HPRegenRate * 4)
+                    var IG = KillStealMenu["IG"].Cast<CheckBox>().CurrentValue;
+                    var IGP = KillStealMenu["IGP"].Cast<CheckBox>().CurrentValue;
+                    if (IGP && target.IsValidTarget(Ignite.Range)
+                        && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
+                        + PassiveDmg(target, target.GetBuffCount("DariusHemo"))
+                        > target.TotalShieldHealth() + target.HPRegenRate)
+                    {
+                        if (PassiveDmg(target, target.GetBuffCount("DariusHemo"))
+                            < target.TotalShieldHealth() + (target.HPRegenRate * 4)
+                            && !target.IsValidTarget(player.GetAutoAttackRange()))
+                        {
+                            Ignite.Cast(target);
+                        }
+
+                        if (PassiveDmg(target, target.GetBuffCount("DariusHemo")) < target.TotalShieldHealth())
+                        {
+                            if (target.TotalShieldHealth() > player.TotalShieldHealth())
+                            {
+                                Ignite.Cast(target);
+                            }
+                        }
+                    }
+
+                    if (IG && target.IsValidTarget(Ignite.Range)
+                        && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
+                        > target.TotalShieldHealth() + (target.HPRegenRate * 4)
                         && !target.IsValidTarget(player.GetAutoAttackRange()))
                     {
                         Ignite.Cast(target);
                     }
-
-                    if (PassiveDmg(target, target.GetBuffCount("DariusHemo")) < target.TotalShieldHealth())
-                    {
-                        if (target.TotalShieldHealth() > player.TotalShieldHealth())
-                        {
-                            Ignite.Cast(target);
-                        }
-                    }
-                }
-
-                if (IG && target.IsValidTarget(Ignite.Range)
-                    && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
-                    > target.TotalShieldHealth() + (target.HPRegenRate * 4)
-                    && !target.IsValidTarget(player.GetAutoAttackRange()))
-                {
-                    Ignite.Cast(target);
                 }
             }
         }
@@ -515,7 +523,7 @@
 
                 if (QMenu["Stick"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (player.HasBuff("RumbleDangerZone") && !target.IsUnderEnemyturret() && !target.IsUnderHisturret())
+                    if (player.HasBuff("RumbleDangerZone") && target.IsValidTarget(Q.Range) && !target.IsUnderEnemyturret() && !target.IsUnderHisturret())
                     {
                         Player.IssueOrder(GameObjectOrder.MoveTo, target.Position);
                     }
@@ -590,7 +598,7 @@
 
                         if (target.IsValidTarget(E.Range))
                         {
-                            if (Q.IsReady() && target.IsInRange(player, Q.Range) && Qcombo
+                            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Qcombo
                                 || !Q.IsReady() && target.IsInRange(player, player.GetAutoAttackRange()))
                             {
                                 return;
@@ -633,7 +641,6 @@
                     && !rt.HasBuff("ChronoShift") && !rt.HasBuff("UndyingRage") && !rt.IsInvulnerable && !rt.IsZombie
                     && !rt.HasUndyingBuff() && !rt.HasBuff("AatroxPassiveActivate") && !rt.HasBuff("rebirthcooldown"))
                 {
-
                     if (SaveR && ObjectManager.Player.GetAutoAttackDamage(rt) * SR > rt.TotalShieldHealth()
                         && rt.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
                     {
