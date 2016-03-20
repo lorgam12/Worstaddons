@@ -61,18 +61,14 @@
 
         public static void track()
         {
-            foreach (var enemy in
-                ObjectManager.Get<AIHeroClient>()
-                    .Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsValid)
-                    .Where(
-                        enemy =>
-                        DamageInd.CalcDamage(enemy) >= enemy.TotalShieldHealth()
-                        && !TrackMenu["DontTrack" + enemy.BaseSkinName].Cast<CheckBox>().CurrentValue))
+            foreach (var enemy in ObjectManager.Get<AIHeroClient>()
+                .Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsValid)
+                .Where(
+                    enemy =>
+                    DamageInd.CalcDamage(enemy) >= enemy.TotalShieldHealth()
+                    && !TrackMenu["DontTrack" + enemy.BaseSkinName].Cast<CheckBox>().CurrentValue).Where(enemy => TrackMenu.Get<CheckBox>("Trackping").CurrentValue && enemy.IsVisible && enemy.IsHPBarRendered))
             {
-                if (TrackMenu.Get<CheckBox>("Trackping").CurrentValue && enemy.IsVisible && enemy.IsHPBarRendered)
-                {
-                    Ping(enemy.Position.To2D());
-                }
+                Ping(enemy.Position.To2D());
             }
         }
 

@@ -41,7 +41,7 @@
 
         private static void Orbwalker_OnPostAttack(AttackableUnit target, System.EventArgs args)
         {
-            if (target.IsMe || target.IsAlly || !target.IsEnemy)
+            if (!target.IsEnemy)
             {
                 return;
             }

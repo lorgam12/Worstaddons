@@ -8,6 +8,7 @@
 
     internal class Zhonya
     {
+        /*
         private static readonly string[] DangerSpells =
             {
                 "AzirR", "zedult", "ViR", "SyndraR", "CaitlynAceintheHole",
@@ -34,5 +35,6 @@
                 Core.DelayAction(() => Defensive.Zhonyas.Cast(), 50);
             }
         }
+    */
     }
 }

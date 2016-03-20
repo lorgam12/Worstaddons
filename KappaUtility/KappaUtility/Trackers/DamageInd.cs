@@ -33,7 +33,7 @@
             DmgMenu.Add(champion + "Q", new CheckBox("Draw Q Damage", false));
             DmgMenu.Add(champion + "W", new CheckBox("Draw W Damage", false));
             DmgMenu.Add(champion + "E", new CheckBox("Draw E Damage", false));
-            DmgMenu.Add(champion + "R", new CheckBox("Draw R Damage"));
+            DmgMenu.Add(champion + "R", new CheckBox("Draw R Damage", false));
             DmgMenu.Add(champion + "Killable", new CheckBox("Draw Killable", false));
             DmgMenu.AddGroupLabel("Don't Draw On:");
             foreach (var enemy in ObjectManager.Get<AIHeroClient>())
