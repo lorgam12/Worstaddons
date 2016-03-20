@@ -28,23 +28,40 @@
         private static void Loading_OnLoadingCompleteSpectatorMode(EventArgs args)
         {
             AutoReveal.OnLoad();
+            Tracker.OnLoad();
         }
 
         private static void OnLoad(EventArgs args)
         {
             UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
             AutoReveal.OnLoad();
+            AutoQSS.OnLoad();
             DamageInd.OnLoad();
             Tracker.OnLoad();
+            Surrender.OnLoad();
             SkinHax.OnLoad();
             Spells.OnLoad();
             Potions.OnLoad();
             Offensive.OnLoad();
             Defensive.OnLoad();
-
+            
             Game.OnUpdate += Game_OnUpdate;
+            Drawing.OnEndScene += Drawing_OnEndScene;
+            Drawing.OnDraw += OnDraw;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Obj_AI_Base.OnBasicAttack += OnBasicAttack;
+        }
+
+        private static void OnDraw(EventArgs args)
+        {
+            AutoReveal.Draw();
+            Tracker.HPtrack();
+        }
+
+        private static void Drawing_OnEndScene(EventArgs args)
+        {
+            DamageInd.Damage();
+            Tracker.Traps();
         }
 
         private static void Game_OnUpdate(EventArgs args)
@@ -56,7 +73,12 @@
                 Defensive.Items();
             }
 
+            AutoReveal.Reveal();
+            AutoQSS.Clean();
+            Tracker.track();
             Smite.Smiteopepi();
+            Spells.Cast();
+            SkinHax.Hax();
         }
 
         public static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)

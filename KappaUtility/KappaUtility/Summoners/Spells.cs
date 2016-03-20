@@ -25,7 +25,6 @@
         {
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Obj_AI_Base.OnBasicAttack += OnBasicAttack;
-            Game.OnUpdate += Game_OnUpdate;
 
             SummMenu = Load.UtliMenu.AddSubMenu("Summoner Spells");
             SummMenu.AddGroupLabel("Summoner Spells Settings");
@@ -127,7 +126,7 @@
             }
         }
 
-        private static void Game_OnUpdate(System.EventArgs args)
+        public static void Cast()
         {
             var target =
                 ObjectManager.Get<AIHeroClient>()

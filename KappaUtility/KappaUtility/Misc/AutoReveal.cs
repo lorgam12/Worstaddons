@@ -35,32 +35,68 @@
         {
             public GameObject Object { get; set; }
 
-            public float NetworkId { get; set; }
-
-            public Vector3 SmokePos { get; set; }
-
-            public double ExpireTime { get; set; }
+            public Vector3 Position { get; set; }
         }
 
         internal class Shaco
         {
             public GameObject Object { get; set; }
 
-            public float NetworkId { get; set; }
-
-            public Vector3 SmokePos { get; set; }
-
-            public double ExpireTime { get; set; }
+            public Vector3 Position { get; set; }
         }
+
+        internal class Talon
+        {
+            public GameObject Object { get; set; }
+
+            public Vector3 Position { get; set; }
+        }
+
+        internal class Rengar
+        {
+            public GameObject Object { get; set; }
+
+            public Vector3 Position { get; set; }
+        }
+
+        internal class KhaZix
+        {
+            public GameObject Object { get; set; }
+
+            public Vector3 Position { get; set; }
+        }
+
+        internal class Twitch
+        {
+            public GameObject Object { get; set; }
+
+            public Vector3 Position { get; set; }
+        }
+
+        internal class Vayne
+        {
+            public GameObject Object { get; set; }
+
+            public Vector3 Position { get; set; }
+        }
+
         private static readonly AkaliSmoke Akalismoke = new AkaliSmoke();
 
         private static readonly Shaco shaco = new Shaco();
 
+        private static readonly Talon talon = new Talon();
+
+        private static readonly Rengar rengar = new Rengar();
+
+        private static readonly KhaZix khazix = new KhaZix();
+
+        private static readonly Vayne vayne = new Vayne();
+
+        private static readonly Twitch twitch = new Twitch();
+
         public static int LastTickTime;
 
         public static Menu BushMenu { get; private set; }
-
-        private static int lastWard;
 
         private static bool DontWard, Changing = false;
 
@@ -74,42 +110,326 @@
             BushMenu.AddGroupLabel("Auto Stealth Reveal Settings");
             BushMenu.Add("enables", new CheckBox("Enable", false));
             BushMenu.Add("combos", new CheckBox("Only On Combo", false));
-            
+            BushMenu.AddGroupLabel("Select Champions:");
+            BushMenu.Add("akali", new CheckBox("Akali"));
+            BushMenu.Add("shaco", new CheckBox("Shaco"));
+            BushMenu.Add("rengar", new CheckBox("Rengar"));
+            BushMenu.Add("talon", new CheckBox("Talon"));
+            BushMenu.Add("twitch", new CheckBox("Twitch"));
+            BushMenu.Add("khazix", new CheckBox("KhaZix"));
+            BushMenu.Add("vayne", new CheckBox("Vayne"));
+
             GameObject.OnCreate += GameObject_OnCreate;
             GameObject.OnDelete += GameObject_OnDelete;
-            Game.OnUpdate += Game_OnUpdate;
-            Drawing.OnDraw += Drawing_OnDraw;
         }
 
-        private static void Drawing_OnDraw(EventArgs args)
+        internal static void Draw()
         {
-            var targets = EntityManager.Heroes.Enemies.Where(x => !x.IsDead && x.Distance(Player.Instance) < 1250);
+            var targets = EntityManager.Heroes.Enemies.Where(x => !x.IsDead);
             foreach (var target in targets)
             {
-                if (target.BaseSkinName == "Shaco")
+                switch (target.BaseSkinName)
                 {
-                    if (shaco.Object != null)
-                    {
-                        Drawing.DrawText(
-                            Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
-                            System.Drawing.Color.White,
-                            "Shaco Here",
-                            12);
-                        Circle.Draw(Color.White, 400, target.Path.LastOrDefault());
-                    }
-                }
+                    case "Akali":
+                        if (BushMenu["akali"].Cast<CheckBox>().CurrentValue)
+                        {
+                            if (Akalismoke.Object != null)
+                            {
+                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
+                                {
+                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
+                                    {
+                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
 
-                if (target.BaseSkinName == "Akali")
-                {
-                    if (Akalismoke.Object != null)
-                    {
-                        Circle.Draw(Color.White, 400, target.Path.LastOrDefault());
-                        Drawing.DrawText(
-                            Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
-                            System.Drawing.Color.White,
-                            "Akali Here",
-                            2);
-                    }
+                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
+                                    {
+                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
+                                    {
+                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
+                                Drawing.DrawText(
+                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
+                                    System.Drawing.Color.White,
+                                    "Akali Is Around Here",
+                                    2);
+                            }
+                        }
+
+                        break;
+
+                    case "Shaco":
+                        if (BushMenu["shaco"].Cast<CheckBox>().CurrentValue)
+                        {
+                            if (shaco.Object != null)
+                            {
+                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
+                                {
+                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
+                                    {
+                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
+                                    {
+                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
+                                    {
+                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                Drawing.DrawText(
+                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
+                                    System.Drawing.Color.White,
+                                    "Shaco Is Around Here",
+                                    12);
+                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
+                            }
+                        }
+
+                        break;
+
+                    case "Talon":
+                        if (BushMenu["talon"].Cast<CheckBox>().CurrentValue)
+                        {
+                            if (talon.Object != null)
+                            {
+                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
+                                {
+                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
+                                    {
+                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
+                                    {
+                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
+                                    {
+                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                Drawing.DrawText(
+                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
+                                    System.Drawing.Color.White,
+                                    "Talon Is Around Here",
+                                    12);
+                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
+                            }
+                        }
+
+                        break;
+
+                    case "Rengar":
+                        if (BushMenu["rengar"].Cast<CheckBox>().CurrentValue)
+                        {
+                            if (rengar.Object != null)
+                            {
+                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
+                                {
+                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
+                                    {
+                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
+                                    {
+                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
+                                    {
+                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                Drawing.DrawText(
+                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
+                                    System.Drawing.Color.White,
+                                    "Rengar Is Around Here",
+                                    12);
+                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
+                            }
+                        }
+
+                        break;
+
+                    case "KhaZix":
+                        if (BushMenu["khazix"].Cast<CheckBox>().CurrentValue)
+                        {
+                            if (khazix.Object != null)
+                            {
+                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
+                                {
+                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
+                                    {
+                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
+                                    {
+                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
+                                    {
+                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                Drawing.DrawText(
+                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
+                                    System.Drawing.Color.White,
+                                    "Kha'Zix Is Around Here",
+                                    12);
+                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
+                            }
+                        }
+
+                        break;
+
+                    case "Twitch":
+                        if (BushMenu["twitch"].Cast<CheckBox>().CurrentValue)
+                        {
+                            if (twitch.Object != null)
+                            {
+                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
+                                {
+                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
+                                    {
+                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
+                                    {
+                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
+                                    {
+                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                Drawing.DrawText(
+                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
+                                    System.Drawing.Color.White,
+                                    "Twitch Is Around Here",
+                                    12);
+                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
+                            }
+                        }
+
+                        break;
+
+                    case "Vayne":
+                        if (BushMenu["vayne"].Cast<CheckBox>().CurrentValue)
+                        {
+                            if (vayne.Object != null)
+                            {
+                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
+                                {
+                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
+                                    {
+                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
+                                    {
+                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
+                                    {
+                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                Drawing.DrawText(
+                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
+                                    System.Drawing.Color.White,
+                                    "Vayne Is Around Here",
+                                    12);
+                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
+                            }
+                        }
+
+                        break;
                 }
             }
         }
@@ -119,21 +439,43 @@
             if (obj != null && obj.Name.Contains("Akali_Base_smoke_bomb_tar"))
             {
                 Akalismoke.Object = obj;
-                Akalismoke.ExpireTime = Game.Time + 8;
-                Akalismoke.NetworkId = obj.NetworkId;
-                Akalismoke.SmokePos = obj.Position;
+                Akalismoke.Position = obj.Position;
             }
 
             if (obj != null && obj.Name.Contains("JackintheboxPoof2"))
             {
                 shaco.Object = obj;
-                shaco.ExpireTime = Game.Time + 8;
-                shaco.NetworkId = obj.NetworkId;
-                shaco.SmokePos = obj.Position;
+                shaco.Position = obj.Position;
             }
 
-            if (obj != null)
+            if (obj != null && obj.Name.Contains("talon_ult_sound"))
             {
+                talon.Object = obj;
+                talon.Position = obj.Position;
+            }
+
+            if (obj != null && obj.Name.Contains("Rengar_Base_R_Alert"))
+            {
+                rengar.Object = obj;
+                rengar.Position = obj.Position;
+            }
+
+            if (obj != null && obj.Name.ToLower().Contains("khazix_base_r_cas"))
+            {
+                khazix.Object = obj;
+                khazix.Position = obj.Position;
+            }
+
+            if (obj != null && obj.Name.ToLower().Contains("twitch_base_q_invisiible_outro"))
+            {
+                twitch.Object = obj;
+                twitch.Position = obj.Position;
+            }
+
+            if (obj != null && obj.Name.ToLower().Contains("vayne_base_r_cas_invisible"))
+            {
+                vayne.Object = obj;
+                vayne.Position = obj.Position;
             }
         }
 
@@ -151,12 +493,38 @@
                 LastTickTime = 0;
             }
 
-            if (obj != null)
+            if (obj != null && obj.Name.Contains("talon_ult_sound"))
             {
+                talon.Object = null;
+                LastTickTime = 0;
+            }
+
+            if (obj != null && obj.Name.Contains("Rengar_Base_R_Alert"))
+            {
+                rengar.Object = null;
+                LastTickTime = 0;
+            }
+
+            if (obj != null && obj.Name.ToLower().Contains("khazix_base_r_cas"))
+            {
+                khazix.Object = null;
+                LastTickTime = 0;
+            }
+
+            if (obj != null && obj.Name.ToLower().Contains("twitch_base_q_invisiible_outro"))
+            {
+                twitch.Object = null;
+                LastTickTime = 0;
+            }
+
+            if (obj != null && obj.Name.ToLower().Contains("vayne_base_q_cas"))
+            {
+                vayne.Object = null;
+                LastTickTime = 0;
             }
         }
 
-        private static void Game_OnUpdate(EventArgs args)
+        public static void Reveal()
         {
             var enemies = EntityManager.Heroes.Enemies.Where(x => !x.IsDead && x.Distance(Player.Instance) < 1250);
             if (BushMenu["enable"].Cast<CheckBox>().CurrentValue && !Player.Instance.IsDead)
@@ -166,10 +534,9 @@
                 {
                     if (!BushMenu["combo"].Cast<CheckBox>().CurrentValue)
                     {
-                        if ((NavMesh.IsWallOfGrass(target.Path.LastOrDefault(), 1)
-                                && target.Distance(target.Path.LastOrDefault()) < 200)
-                               && (!NavMesh.IsWallOfGrass(Player.Instance.Position, 1)
-                                   && Player.Instance.Distance(target.Path.LastOrDefault()) < 500))
+                        if (NavMesh.IsWallOfGrass(target.Path.LastOrDefault(), 1)
+                            && !NavMesh.IsWallOfGrass(Player.Instance.Position, 1)
+                            && Player.Instance.Distance(target.Path.LastOrDefault()) < 500)
                         {
                             var target1 = target;
                             var wards =
@@ -179,21 +546,19 @@
                                         x.Name.Contains("Ward") && x.IsAlly
                                         && x.Position.Distance(target1.Position) < 750);
 
-                            foreach (var ward in wards)
+                            foreach (var ward in
+                                wards.Where(
+                                    ward => (NavMesh.IsWallOfGrass(ward.Position, 50) && ward.Distance(target1) < 750)))
                             {
-                                if (NavMesh.IsWallOfGrass(ward.Position, 50) || target.IsHPBarRendered)
-                                {
-                                    DontWard = true;
-                                }
+                                DontWard = true;
                             }
 
-
-                            if (DontWard == false)
+                            if (!DontWard)
                             {
                                 WardCast();
                             }
 
-                            if (DontWard && Changing == false)
+                            if (DontWard && !Changing)
                             {
                                 Changing = true;
                                 Core.DelayAction(
@@ -209,10 +574,9 @@
 
                     if (BushMenu["combo"].Cast<CheckBox>().CurrentValue && flags.HasFlag(Orbwalker.ActiveModes.Combo))
                     {
-                        if ((NavMesh.IsWallOfGrass(target.Path.LastOrDefault(), 1)
-                                && target.Distance(target.Path.LastOrDefault()) < 200)
-                               && (!NavMesh.IsWallOfGrass(Player.Instance.Position, 1)
-                                   && Player.Instance.Distance(target.Path.LastOrDefault()) < 500))
+                        if (NavMesh.IsWallOfGrass(target.Path.LastOrDefault(), 1)
+                            && !NavMesh.IsWallOfGrass(Player.Instance.Position, 1)
+                            && Player.Instance.Distance(target.Path.LastOrDefault()) < 500)
                         {
                             var target1 = target;
                             var wards =
@@ -222,29 +586,27 @@
                                         x.Name.Contains("Ward") && x.IsAlly
                                         && x.Position.Distance(target1.Position) < 750);
 
-                            foreach (var ward in wards)
+                            foreach (var ward in
+                                wards.Where(
+                                    ward => NavMesh.IsWallOfGrass(ward.Position, 50) && ward.Distance(target1) < 750))
                             {
-                                if (NavMesh.IsWallOfGrass(ward.Position, 50))
-                                {
-                                    DontWard = true;
-                                }
+                                DontWard = true;
                             }
 
-
-                            if (DontWard == false)
+                            if (!DontWard)
                             {
                                 WardCast();
                             }
 
-                            if (DontWard && Changing == false)
+                            if (DontWard && !Changing)
                             {
                                 Changing = true;
                                 Core.DelayAction(
                                     delegate
-                                    {
-                                        DontWard = false;
-                                        Changing = false;
-                                    },
+                                        {
+                                            DontWard = false;
+                                            Changing = false;
+                                        },
                                     500);
                             }
                         }
@@ -261,38 +623,50 @@
             {
                 if (Warding_Totem_Trinket.IsOwned() && Warding_Totem_Trinket.IsReady())
                 {
-                    Warding_Totem_Trinket.Cast(target.Path.LastOrDefault());
-                    return;
+                    if (Warding_Totem_Trinket.Cast(target.Path.LastOrDefault()))
+                    {
+                        return;
+                    }
                 }
 
                 if (Greater_Stealth_Totem_Trinket.IsOwned() && Greater_Stealth_Totem_Trinket.IsReady())
                 {
-                    Greater_Stealth_Totem_Trinket.Cast(target.Path.LastOrDefault());
-                    return;
+                    if (Greater_Stealth_Totem_Trinket.Cast(target.Path.LastOrDefault()))
+                    {
+                        return;
+                    }
                 }
 
                 if (Greater_Vision_Totem_Trinket.IsOwned() && Greater_Vision_Totem_Trinket.IsReady())
                 {
-                    Greater_Vision_Totem_Trinket.Cast(target.Path.LastOrDefault());
-                    return;
+                    if (Greater_Vision_Totem_Trinket.Cast(target.Path.LastOrDefault()))
+                    {
+                        return;
+                    }
                 }
 
                 if (Sightstone.IsOwned() && Sightstone.IsReady())
                 {
-                    Sightstone.Cast(target.Path.LastOrDefault());
-                    return;
+                    if (Sightstone.Cast(target.Path.LastOrDefault()))
+                    {
+                        return;
+                    }
                 }
 
                 if (Ruby_Sightstone.IsOwned() && Ruby_Sightstone.IsReady())
                 {
-                    Ruby_Sightstone.Cast(target.Path.LastOrDefault());
-                    return;
+                    if (Ruby_Sightstone.Cast(target.Path.LastOrDefault()))
+                    {
+                        return;
+                    }
                 }
 
                 if (Farsight_Alteration.IsOwned() && Farsight_Alteration.IsReady())
                 {
-                    Farsight_Alteration.Cast(target.Path.LastOrDefault());
-                    return;
+                    if (Farsight_Alteration.Cast(target.Path.LastOrDefault()))
+                    {
+                        return;
+                    }
                 }
             }
         }

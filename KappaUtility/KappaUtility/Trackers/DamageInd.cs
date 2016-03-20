@@ -1,6 +1,5 @@
 ﻿namespace KappaUtility.Trackers
 {
-    using System;
     using System.Drawing;
     using System.Linq;
 
@@ -45,11 +44,9 @@
                     DmgMenu.Add("DontDraw" + enemy.BaseSkinName, cb);
                 }
             }
-
-            Drawing.OnEndScene += Drawing_OnEndScene;
         }
 
-        private static void Drawing_OnEndScene(EventArgs args)
+        public static void Damage()
         {
             foreach (var enemy in
                 ObjectManager.Get<AIHeroClient>()
@@ -79,19 +76,20 @@
         {
             var aa = ObjectManager.Player.GetAutoAttackDamage(target, true);
             var damage = aa;
-
-            if (Player.Instance.Spellbook.GetSpell(SpellSlot.R).IsReady
-                && DmgMenu[champion + "R"].Cast<CheckBox>().CurrentValue)
-            {
-                // R damage
-                damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.R);
-            }
+            
 
             if (Player.Instance.Spellbook.GetSpell(SpellSlot.Q).IsReady
                 && DmgMenu[champion + "Q"].Cast<CheckBox>().CurrentValue)
             {
                 // Q damage
                 damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q);
+            }
+
+            if (Player.Instance.Spellbook.GetSpell(SpellSlot.W).IsReady
+                && DmgMenu[champion + "W"].Cast<CheckBox>().CurrentValue)
+            {
+                // W damage
+                damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.W);
             }
 
             if (Player.Instance.Spellbook.GetSpell(SpellSlot.E).IsReady
@@ -101,11 +99,11 @@
                 damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.E);
             }
 
-            if (Player.Instance.Spellbook.GetSpell(SpellSlot.W).IsReady
-                && DmgMenu[champion + "W"].Cast<CheckBox>().CurrentValue)
+            if (Player.Instance.Spellbook.GetSpell(SpellSlot.R).IsReady
+                && DmgMenu[champion + "R"].Cast<CheckBox>().CurrentValue)
             {
-                // W damage
-                damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.W);
+                // R damage
+                damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.R);
             }
 
             return (int)damage;

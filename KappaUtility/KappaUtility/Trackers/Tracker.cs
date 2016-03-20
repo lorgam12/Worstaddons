@@ -17,6 +17,8 @@
 
     internal class Tracker
     {
+        public static TeleportStatus teleport;
+
         private static Vector2 PingLocation;
 
         private static int LastPingT = 0;
@@ -26,31 +28,48 @@
         internal static void OnLoad()
         {
             TrackMenu = Load.UtliMenu.AddSubMenu("Tracker");
+            TrackMenu.AddGroupLabel("Surrender Tracker");
+            TrackMenu.Add("Trackally", new CheckBox("Track Allies Surrender"));
+            TrackMenu.Add("Trackenemy", new CheckBox("Track Enemies Surrender"));
+            TrackMenu.AddSeparator();
+            TrackMenu.AddGroupLabel("Notifications Settings");
+            TrackMenu.Add("recallnotify", new CheckBox("Notify On Enemy Recall"));
+            TrackMenu.AddSeparator();
             TrackMenu.AddGroupLabel("Tracker Settings");
-            TrackMenu.Add("Trackrecall", new CheckBox("Track Enemies Recall"));
+            TrackMenu.Add("Track", new CheckBox("Track Enemies Status"));
             TrackMenu.Add("Tracktraps", new CheckBox("Track Enemy Traps [BETA]"));
             TrackMenu.Add("Trackping", new CheckBox("Ping On Killable Enemies (Local)"));
+            TrackMenu.Add("Trackway", new CheckBox("Track Enemy WayPoints"));
             TrackMenu.AddSeparator();
-            TrackMenu.Add("Track", new CheckBox("Track Enemies"));
+            TrackMenu.AddGroupLabel("Don't Track:");
+            foreach (var enemy in ObjectManager.Get<AIHeroClient>())
+            {
+                CheckBox cb = new CheckBox(enemy.BaseSkinName) { CurrentValue = false };
+                if (enemy.Team != Player.Instance.Team)
+                {
+                    TrackMenu.Add("DontTrack" + enemy.BaseSkinName, cb);
+                }
+            }
+
+            TrackMenu.Add("Distance", new Slider("WayPoints Detection Range", 1000, 0, 5000));
+            TrackMenu.AddGroupLabel("Drawings Settings");
             TrackMenu.Add("trackx", new Slider("Tracker Position X", 0, 0, 100));
             TrackMenu.Add("tracky", new Slider("Tracker Position Y", 0, 0, 100));
 
-            Drawing.OnDraw += OnDraw;
-            Drawing.OnEndScene += Drawing_OnEndScene;
             Teleport.OnTeleport += OnTeleport;
-            Game.OnUpdate += Game_OnUpdate;
         }
 
-        private static void Game_OnUpdate(EventArgs args)
+        public static void track()
         {
             foreach (var enemy in
                 ObjectManager.Get<AIHeroClient>()
+                    .Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsValid)
                     .Where(
-                        ene =>
-                        ene != null && !ene.IsDead && ene.IsEnemy && ene.IsVisible && ene.IsValid && ene.IsHPBarRendered)
-                    .Where(enemy => DamageInd.CalcDamage(enemy) >= enemy.TotalShieldHealth()))
+                        enemy =>
+                        DamageInd.CalcDamage(enemy) >= enemy.TotalShieldHealth()
+                        && !TrackMenu["DontTrack" + enemy.BaseSkinName].Cast<CheckBox>().CurrentValue))
             {
-                if (TrackMenu.Get<CheckBox>("Trackping").CurrentValue)
+                if (TrackMenu.Get<CheckBox>("Trackping").CurrentValue && enemy.IsVisible && enemy.IsHPBarRendered)
                 {
                     Ping(enemy.Position.To2D());
                 }
@@ -74,10 +93,10 @@
 
         private static void SimplePing()
         {
-            TacticalMap.ShowPing(PingCategory.Danger, PingLocation);
+            TacticalMap.ShowPing(PingCategory.Danger, PingLocation, true);
         }
 
-        private static void Drawing_OnEndScene(EventArgs args)
+        internal static void Traps()
         {
             if (TrackMenu["Tracktraps"].Cast<CheckBox>().CurrentValue)
             {
@@ -154,23 +173,25 @@
                 return;
             }
 
+            teleport = args.Status;
             if (sender is AIHeroClient)
             {
-                if (TrackMenu["Trackrecall"].Cast<CheckBox>().CurrentValue)
+                if (TrackMenu["recallnotify"].Cast<CheckBox>().CurrentValue
+                    && !TrackMenu["DontTrack" + sender.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
-                    if (args.Status == TeleportStatus.Start)
+                    if (teleport == TeleportStatus.Start)
                     {
                         Notifications.Show(
                             new SimpleNotification(sender.BaseSkinName + " Is Recalling", "KappaTracker"));
                     }
 
-                    if (args.Status == TeleportStatus.Abort)
+                    if (teleport == TeleportStatus.Abort)
                     {
                         Notifications.Show(
                             new SimpleNotification(sender.BaseSkinName + " Recall Aborted", "KappaTracker"));
                     }
 
-                    if (args.Status == TeleportStatus.Finish)
+                    if (teleport == TeleportStatus.Finish)
                     {
                         Notifications.Show(
                             new SimpleNotification(sender.BaseSkinName + " Recall Finished", "KappaTracker"));
@@ -179,16 +200,19 @@
             }
         }
 
-        private static void OnDraw(EventArgs args)
+        internal static void HPtrack()
         {
-            if (TrackMenu["Track"].Cast<CheckBox>().CurrentValue)
+            float timer = 0;
+            var trackx = TrackMenu["trackx"].Cast<Slider>().CurrentValue;
+            var tracky = TrackMenu["tracky"].Cast<Slider>().CurrentValue;
+            float i = 0;
+            foreach (var hero in
+                EntityManager.Heroes.Enemies.Where(
+                    hero =>
+                    hero != null && hero.IsEnemy && !hero.IsMe
+                    && !TrackMenu["DontTrack" + hero.BaseSkinName].Cast<CheckBox>().CurrentValue))
             {
-                var trackx = TrackMenu["trackx"].Cast<Slider>().CurrentValue;
-                var tracky = TrackMenu["tracky"].Cast<Slider>().CurrentValue;
-                float i = 0;
-                foreach (var hero in
-                    EntityManager.Heroes.Enemies.Where(
-                        hero => hero != null && hero.IsEnemy && !hero.IsMe && !hero.IsDead))
+                if (TrackMenu["Track"].Cast<CheckBox>().CurrentValue)
                 {
                     var champion = hero.ChampionName;
                     if (champion.Length > 12)
@@ -197,7 +221,13 @@
                     }
 
                     var percent = (int)hero.HealthPercent;
-                    var color = System.Drawing.Color.Red;
+                    var color = System.Drawing.Color.FromArgb(206, 206, 206);
+
+                    if (percent > 0)
+                    {
+                        color = System.Drawing.Color.Red;
+                    }
+
                     if (percent > 25)
                     {
                         color = System.Drawing.Color.Orange;
@@ -224,24 +254,70 @@
                         color,
                         (" ( " + (int)hero.TotalShieldHealth()) + " / " + (int)hero.MaxHealth + " | " + percent + "% ) ");
 
-                    if (hero.IsVisible && hero.IsHPBarRendered)
+                    if (hero.IsVisible && hero.IsHPBarRendered && !hero.IsDead)
                     {
                         Drawing.DrawText(
                             (Drawing.Width * 0.13f) + (trackx * 20),
                             (Drawing.Height * 0.1f) + (tracky * 10) + i,
                             color,
-                            "    Visible ");
+                            "     Visible ");
                     }
                     else
                     {
+                        if (!hero.IsDead)
+                        {
+                            Drawing.DrawText(
+                                (Drawing.Width * 0.13f) + (trackx * 20),
+                                (Drawing.Height * 0.1f) + (tracky * 10) + i,
+                                color,
+                                "     Not Visible ");
+                        }
+                    }
+                    if (hero.IsDead)
+                    {
                         Drawing.DrawText(
                             (Drawing.Width * 0.13f) + (trackx * 20),
                             (Drawing.Height * 0.1f) + (tracky * 10) + i,
                             color,
-                            "    Not Visible ");
+                            "     Dead ");
+                    }
+
+                    if (hero.Health < DamageInd.CalcDamage(hero))
+                    {
+                        Drawing.DrawText(
+                            (Drawing.Width * 0.18f) + (trackx * 20),
+                            (Drawing.Height * 0.1f) + (tracky * 10) + i,
+                            color,
+                            "Killable");
                     }
 
                     i += 20f;
+                }
+
+                if (TrackMenu.Get<CheckBox>("Trackway").CurrentValue)
+                {
+                    if (hero.Path.LastOrDefault().Distance(Player.Instance)
+                        <= TrackMenu["Distance"].Cast<Slider>().CurrentValue)
+                    {
+                        if (!hero.IsInRange(hero.Path.LastOrDefault(), 50))
+                        {
+                            Drawing.DrawLine(
+                                hero.Position.WorldToScreen(),
+                                hero.Path.LastOrDefault().WorldToScreen(),
+                                2,
+                                System.Drawing.Color.White);
+                            Circle.Draw(Color.White, 50, hero.Path.LastOrDefault());
+                            if (hero != null && hero.Position != null && hero.Path.LastOrDefault() != null)
+                            {
+                                timer += hero.Position.Distance(hero.Path.LastOrDefault()) / hero.MoveSpeed;
+                                Drawing.DrawText(
+                                    Drawing.WorldToScreen(hero.Path.LastOrDefault()) - new Vector2(15, -15),
+                                    System.Drawing.Color.White,
+                                    hero.ChampionName + " " + timer.ToString("F"),
+                                    12);
+                            }
+                        }
+                    }
                 }
             }
         }
