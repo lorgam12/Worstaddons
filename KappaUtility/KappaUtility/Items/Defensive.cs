@@ -24,6 +24,7 @@
             DefMenu = Load.UtliMenu.AddSubMenu("Defence Items");
             DefMenu.AddGroupLabel("Defence Settings");
             DefMenu.Add("Zhonyas", new CheckBox("Use Zhonyas"));
+            DefMenu.Add("ZhonyasD", new CheckBox("Deny Dangers Spells"));
             DefMenu.Add("Zhonyash", new Slider("Use Zhonyas health", 25, 0, 100));
             DefMenu.AddSeparator();
             DefMenu.Add("Seraph", new CheckBox("Use Seraph"));
@@ -37,6 +38,7 @@
             DefMenu.AddSeparator();
             DefMenu.Add("Randuin", new CheckBox("Use Randuin"));
             DefMenu.Add("Randuinh", new Slider("Use Randuin On X Enemies", 2, 1, 5));
+            Zhonya.OnLoad();
         }
 
         internal static void Items()

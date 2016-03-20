@@ -62,6 +62,7 @@
     <Compile Include="Items\Defensive.cs" />
     <Compile Include="Items\Offensive.cs" />
     <Compile Include="Items\Potions.cs" />
+    <Compile Include="Items\Zhonya.cs" />
     <Compile Include="Load.cs" />
     <Compile Include="Misc\AutoQSS.cs" />
     <Compile Include="Misc\AutoReveal.cs" />

@@ -5,7 +5,7 @@
 
     using Trackers;
 
-    class Surrender
+    internal class Surrender
     {
         internal static void OnLoad()
         {

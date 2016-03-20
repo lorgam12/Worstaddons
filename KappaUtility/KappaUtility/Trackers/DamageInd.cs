@@ -76,7 +76,6 @@
         {
             var aa = ObjectManager.Player.GetAutoAttackDamage(target, true);
             var damage = aa;
-            
 
             if (Player.Instance.Spellbook.GetSpell(SpellSlot.Q).IsReady
                 && DmgMenu[champion + "Q"].Cast<CheckBox>().CurrentValue)

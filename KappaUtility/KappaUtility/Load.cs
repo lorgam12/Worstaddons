@@ -25,12 +25,6 @@
             Loading.OnLoadingComplete += OnLoad;
         }
 
-        private static void Loading_OnLoadingCompleteSpectatorMode(EventArgs args)
-        {
-            AutoReveal.OnLoad();
-            Tracker.OnLoad();
-        }
-
         private static void OnLoad(EventArgs args)
         {
             UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
@@ -44,7 +38,7 @@
             Potions.OnLoad();
             Offensive.OnLoad();
             Defensive.OnLoad();
-            
+
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnEndScene += Drawing_OnEndScene;
             Drawing.OnDraw += OnDraw;
