@@ -21,7 +21,7 @@
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (Player.Instance.IsDead || sender.IsAlly || sender.IsMe || !args.Target.IsMe || args.Target == null)
+            if (!(sender is AIHeroClient))
             {
                 return;
             }
