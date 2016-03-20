@@ -23,20 +23,20 @@
         {
             DefMenu = Load.UtliMenu.AddSubMenu("Defence Items");
             DefMenu.AddGroupLabel("Defence Settings");
-            DefMenu.Add("Zhonyas", new CheckBox("Use Zhonyas"));
-            DefMenu.Add("ZhonyasD", new CheckBox("Deny Dangers Spells"));
+            DefMenu.Add("Zhonyas", new CheckBox("Use Zhonyas", false));
+            DefMenu.Add("ZhonyasD", new CheckBox("Deny Dangers Spells", false));
             DefMenu.Add("Zhonyash", new Slider("Use Zhonyas health", 25, 0, 100));
             DefMenu.AddSeparator();
-            DefMenu.Add("Seraph", new CheckBox("Use Seraph"));
+            DefMenu.Add("Seraph", new CheckBox("Use Seraph", false));
             DefMenu.Add("Seraphh", new Slider("Use Seraph health", 45, 0, 100));
             DefMenu.AddSeparator();
-            DefMenu.Add("FaceOfTheMountain", new CheckBox("Use Face Of The Mountain"));
+            DefMenu.Add("FaceOfTheMountain", new CheckBox("Use Face Of The Mountain", false));
             DefMenu.Add("FaceOfTheMountainh", new Slider("Use Face Of The Mountain health", 50, 0, 100));
             DefMenu.AddSeparator();
-            DefMenu.Add("Solari", new CheckBox("Use Solari"));
+            DefMenu.Add("Solari", new CheckBox("Use Solari", false));
             DefMenu.Add("Solarih", new Slider("Use Solari health", 30, 0, 100));
             DefMenu.AddSeparator();
-            DefMenu.Add("Randuin", new CheckBox("Use Randuin"));
+            DefMenu.Add("Randuin", new CheckBox("Use Randuin", false));
             DefMenu.Add("Randuinh", new Slider("Use Randuin On X Enemies", 2, 1, 5));
             Zhonya.OnLoad();
         }

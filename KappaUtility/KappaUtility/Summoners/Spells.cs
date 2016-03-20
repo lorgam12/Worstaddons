@@ -32,7 +32,7 @@
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerDot")) != null)
             {
                 SummMenu.AddGroupLabel("Ignite Settings");
-                SummMenu.Add("ignite", new CheckBox("Ignite"));
+                SummMenu.Add("ignite", new CheckBox("Ignite", false));
                 SummMenu.AddGroupLabel("Don't Use Ignite On:");
                 foreach (var enemy in ObjectManager.Get<AIHeroClient>())
                 {
@@ -50,7 +50,7 @@
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerBarrier")) != null)
             {
                 SummMenu.AddGroupLabel("Barrier Settings");
-                SummMenu.Add("barrier", new CheckBox("Barrier"));
+                SummMenu.Add("barrier", new CheckBox("Barrier", false));
                 SummMenu.Add("barrierme", new Slider("Use On My Health %", 30, 0, 100));
                 SummMenu.AddSeparator();
                 Barrier = new Spell.Active(ObjectManager.Player.GetSpellSlotFromName("SummonerBarrier"));
@@ -59,7 +59,7 @@
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerHeal")) != null)
             {
                 SummMenu.AddGroupLabel("Heal Settings");
-                SummMenu.Add("Heal", new CheckBox("Heal"));
+                SummMenu.Add("Heal", new CheckBox("Heal", false));
                 SummMenu.Add("Healally", new Slider("Use On Ally Health %", 25, 0, 100));
                 SummMenu.Add("Healme", new Slider("Use On My Health %", 30, 0, 100));
                 SummMenu.AddGroupLabel("Don't Use Heal On:");
@@ -79,7 +79,7 @@
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerExhaust")) != null)
             {
                 SummMenu.AddGroupLabel("Exhaust Settings");
-                SummMenu.Add("Exhaust", new CheckBox("Exhaust"));
+                SummMenu.Add("Exhaust", new CheckBox("Exhaust", false));
                 SummMenu.Add("exhaustally", new Slider("Use When Ally/Self Health %", 35, 0, 100));
                 SummMenu.Add("exhaustenemy", new Slider("Use When Enemy Health %", 40, 0, 100));
                 SummMenu.AddGroupLabel("Don't Use Exhaust On:");
@@ -98,9 +98,9 @@
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerSmite")) != null)
             {
                 SummMenu.AddGroupLabel("Smite Settings");
-                SummMenu.Add("smitemob", new CheckBox("Smite Monsters"));
-                SummMenu.Add("smitecombo", new CheckBox("Smite Combo"));
-                SummMenu.Add("smiteks", new CheckBox("Smite KillSteal"));
+                SummMenu.Add("smitemob", new CheckBox("Smite Monsters", false));
+                SummMenu.Add("smitecombo", new CheckBox("Smite Combo", false));
+                SummMenu.Add("smiteks", new CheckBox("Smite KillSteal", false));
                 SummMenu.AddGroupLabel("Don't Use Smite On:");
                 foreach (var enemy in ObjectManager.Get<AIHeroClient>())
                 {

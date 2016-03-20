@@ -27,11 +27,11 @@
         {
             OffMenu = Load.UtliMenu.AddSubMenu("Offense Items");
             OffMenu.AddGroupLabel("Offense Settings");
-            OffMenu.Add("Hydra", new CheckBox("Use Hydra / Timat / Titanic"));
-            OffMenu.Add("useGhostblade", new CheckBox("Use Youmuu's Ghostblade"));
-            OffMenu.Add("UseBOTRK", new CheckBox("Use Blade of the Ruined King"));
-            OffMenu.Add("UseBilge", new CheckBox("Use Bilgewater Cutlass"));
-            OffMenu.Add("UseGunblade", new CheckBox("Use Hextech Gunblade"));
+            OffMenu.Add("Hydra", new CheckBox("Use Hydra / Timat / Titanic", false));
+            OffMenu.Add("useGhostblade", new CheckBox("Use Youmuu's Ghostblade", false));
+            OffMenu.Add("UseBOTRK", new CheckBox("Use Blade of the Ruined King", false));
+            OffMenu.Add("UseBilge", new CheckBox("Use Bilgewater Cutlass", false));
+            OffMenu.Add("UseGunblade", new CheckBox("Use Hextech Gunblade", false));
             OffMenu.AddSeparator();
             OffMenu.Add("eL", new Slider("Use On Enemy health", 65, 0, 100));
             OffMenu.Add("oL", new Slider("Use On My health", 65, 0, 100));

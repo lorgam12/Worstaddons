@@ -111,13 +111,13 @@
             BushMenu.Add("enables", new CheckBox("Enable", false));
             BushMenu.Add("combos", new CheckBox("Only On Combo", false));
             BushMenu.AddGroupLabel("Select Champions:");
-            BushMenu.Add("akali", new CheckBox("Akali"));
-            BushMenu.Add("shaco", new CheckBox("Shaco"));
-            BushMenu.Add("rengar", new CheckBox("Rengar"));
-            BushMenu.Add("talon", new CheckBox("Talon"));
-            BushMenu.Add("twitch", new CheckBox("Twitch"));
-            BushMenu.Add("khazix", new CheckBox("KhaZix"));
-            BushMenu.Add("vayne", new CheckBox("Vayne"));
+            BushMenu.Add("akali", new CheckBox("Akali", false));
+            BushMenu.Add("shaco", new CheckBox("Shaco", false));
+            BushMenu.Add("rengar", new CheckBox("Rengar", false));
+            BushMenu.Add("talon", new CheckBox("Talon", false));
+            BushMenu.Add("twitch", new CheckBox("Twitch", false));
+            BushMenu.Add("khazix", new CheckBox("KhaZix", false));
+            BushMenu.Add("vayne", new CheckBox("Vayne", false));
 
             GameObject.OnCreate += GameObject_OnCreate;
             GameObject.OnDelete += GameObject_OnDelete;

@@ -29,17 +29,17 @@
         {
             TrackMenu = Load.UtliMenu.AddSubMenu("Tracker");
             TrackMenu.AddGroupLabel("Surrender Tracker");
-            TrackMenu.Add("Trackally", new CheckBox("Track Allies Surrender"));
-            TrackMenu.Add("Trackenemy", new CheckBox("Track Enemies Surrender"));
+            TrackMenu.Add("Trackally", new CheckBox("Track Allies Surrender", false));
+            TrackMenu.Add("Trackenemy", new CheckBox("Track Enemies Surrender", false));
             TrackMenu.AddSeparator();
             TrackMenu.AddGroupLabel("Notifications Settings");
-            TrackMenu.Add("recallnotify", new CheckBox("Notify On Enemy Recall"));
+            TrackMenu.Add("recallnotify", new CheckBox("Notify On Enemy Recall", false));
             TrackMenu.AddSeparator();
             TrackMenu.AddGroupLabel("Tracker Settings");
             TrackMenu.Add("Track", new CheckBox("Track Enemies Status"));
-            TrackMenu.Add("Tracktraps", new CheckBox("Track Enemy Traps [BETA]"));
-            TrackMenu.Add("Trackping", new CheckBox("Ping On Killable Enemies (Local)"));
-            TrackMenu.Add("Trackway", new CheckBox("Track Enemy WayPoints"));
+            TrackMenu.Add("Tracktraps", new CheckBox("Track Enemy Traps [BETA]", false));
+            TrackMenu.Add("Trackping", new CheckBox("Ping On Killable Enemies (Local)", false));
+            TrackMenu.Add("Trackway", new CheckBox("Track Enemy WayPoints", false));
             TrackMenu.AddSeparator();
             TrackMenu.AddGroupLabel("Don't Track:");
             foreach (var enemy in ObjectManager.Get<AIHeroClient>())
