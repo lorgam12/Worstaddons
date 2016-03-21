@@ -33,7 +33,7 @@
             QssMenu.Add("supperss", new CheckBox("Use On Supperss?", false));
             QssMenu.Add("slow", new CheckBox("Use On Slows?", false));
             QssMenu.Add("knockup", new CheckBox("Use On Knock Ups?", false));
-            QssMenu.Add("knockback", new CheckBox("Use On Knock Backs?, false"));
+            QssMenu.Add("knockback", new CheckBox("Use On Knock Backs?", false));
             QssMenu.Add("nearsight", new CheckBox("Use On NearSight?", false));
             QssMenu.Add("root", new CheckBox("Use On Roots?", false));
             QssMenu.Add("tunt", new CheckBox("Use On Taunts?", false));

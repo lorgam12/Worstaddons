@@ -38,6 +38,7 @@
             DefMenu.AddSeparator();
             DefMenu.Add("Randuin", new CheckBox("Use Randuin", false));
             DefMenu.Add("Randuinh", new Slider("Use Randuin On X Enemies", 2, 1, 5));
+            Zhonya.OnLoad();
         }
 
         internal static void Items()
