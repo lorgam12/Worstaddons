@@ -71,8 +71,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Summoners\Smite.cs" />
     <Compile Include="Summoners\Spells.cs" />
-    <Compile Include="Trackers\DamageInd.cs" />
-    <Compile Include="Trackers\HpBarIndicator.cs" />
     <Compile Include="Trackers\Tracker.cs" />
   </ItemGroup>
   <ItemGroup>

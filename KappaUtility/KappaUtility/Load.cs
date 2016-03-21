@@ -30,7 +30,6 @@
             UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
             AutoReveal.OnLoad();
             AutoQSS.OnLoad();
-            DamageInd.OnLoad();
             Tracker.OnLoad();
             Surrender.OnLoad();
             SkinHax.OnLoad();
@@ -54,7 +53,6 @@
 
         private static void Drawing_OnEndScene(EventArgs args)
         {
-            DamageInd.Damage();
             Tracker.Traps();
         }
 

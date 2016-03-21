@@ -61,12 +61,18 @@
 
         public static void track()
         {
-            foreach (var enemy in ObjectManager.Get<AIHeroClient>()
-                .Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsValid)
-                .Where(
-                    enemy =>
-                    DamageInd.CalcDamage(enemy) >= enemy.TotalShieldHealth()
-                    && !TrackMenu["DontTrack" + enemy.BaseSkinName].Cast<CheckBox>().CurrentValue).Where(enemy => TrackMenu.Get<CheckBox>("Trackping").CurrentValue && enemy.IsVisible && enemy.IsHPBarRendered))
+            foreach (
+                var enemy in
+                    ObjectManager.Get<AIHeroClient>()
+                        .Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsValid)
+                        .Where(
+                            enemy =>
+                            CalcDamage(enemy) >= enemy.TotalShieldHealth()
+                            && !TrackMenu["DontTrack" + enemy.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                        .Where(
+                            enemy =>
+                            TrackMenu.Get<CheckBox>("Trackping").CurrentValue && enemy.IsVisible
+                            && enemy.IsHPBarRendered))
             {
                 Ping(enemy.Position.To2D());
             }
@@ -92,6 +98,38 @@
             TacticalMap.ShowPing(PingCategory.Danger, PingLocation, true);
         }
 
+        public static int CalcDamage(Obj_AI_Base target)
+        {
+            var aa = ObjectManager.Player.GetAutoAttackDamage(target, true);
+            var damage = aa;
+
+            if (Player.Instance.Spellbook.GetSpell(SpellSlot.Q).IsReady)
+            {
+                // Q damage
+                damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q);
+            }
+
+            if (Player.Instance.Spellbook.GetSpell(SpellSlot.W).IsReady)
+            {
+                // W damage
+                damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.W);
+            }
+
+            if (Player.Instance.Spellbook.GetSpell(SpellSlot.E).IsReady)
+            {
+                // E damage
+                damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.E);
+            }
+
+            if (Player.Instance.Spellbook.GetSpell(SpellSlot.R).IsReady)
+            {
+                // R damage
+                damage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.R);
+            }
+
+            return (int)damage;
+        }
+
         internal static void Traps()
         {
             if (TrackMenu["Tracktraps"].Cast<CheckBox>().CurrentValue)
@@ -102,59 +140,59 @@
                     {
                         if (trap != null)
                         {
-                            if (trap.Name == "Cupcake Trap")
+                            switch (trap.Name)
                             {
-                                Drawing.DrawText(
-                                    Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
-                                    System.Drawing.Color.White,
-                                    "Caitlyn Trap",
-                                    2);
-                                Circle.Draw(Color.Purple, trap.BoundingRadius + 10, trap.Position);
-                            }
-
-                            if (trap.Name == "Noxious Trap")
-                            {
-                                if (trap.BaseSkinName == "NidaleeSpear")
-                                {
-                                    var endTime = Math.Max(0, -Game.Time + 120);
+                                case "Cupcake Trap":
                                     Drawing.DrawText(
                                         Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
                                         System.Drawing.Color.White,
-                                        "Nidalee Trap",
+                                        "Caitlyn Trap",
                                         2);
-                                    Circle.Draw(Color.Green, trap.BoundingRadius + 25, trap.Position);
-                                }
+                                    Circle.Draw(Color.Purple, trap.BoundingRadius + 10, trap.Position);
+                                    break;
 
-                                if (trap.BaseSkinName == "TeemoMushroom")
-                                {
-                                    if (trap.GetBuff("BantamTrap") != null)
+                                case "Noxious Trap":
+                                    if (trap.BaseSkinName == "NidaleeSpear")
                                     {
-                                        var endTime = Math.Max(0, trap.GetBuff("BantamTrap").EndTime - Game.Time);
+                                        var endTime = Math.Max(0, -Game.Time + 120);
                                         Drawing.DrawText(
                                             Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
                                             System.Drawing.Color.White,
-                                            "Teemo Mushroom Expire: "
-                                            + Convert.ToString(endTime, CultureInfo.InstalledUICulture),
+                                            "Nidalee Trap",
+                                            2);
+                                        Circle.Draw(Color.Green, trap.BoundingRadius + 25, trap.Position);
+                                    }
+
+                                    if (trap.BaseSkinName == "TeemoMushroom")
+                                    {
+                                        if (trap.GetBuff("BantamTrap") != null)
+                                        {
+                                            var endTime = Math.Max(0, trap.GetBuff("BantamTrap").EndTime - Game.Time);
+                                            Drawing.DrawText(
+                                                Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
+                                                System.Drawing.Color.White,
+                                                "Teemo Mushroom Expire: "
+                                                + Convert.ToString(endTime, CultureInfo.InstalledUICulture),
+                                                2);
+                                        }
+
+                                        Circle.Draw(Color.Green, trap.BoundingRadius * 3, trap.Position);
+                                    }
+                                    break;
+
+                                case "Jack In The Box":
+                                    if (trap.GetBuff("JackInTheBox") != null)
+                                    {
+                                        var endTime = Math.Max(0, trap.GetBuff("JackInTheBox").EndTime - Game.Time);
+                                        Drawing.DrawText(
+                                            Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
+                                            System.Drawing.Color.White,
+                                            "Shaco Box Expire: " + Convert.ToString(endTime, CultureInfo.InvariantCulture),
                                             2);
                                     }
 
-                                    Circle.Draw(Color.Green, trap.BoundingRadius * 3, trap.Position);
-                                }
-                            }
-
-                            if (trap.Name == "Jack In The Box")
-                            {
-                                if (trap.GetBuff("JackInTheBox") != null)
-                                {
-                                    var endTime = Math.Max(0, trap.GetBuff("JackInTheBox").EndTime - Game.Time);
-                                    Drawing.DrawText(
-                                        Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
-                                        System.Drawing.Color.White,
-                                        "Shaco Box Expire: " + Convert.ToString(endTime, CultureInfo.InvariantCulture),
-                                        2);
-                                }
-
-                                Circle.Draw(Color.Green, trap.BoundingRadius * 15, trap.Position);
+                                    Circle.Draw(Color.Green, trap.BoundingRadius * 15, trap.Position);
+                                    break;
                             }
                         }
                     }
@@ -205,7 +243,7 @@
             foreach (var hero in
                 EntityManager.Heroes.Enemies.Where(
                     hero =>
-                    hero != null && hero.IsEnemy && !hero.IsMe
+                    hero != null && hero.IsEnemy
                     && !TrackMenu["DontTrack" + hero.BaseSkinName].Cast<CheckBox>().CurrentValue))
             {
                 if (TrackMenu["Track"].Cast<CheckBox>().CurrentValue)
@@ -278,7 +316,7 @@
                             "     Dead ");
                     }
 
-                    if (hero.Health < DamageInd.CalcDamage(hero))
+                    if (hero.Health < CalcDamage(hero))
                     {
                         Drawing.DrawText(
                             (Drawing.Width * 0.18f) + (trackx * 20),
@@ -293,26 +331,21 @@
                 if (TrackMenu.Get<CheckBox>("Trackway").CurrentValue)
                 {
                     if (hero.Path.LastOrDefault().Distance(Player.Instance)
-                        <= TrackMenu["Distance"].Cast<Slider>().CurrentValue)
+                        <= TrackMenu["Distance"].Cast<Slider>().CurrentValue
+                        && !hero.IsInRange(hero.Path.LastOrDefault(), 50))
                     {
-                        if (!hero.IsInRange(hero.Path.LastOrDefault(), 50))
-                        {
-                            Drawing.DrawLine(
-                                hero.Position.WorldToScreen(),
-                                hero.Path.LastOrDefault().WorldToScreen(),
-                                2,
-                                System.Drawing.Color.White);
-                            Circle.Draw(Color.White, 50, hero.Path.LastOrDefault());
-                            if (hero != null && hero.Position != null && hero.Path.LastOrDefault() != null)
-                            {
-                                timer += hero.Position.Distance(hero.Path.LastOrDefault()) / hero.MoveSpeed;
-                                Drawing.DrawText(
-                                    Drawing.WorldToScreen(hero.Path.LastOrDefault()) - new Vector2(15, -15),
-                                    System.Drawing.Color.White,
-                                    hero.ChampionName + " " + timer.ToString("F"),
-                                    12);
-                            }
-                        }
+                        Drawing.DrawLine(
+                            hero.Position.WorldToScreen(),
+                            hero.Path.LastOrDefault().WorldToScreen(),
+                            2,
+                            System.Drawing.Color.White);
+                        Circle.Draw(Color.White, 50, hero.Path.LastOrDefault());
+                        timer += hero.Position.Distance(hero.Path.LastOrDefault()) / hero.MoveSpeed;
+                        Drawing.DrawText(
+                            Drawing.WorldToScreen(hero.Path.LastOrDefault()) - new Vector2(15, -15),
+                            System.Drawing.Color.White,
+                            hero.ChampionName + " " + timer.ToString("F"),
+                            12);
                     }
                 }
             }
