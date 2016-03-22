@@ -15,13 +15,15 @@
 
     using SharpDX;
 
+    using Color = System.Drawing.Color;
+
     internal class Tracker
     {
         public static TeleportStatus teleport;
 
         private static Vector2 PingLocation;
 
-        private static int LastPingT = 0;
+        private static int LastPingT;
 
         public static Menu TrackMenu { get; private set; }
 
@@ -44,7 +46,7 @@
             TrackMenu.AddGroupLabel("Don't Track:");
             foreach (var enemy in ObjectManager.Get<AIHeroClient>())
             {
-                CheckBox cb = new CheckBox(enemy.BaseSkinName) { CurrentValue = false };
+                var cb = new CheckBox(enemy.BaseSkinName) { CurrentValue = false };
                 if (enemy.Team != Player.Instance.Team)
                 {
                     TrackMenu.Add("DontTrack" + enemy.BaseSkinName, cb);
@@ -61,18 +63,16 @@
 
         public static void track()
         {
-            foreach (
-                var enemy in
-                    ObjectManager.Get<AIHeroClient>()
-                        .Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsValid)
-                        .Where(
-                            enemy =>
-                            CalcDamage(enemy) >= enemy.TotalShieldHealth()
-                            && !TrackMenu["DontTrack" + enemy.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                        .Where(
-                            enemy =>
-                            TrackMenu.Get<CheckBox>("Trackping").CurrentValue && enemy.IsVisible
-                            && enemy.IsHPBarRendered))
+            foreach (var enemy in
+                ObjectManager.Get<AIHeroClient>()
+                    .Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsValid)
+                    .Where(
+                        enemy =>
+                        CalcDamage(enemy) >= enemy.TotalShieldHealth()
+                        && !TrackMenu["DontTrack" + enemy.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    .Where(
+                        enemy =>
+                        TrackMenu.Get<CheckBox>("Trackping").CurrentValue && enemy.IsVisible && enemy.IsHPBarRendered))
             {
                 Ping(enemy.Position.To2D());
             }
@@ -90,7 +90,7 @@
             SimplePing();
             Core.DelayAction(SimplePing, 150);
             Core.DelayAction(SimplePing, 450);
-            Core.DelayAction(SimplePing, 950);
+            Core.DelayAction(SimplePing, 750);
         }
 
         private static void SimplePing()
@@ -132,69 +132,69 @@
 
         internal static void Traps()
         {
-            if (TrackMenu["Tracktraps"].Cast<CheckBox>().CurrentValue)
+            if (!TrackMenu["Tracktraps"].Cast<CheckBox>().CurrentValue)
             {
-                var traps = ObjectManager.Get<Obj_AI_Minion>();
+                return;
+            }
+
+            var traps = ObjectManager.Get<Obj_AI_Minion>();
+            {
+                foreach (var trap in traps.Where(trap => trap != null))
                 {
-                    foreach (var trap in traps)
+                    switch (trap.Name)
                     {
-                        if (trap != null)
-                        {
-                            switch (trap.Name)
+                        case "Cupcake Trap":
+                            Drawing.DrawText(
+                                Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
+                                Color.White,
+                                "Caitlyn Trap",
+                                2);
+                            Circle.Draw(SharpDX.Color.Purple, trap.BoundingRadius + 10, trap.Position);
+                            break;
+
+                        case "Noxious Trap":
+                            if (trap.BaseSkinName == "NidaleeSpear")
                             {
-                                case "Cupcake Trap":
+                                var endTime = Math.Max(0, -Game.Time + 120);
+                                Drawing.DrawText(
+                                    Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
+                                    Color.White,
+                                    "Nidalee Trap",
+                                    2);
+                                Circle.Draw(SharpDX.Color.Green, trap.BoundingRadius + 25, trap.Position);
+                            }
+
+                            if (trap.BaseSkinName == "TeemoMushroom")
+                            {
+                                if (trap.GetBuff("BantamTrap") != null)
+                                {
+                                    var endTime = Math.Max(0, trap.GetBuff("BantamTrap").EndTime - Game.Time);
                                     Drawing.DrawText(
                                         Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
-                                        System.Drawing.Color.White,
-                                        "Caitlyn Trap",
+                                        Color.White,
+                                        "Teemo Mushroom Expire: "
+                                        + Convert.ToString(endTime, CultureInfo.InstalledUICulture),
                                         2);
-                                    Circle.Draw(Color.Purple, trap.BoundingRadius + 10, trap.Position);
-                                    break;
+                                }
 
-                                case "Noxious Trap":
-                                    if (trap.BaseSkinName == "NidaleeSpear")
-                                    {
-                                        var endTime = Math.Max(0, -Game.Time + 120);
-                                        Drawing.DrawText(
-                                            Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
-                                            System.Drawing.Color.White,
-                                            "Nidalee Trap",
-                                            2);
-                                        Circle.Draw(Color.Green, trap.BoundingRadius + 25, trap.Position);
-                                    }
-
-                                    if (trap.BaseSkinName == "TeemoMushroom")
-                                    {
-                                        if (trap.GetBuff("BantamTrap") != null)
-                                        {
-                                            var endTime = Math.Max(0, trap.GetBuff("BantamTrap").EndTime - Game.Time);
-                                            Drawing.DrawText(
-                                                Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
-                                                System.Drawing.Color.White,
-                                                "Teemo Mushroom Expire: "
-                                                + Convert.ToString(endTime, CultureInfo.InstalledUICulture),
-                                                2);
-                                        }
-
-                                        Circle.Draw(Color.Green, trap.BoundingRadius * 3, trap.Position);
-                                    }
-                                    break;
-
-                                case "Jack In The Box":
-                                    if (trap.GetBuff("JackInTheBox") != null)
-                                    {
-                                        var endTime = Math.Max(0, trap.GetBuff("JackInTheBox").EndTime - Game.Time);
-                                        Drawing.DrawText(
-                                            Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
-                                            System.Drawing.Color.White,
-                                            "Shaco Box Expire: " + Convert.ToString(endTime, CultureInfo.InvariantCulture),
-                                            2);
-                                    }
-
-                                    Circle.Draw(Color.Green, trap.BoundingRadius * 15, trap.Position);
-                                    break;
+                                Circle.Draw(SharpDX.Color.Green, trap.BoundingRadius * 3, trap.Position);
                             }
-                        }
+                            break;
+
+                        case "Jack In The Box":
+                            if (trap.GetBuff("JackInTheBox") != null)
+                            {
+                                var endTime = Math.Max(0, trap.GetBuff("JackInTheBox").EndTime - Game.Time);
+                                Drawing.DrawText(
+                                    Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
+                                    Color.White,
+                                    "Shaco Box Expire: "
+                                    + Convert.ToString(endTime, CultureInfo.InvariantCulture),
+                                    2);
+                            }
+
+                            Circle.Draw(SharpDX.Color.Green, trap.BoundingRadius * 15, trap.Position);
+                            break;
                     }
                 }
             }
@@ -208,29 +208,33 @@
             }
 
             teleport = args.Status;
-            if (sender is AIHeroClient)
+            if (!(sender is AIHeroClient))
             {
-                if (TrackMenu["recallnotify"].Cast<CheckBox>().CurrentValue
-                    && !TrackMenu["DontTrack" + sender.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                {
-                    if (teleport == TeleportStatus.Start)
-                    {
-                        Notifications.Show(
-                            new SimpleNotification(sender.BaseSkinName + " Is Recalling", "KappaTracker"));
-                    }
+                return;
+            }
 
-                    if (teleport == TeleportStatus.Abort)
-                    {
-                        Notifications.Show(
-                            new SimpleNotification(sender.BaseSkinName + " Recall Aborted", "KappaTracker"));
-                    }
+            if (!TrackMenu["recallnotify"].Cast<CheckBox>().CurrentValue
+                || TrackMenu["DontTrack" + sender.BaseSkinName].Cast<CheckBox>().CurrentValue)
+            {
+                return;
+            }
 
-                    if (teleport == TeleportStatus.Finish)
-                    {
-                        Notifications.Show(
-                            new SimpleNotification(sender.BaseSkinName + " Recall Finished", "KappaTracker"));
-                    }
-                }
+            if (teleport == TeleportStatus.Start)
+            {
+                Notifications.Show(
+                    new SimpleNotification(sender.BaseSkinName + " Is Recalling", sender.BaseSkinName + " Current Health = " + (int)sender.TotalShieldHealth()));
+            }
+
+            if (teleport == TeleportStatus.Abort)
+            {
+                Notifications.Show(
+                    new SimpleNotification(sender.BaseSkinName + " Recall Aborted", sender.BaseSkinName + " Current Health = " + (int)sender.TotalShieldHealth()));
+            }
+
+            if (teleport == TeleportStatus.Finish)
+            {
+                Notifications.Show(
+                    new SimpleNotification(sender.BaseSkinName + " Recall Finished", sender.BaseSkinName + " Current Health = " + (int)sender.TotalShieldHealth()));
             }
         }
 
@@ -255,26 +259,26 @@
                     }
 
                     var percent = (int)hero.HealthPercent;
-                    var color = System.Drawing.Color.FromArgb(206, 206, 206);
+                    var color = Color.FromArgb(194, 194, 194);
 
                     if (percent > 0)
                     {
-                        color = System.Drawing.Color.Red;
+                        color = Color.Red;
                     }
 
                     if (percent > 25)
                     {
-                        color = System.Drawing.Color.Orange;
+                        color = Color.Orange;
                     }
 
                     if (percent > 50)
                     {
-                        color = System.Drawing.Color.Yellow;
+                        color = Color.Yellow;
                     }
 
                     if (percent > 75)
                     {
-                        color = System.Drawing.Color.LimeGreen;
+                        color = Color.LimeGreen;
                     }
 
                     Drawing.DrawText(
@@ -316,7 +320,7 @@
                             "     Dead ");
                     }
 
-                    if (hero.Health < CalcDamage(hero))
+                    if (hero.Health < CalcDamage(hero) && !hero.IsDead)
                     {
                         Drawing.DrawText(
                             (Drawing.Width * 0.18f) + (trackx * 20),
@@ -328,26 +332,26 @@
                     i += 20f;
                 }
 
-                if (TrackMenu.Get<CheckBox>("Trackway").CurrentValue)
+                if (!TrackMenu.Get<CheckBox>("Trackway").CurrentValue
+                    || (!(hero.Path.LastOrDefault().Distance(Player.Instance)
+                          <= TrackMenu["Distance"].Cast<Slider>().CurrentValue)
+                        || hero.IsInRange(hero.Path.LastOrDefault(), 50)))
                 {
-                    if (hero.Path.LastOrDefault().Distance(Player.Instance)
-                        <= TrackMenu["Distance"].Cast<Slider>().CurrentValue
-                        && !hero.IsInRange(hero.Path.LastOrDefault(), 50))
-                    {
-                        Drawing.DrawLine(
-                            hero.Position.WorldToScreen(),
-                            hero.Path.LastOrDefault().WorldToScreen(),
-                            2,
-                            System.Drawing.Color.White);
-                        Circle.Draw(Color.White, 50, hero.Path.LastOrDefault());
-                        timer += hero.Position.Distance(hero.Path.LastOrDefault()) / hero.MoveSpeed;
-                        Drawing.DrawText(
-                            Drawing.WorldToScreen(hero.Path.LastOrDefault()) - new Vector2(15, -15),
-                            System.Drawing.Color.White,
-                            hero.ChampionName + " " + timer.ToString("F"),
-                            12);
-                    }
+                    continue;
                 }
+
+                Drawing.DrawLine(
+                    hero.Position.WorldToScreen(),
+                    hero.Path.LastOrDefault().WorldToScreen(),
+                    2,
+                    Color.White);
+                Circle.Draw(SharpDX.Color.White, 50, hero.Path.LastOrDefault());
+                timer += hero.Position.Distance(hero.Path.LastOrDefault()) / hero.MoveSpeed;
+                Drawing.DrawText(
+                    Drawing.WorldToScreen(hero.Path.LastOrDefault()) - new Vector2(15, -15),
+                    Color.White,
+                    hero.ChampionName + " " + timer.ToString("F"),
+                    12);
             }
         }
     }

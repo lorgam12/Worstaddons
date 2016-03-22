@@ -13,8 +13,10 @@
             SkinMenu = Load.UtliMenu.AddSubMenu("Skin Hax");
             SkinMenu.AddGroupLabel("Skin Settings");
             SkinMenu.Add(Player.Instance.ChampionName + "skin", new CheckBox("Enable", false));
-            SkinMenu.Add(Player.Instance.ChampionName + "skins", new Slider("Select Skin", 0, 0, 15));
-            SkinMenu.AddLabel("Can be buggy when your champion Model changes in game.");
+            var setskin = SkinMenu.Add(Player.Instance.ChampionName + "skins", new Slider("Select Skin", 0, 0, 15));
+            setskin.OnValueChange += delegate { Hax(); };
+
+            SkinMenu.AddLabel("Can be buggy When your Champion Model Changes in Game.");
         }
 
         public static void Hax()

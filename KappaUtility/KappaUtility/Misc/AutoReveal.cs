@@ -98,7 +98,7 @@
 
         public static Menu BushMenu { get; private set; }
 
-        private static bool DontWard, Changing = false;
+        private static bool DontWard, Changing;
 
         internal static void OnLoad()
         {
@@ -137,29 +137,7 @@
                             {
                                 if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
                                 {
-                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
-                                    {
-                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
-                                    {
-                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
-                                    {
-                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
+                                    RevealCast();
                                 }
 
                                 Circle.Draw(Color.White, target.MoveSpeed, target.Position);
@@ -180,29 +158,7 @@
                             {
                                 if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
                                 {
-                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
-                                    {
-                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
-                                    {
-                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
-                                    {
-                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
+                                    RevealCast();
                                 }
 
                                 Drawing.DrawText(
@@ -223,29 +179,7 @@
                             {
                                 if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
                                 {
-                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
-                                    {
-                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
-                                    {
-                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
-                                    {
-                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
+                                    RevealCast();
                                 }
 
                                 Drawing.DrawText(
@@ -266,29 +200,7 @@
                             {
                                 if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
                                 {
-                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
-                                    {
-                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
-                                    {
-                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
-                                    {
-                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
+                                    RevealCast();
                                 }
 
                                 Drawing.DrawText(
@@ -309,29 +221,7 @@
                             {
                                 if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
                                 {
-                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
-                                    {
-                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
-                                    {
-                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
-                                    {
-                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
+                                    RevealCast();
                                 }
 
                                 Drawing.DrawText(
@@ -352,29 +242,7 @@
                             {
                                 if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
                                 {
-                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
-                                    {
-                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
-                                    {
-                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
-                                    {
-                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
+                                    RevealCast();
                                 }
 
                                 Drawing.DrawText(
@@ -395,29 +263,7 @@
                             {
                                 if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
                                 {
-                                    if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
-                                    {
-                                        if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
-                                    {
-                                        if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
-                                    {
-                                        if (Vision_Ward.Cast(target.Path.LastOrDefault()))
-                                        {
-                                            return;
-                                        }
-                                    }
+                                    RevealCast();
                                 }
 
                                 Drawing.DrawText(
@@ -610,6 +456,37 @@
                                     500);
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        public static void RevealCast()
+        {
+            var targets = EntityManager.Heroes.Enemies.Where(x => !x.IsDead);
+            foreach (var target in targets)
+            {
+                if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
+                {
+                    if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
+                    {
+                        return;
+                    }
+                }
+
+                if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
+                {
+                    if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
+                    {
+                        return;
+                    }
+                }
+
+                if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
+                {
+                    if (Vision_Ward.Cast(target.Path.LastOrDefault()))
+                    {
+                        return;
                     }
                 }
             }

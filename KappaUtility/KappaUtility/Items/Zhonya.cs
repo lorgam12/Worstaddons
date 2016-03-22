@@ -29,7 +29,10 @@
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if (!Defensive.Zhonyas.IsOwned() || !Defensive.Zhonyas.IsReady() || (!(caster is AIHeroClient) || caster == null || target == null || !target.IsMe || Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue || Defensive.DefMenu["ZhonyasD"].Cast<CheckBox>().CurrentValue))
+            if (!Defensive.Zhonyas.IsOwned() || !Defensive.Zhonyas.IsReady()
+                || (!(caster is AIHeroClient) || caster == null || target == null || !target.IsMe
+                    || Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue
+                    || Defensive.DefMenu["ZhonyasD"].Cast<CheckBox>().CurrentValue))
             {
                 return;
             }

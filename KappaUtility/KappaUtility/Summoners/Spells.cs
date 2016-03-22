@@ -6,6 +6,7 @@
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
+    using static EloBuddy.SDK.DamageLibrary;
 
     internal class Spells
     {
@@ -139,7 +140,7 @@
                 var ignitec = SummMenu["ignite"].Cast<CheckBox>().CurrentValue && Ignite.IsReady();
 
                 if (ignitec && target != null
-                    && Player.Instance.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
+                    && Player.Instance.GetSummonerSpellDamage(target, SummonerSpells.Ignite)
                     >= target.TotalShieldHealth() + (target.HPRegenRate * 4))
                 {
                     if (target.IsValidTarget(Ignite.Range) && !target.IsDead

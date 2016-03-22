@@ -20,6 +20,86 @@
     {
         public static Menu UtliMenu;
 
+        private static readonly CheckBox Corruptingc;
+
+        private static readonly CheckBox Healthc;
+
+        private static readonly CheckBox Huntersc;
+
+        private static readonly CheckBox Refillablec;
+
+        private static readonly CheckBox Biscuitc;
+
+        private static readonly CheckBox Seraphc;
+
+        private static readonly CheckBox Solaric;
+
+        private static readonly CheckBox FaceOfTheMountainc;
+
+        private static readonly CheckBox Zhonyasc;
+
+        private static readonly Slider Corruptingh;
+
+        private static readonly Slider Healthh;
+
+        private static readonly Slider Huntersh;
+
+        private static readonly Slider Refillableh;
+
+        private static readonly Slider Biscuith;
+
+        private static readonly Slider Seraphh;
+
+        private static readonly Slider Solarih;
+
+        private static readonly Slider FaceOfTheMountainh;
+
+        private static readonly Slider Zhonyash;
+
+        public static int _Corruptingh => Potions.PotMenu["CPH"].Cast<Slider>().CurrentValue;
+
+        public static int _Healthh => Potions.PotMenu["HPH"].Cast<Slider>().CurrentValue;
+
+        public static int _Huntersh => Potions.PotMenu["HPSH"].Cast<Slider>().CurrentValue;
+
+        public static int _Refillableh => Potions.PotMenu["RPH"].Cast<Slider>().CurrentValue;
+
+        public static int _Biscuith => Potions.PotMenu["BPH"].Cast<Slider>().CurrentValue;
+
+        public static int _Seraphh => Defensive.DefMenu["Seraphh"].Cast<Slider>().CurrentValue;
+
+        public static int _Solarih => Defensive.DefMenu["Solarih"].Cast<Slider>().CurrentValue;
+
+        public static int _FaceOfTheMountainh => Defensive.DefMenu["FaceOfTheMountainh"].Cast<Slider>().CurrentValue;
+
+        public static int _Zhonyash => Defensive.DefMenu["Zhonyash"].Cast<Slider>().CurrentValue;
+
+        public static bool _Corruptingc => !Potions.PotMenu["CP"].Cast<CheckBox>().CurrentValue || !Potions.Corrupting.IsOwned() || !Potions.Corrupting.IsReady();
+
+        public static bool _Healthc => Potions.PotMenu["HP"].Cast<CheckBox>().CurrentValue && Potions.Health.IsOwned()
+                                       && Potions.Health.IsReady();
+
+        public static bool _Huntersc => Potions.PotMenu["HPS"].Cast<CheckBox>().CurrentValue && Potions.Hunters.IsOwned()
+                                        && Potions.Hunters.IsReady();
+
+        public static bool _Refillablec => Potions.PotMenu["RP"].Cast<CheckBox>().CurrentValue && Potions.Refillable.IsOwned()
+                                           && Potions.Refillable.IsReady();
+
+        public static bool _Biscuitc => Potions.PotMenu["BP"].Cast<CheckBox>().CurrentValue && Potions.Biscuit.IsOwned()
+                                        && Potions.Biscuit.IsReady();
+
+        public static bool _Seraphc => Defensive.DefMenu["Seraph"].Cast<CheckBox>().CurrentValue && Defensive.Seraph.IsOwned()
+                                       && Defensive.Seraph.IsReady();
+
+        public static bool _Solaric => Defensive.DefMenu["Solari"].Cast<CheckBox>().CurrentValue && Defensive.Solari.IsOwned()
+                                       && Defensive.Solari.IsReady();
+
+        public static bool _FaceOfTheMountainc => Defensive.DefMenu["FaceOfTheMountain"].Cast<CheckBox>().CurrentValue && Defensive.FOTM.IsOwned()
+                                                  && Defensive.FOTM.IsReady();
+
+        public static bool _Zhonyasc => Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue && Defensive.Zhonyas.IsOwned()
+                                        && Defensive.Zhonyas.IsReady();
+
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoad;
@@ -38,9 +118,8 @@
             Offensive.OnLoad();
             Defensive.OnLoad();
 
-            Game.OnUpdate += Game_OnUpdate;
-            Drawing.OnEndScene += Drawing_OnEndScene;
-            Drawing.OnDraw += OnDraw;
+            Game.OnTick += Game_OnUpdate;
+            Drawing.OnEndScene += OnDraw;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Obj_AI_Base.OnBasicAttack += OnBasicAttack;
         }
@@ -49,10 +128,7 @@
         {
             AutoReveal.Draw();
             Tracker.HPtrack();
-        }
-
-        private static void Drawing_OnEndScene(EventArgs args)
-        {
+            Tracker.track();
             Tracker.Traps();
         }
 
@@ -66,60 +142,12 @@
             }
 
             AutoReveal.Reveal();
-            AutoQSS.Clean();
-            Tracker.track();
             Smite.Smiteopepi();
             Spells.Cast();
-            SkinHax.Hax();
         }
 
         public static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            var Seraph = Defensive.Seraph;
-            var Solari = Defensive.Solari;
-            var FOTM = Defensive.FOTM;
-            var Zhonyas = Defensive.Zhonyas;
-
-            var Corrupting = Potions.Corrupting;
-            var Health = Potions.Health;
-            var Hunters = Potions.Hunters;
-            var Refillable = Potions.Refillable;
-            var Biscuit = Potions.Biscuit;
-
-            var Corruptingc = Potions.PotMenu["CP"].Cast<CheckBox>().CurrentValue && Corrupting.IsOwned()
-                              && Corrupting.IsReady();
-            var Corruptingh = Potions.PotMenu["CPH"].Cast<Slider>().CurrentValue;
-
-            var Healthc = Potions.PotMenu["HP"].Cast<CheckBox>().CurrentValue && Health.IsOwned() && Health.IsReady();
-            var Healthh = Potions.PotMenu["HPH"].Cast<Slider>().CurrentValue;
-
-            var Huntersc = Potions.PotMenu["HPS"].Cast<CheckBox>().CurrentValue && Hunters.IsOwned()
-                           && Hunters.IsReady();
-            var Huntersh = Potions.PotMenu["HPSH"].Cast<Slider>().CurrentValue;
-
-            var Refillablec = Potions.PotMenu["RP"].Cast<CheckBox>().CurrentValue && Refillable.IsOwned()
-                              && Refillable.IsReady();
-            var Refillableh = Potions.PotMenu["RPH"].Cast<Slider>().CurrentValue;
-
-            var Biscuitc = Potions.PotMenu["BP"].Cast<CheckBox>().CurrentValue && Biscuit.IsOwned() && Biscuit.IsReady();
-            var Biscuith = Potions.PotMenu["BPH"].Cast<Slider>().CurrentValue;
-
-            var Seraphc = Defensive.DefMenu["Seraph"].Cast<CheckBox>().CurrentValue && Seraph.IsOwned()
-                          && Seraph.IsReady();
-            var Seraphh = Defensive.DefMenu["Seraphh"].Cast<Slider>().CurrentValue;
-
-            var Solaric = Defensive.DefMenu["Solari"].Cast<CheckBox>().CurrentValue && Solari.IsOwned()
-                          && Solari.IsReady();
-            var Solarih = Defensive.DefMenu["Solarih"].Cast<Slider>().CurrentValue;
-
-            var FaceOfTheMountainc = Defensive.DefMenu["FaceOfTheMountain"].Cast<CheckBox>().CurrentValue
-                                     && FOTM.IsOwned() && FOTM.IsReady();
-            var FaceOfTheMountainh = Defensive.DefMenu["FaceOfTheMountainh"].Cast<Slider>().CurrentValue;
-
-            var Zhonyasc = Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue && Zhonyas.IsOwned()
-                           && Zhonyas.IsReady();
-            var Zhonyash = Defensive.DefMenu["Zhonyash"].Cast<Slider>().CurrentValue;
-
             if (!(args.Target is AIHeroClient))
             {
                 return;
@@ -133,122 +161,122 @@
                 return;
             }
 
-            if (target.IsValidTarget(FOTM.Range) && FaceOfTheMountainc)
+            if (target.IsValidTarget(Defensive.FOTM.Range) && _FaceOfTheMountainc)
             {
-                if (target.HealthPercent < FaceOfTheMountainh)
+                if (target.HealthPercent < _FaceOfTheMountainh)
                 {
-                    FOTM.Cast(target);
+                    Defensive.FOTM.Cast(target);
                 }
 
                 if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
                 {
-                    FOTM.Cast(target);
+                    Defensive.FOTM.Cast(target);
                 }
             }
 
-            if (target.IsValidTarget(Solari.Range) && Solaric)
+            if (target.IsValidTarget(Defensive.Solari.Range) && _Solaric)
             {
-                if (target.HealthPercent < Solarih)
+                if (target.HealthPercent < _Solarih)
                 {
-                    Solari.Cast();
+                    Defensive.Solari.Cast();
                 }
 
                 if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
                 {
-                    Solari.Cast();
+                    Defensive.Solari.Cast();
                 }
             }
 
             if (target.IsMe)
             {
-                if (Refillablec)
+                if (_Refillablec)
                 {
-                    if (target.HealthPercent < Refillableh)
+                    if (target.HealthPercent < _Refillableh)
                     {
-                        Refillable.Cast();
+                        Potions.Refillable.Cast();
                     }
 
                     if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
                     {
-                        Refillable.Cast();
+                        Potions.Refillable.Cast();
                     }
                 }
 
-                if (Healthc)
+                if (_Healthc)
                 {
-                    if (target.HealthPercent < Healthh)
+                    if (target.HealthPercent < _Healthh)
                     {
-                        Health.Cast();
+                        Potions.Health.Cast();
                     }
 
                     if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
                     {
-                        Health.Cast();
+                        Potions.Health.Cast();
                     }
                 }
 
-                if (Huntersc)
+                if (_Huntersc)
                 {
-                    if (target.HealthPercent < Huntersh)
+                    if (target.HealthPercent < _Huntersh)
                     {
-                        Hunters.Cast();
+                        Potions.Hunters.Cast();
                     }
 
                     if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
                     {
-                        Hunters.Cast();
+                        Potions.Hunters.Cast();
                     }
                 }
 
-                if (Biscuitc)
+                if (_Biscuitc)
                 {
-                    if (target.HealthPercent < Biscuith)
+                    if (target.HealthPercent < _Biscuith)
                     {
-                        Biscuit.Cast();
+                        Potions.Biscuit.Cast();
                     }
 
                     if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
                     {
-                        Biscuit.Cast();
+                        Potions.Biscuit.Cast();
                     }
                 }
 
-                if (Corruptingc)
+                if (_Corruptingc)
                 {
-                    if (target.HealthPercent < Corruptingh)
+                    if (target.HealthPercent < _Corruptingh)
                     {
-                        Corrupting.Cast();
+                        Potions.Corrupting.Cast();
                     }
 
                     if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
                     {
-                        Corrupting.Cast();
+                        Potions.Corrupting.Cast();
                     }
                 }
 
-                if (Seraphc)
+                if (_Seraphc)
                 {
-                    if (target.HealthPercent < Seraphh)
+                    if (target.HealthPercent < _Seraphh)
                     {
-                        Seraph.Cast();
+                        Defensive.Seraph.Cast();
                     }
 
                     if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
                     {
-                        Seraph.Cast();
+                        Defensive.Seraph.Cast();
                     }
                 }
 
-                if (Zhonyasc)
+                if (_Zhonyasc)
                 {
-                    if (target.HealthPercent < Zhonyash)
+                    if (target.HealthPercent < _Zhonyash)
                     {
-                        Zhonyas.Cast();
+                        Defensive.Zhonyas.Cast();
                     }
 
                     if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
                     {
-                        Zhonyas.Cast();
+                        Defensive.Zhonyas.Cast();
                     }
                 }
             }
@@ -256,50 +284,6 @@
 
         public static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            var Corrupting = Potions.Corrupting;
-            var Health = Potions.Health;
-            var Hunters = Potions.Hunters;
-            var Refillable = Potions.Refillable;
-            var Biscuit = Potions.Biscuit;
-
-            var Corruptingc = Potions.PotMenu["CP"].Cast<CheckBox>().CurrentValue && Corrupting.IsOwned()
-                              && Corrupting.IsReady();
-            var Corruptingh = Potions.PotMenu["CPH"].Cast<Slider>().CurrentValue;
-
-            var Healthc = Potions.PotMenu["HP"].Cast<CheckBox>().CurrentValue && Health.IsOwned() && Health.IsReady();
-            var Healthh = Potions.PotMenu["HPH"].Cast<Slider>().CurrentValue;
-
-            var Huntersc = Potions.PotMenu["HPS"].Cast<CheckBox>().CurrentValue && Hunters.IsOwned()
-                           && Hunters.IsReady();
-            var Huntersh = Potions.PotMenu["HPSH"].Cast<Slider>().CurrentValue;
-
-            var Refillablec = Potions.PotMenu["RP"].Cast<CheckBox>().CurrentValue && Refillable.IsOwned()
-                              && Refillable.IsReady();
-            var Refillableh = Potions.PotMenu["RPH"].Cast<Slider>().CurrentValue;
-
-            var Biscuitc = Potions.PotMenu["BP"].Cast<CheckBox>().CurrentValue && Biscuit.IsOwned() && Biscuit.IsReady();
-            var Biscuith = Potions.PotMenu["BPH"].Cast<Slider>().CurrentValue;
-
-            var Seraph = Defensive.Seraph;
-            var Seraphc = Defensive.DefMenu["Seraph"].Cast<CheckBox>().CurrentValue && Seraph.IsOwned()
-                          && Seraph.IsReady();
-            var Seraphh = Defensive.DefMenu["Seraphh"].Cast<Slider>().CurrentValue;
-
-            var Solari = Defensive.Solari;
-            var Solaric = Defensive.DefMenu["Solari"].Cast<CheckBox>().CurrentValue && Solari.IsOwned()
-                          && Solari.IsReady();
-            var Solarih = Defensive.DefMenu["Solarih"].Cast<Slider>().CurrentValue;
-
-            var FOTM = Defensive.FOTM;
-            var FaceOfTheMountainc = Defensive.DefMenu["FaceOfTheMountain"].Cast<CheckBox>().CurrentValue
-                                     && FOTM.IsOwned() && FOTM.IsReady();
-            var FaceOfTheMountainh = Defensive.DefMenu["FaceOfTheMountainh"].Cast<Slider>().CurrentValue;
-
-            var Zhonyas = Defensive.Zhonyas;
-            var Zhonyasc = Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue && Zhonyas.IsOwned()
-                           && Zhonyas.IsReady();
-            var Zhonyash = Defensive.DefMenu["Zhonyash"].Cast<Slider>().CurrentValue;
-
             if (!(args.Target is AIHeroClient))
             {
                 return;
@@ -308,134 +292,135 @@
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if ((caster is AIHeroClient || caster is Obj_AI_Turret) && caster != null && target != null)
+            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null || target == null)
             {
-                if (target.IsValidTarget(FOTM.Range))
+                return;
+            }
+            if (target.IsValidTarget(Defensive.FOTM.Range))
+            {
+                if (_FaceOfTheMountainc && target.HealthPercent < _FaceOfTheMountainh)
                 {
-                    if (FaceOfTheMountainc && target.HealthPercent < FaceOfTheMountainh)
+                    Defensive.FOTM.Cast(target);
+                }
+
+                if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                    || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                {
+                    Defensive.FOTM.Cast(target);
+                }
+            }
+
+            if (target.IsValidTarget(Defensive.Solari.Range) && _Solaric)
+            {
+                if (target.HealthPercent < _Solarih)
+                {
+                    Defensive.Solari.Cast();
+                }
+
+                if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                    || caster.BaseAbilityDamage > target.TotalShieldHealth())
+                {
+                    Defensive.Solari.Cast();
+                }
+            }
+
+            if (target.IsMe)
+            {
+                if (_Refillablec)
+                {
+                    if (target.HealthPercent < _Refillableh)
                     {
-                        FOTM.Cast(target);
+                        Potions.Refillable.Cast();
                     }
 
                     if (caster.BaseAttackDamage > target.TotalShieldHealth()
                         || caster.BaseAbilityDamage > target.TotalShieldHealth())
                     {
-                        FOTM.Cast(target);
+                        Potions.Refillable.Cast();
                     }
                 }
 
-                if (target.IsValidTarget(Solari.Range) && Solaric)
+                if (_Healthc)
                 {
-                    if (target.HealthPercent < Solarih)
+                    if (target.HealthPercent < _Healthh)
                     {
-                        Solari.Cast();
+                        Potions.Health.Cast();
                     }
 
                     if (caster.BaseAttackDamage > target.TotalShieldHealth()
                         || caster.BaseAbilityDamage > target.TotalShieldHealth())
                     {
-                        Solari.Cast();
+                        Potions.Health.Cast();
                     }
                 }
 
-                if (target.IsMe)
+                if (_Huntersc)
                 {
-                    if (Refillablec)
+                    if (target.HealthPercent < _Huntersh)
                     {
-                        if (target.HealthPercent < Refillableh)
-                        {
-                            Refillable.Cast();
-                        }
-
-                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                        {
-                            Refillable.Cast();
-                        }
+                        Potions.Hunters.Cast();
                     }
 
-                    if (Healthc)
+                    if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                        || caster.BaseAbilityDamage > target.TotalShieldHealth())
                     {
-                        if (target.HealthPercent < Healthh)
-                        {
-                            Health.Cast();
-                        }
+                        Potions.Hunters.Cast();
+                    }
+                }
 
-                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                        {
-                            Health.Cast();
-                        }
+                if (_Biscuitc)
+                {
+                    if (target.HealthPercent < _Biscuith)
+                    {
+                        Potions.Biscuit.Cast();
                     }
 
-                    if (Huntersc)
+                    if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                        || caster.BaseAbilityDamage > target.TotalShieldHealth())
                     {
-                        if (target.HealthPercent < Huntersh)
-                        {
-                            Hunters.Cast();
-                        }
+                        Potions.Biscuit.Cast();
+                    }
+                }
 
-                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                        {
-                            Hunters.Cast();
-                        }
+                if (_Corruptingc)
+                {
+                    if (target.HealthPercent < _Corruptingh)
+                    {
+                        Potions.Corrupting.Cast();
                     }
 
-                    if (Biscuitc)
+                    if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                        || caster.BaseAbilityDamage > target.TotalShieldHealth())
                     {
-                        if (target.HealthPercent < Biscuith)
-                        {
-                            Biscuit.Cast();
-                        }
+                        Potions.Corrupting.Cast();
+                    }
+                }
 
-                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                        {
-                            Biscuit.Cast();
-                        }
+                if (_Seraphc)
+                {
+                    if (target.HealthPercent < _Seraphh)
+                    {
+                        Defensive.Seraph.Cast();
                     }
 
-                    if (Corruptingc)
+                    if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                        || caster.BaseAbilityDamage > target.TotalShieldHealth())
                     {
-                        if (target.HealthPercent < Corruptingh)
-                        {
-                            Corrupting.Cast();
-                        }
+                        Defensive.Seraph.Cast();
+                    }
+                }
 
-                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                        {
-                            Corrupting.Cast();
-                        }
+                if (_Zhonyasc)
+                {
+                    if (target.HealthPercent < _Zhonyash)
+                    {
+                        Defensive.Zhonyas.Cast();
                     }
 
-                    if (Seraphc)
+                    if (caster.BaseAttackDamage > target.TotalShieldHealth()
+                        || caster.BaseAbilityDamage > target.TotalShieldHealth())
                     {
-                        if (target.HealthPercent < Seraphh)
-                        {
-                            Seraph.Cast();
-                        }
-
-                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                        {
-                            Seraph.Cast();
-                        }
-                    }
-
-                    if (Zhonyasc)
-                    {
-                        if (target.HealthPercent < Zhonyash)
-                        {
-                            Zhonyas.Cast();
-                        }
-
-                        if (caster.BaseAttackDamage > target.TotalShieldHealth()
-                            || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                        {
-                            Zhonyas.Cast();
-                        }
+                        Defensive.Zhonyas.Cast();
                     }
                 }
             }

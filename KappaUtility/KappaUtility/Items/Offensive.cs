@@ -1,5 +1,7 @@
 ﻿namespace KappaUtility.Items
 {
+    using System;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu;
@@ -39,7 +41,7 @@
             Orbwalker.OnPostAttack += Orbwalker_OnPostAttack;
         }
 
-        private static void Orbwalker_OnPostAttack(AttackableUnit target, System.EventArgs args)
+        private static void Orbwalker_OnPostAttack(AttackableUnit target, EventArgs args)
         {
             if (!target.IsEnemy)
             {
