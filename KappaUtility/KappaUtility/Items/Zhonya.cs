@@ -30,18 +30,19 @@
             var target = (AIHeroClient)args.Target;
 
             if (!Defensive.Zhonyas.IsOwned() || !Defensive.Zhonyas.IsReady()
-                || (!(caster is AIHeroClient) || caster == null || target == null || !target.IsMe
-                    || Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue
-                    || Defensive.DefMenu["ZhonyasD"].Cast<CheckBox>().CurrentValue))
+                || (!(caster is AIHeroClient) || caster == null || target == null || !target.IsMe))
             {
                 return;
             }
-
-            foreach (var spell in
-                DangerSpells.Where(spell => args.SData.Name == spell && caster.IsEnemy)
-                    .Where(spell => spell != null && args.SData.Name == spell))
+            if (Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue
+                && Defensive.DefMenu["ZhonyasD"].Cast<CheckBox>().CurrentValue)
             {
-                Core.DelayAction(() => Defensive.Zhonyas.Cast(), 50);
+                foreach (var spell in
+                    DangerSpells.Where(spell => args.SData.Name == spell && caster.IsEnemy)
+                        .Where(spell => spell != null && args.SData.Name == spell))
+                {
+                    Core.DelayAction(() => Defensive.Zhonyas.Cast(), 50);
+                }
             }
         }
     }
