@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{70AF6D65-56CE-4A77-9023-BAC3C4064D49}</ProjectGuid>
+    <ProjectGuid>{234BAD7C-29F7-42F0-A341-46D9F4CCC472}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Olaf</RootNamespace>
