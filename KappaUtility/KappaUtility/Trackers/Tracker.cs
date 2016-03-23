@@ -240,9 +240,9 @@
 
         internal static void HPtrack()
         {
-            float timer = 0;
             var trackx = TrackMenu["trackx"].Cast<Slider>().CurrentValue;
             var tracky = TrackMenu["tracky"].Cast<Slider>().CurrentValue;
+            float timer = 0;
             float i = 0;
             foreach (var hero in
                 EntityManager.Heroes.Enemies.Where(
@@ -332,6 +332,7 @@
                     i += 20f;
                 }
 
+
                 if (!TrackMenu.Get<CheckBox>("Trackway").CurrentValue
                     || (!(hero.Path.LastOrDefault().Distance(Player.Instance)
                           <= TrackMenu["Distance"].Cast<Slider>().CurrentValue)
@@ -348,7 +349,7 @@
                 Circle.Draw(SharpDX.Color.White, 50, hero.Path.LastOrDefault());
                 timer += hero.Position.Distance(hero.Path.LastOrDefault()) / hero.MoveSpeed;
                 Drawing.DrawText(
-                    Drawing.WorldToScreen(hero.Path.LastOrDefault()) - new Vector2(15, -15),
+                    Drawing.WorldToScreen(hero.Path.LastOrDefault()) - new Vector2(25, -20),
                     Color.White,
                     hero.ChampionName + " " + timer.ToString("F"),
                     12);

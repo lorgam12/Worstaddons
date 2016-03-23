@@ -122,24 +122,14 @@
             Drawing.OnEndScene += OnDraw;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Obj_AI_Base.OnBasicAttack += OnBasicAttack;
-            Obj_AI_Base.OnNewPath += Obj_AI_Base_OnNewPath;
         }
-
-        private static void Obj_AI_Base_OnNewPath(Obj_AI_Base sender, GameObjectNewPathEventArgs args)
-        {
-            if (!(sender is AIHeroClient) || !sender.IsEnemy)
-            {
-                return;
-            }
-
-            Tracker.HPtrack();
-            Tracker.track();
-        }
-
+        
         private static void OnDraw(EventArgs args)
         {
             AutoReveal.Draw();
             Tracker.Traps();
+            Tracker.HPtrack();
+            Tracker.track();
         }
 
         private static void Game_OnUpdate(EventArgs args)

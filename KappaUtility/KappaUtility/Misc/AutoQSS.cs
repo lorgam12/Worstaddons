@@ -43,10 +43,10 @@
             QssMenu.Add("human", new Slider("Humanizer Delay", 150, 0, 1500));
             QssMenu.Add("Rene", new Slider("Enemies Near to Cast", 1, 0, 5));
             QssMenu.Add("enemydetect", new Slider("Enemies Detect Range", 1000, 0, 2000));
-            Obj_AI_Base.OnBuffUpdate += OnBuffGain;
+            Obj_AI_Base.OnBuffGain += OnBuffGain;
         }
 
-        private static void OnBuffGain(Obj_AI_Base sender, Obj_AI_BaseBuffUpdateEventArgs args)
+        private static void OnBuffGain(Obj_AI_Base sender, Obj_AI_BaseBuffGainEventArgs args)
         {
             if (sender.IsEnemy && args.Buff.Caster.IsEnemy && sender is AIHeroClient && args.Buff.Caster is AIHeroClient)
             {
