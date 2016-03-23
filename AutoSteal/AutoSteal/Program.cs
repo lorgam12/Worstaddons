@@ -29,8 +29,12 @@
 
             KillStealMenu = menuIni.AddSubMenu("Kill Steal ", "Kill Steal");
             KillStealMenu.AddGroupLabel("Kill Steal Settings");
-            KillStealMenu.Add(champion + "EnableKST", new KeyBind("Enable Kill Steal Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
-            KillStealMenu.Add(champion + "EnableKSA", new KeyBind("Enable Kill Steal Active", false, KeyBind.BindTypes.HoldActive));
+            KillStealMenu.Add(
+                champion + "EnableKST",
+                new KeyBind("Enable Kill Steal Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
+            KillStealMenu.Add(
+                champion + "EnableKSA",
+                new KeyBind("Enable Kill Steal Active", false, KeyBind.BindTypes.HoldActive));
             KillStealMenu.AddSeparator();
             KillStealMenu.AddGroupLabel(champion + " Kill Steal Spells");
             KillStealMenu.Add(champion + "AAC", new CheckBox("Use AA "));
@@ -52,8 +56,12 @@
 
             JungleStealMenu = menuIni.AddSubMenu("Jungle Steal ", "Jungle Steal");
             JungleStealMenu.AddGroupLabel("Jungle Steal Settings");
-            JungleStealMenu.Add(champion + "EnableJST", new KeyBind("Enable Jungle Steal Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
-            JungleStealMenu.Add(champion + "EnableJSA", new KeyBind("Enable Jungle Steal Active", false, KeyBind.BindTypes.HoldActive));
+            JungleStealMenu.Add(
+                champion + "EnableJST",
+                new KeyBind("Enable Jungle Steal Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
+            JungleStealMenu.Add(
+                champion + "EnableJSA",
+                new KeyBind("Enable Jungle Steal Active", false, KeyBind.BindTypes.HoldActive));
             JungleStealMenu.AddSeparator();
             JungleStealMenu.AddGroupLabel(champion + " Jungle Steal Spells");
             JungleStealMenu.Add(champion + "AAJ", new CheckBox("Use AA "));
@@ -83,12 +91,14 @@
         private static void OnUpdate(EventArgs args)
         {
             var champion = ObjectManager.Player.ChampionName;
-            if (KillStealMenu[champion + "EnableKST"].Cast<KeyBind>().CurrentValue || KillStealMenu[champion + "EnableKSA"].Cast<KeyBind>().CurrentValue)
+            if (KillStealMenu[champion + "EnableKST"].Cast<KeyBind>().CurrentValue
+                || KillStealMenu[champion + "EnableKSA"].Cast<KeyBind>().CurrentValue)
             {
                 Modes.KillSteal.KS();
             }
 
-            if (JungleStealMenu[champion + "EnableJST"].Cast<KeyBind>().CurrentValue || JungleStealMenu[champion + "EnableJSA"].Cast<KeyBind>().CurrentValue)
+            if (JungleStealMenu[champion + "EnableJST"].Cast<KeyBind>().CurrentValue
+                || JungleStealMenu[champion + "EnableJSA"].Cast<KeyBind>().CurrentValue)
             {
                 Modes.JungleSteal.JS();
             }

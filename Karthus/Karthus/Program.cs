@@ -15,15 +15,27 @@ using EloBuddy.SDK.Rendering;
 
 namespace Karthus
 {
-    using static EntityManager;
+    using
+    
 
-    using static Gapcloser;
+    static
+EntityManager;
 
-    using static Orbwalker;
+    using
+    static
+Gapcloser;
 
-    using static Prediction;
+    using
+    static
+Orbwalker;
 
-    using static Spell;
+    using
+    static
+Prediction;
+
+    using
+    static
+Spell;
 
     using Color = Color;
     using RectangleF = RectangleF;
@@ -720,7 +732,6 @@ namespace Karthus
                             }
                         }
                     }
-                    
 
                     double countmana = W.Handle.SData.Mana;
                     if (wm && W.IsReady() && wTarget.IsValid && wTarget != null)

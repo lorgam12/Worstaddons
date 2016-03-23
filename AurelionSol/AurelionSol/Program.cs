@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Enumerations;
@@ -9,41 +10,47 @@
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
     using EloBuddy.SDK.Rendering;
+
     using SharpDX;
-    
+
     internal class Program
     {
-        static Geometry.Polygon.Circle QCircle;
+        private static Geometry.Polygon.Circle QCircle;
 
         private static MissileClient QMissle;
 
-        private static AIHeroClient player = ObjectManager.Player;
-        
+        private static readonly AIHeroClient player = ObjectManager.Player;
+
         public static Spell.Skillshot Q { get; private set; }
-        
+
         public static Spell.Active W { get; private set; }
-        
+
         public static Spell.Skillshot R { get; private set; }
-        
+
         public static Menu ComboMenu { get; private set; }
-        
+
         public static Menu HarassMenu { get; private set; }
-        
+
         public static Menu LaneMenu { get; private set; }
-        
+
         public static Menu MiscMenu { get; private set; }
-        
+
         public static Menu DrawMenu { get; private set; }
-        
+
         private static Menu menuIni;
-        
+
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoad;
         }
-        
+
         private static void OnLoad(EventArgs args)
         {
+            if (player.ChampionName != "AurelionSol")
+            {
+                return;
+            }
+
             Q = new Spell.Skillshot(SpellSlot.Q, 650, SkillShotType.Circular, 1000, 850, 160);
             W = new Spell.Active(SpellSlot.W, 700);
             R = new Spell.Skillshot(SpellSlot.R, 1600, SkillShotType.Linear, 250, 1600, 115);
@@ -142,22 +149,21 @@
             }
 
             var qsize = QMissle.StartPosition.Distance(QMissle.Position);
-            if (QMissle.Position.CountEnemiesInRange((qsize + Q.Width) / 20) >= MiscMenu.Get<Slider>("AQ").CurrentValue && Q.Handle.ToggleState == 2)
+            if (QMissle.Position.CountEnemiesInRange((qsize + Q.Width) / 20) >= MiscMenu.Get<Slider>("AQ").CurrentValue
+                && Q.Handle.ToggleState == 2)
             {
                 Q.Cast(Game.CursorPos);
             }
         }
-        
+
         private static void Gapcloser_OnGap(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
-            if (!menuIni.Get<CheckBox>("Misc").CurrentValue
-                || Sender == null || Sender.IsAlly || Sender.IsMe)
+            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || Sender == null || Sender.IsAlly || Sender.IsMe)
             {
                 return;
             }
             if (MiscMenu.Get<CheckBox>("gapcloserQ").CurrentValue)
             {
-
                 var qsize = QMissle.StartPosition.Distance(QMissle.Position);
                 var pred = Q.GetPrediction(Sender);
                 if (pred.HitChance >= HitChance.High && Q.Handle.ToggleState == 1)
@@ -180,7 +186,7 @@
                 }
             }
         }
-        
+
         private static void OnDraw(EventArgs args)
         {
             if (!player.IsDead && menuIni.Get<CheckBox>("Drawings").CurrentValue)
@@ -195,7 +201,6 @@
                     Circle.Draw(Color.Blue, W.Range, Player.Instance.Position);
                     Circle.Draw(Color.Blue, W.Range - 100, Player.Instance.Position);
                 }
-                
 
                 if (DrawMenu.Get<CheckBox>("R").CurrentValue)
                 {
@@ -209,7 +214,7 @@
                 }
             }
         }
-        
+
         private static void Combo()
         {
             var fQ = ComboMenu["Q2"].Cast<CheckBox>().CurrentValue;
@@ -243,17 +248,18 @@
 
             if (useW)
             {
-                if (W.Handle.ToggleState == 1 && Wtarget != null && Wtarget.IsValidTarget(W.Range) && !Wtarget.IsValidTarget(W.Range - 100))
+                if (W.Handle.ToggleState == 1 && Wtarget != null && Wtarget.IsValidTarget(W.Range)
+                    && !Wtarget.IsValidTarget(W.Range - 100))
                 {
                     W.Cast();
                 }
 
-                if (W.Handle.ToggleState == 2 && Wtarget != null && !Wtarget.IsValidTarget(W.Range) && Wtarget.IsValidTarget(W.Range - 100))
+                if (W.Handle.ToggleState == 2 && Wtarget != null && !Wtarget.IsValidTarget(W.Range)
+                    && Wtarget.IsValidTarget(W.Range - 100))
                 {
                     W.Cast();
                 }
             }
-
 
             if (useR && Rtarget != null && Rtarget.IsValidTarget(R.Range))
             {
@@ -264,7 +270,7 @@
                 }
             }
         }
-        
+
         private static void Harass()
         {
             var useQ = HarassMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady();
@@ -292,7 +298,7 @@
                 W.Cast();
             }
         }
-        
+
         private static void Clear()
         {
             var useQ = LaneMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady();
@@ -302,17 +308,17 @@
             {
                 // Credits stefsot
                 var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(
-                    EntityManager.UnitTeam.Enemy, 
-                    Player.Instance.Position, 
-                    1500, 
+                    EntityManager.UnitTeam.Enemy,
+                    Player.Instance.Position,
+                    1500,
                     false);
 
                 var predictResult =
                     Prediction.Position.PredictCircularMissileAoe(
-                        minions.Cast<Obj_AI_Base>().ToArray(), 
-                        Q.Range, 
-                        Q.Radius, 
-                        Q.CastDelay, 
+                        minions.Cast<Obj_AI_Base>().ToArray(),
+                        Q.Range,
+                        Q.Radius,
+                        Q.CastDelay,
                         Q.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
 
                 if (predictResult != null && predictResult.CollisionObjects.Length >= 2)
@@ -324,9 +330,9 @@
             if (useW)
             {
                 var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(
-                    EntityManager.UnitTeam.Enemy, 
-                    Player.Instance.Position, 
-                    W.Range, 
+                    EntityManager.UnitTeam.Enemy,
+                    Player.Instance.Position,
+                    W.Range,
                     false);
 
                 if (minions.Count() >= 2)

@@ -138,7 +138,7 @@
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             }
 
-           ManaMenu = menuIni.AddSubMenu("Mana Manager");
+            ManaMenu = menuIni.AddSubMenu("Mana Manager");
             ManaMenu.AddGroupLabel("Harass");
             ManaMenu.Add("harassmana", new Slider("Harass Mana %", 75, 0, 100));
             ManaMenu.AddGroupLabel("Lane Clear");
@@ -293,7 +293,8 @@
                 KillSteal();
             }
 
-            if (QMenu["Qaoe"].Cast<CheckBox>().CurrentValue && player.CountEnemiesInRange(Q.Range) >= QMenu["Qhit"].Cast<Slider>().CurrentValue)
+            if (QMenu["Qaoe"].Cast<CheckBox>().CurrentValue
+                && player.CountEnemiesInRange(Q.Range) >= QMenu["Qhit"].Cast<Slider>().CurrentValue)
             {
                 Q.Cast();
             }
@@ -388,8 +389,8 @@
                         enemy.IsEnemy && enemy.IsValidTarget(1000) && !enemy.IsDead
                         && !enemy.HasBuff("kindredrnodeathbuff") && !enemy.HasBuff("JudicatorIntervention")
                         && !enemy.HasBuff("ChronoShift") && !enemy.HasBuff("UndyingRage") && !enemy.IsInvulnerable
-                        && !enemy.IsZombie && !enemy.HasUndyingBuff() && !enemy.HasBuff("AatroxPassiveActivate") && !enemy.HasBuff("rebirthcooldown"));
-            
+                        && !enemy.IsZombie && !enemy.HasUndyingBuff() && !enemy.HasBuff("AatroxPassiveActivate")
+                        && !enemy.HasBuff("rebirthcooldown"));
 
             if (target != null)
             {
@@ -398,7 +399,7 @@
                     if (SaveR && ObjectManager.Player.GetAutoAttackDamage(target) * SR > target.TotalShieldHealth()
                         && target.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
                     {
-                            return;
+                        return;
                     }
 
                     var pred = E.GetPrediction(target);
@@ -523,7 +524,8 @@
 
                 if (QMenu["Stick"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (player.HasBuff("RumbleDangerZone") && target.IsValidTarget(Q.Range) && !target.IsUnderEnemyturret() && !target.IsUnderHisturret())
+                    if (player.HasBuff("RumbleDangerZone") && target.IsValidTarget(Q.Range)
+                        && !target.IsUnderEnemyturret() && !target.IsUnderHisturret())
                     {
                         Player.IssueOrder(GameObjectOrder.MoveTo, target.Position);
                     }
@@ -644,7 +646,7 @@
                     if (SaveR && ObjectManager.Player.GetAutoAttackDamage(rt) * SR > rt.TotalShieldHealth()
                         && rt.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
                     {
-                            return;
+                        return;
                     }
 
                     if (Rcombo)

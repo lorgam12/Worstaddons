@@ -21,7 +21,8 @@
                 return;
             }
 
-            if (target != null && target.HasBuff("kindredrnodeathbuff") && target.HealthPercent <= 15 && Menu.ComboMenu["Pspells"].Cast<CheckBox>().CurrentValue)
+            if (target != null && target.HasBuff("kindredrnodeathbuff") && target.HealthPercent <= 15
+                && Menu.ComboMenu["Pspells"].Cast<CheckBox>().CurrentValue)
             {
                 return;
             }

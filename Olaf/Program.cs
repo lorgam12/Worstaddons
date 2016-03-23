@@ -223,18 +223,27 @@ namespace Olaf
                              || (UltMenu["tunt"].Cast<CheckBox>().CurrentValue && player.IsTaunted)
                              || (UltMenu["stun"].Cast<CheckBox>().CurrentValue && player.IsStunned)
                              || (UltMenu["fear"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Fear))
-                             || (UltMenu["silence"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Silence))
+                             || (UltMenu["silence"].Cast<CheckBox>().CurrentValue
+                                 && player.HasBuffOfType(BuffType.Silence))
                              || (UltMenu["snare"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Snare))
-                             || (UltMenu["supperss"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Suppression))
+                             || (UltMenu["supperss"].Cast<CheckBox>().CurrentValue
+                                 && player.HasBuffOfType(BuffType.Suppression))
                              || (UltMenu["sleep"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Sleep))
-                             || (UltMenu["poly"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Polymorph))
-                             || (UltMenu["frenzy"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Frenzy))
-                             || (UltMenu["disarm"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Disarm))
-                             || (UltMenu["nearsight"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.NearSight))
-                             || (UltMenu["knockback"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Knockback))
-                             || (UltMenu["knockup"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Knockup))
+                             || (UltMenu["poly"].Cast<CheckBox>().CurrentValue
+                                 && player.HasBuffOfType(BuffType.Polymorph))
+                             || (UltMenu["frenzy"].Cast<CheckBox>().CurrentValue
+                                 && player.HasBuffOfType(BuffType.Frenzy))
+                             || (UltMenu["disarm"].Cast<CheckBox>().CurrentValue
+                                 && player.HasBuffOfType(BuffType.Disarm))
+                             || (UltMenu["nearsight"].Cast<CheckBox>().CurrentValue
+                                 && player.HasBuffOfType(BuffType.NearSight))
+                             || (UltMenu["knockback"].Cast<CheckBox>().CurrentValue
+                                 && player.HasBuffOfType(BuffType.Knockback))
+                             || (UltMenu["knockup"].Cast<CheckBox>().CurrentValue
+                                 && player.HasBuffOfType(BuffType.Knockup))
                              || (UltMenu["slow"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Slow))
-                             || (UltMenu["poison"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Poison))
+                             || (UltMenu["poison"].Cast<CheckBox>().CurrentValue
+                                 && player.HasBuffOfType(BuffType.Poison))
                              || (UltMenu["blind"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Blind));
                 var enemys = UltMenu["Rene"].Cast<Slider>().CurrentValue;
                 var hp = UltMenu["hp"].Cast<Slider>().CurrentValue;
