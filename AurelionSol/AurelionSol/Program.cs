@@ -13,6 +13,10 @@
     
     internal class Program
     {
+        static Geometry.Polygon.Circle QCircle;
+
+        private static MissileClient QMissle;
+
         private static AIHeroClient player = ObjectManager.Player;
         
         public static Spell.Skillshot Q { get; private set; }
@@ -40,9 +44,9 @@
         
         private static void OnLoad(EventArgs args)
         {
-            Q = new Spell.Skillshot(SpellSlot.Q, 875, SkillShotType.Circular, 1000, int.MaxValue, 160);
-            W = new Spell.Active(SpellSlot.W, 1000);
-            R = new Spell.Skillshot(SpellSlot.R, 1300, SkillShotType.Linear, 250, 1300, 115);
+            Q = new Spell.Skillshot(SpellSlot.Q, 650, SkillShotType.Circular, 1000, 850, 160);
+            W = new Spell.Active(SpellSlot.W, 700);
+            R = new Spell.Skillshot(SpellSlot.R, 1600, SkillShotType.Linear, 250, 1600, 115);
 
             menuIni = MainMenu.AddMenu("AurelionSol", "AurelionSol");
             menuIni.AddGroupLabel("Welcome to the Worst AurelionSol addon!");
@@ -55,6 +59,7 @@
             ComboMenu = menuIni.AddSubMenu("Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.Add("Q", new CheckBox("Use Q"));
+            ComboMenu.Add("Q2", new CheckBox("Follow Q"));
             ComboMenu.Add("W", new CheckBox("Use W"));
             ComboMenu.Add("R", new CheckBox("Use R"));
             ComboMenu.Add("Rhit", new Slider("Use R Hit", 2, 1, 5));
@@ -73,8 +78,9 @@
 
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.AddGroupLabel("Misc Settings");
-            MiscMenu.Add("gapcloser", new CheckBox("Anti-GapCloser"));
-            MiscMenu.Add("gapclosermana", new Slider("Anti-GapCloser Mana", 25, 0, 100));
+            MiscMenu.Add("gapcloserQ", new CheckBox("Anti-GapCloser (Q)"));
+            MiscMenu.Add("gapcloserR", new CheckBox("Anti-GapCloser (R)"));
+            MiscMenu.Add("AQ", new Slider("Auto Trigger Q On hit (Size inc)", 2, 1, 5));
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
             DrawMenu.AddGroupLabel("Drawing Settings");
@@ -82,12 +88,41 @@
             DrawMenu.Add("W", new CheckBox("Draw W"));
             DrawMenu.Add("E", new CheckBox("Draw E"));
             DrawMenu.Add("R", new CheckBox("Draw R"));
+            DrawMenu.Add("QS", new CheckBox("Draw Q Size"));
 
             Game.OnUpdate += OnUpdate;
             Drawing.OnDraw += OnDraw;
             Gapcloser.OnGapcloser += Gapcloser_OnGap;
+            GameObject.OnCreate += OnCreate;
+            GameObject.OnDelete += OnDelete;
         }
-        
+
+        private static void OnCreate(GameObject sender, EventArgs args)
+        {
+            var miss = sender as MissileClient;
+            if (miss != null && miss.IsValid)
+            {
+                if (miss.SpellCaster.IsMe && miss.SpellCaster.IsValid)
+                {
+                    QMissle = miss;
+                }
+            }
+        }
+
+        private static void OnDelete(GameObject sender, EventArgs args)
+        {
+            var miss = sender as MissileClient;
+            if (miss == null || !miss.IsValid)
+            {
+                return;
+            }
+
+            if (miss.SpellCaster is AIHeroClient && miss.SpellCaster.IsValid && miss.SpellCaster.IsMe)
+            {
+                QMissle = null;
+            }
+        }
+
         private static void OnUpdate(EventArgs args)
         {
             var flags = Orbwalker.ActiveModesFlags;
@@ -105,21 +140,44 @@
             {
                 Clear();
             }
+
+            var qsize = QMissle.StartPosition.Distance(QMissle.Position);
+            if (QMissle.Position.CountEnemiesInRange((qsize + Q.Width) / 20) >= MiscMenu.Get<Slider>("AQ").CurrentValue && Q.Handle.ToggleState == 2)
+            {
+                Q.Cast(Game.CursorPos);
+            }
         }
         
         private static void Gapcloser_OnGap(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
-            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || !MiscMenu.Get<CheckBox>("gapcloser").CurrentValue
-                || ObjectManager.Player.ManaPercent < MiscMenu.Get<Slider>("gapclosermana").CurrentValue
-                || Sender == null)
+            if (!menuIni.Get<CheckBox>("Misc").CurrentValue
+                || Sender == null || Sender.IsAlly || Sender.IsMe)
             {
                 return;
             }
-
-            var pred = Q.GetPrediction(Sender);
-            if (Sender.IsValidTarget(W.Range) && W.IsReady() && !Sender.IsAlly && !Sender.IsMe)
+            if (MiscMenu.Get<CheckBox>("gapcloserQ").CurrentValue)
             {
-                Q.Cast(pred.CastPosition);
+
+                var qsize = QMissle.StartPosition.Distance(QMissle.Position);
+                var pred = Q.GetPrediction(Sender);
+                if (pred.HitChance >= HitChance.High && Q.Handle.ToggleState == 1)
+                {
+                    Q.Cast(pred.CastPosition);
+                }
+
+                if (QMissle.Position.IsInRange(Sender, (qsize + Q.Width) / 20) && Q.Handle.ToggleState == 2)
+                {
+                    Q.Cast(Game.CursorPos);
+                }
+            }
+
+            if (MiscMenu.Get<CheckBox>("gapcloserR").CurrentValue)
+            {
+                var pred = R.GetPrediction(Sender);
+                if (pred.HitChance >= HitChance.High)
+                {
+                    R.Cast(pred.CastPosition);
+                }
             }
         }
         
@@ -129,62 +187,80 @@
             {
                 if (DrawMenu.Get<CheckBox>("Q").CurrentValue)
                 {
-                    Circle.Draw(Color.DarkRed, Q.Range, Player.Instance.Position);
+                    Circle.Draw(Color.Blue, Q.Range, Player.Instance.Position);
                 }
 
                 if (DrawMenu.Get<CheckBox>("W").CurrentValue)
                 {
-                    Circle.Draw(Color.DarkRed, W.Range, Player.Instance.Position);
+                    Circle.Draw(Color.Blue, W.Range, Player.Instance.Position);
+                    Circle.Draw(Color.Blue, W.Range - 100, Player.Instance.Position);
                 }
-
-                if (DrawMenu.Get<CheckBox>("E").CurrentValue)
-                {
-                    Circle.Draw(Color.DarkRed, 5000, Player.Instance.Position);
-                }
+                
 
                 if (DrawMenu.Get<CheckBox>("R").CurrentValue)
                 {
-                    Circle.Draw(Color.DarkRed, R.Range, Player.Instance.Position);
+                    Circle.Draw(Color.Blue, R.Range, Player.Instance.Position);
+                }
+
+                if (DrawMenu.Get<CheckBox>("QS").CurrentValue && QMissle != null)
+                {
+                    var Qsize = QMissle.StartPosition.Distance(QMissle.Position);
+                    Circle.Draw(Color.White, Q.Width + Qsize / 20, QMissle.Position);
                 }
             }
         }
         
         private static void Combo()
         {
+            var fQ = ComboMenu["Q2"].Cast<CheckBox>().CurrentValue;
             var useQ = ComboMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady();
             var useW = ComboMenu["W"].Cast<CheckBox>().CurrentValue && W.IsReady();
             var useR = ComboMenu["R"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var Rhit = ComboMenu["Rhit"].Cast<Slider>().CurrentValue;
-            var Qtarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
+            var Qtarget = TargetSelector.GetTarget(Q.Range * 2, DamageType.Magical);
             var Wtarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
             var Rtarget = TargetSelector.GetTarget(R.Range, DamageType.Magical);
 
             if (useQ && Qtarget != null && Qtarget.IsValidTarget(Q.Range))
             {
+                var qsize = QMissle.StartPosition.Distance(QMissle.Position);
                 var pred = Q.GetPrediction(Qtarget);
-                if (pred.HitChance >= HitChance.High)
+                if (pred.HitChance >= HitChance.High && Q.Handle.ToggleState == 1)
                 {
                     Q.Cast(pred.CastPosition);
                 }
+
+                if (QMissle.Position.IsInRange(Qtarget, (qsize + Q.Width) / 20) && Q.Handle.ToggleState == 2)
+                {
+                    Q.Cast(Game.CursorPos);
+                }
             }
 
-            if (useW && Wtarget != null && Wtarget.IsValidTarget(W.Range))
+            if (fQ && Q.Handle.ToggleState == 2 && Qtarget != null && QMissle != null)
             {
-                W.Cast();
+                Player.IssueOrder(GameObjectOrder.MoveTo, QMissle.Position);
             }
+
+            if (useW)
+            {
+                if (W.Handle.ToggleState == 1 && Wtarget != null && Wtarget.IsValidTarget(W.Range) && !Wtarget.IsValidTarget(W.Range - 100))
+                {
+                    W.Cast();
+                }
+
+                if (W.Handle.ToggleState == 2 && Wtarget != null && !Wtarget.IsValidTarget(W.Range) && Wtarget.IsValidTarget(W.Range - 100))
+                {
+                    W.Cast();
+                }
+            }
+
 
             if (useR && Rtarget != null && Rtarget.IsValidTarget(R.Range))
             {
-                // credits centilmen
-                foreach (AIHeroClient enemie in EntityManager.Heroes.Enemies)
+                var predR = R.GetPrediction(Rtarget).CastPosition;
+                if (Rtarget.CountEnemiesInRange(R.Width) >= Rhit)
                 {
-                    if (Rhit > 0
-                        && EntityManager.Heroes.Enemies.Where(
-                            enemy => enemy != player && enemy.Distance(player) <= 1200).Count() >= Rhit
-                        && !enemie.IsDead && !enemie.IsZombie)
-                    {
-                        R.Cast(enemie);
-                    }
+                    R.Cast(predR);
                 }
             }
         }
@@ -198,8 +274,17 @@
 
             if (useQ && Qtarget != null && Qtarget.IsValidTarget(Q.Range))
             {
+                var qsize = QMissle.StartPosition.Distance(QMissle.Position);
                 var pred = Q.GetPrediction(Qtarget);
-                Q.Cast(pred.CastPosition);
+                if (pred.HitChance >= HitChance.High && Q.Handle.ToggleState == 1)
+                {
+                    Q.Cast(pred.CastPosition);
+                }
+
+                if (QMissle.Position.IsInRange(Qtarget, (qsize + Q.Width) / 20) && Q.Handle.ToggleState == 2)
+                {
+                    Q.Cast(Game.CursorPos);
+                }
             }
 
             if (useW && Wtarget != null && Wtarget.IsValidTarget(W.Range))
