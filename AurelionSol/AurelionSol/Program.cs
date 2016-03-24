@@ -46,7 +46,7 @@
 
         private static void OnLoad(EventArgs args)
         {
-			if (player.ChampionName != "AurelionSol")
+            if (player.ChampionName != "AurelionSol")
             {
                 return;
             }
@@ -89,6 +89,8 @@
             MiscMenu.AddGroupLabel("Misc Settings");
             MiscMenu.Add("gapcloserQ", new CheckBox("Anti-GapCloser (Q)"));
             MiscMenu.Add("gapcloserR", new CheckBox("Anti-GapCloser (R)"));
+            MiscMenu.Add("KillStealQ", new CheckBox("KillSteal (Q)"));
+            MiscMenu.Add("KillStealR", new CheckBox("KillSteal (R)"));
             MiscMenu.Add("AQ", new Slider("Auto Trigger Q On hit (Size inc)", 2, 1, 5));
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
@@ -156,11 +158,13 @@
             {
                 Q.Cast(Game.CursorPos);
             }
+
+            KS();
         }
 
         private static void Gapcloser_OnGap(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
-            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || Sender == null || Sender.IsAlly || Sender.IsMe)
+            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || Sender == null || !Sender.IsEnemy)
             {
                 return;
             }
@@ -169,7 +173,7 @@
             {
                 var qsize = QMissle.StartPosition.Distance(QMissle.Position);
                 var pred = Q.GetPrediction(Sender);
-                if (pred.HitChance >= HitChance.High && Q.Handle.ToggleState == 1)
+                if (Q.Handle.ToggleState != 2 && args.SenderMousePos.IsInRange(Player.Instance, Q.Range))
                 {
                     Q.Cast(pred.CastPosition);
                 }
@@ -183,7 +187,7 @@
             if (MiscMenu.Get<CheckBox>("gapcloserR").CurrentValue)
             {
                 var pred = R.GetPrediction(Sender);
-                if (pred.HitChance >= HitChance.High)
+                if (args.SenderMousePos.IsInRange(Player.Instance, Player.Instance.GetAutoAttackRange()))
                 {
                     R.Cast(pred.CastPosition);
                 }
@@ -214,6 +218,35 @@
                 {
                     var Qsize = QMissle.StartPosition.Distance(QMissle.Position);
                     Circle.Draw(Color.White, Q.Width + Qsize / 15, QMissle.Position);
+                }
+            }
+        }
+
+        private static void KS()
+        {
+            foreach (var target in EntityManager.Heroes.Enemies.Where(target => target != null))
+            {
+                if (target.IsValidTarget(Q.Range) && Q.IsReady() && Damage.Q(target) >= target.Health)
+                {
+                    if (MiscMenu["KillStealQ"].Cast<CheckBox>().CurrentValue)
+                    {
+                        var qsize = QMissle.StartPosition.Distance(QMissle.Position);
+                        var pred = Q.GetPrediction(target);
+                        if (Q.Handle.ToggleState != 2)
+                        {
+                            Q.Cast(pred.CastPosition);
+                        }
+
+                        if (QMissle.Position.IsInRange(target, (qsize + Q.Width) / 15) && Q.Handle.ToggleState == 2)
+                        {
+                            Q.Cast(Game.CursorPos);
+                        }
+                    }
+                }
+
+                if (MiscMenu["KillStealR"].Cast<CheckBox>().CurrentValue)
+                {
+                    R.Cast(target.Position);
                 }
             }
         }
