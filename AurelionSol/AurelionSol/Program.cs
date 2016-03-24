@@ -68,19 +68,21 @@
             ComboMenu.Add("Q", new CheckBox("Use Q"));
             ComboMenu.Add("Q2", new CheckBox("Follow Q"));
             ComboMenu.Add("W", new CheckBox("Use W"));
+            ComboMenu.Add("W2", new CheckBox("Use W2"));
             ComboMenu.Add("R", new CheckBox("Use R"));
             ComboMenu.Add("Rhit", new Slider("Use R Hit", 2, 1, 5));
 
             HarassMenu = menuIni.AddSubMenu("Harass");
             HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("Q", new CheckBox("Use Q"));
-            HarassMenu.Add("W", new CheckBox("Use W"));
+            HarassMenu.Add("W", new CheckBox("Use W", false));
+            HarassMenu.Add("W2", new CheckBox("Use W2", false));
             HarassMenu.Add("Mana", new Slider("Save Mana %", 30, 0, 100));
 
             LaneMenu = menuIni.AddSubMenu("Farm");
             LaneMenu.AddGroupLabel("LaneClear Settings");
             LaneMenu.Add("Q", new CheckBox("Use Q"));
-            LaneMenu.Add("W", new CheckBox("Use W"));
+            LaneMenu.Add("W", new CheckBox("Use W", false));
             LaneMenu.Add("Mana", new Slider("Save Mana %", 30, 0, 100));
 
             MiscMenu = menuIni.AddSubMenu("Misc");
@@ -221,6 +223,7 @@
             var fQ = ComboMenu["Q2"].Cast<CheckBox>().CurrentValue;
             var useQ = ComboMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady();
             var useW = ComboMenu["W"].Cast<CheckBox>().CurrentValue && W.IsReady();
+            var useW2 = ComboMenu["W2"].Cast<CheckBox>().CurrentValue && W.IsReady();
             var useR = ComboMenu["R"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var Rhit = ComboMenu["Rhit"].Cast<Slider>().CurrentValue;
             var Qtarget = TargetSelector.GetTarget(Q.Range * 2, DamageType.Magical);
@@ -254,9 +257,12 @@
                 {
                     W.Cast();
                 }
+            }
 
-                if (W.Handle.ToggleState == 2 && (!Wtarget.IsValidTarget(W.Range)
-                    || Wtarget.IsValidTarget(W.Range - 250)))
+            if (useW2)
+            {
+                if (W.Handle.ToggleState == 2
+                    && (!Wtarget.IsValidTarget(W.Range) || Wtarget.IsValidTarget(W.Range - 250)))
                 {
                     W.Cast();
                 }
@@ -276,6 +282,7 @@
         {
             var useQ = HarassMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady();
             var useW = HarassMenu["W"].Cast<CheckBox>().CurrentValue && W.IsReady();
+            var useW2 = HarassMenu["W2"].Cast<CheckBox>().CurrentValue && W.IsReady();
             var Qtarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
             var Wtarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
 
@@ -301,9 +308,12 @@
                 {
                     W.Cast();
                 }
+            }
 
-                if (W.Handle.ToggleState == 2 && (!Wtarget.IsValidTarget(W.Range)
-                    || Wtarget.IsValidTarget(W.Range - 250)))
+            if (useW2)
+            {
+                if (W.Handle.ToggleState == 2
+                    && (!Wtarget.IsValidTarget(W.Range) || Wtarget.IsValidTarget(W.Range - 250)))
                 {
                     W.Cast();
                 }
