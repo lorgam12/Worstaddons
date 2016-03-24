@@ -46,14 +46,9 @@
 
         private static void OnLoad(EventArgs args)
         {
-            if (player.ChampionName != "AurelionSol")
-            {
-                return;
-            }
-
             Q = new Spell.Skillshot(SpellSlot.Q, 650, SkillShotType.Circular, 1000, 850, 160);
-            W = new Spell.Active(SpellSlot.W, 700);
-            R = new Spell.Skillshot(SpellSlot.R, 1600, SkillShotType.Linear, 250, 1600, 115);
+            W = new Spell.Active(SpellSlot.W, 675);
+            R = new Spell.Skillshot(SpellSlot.R, 1550, SkillShotType.Linear, 250, 1600, 115);
 
             menuIni = MainMenu.AddMenu("AurelionSol", "AurelionSol");
             menuIni.AddGroupLabel("Welcome to the Worst AurelionSol addon!");
@@ -109,7 +104,7 @@
             var miss = sender as MissileClient;
             if (miss != null && miss.IsValid)
             {
-                if (miss.SpellCaster.IsMe && miss.SpellCaster.IsValid)
+                if (miss.SpellCaster.IsMe && miss.SpellCaster.IsValid && Q.Handle.ToggleState == 2)
                 {
                     QMissle = miss;
                 }
@@ -149,7 +144,7 @@
             }
 
             var qsize = QMissle.StartPosition.Distance(QMissle.Position);
-            if (QMissle.Position.CountEnemiesInRange((qsize + Q.Width) / 20) >= MiscMenu.Get<Slider>("AQ").CurrentValue
+            if (QMissle.Position.CountEnemiesInRange((qsize + Q.Width) / 15) >= MiscMenu.Get<Slider>("AQ").CurrentValue
                 && Q.Handle.ToggleState == 2)
             {
                 Q.Cast(Game.CursorPos);
@@ -162,6 +157,7 @@
             {
                 return;
             }
+
             if (MiscMenu.Get<CheckBox>("gapcloserQ").CurrentValue)
             {
                 var qsize = QMissle.StartPosition.Distance(QMissle.Position);
@@ -171,7 +167,7 @@
                     Q.Cast(pred.CastPosition);
                 }
 
-                if (QMissle.Position.IsInRange(Sender, (qsize + Q.Width) / 20) && Q.Handle.ToggleState == 2)
+                if (QMissle.Position.IsInRange(Sender, (qsize + Q.Width) / 15) && Q.Handle.ToggleState == 2)
                 {
                     Q.Cast(Game.CursorPos);
                 }
@@ -199,7 +195,7 @@
                 if (DrawMenu.Get<CheckBox>("W").CurrentValue)
                 {
                     Circle.Draw(Color.Blue, W.Range, Player.Instance.Position);
-                    Circle.Draw(Color.Blue, W.Range - 100, Player.Instance.Position);
+                    Circle.Draw(Color.Blue, W.Range - 250, Player.Instance.Position);
                 }
 
                 if (DrawMenu.Get<CheckBox>("R").CurrentValue)
@@ -210,7 +206,7 @@
                 if (DrawMenu.Get<CheckBox>("QS").CurrentValue && QMissle != null)
                 {
                     var Qsize = QMissle.StartPosition.Distance(QMissle.Position);
-                    Circle.Draw(Color.White, Q.Width + Qsize / 20, QMissle.Position);
+                    Circle.Draw(Color.White, Q.Width + Qsize / 15, QMissle.Position);
                 }
             }
         }
@@ -230,12 +226,12 @@
             {
                 var qsize = QMissle.StartPosition.Distance(QMissle.Position);
                 var pred = Q.GetPrediction(Qtarget);
-                if (pred.HitChance >= HitChance.High && Q.Handle.ToggleState == 1)
+                if (Q.Handle.ToggleState != 2)
                 {
                     Q.Cast(pred.CastPosition);
                 }
 
-                if (QMissle.Position.IsInRange(Qtarget, (qsize + Q.Width) / 20) && Q.Handle.ToggleState == 2)
+                if (QMissle.Position.IsInRange(Qtarget, (qsize + Q.Width) / 15) && Q.Handle.ToggleState == 2)
                 {
                     Q.Cast(Game.CursorPos);
                 }
@@ -248,14 +244,14 @@
 
             if (useW)
             {
-                if (W.Handle.ToggleState == 1 && Wtarget != null && Wtarget.IsValidTarget(W.Range)
-                    && !Wtarget.IsValidTarget(W.Range - 100))
+                if (W.Handle.ToggleState != 2 && Wtarget != null && Wtarget.IsValidTarget(W.Range)
+                    && !Wtarget.IsValidTarget(W.Range - 250))
                 {
                     W.Cast();
                 }
 
-                if (W.Handle.ToggleState == 2 && Wtarget != null && !Wtarget.IsValidTarget(W.Range)
-                    && Wtarget.IsValidTarget(W.Range - 100))
+                if (W.Handle.ToggleState == 2 && (!Wtarget.IsValidTarget(W.Range)
+                    || Wtarget.IsValidTarget(W.Range - 250)))
                 {
                     W.Cast();
                 }
@@ -287,15 +283,25 @@
                     Q.Cast(pred.CastPosition);
                 }
 
-                if (QMissle.Position.IsInRange(Qtarget, (qsize + Q.Width) / 20) && Q.Handle.ToggleState == 2)
+                if (QMissle.Position.IsInRange(Qtarget, (qsize + Q.Width) / 15) && Q.Handle.ToggleState == 2)
                 {
                     Q.Cast(Game.CursorPos);
                 }
             }
 
-            if (useW && Wtarget != null && Wtarget.IsValidTarget(W.Range))
+            if (useW)
             {
-                W.Cast();
+                if (W.Handle.ToggleState != 2 && Wtarget != null && Wtarget.IsValidTarget(W.Range)
+                    && !Wtarget.IsValidTarget(W.Range - 250))
+                {
+                    W.Cast();
+                }
+
+                if (W.Handle.ToggleState == 2 && (!Wtarget.IsValidTarget(W.Range)
+                    || Wtarget.IsValidTarget(W.Range - 250)))
+                {
+                    W.Cast();
+                }
             }
         }
 
