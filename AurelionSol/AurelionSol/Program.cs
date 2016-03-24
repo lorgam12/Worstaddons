@@ -46,6 +46,11 @@
 
         private static void OnLoad(EventArgs args)
         {
+			if (player.ChampionName != "AurelionSol")
+            {
+                return;
+            }
+
             Q = new Spell.Skillshot(SpellSlot.Q, 650, SkillShotType.Circular, 1000, 850, 160);
             W = new Spell.Active(SpellSlot.W, 675);
             R = new Spell.Skillshot(SpellSlot.R, 1550, SkillShotType.Linear, 250, 1600, 115);
