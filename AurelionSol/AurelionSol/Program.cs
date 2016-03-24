@@ -152,8 +152,8 @@
                 Clear();
             }
 
-            var qsize = QMissle.StartPosition.Distance(QMissle.Position);
-            if (QMissle.Position.CountEnemiesInRange((qsize + Q.Width) / 15) >= MiscMenu.Get<Slider>("AQ").CurrentValue
+            var qsize = QMissle?.StartPosition.Distance(QMissle.Position);
+            if (QMissle?.Position.CountEnemiesInRange((float)((qsize + Q.Width) / 15)) >= MiscMenu.Get<Slider>("AQ").CurrentValue
                 && Q.Handle.ToggleState == 2)
             {
                 Q.Cast(Game.CursorPos);
