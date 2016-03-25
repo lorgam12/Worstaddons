@@ -20,7 +20,7 @@
             QssMenu.Add("enable", new CheckBox("Enable", false));
             QssMenu.Add("Mercurial", new CheckBox("Use Mercurial Scimitar", false));
             QssMenu.Add("Quicksilver", new CheckBox("Use Quicksilver Sash", false));
-            QssMenu.AddLabel("Cleanse Settings:");
+            QssMenu.AddLabel("Debuffs Settings:");
             QssMenu.Add("blind", new CheckBox("Use On Blinds?", false));
             QssMenu.Add("charm", new CheckBox("Use On Charms?", false));
             QssMenu.Add("disarm", new CheckBox("Use On Disarm?", false));
@@ -39,6 +39,14 @@
             QssMenu.Add("tunt", new CheckBox("Use On Taunts?", false));
             QssMenu.Add("poly", new CheckBox("Use On Polymorph?", false));
             QssMenu.Add("poison", new CheckBox("Use On Poisons?", false));
+            QssMenu.AddLabel("Ults Settings:");
+            QssMenu.Add("liss", new CheckBox("Use On Lissandra Ult?", false));
+            QssMenu.Add("naut", new CheckBox("Use On Nautilus Ult?", false));
+            QssMenu.Add("zed", new CheckBox("Use On Zed Ult?", false));
+            QssMenu.Add("vlad", new CheckBox("Use On Vlad Ult?", false));
+            QssMenu.Add("fizz", new CheckBox("Use On Fizz Ult?", false));
+            QssMenu.Add("fiora", new CheckBox("Use On Fiora Ult?", false));
+            QssMenu.AddSeparator();
             QssMenu.Add("hp", new Slider("Use Only When HP is Under %", 25, 0, 100));
             QssMenu.Add("human", new Slider("Humanizer Delay", 150, 0, 1500));
             QssMenu.Add("Rene", new Slider("Enemies Near to Cast", 1, 0, 5));
@@ -89,14 +97,21 @@
                              || (QssMenu["poison"].Cast<CheckBox>().CurrentValue
                                  && Player.Instance.HasBuffOfType(BuffType.Poison))
                              || (QssMenu["blind"].Cast<CheckBox>().CurrentValue
-                                 && Player.Instance.HasBuffOfType(BuffType.Blind));
+                                 && Player.Instance.HasBuffOfType(BuffType.Blind))
+                                 || (QssMenu["zed"].Cast<CheckBox>().CurrentValue && Player.Instance.HasBuff("zedrtargetmark"))
+                                 || (QssMenu["vlad"].Cast<CheckBox>().CurrentValue && Player.Instance.HasBuff("vladimirhemoplaguedebuff"))
+                                 || (QssMenu["liss"].Cast<CheckBox>().CurrentValue && Player.Instance.HasBuff("LissandraREnemy2"))
+                                 || (QssMenu["fizz"].Cast<CheckBox>().CurrentValue && Player.Instance.HasBuff("fizzmarinerdoombomb"))
+                                 || (QssMenu["naut"].Cast<CheckBox>().CurrentValue && Player.Instance.HasBuff("nautilusgrandlinetarget"))
+                                 || (QssMenu["fiora"].Cast<CheckBox>().CurrentValue && Player.Instance.HasBuff("fiorarmark"));
                 var enemys = QssMenu["Rene"].Cast<Slider>().CurrentValue;
                 var hp = QssMenu["hp"].Cast<Slider>().CurrentValue;
                 var enemysrange = QssMenu["enemydetect"].Cast<Slider>().CurrentValue;
+                var delay = QssMenu["human"].Cast<Slider>().CurrentValue;
                 if (debuff && ObjectManager.Player.HealthPercent <= hp
                     && enemys >= ObjectManager.Player.Position.CountEnemiesInRange(enemysrange))
                 {
-                    Core.DelayAction(QssCast, QssMenu["human"].Cast<Slider>().CurrentValue);
+                    Core.DelayAction(QssCast, delay);
                 }
             }
         }
