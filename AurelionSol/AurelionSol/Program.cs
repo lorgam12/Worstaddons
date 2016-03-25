@@ -288,9 +288,15 @@
                 }
             }
 
-            if (fQ && Q.Handle.ToggleState == 2 && Qtarget != null && QMissle != null)
+            if (fQ && Q.Handle.ToggleState == 2 && QMissle != null)
             {
                 Player.IssueOrder(GameObjectOrder.MoveTo, QMissle.Position);
+            }
+
+            if (fQ)
+            {
+                Orbwalker.DisableAttacking = Q.Handle.ToggleState == 2;
+                Orbwalker.DisableMovement = Q.Handle.ToggleState == 2;
             }
 
             if (useW)
