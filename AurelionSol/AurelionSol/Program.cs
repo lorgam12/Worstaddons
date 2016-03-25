@@ -51,7 +51,7 @@
                 return;
             }
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 700, SkillShotType.Circular, 250, 850, 75);
+            Q = new Spell.Skillshot(SpellSlot.Q, 700, SkillShotType.Circular, 420, 800, 180);
             W = new Spell.Active(SpellSlot.W, 675);
             R = new Spell.Skillshot(SpellSlot.R, 1550, SkillShotType.Linear, 250, 1750, 180);
 
@@ -91,7 +91,7 @@
             MiscMenu.Add("gapcloserR", new CheckBox("Anti-GapCloser (R)"));
             MiscMenu.Add("KillStealQ", new CheckBox("KillSteal (Q)"));
             MiscMenu.Add("KillStealR", new CheckBox("KillSteal (R)"));
-            MiscMenu.Add("AQ", new Slider("Auto Trigger Q On hit (Size inc)", 2, 1, 5));
+            MiscMenu.Add("AQ", new Slider("Auto Trigger Q On hit (Size inc)", 1, 1, 5));
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
             DrawMenu.AddGroupLabel("Drawing Settings");
@@ -158,6 +158,7 @@
                 Q.Cast(Game.CursorPos);
             }
 
+            Orbwalker.DisableAttacking = Q.Handle.ToggleState == 2;
             KS();
         }
 
@@ -171,7 +172,7 @@
             if (MiscMenu.Get<CheckBox>("gapcloserQ").CurrentValue)
             {
                 var pred = Q.GetPrediction(Sender);
-                if (Q.Handle.ToggleState == 1 && args.SenderMousePos.IsInRange(Player.Instance, Q.Range))
+                if (Q.Handle.ToggleState == 1 && Sender.IsValidTarget(Q.Range))
                 {
                     Q.Cast(pred.CastPosition);
                 }

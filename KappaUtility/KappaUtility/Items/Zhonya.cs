@@ -38,55 +38,16 @@
                 return;
             }
 
-            if (Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue
-                && Defensive.DefMenu["ZhonyasD"].Cast<CheckBox>().CurrentValue)
+            if (Defensive.DefMenu["ZhonyasD"].Cast<CheckBox>().CurrentValue)
             {
                 foreach (
                     var spell in
                         DangerSpells.Where(spell => args.SData.Name == spell && caster.IsEnemy)
                             .Where(spell => spell != null && args.SData.Name == spell))
                 {
-                    switch (spell)
-                    {
-                        case "zedult":
-                            {
-                                castdelay = 2800;
-                            }
-
-                            break;
-
-                        case "FallenOne":
-                            {
-                                castdelay = 2700;
-                            }
-
-                            break;
-
-                        case "ViR":
-                            {
-                                castdelay = 100;
-                            }
-
-                            break;
-
-                        case "CaitlynAceintheHole":
-                            {
-                                castdelay = 600;
-                            }
-
-                            break;
-
-                        case "BlindMonkRKick":
-                            {
-                                castdelay = 100;
-                            }
-
-                            break;
-                    }
-
-                    Core.DelayAction(() => Defensive.Zhonyas.Cast(), castdelay);
+                    Core.DelayAction(() => Defensive.Zhonyas.Cast(), (int)sender.Spellbook.GetSpell(SpellSlot.R).SData.SpellCastTime * 2);
+                }
                 }
             }
         }
     }
-}
