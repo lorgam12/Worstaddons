@@ -188,8 +188,7 @@
                                 Drawing.DrawText(
                                     Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
                                     Color.White,
-                                    "Shaco Box Expire: "
-                                    + Convert.ToString(endTime, CultureInfo.InvariantCulture),
+                                    "Shaco Box Expire: " + Convert.ToString(endTime, CultureInfo.InvariantCulture),
                                     2);
                             }
 
@@ -222,19 +221,25 @@
             if (teleport == TeleportStatus.Start)
             {
                 Notifications.Show(
-                    new SimpleNotification(sender.BaseSkinName + " Is Recalling", sender.BaseSkinName + " Current Health = " + (int)sender.TotalShieldHealth()));
+                    new SimpleNotification(
+                        sender.BaseSkinName + " Is Recalling",
+                        sender.BaseSkinName + " Current Health = " + (int)sender.TotalShieldHealth()));
             }
 
             if (teleport == TeleportStatus.Abort)
             {
                 Notifications.Show(
-                    new SimpleNotification(sender.BaseSkinName + " Recall Aborted", sender.BaseSkinName + " Current Health = " + (int)sender.TotalShieldHealth()));
+                    new SimpleNotification(
+                        sender.BaseSkinName + " Recall Aborted",
+                        sender.BaseSkinName + " Current Health = " + (int)sender.TotalShieldHealth()));
             }
 
             if (teleport == TeleportStatus.Finish)
             {
                 Notifications.Show(
-                    new SimpleNotification(sender.BaseSkinName + " Recall Finished", sender.BaseSkinName + " Current Health = " + (int)sender.TotalShieldHealth()));
+                    new SimpleNotification(
+                        sender.BaseSkinName + " Recall Finished",
+                        sender.BaseSkinName + " Current Health = " + (int)sender.TotalShieldHealth()));
             }
         }
 
@@ -331,7 +336,6 @@
 
                     i += 20f;
                 }
-
 
                 if (!TrackMenu.Get<CheckBox>("Trackway").CurrentValue
                     || (!(hero.Path.LastOrDefault().Distance(Player.Instance)

@@ -74,31 +74,50 @@
 
         public static int _Zhonyash => Defensive.DefMenu["Zhonyash"].Cast<Slider>().CurrentValue;
 
-        public static bool _Corruptingc => !Potions.PotMenu["CP"].Cast<CheckBox>().CurrentValue || !Potions.Corrupting.IsOwned() || !Potions.Corrupting.IsReady();
+        public static bool _Corruptingc
+            =>
+                !Potions.PotMenu["CP"].Cast<CheckBox>().CurrentValue || !Potions.Corrupting.IsOwned()
+                || !Potions.Corrupting.IsReady();
 
-        public static bool _Healthc => Potions.PotMenu["HP"].Cast<CheckBox>().CurrentValue && Potions.Health.IsOwned()
-                                       && Potions.Health.IsReady();
+        public static bool _Healthc
+            =>
+                Potions.PotMenu["HP"].Cast<CheckBox>().CurrentValue && Potions.Health.IsOwned()
+                && Potions.Health.IsReady();
 
-        public static bool _Huntersc => Potions.PotMenu["HPS"].Cast<CheckBox>().CurrentValue && Potions.Hunters.IsOwned()
-                                        && Potions.Hunters.IsReady();
+        public static bool _Huntersc
+            =>
+                Potions.PotMenu["HPS"].Cast<CheckBox>().CurrentValue && Potions.Hunters.IsOwned()
+                && Potions.Hunters.IsReady();
 
-        public static bool _Refillablec => Potions.PotMenu["RP"].Cast<CheckBox>().CurrentValue && Potions.Refillable.IsOwned()
-                                           && Potions.Refillable.IsReady();
+        public static bool _Refillablec
+            =>
+                Potions.PotMenu["RP"].Cast<CheckBox>().CurrentValue && Potions.Refillable.IsOwned()
+                && Potions.Refillable.IsReady();
 
-        public static bool _Biscuitc => Potions.PotMenu["BP"].Cast<CheckBox>().CurrentValue && Potions.Biscuit.IsOwned()
-                                        && Potions.Biscuit.IsReady();
+        public static bool _Biscuitc
+            =>
+                Potions.PotMenu["BP"].Cast<CheckBox>().CurrentValue && Potions.Biscuit.IsOwned()
+                && Potions.Biscuit.IsReady();
 
-        public static bool _Seraphc => Defensive.DefMenu["Seraph"].Cast<CheckBox>().CurrentValue && Defensive.Seraph.IsOwned()
-                                       && Defensive.Seraph.IsReady();
+        public static bool _Seraphc
+            =>
+                Defensive.DefMenu["Seraph"].Cast<CheckBox>().CurrentValue && Defensive.Seraph.IsOwned()
+                && Defensive.Seraph.IsReady();
 
-        public static bool _Solaric => Defensive.DefMenu["Solari"].Cast<CheckBox>().CurrentValue && Defensive.Solari.IsOwned()
-                                       && Defensive.Solari.IsReady();
+        public static bool _Solaric
+            =>
+                Defensive.DefMenu["Solari"].Cast<CheckBox>().CurrentValue && Defensive.Solari.IsOwned()
+                && Defensive.Solari.IsReady();
 
-        public static bool _FaceOfTheMountainc => Defensive.DefMenu["FaceOfTheMountain"].Cast<CheckBox>().CurrentValue && Defensive.FOTM.IsOwned()
-                                                  && Defensive.FOTM.IsReady();
+        public static bool _FaceOfTheMountainc
+            =>
+                Defensive.DefMenu["FaceOfTheMountain"].Cast<CheckBox>().CurrentValue && Defensive.FOTM.IsOwned()
+                && Defensive.FOTM.IsReady();
 
-        public static bool _Zhonyasc => Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue && Defensive.Zhonyas.IsOwned()
-                                        && Defensive.Zhonyas.IsReady();
+        public static bool _Zhonyasc
+            =>
+                Defensive.DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue && Defensive.Zhonyas.IsOwned()
+                && Defensive.Zhonyas.IsReady();
 
         private static void Main(string[] args)
         {
@@ -123,7 +142,7 @@
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Obj_AI_Base.OnBasicAttack += OnBasicAttack;
         }
-        
+
         private static void OnDraw(EventArgs args)
         {
             AutoReveal.Draw();
