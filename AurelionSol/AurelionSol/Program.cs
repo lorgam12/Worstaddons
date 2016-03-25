@@ -53,7 +53,7 @@
 
             Q = new Spell.Skillshot(SpellSlot.Q, 700, SkillShotType.Circular, 1000, 650, 75);
             W = new Spell.Active(SpellSlot.W, 675);
-            R = new Spell.Skillshot(SpellSlot.R, 1550, SkillShotType.Linear, 250, 1750, 100);
+            R = new Spell.Skillshot(SpellSlot.R, 1550, SkillShotType.Linear, 250, 1750, 180);
 
             menuIni = MainMenu.AddMenu("AurelionSol", "AurelionSol");
             menuIni.AddGroupLabel("Welcome to the Worst AurelionSol addon!");
@@ -127,7 +127,6 @@
             {
                 return;
             }
-
             if (miss.SpellCaster is AIHeroClient && miss.SpellCaster.IsValid && miss.SpellCaster.IsMe)
             {
                 QMissle = null;
@@ -319,10 +318,9 @@
 
             if (useR && Rtarget != null && Rtarget.IsValidTarget(R.Range))
             {
-                var predR = R.GetPrediction(Rtarget).CastPosition;
-                if (Rtarget.CountEnemiesInRange(R.Width) >= Rhit)
+                foreach (var enemy in from enemy in EntityManager.Heroes.Enemies let startPos = enemy.ServerPosition let endPos = Player.Instance.ServerPosition.Extend(startPos, Player.Instance.Distance(enemy) + R.Range) let rectangle = new Geometry.Polygon.Rectangle((Vector2)startPos, endPos, R.Radius) where EntityManager.Heroes.Enemies.Count(x => rectangle.IsInside(x)) >= Rhit select enemy)
                 {
-                    R.Cast(predR);
+                    R.Cast(enemy.Position);
                 }
             }
         }
