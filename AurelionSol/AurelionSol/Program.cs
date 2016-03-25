@@ -51,7 +51,6 @@
                 return;
             }
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 750, SkillShotType.Circular, 1000, 850, 160);
             W = new Spell.Active(SpellSlot.W, 675);
             R = new Spell.Skillshot(SpellSlot.R, 1550, SkillShotType.Linear, 250, 1750, 100);
 
