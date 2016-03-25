@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
     using EloBuddy;
     using EloBuddy.SDK;
@@ -51,7 +52,7 @@
                 return;
             }
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 650, SkillShotType.Circular, 1000, 850, 160);
+            Q = new Spell.Skillshot(SpellSlot.Q, 750, SkillShotType.Circular, 1000, 850, 160);
             W = new Spell.Active(SpellSlot.W, 675);
             R = new Spell.Skillshot(SpellSlot.R, 1550, SkillShotType.Linear, 250, 1750, 100);
 
@@ -136,6 +137,7 @@
 
         private static void OnUpdate(EventArgs args)
         {
+            Chat.Print(Q.Handle.ToggleState);
             var flags = Orbwalker.ActiveModesFlags;
             if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
             {
@@ -171,16 +173,19 @@
 
             if (MiscMenu.Get<CheckBox>("gapcloserQ").CurrentValue)
             {
-                var qsize = QMissle.StartPosition.Distance(QMissle.Position);
                 var pred = Q.GetPrediction(Sender);
                 if (Q.Handle.ToggleState == 1 && args.SenderMousePos.IsInRange(Player.Instance, Q.Range))
                 {
                     Q.Cast(pred.CastPosition);
                 }
 
-                if (QMissle.Position.IsInRange(Sender, (qsize + Q.Width) / 15) && Q.Handle.ToggleState == 2)
+                if (Q.Handle.ToggleState == 2)
                 {
-                    Q.Cast(Game.CursorPos);
+                    var qsize = QMissle.StartPosition.Distance(QMissle.Position);
+                    if (QMissle.Position.IsInRange(Sender, (qsize + Q.Width) / 15))
+                    {
+                        Q.Cast(Game.CursorPos);
+                    }
                 }
             }
 
@@ -230,21 +235,24 @@
                 {
                     if (MiscMenu["KillStealQ"].Cast<CheckBox>().CurrentValue)
                     {
-                        var qsize = QMissle.StartPosition.Distance(QMissle.Position);
                         var pred = Q.GetPrediction(target);
                         if (Q.Handle.ToggleState == 1)
                         {
                             Q.Cast(pred.CastPosition);
                         }
 
-                        if (QMissle.Position.IsInRange(target, (qsize + Q.Width) / 15) && Q.Handle.ToggleState == 2)
+                        if (Q.Handle.ToggleState == 2)
                         {
-                            Q.Cast(Game.CursorPos);
+                            var qsize = QMissle.StartPosition.Distance(QMissle.Position);
+                            if (QMissle.Position.IsInRange(target, (qsize + Q.Width) / 15))
+                            {
+                                Q.Cast(Game.CursorPos);
+                            }
                         }
                     }
                 }
 
-                if (MiscMenu["KillStealR"].Cast<CheckBox>().CurrentValue)
+                if (MiscMenu["KillStealR"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(R.Range) && R.IsReady() && Damage.R(target) >= target.Health)
                 {
                     R.Cast(target.Position);
                 }
@@ -265,16 +273,19 @@
 
             if (useQ && Qtarget != null && Qtarget.IsValidTarget(Q.Range))
             {
-                var qsize = QMissle.StartPosition.Distance(QMissle.Position);
                 var pred = Q.GetPrediction(Qtarget);
                 if (Q.Handle.ToggleState == 1)
                 {
                     Q.Cast(pred.CastPosition);
                 }
 
-                if (QMissle.Position.IsInRange(Qtarget, (qsize + Q.Width) / 15) && Q.Handle.ToggleState == 2)
+                if (Q.Handle.ToggleState == 2 && QMissle != null)
                 {
-                    Q.Cast(Game.CursorPos);
+                    var qsize = QMissle.StartPosition.Distance(QMissle.Position);
+                    if (QMissle.Position.IsInRange(Qtarget, (qsize + Q.Width) / 15))
+                    {
+                        Q.Cast(Game.CursorPos);
+                    }
                 }
             }
 
