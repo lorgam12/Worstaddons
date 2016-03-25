@@ -14,7 +14,7 @@
             {
                 "AzirR", "zedult", "ViR", "SyndraR", "CaitlynAceintheHole",
                 "LissandraR", "GarenR", "DariusR", "BlindMonkRKick",
-                "karthusfallenonetarget"
+                "FallenOne"
             };
 
         internal static void OnLoad()
@@ -55,7 +55,7 @@
 
                             break;
 
-                        case "karthusfallenonetarget":
+                        case "FallenOne":
                             {
                                 castdelay = 2700;
                             }
