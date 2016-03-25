@@ -53,7 +53,7 @@
 
             Q = new Spell.Skillshot(SpellSlot.Q, 650, SkillShotType.Circular, 1000, 850, 160);
             W = new Spell.Active(SpellSlot.W, 675);
-            R = new Spell.Skillshot(SpellSlot.R, 1550, SkillShotType.Linear, 250, 1600, 115);
+            R = new Spell.Skillshot(SpellSlot.R, 1550, SkillShotType.Linear, 250, 1750, 100);
 
             menuIni = MainMenu.AddMenu("AurelionSol", "AurelionSol");
             menuIni.AddGroupLabel("Welcome to the Worst AurelionSol addon!");
@@ -173,7 +173,7 @@
             {
                 var qsize = QMissle.StartPosition.Distance(QMissle.Position);
                 var pred = Q.GetPrediction(Sender);
-                if (Q.Handle.ToggleState != 2 && args.SenderMousePos.IsInRange(Player.Instance, Q.Range))
+                if (Q.Handle.ToggleState == 1 && args.SenderMousePos.IsInRange(Player.Instance, Q.Range))
                 {
                     Q.Cast(pred.CastPosition);
                 }
@@ -232,7 +232,7 @@
                     {
                         var qsize = QMissle.StartPosition.Distance(QMissle.Position);
                         var pred = Q.GetPrediction(target);
-                        if (Q.Handle.ToggleState != 2)
+                        if (Q.Handle.ToggleState == 1)
                         {
                             Q.Cast(pred.CastPosition);
                         }
@@ -267,7 +267,7 @@
             {
                 var qsize = QMissle.StartPosition.Distance(QMissle.Position);
                 var pred = Q.GetPrediction(Qtarget);
-                if (Q.Handle.ToggleState != 2)
+                if (Q.Handle.ToggleState == 1)
                 {
                     Q.Cast(pred.CastPosition);
                 }
