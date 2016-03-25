@@ -554,7 +554,8 @@ namespace GenesisSpellLibrary.Spells
                          { AllowedCollisionCount = 0 };
             this.W = new Spell.Skillshot(SpellSlot.W, 1050, SkillShotType.Linear, 250, 1600, 80);
             this.E = new Spell.Skillshot(SpellSlot.E, 475, SkillShotType.Linear, 250, 2000, 80);
-            this.R = new Spell.Skillshot(SpellSlot.R, 5000, SkillShotType.Linear, 1000, 2000, 160);
+            this.R = new Spell.Skillshot(SpellSlot.R, 5000, SkillShotType.Linear, 1000, 25000, 160)
+            { AllowedCollisionCount = int.MaxValue };
         }
     }
 
@@ -1197,7 +1198,6 @@ namespace GenesisSpellLibrary.Spells
             this.Q = new Spell.Targeted(SpellSlot.Q, 675);
             this.W = new Spell.Skillshot(SpellSlot.W, 1000, SkillShotType.Linear, 250, 1600, 80);
             this.E = new Spell.Skillshot(SpellSlot.E, 475, SkillShotType.Linear);
-            this.R = new Spell.Skillshot(SpellSlot.R, 1400, SkillShotType.Linear, 500, 2800, 110);
         }
     }
 

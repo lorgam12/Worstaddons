@@ -65,7 +65,7 @@
                         return;
                     }
 
-                    if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
+                    if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.Q)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime)
                         && Spells.Q.IsInRange(mob) && Spells.Q.IsReady())
@@ -124,7 +124,7 @@
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
+                    if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.W)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime)
                         && Spells.W.IsInRange(mob) && Spells.W.IsReady())
@@ -182,7 +182,7 @@
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
+                    if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.E)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime)
                         && Spells.E.IsInRange(mob) && Spells.E.IsReady())
@@ -240,7 +240,7 @@
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
+                    if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.R)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime)
                         && Spells.R.IsInRange(mob) && Spells.R.IsReady())

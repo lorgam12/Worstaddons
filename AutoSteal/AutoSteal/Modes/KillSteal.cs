@@ -42,7 +42,7 @@
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(target)
+                    if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)
                         > Prediction.Health.GetPrediction(target, (int)qtraveltime)
                         && Spells.Q.IsInRange(target) && Spells.Q.IsReady())
@@ -94,7 +94,7 @@
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(target)
+                    if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetSpellDamage(target, SpellSlot.W)
                         > Prediction.Health.GetPrediction(target, (int)(wtraveltime))
                         && Spells.W.IsInRange(target) && Spells.W.IsReady())
@@ -152,7 +152,7 @@
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(target)
+                    if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetSpellDamage(target, SpellSlot.E)
                         > Prediction.Health.GetPrediction(target, (int)(etraveltime))
                         && Spells.E.IsInRange(target) && Spells.E.IsReady())
@@ -210,7 +210,7 @@
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(target)
+                    if (ObjectManager.Player.BaseAbilityDamage
                         + ObjectManager.Player.GetSpellDamage(target, SpellSlot.R)
                         > Prediction.Health.GetPrediction(target, (int)(rtraveltime))
                         && Spells.R.IsInRange(target) && Spells.R.IsReady())
