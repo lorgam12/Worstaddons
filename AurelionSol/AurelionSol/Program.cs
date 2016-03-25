@@ -136,7 +136,6 @@
 
         private static void OnUpdate(EventArgs args)
         {
-            Chat.Print(Q.Handle.ToggleState);
             var flags = Orbwalker.ActiveModesFlags;
             if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
             {
