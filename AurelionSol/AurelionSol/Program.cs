@@ -2,7 +2,6 @@
 {
     using System;
     using System.Linq;
-    using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
     using EloBuddy;
     using EloBuddy.SDK;
@@ -155,8 +154,8 @@
             }
 
             var qsize = QMissle?.StartPosition.Distance(QMissle.Position);
-            if (QMissle?.Position.CountEnemiesInRange((float)((qsize + Q.Width) / 15)) >= MiscMenu.Get<Slider>("AQ").CurrentValue
-                && Q.Handle.ToggleState == 2)
+            if (QMissle?.Position.CountEnemiesInRange((float)((qsize + Q.Width) / 15))
+                >= MiscMenu.Get<Slider>("AQ").CurrentValue && Q.Handle.ToggleState == 2)
             {
                 Q.Cast(Game.CursorPos);
             }
@@ -252,7 +251,8 @@
                     }
                 }
 
-                if (MiscMenu["KillStealR"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(R.Range) && R.IsReady() && Damage.R(target) >= target.Health)
+                if (MiscMenu["KillStealR"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(R.Range) && R.IsReady()
+                    && Damage.R(target) >= target.Health)
                 {
                     R.Cast(target.Position);
                 }
