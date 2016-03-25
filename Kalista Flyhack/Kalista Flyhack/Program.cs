@@ -44,7 +44,6 @@
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
-                    Chat.Print(Player.Instance.AttackSpeedMod);
                     var target = TargetSelector.GetTarget(
                         ObjectManager.Player.GetAutoAttackRange(),
                         DamageType.Physical);
