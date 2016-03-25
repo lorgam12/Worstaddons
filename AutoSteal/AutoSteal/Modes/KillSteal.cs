@@ -11,13 +11,7 @@
 
     internal class KillSteal
     {
-        protected static SpellBase Spells
-        {
-            get
-            {
-                return SpellManager.CurrentSpells;
-            }
-        }
+        protected static SpellBase Spells => SpellManager.CurrentSpells;
 
         public static void KS()
         {
@@ -36,27 +30,31 @@
                         && ObjectManager.Player.GetAutoAttackDamage(target) > target.Health
                         && target.IsInAutoAttackRange(ObjectManager.Player))
                     {
-                        Player.IssueOrder(GameObjectOrder.AutoAttack, target);
+                        Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                         return;
                     }
                 }
 
                 if (Program.KillStealMenu[champion + "QC"].Cast<CheckBox>().CurrentValue)
                 {
+                    var qtraveltime = target.Distance(ObjectManager.Player) / Spells.Q.Handle.SData.MissileSpeed + Spells.Q.CastDelay + Game.Ping / 2f / 1000;
                     if (Spells.QisToggle)
                     {
                         return;
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(target)
                         + ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)
-                        > Prediction.Health.GetPrediction(target, (int)(Spells.Q.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(target, (int)qtraveltime)
                         && Spells.Q.IsInRange(target) && Spells.Q.IsReady())
                     {
                         if (Spells.Q.GetType() == typeof(Spell.Skillshot))
                         {
                             Spell.Skillshot Qx = Spells.Q as Spell.Skillshot;
-                            Qx.GetPrediction(target);
-                            Qx.Cast(target);
+                            if (Qx != null)
+                            {
+                                Qx.GetPrediction(target);
+                                Qx.Cast(target);
+                            }
                             return;
                         }
 
@@ -91,20 +89,24 @@
 
                 if (Program.KillStealMenu[champion + "WC"].Cast<CheckBox>().CurrentValue)
                 {
+                    var wtraveltime = target.Distance(ObjectManager.Player) / Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay + Game.Ping / 2f / 1000;
                     if (Spells.WisToggle)
                     {
                         return;
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(target)
                         + ObjectManager.Player.GetSpellDamage(target, SpellSlot.W)
-                        > Prediction.Health.GetPrediction(target, (int)(Spells.W.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(target, (int)(wtraveltime))
                         && Spells.W.IsInRange(target) && Spells.W.IsReady())
                     {
                         if (Spells.W.GetType() == typeof(Spell.Skillshot))
                         {
                             Spell.Skillshot Wx = Spells.W as Spell.Skillshot;
-                            Wx.GetPrediction(target);
-                            Wx.Cast(target);
+                            if (Wx != null)
+                            {
+                                Wx.GetPrediction(target);
+                                Wx.Cast(target);
+                            }
                             return;
                         }
 
@@ -128,7 +130,7 @@
                                 Wx.StartCharging();
                             }
 
-                            if (Wx.Range == Wx.MaximumRange)
+                            if (Wx != null && Wx.Range == Wx.MaximumRange)
                             {
                                 Wx.Cast(target.Position);
                             }
@@ -145,20 +147,24 @@
 
                 if (Program.KillStealMenu[champion + "EC"].Cast<CheckBox>().CurrentValue)
                 {
+                    var etraveltime = target.Distance(ObjectManager.Player) / Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay + Game.Ping / 2f / 1000;
                     if (Spells.EisToggle)
                     {
                         return;
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(target)
                         + ObjectManager.Player.GetSpellDamage(target, SpellSlot.E)
-                        > Prediction.Health.GetPrediction(target, (int)(Spells.E.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(target, (int)(etraveltime))
                         && Spells.E.IsInRange(target) && Spells.E.IsReady())
                     {
                         if (Spells.E.GetType() == typeof(Spell.Skillshot))
                         {
                             Spell.Skillshot Ex = Spells.E as Spell.Skillshot;
-                            Ex.GetPrediction(target);
-                            Ex.Cast(target);
+                            if (Ex != null)
+                            {
+                                Ex.GetPrediction(target);
+                                Ex.Cast(target);
+                            }
                             return;
                         }
 
@@ -182,7 +188,7 @@
                                 Ex.StartCharging();
                             }
 
-                            if (Ex.Range == Ex.MaximumRange)
+                            if (Ex != null && Ex.Range == Ex.MaximumRange)
                             {
                                 Ex.Cast(target.Position);
                             }
@@ -199,20 +205,24 @@
 
                 if (Program.KillStealMenu[champion + "RC"].Cast<CheckBox>().CurrentValue)
                 {
+                    var rtraveltime = target.Distance(ObjectManager.Player) / Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay + Game.Ping / 2f / 1000;
                     if (Spells.RisToggle)
                     {
                         return;
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(target)
                         + ObjectManager.Player.GetSpellDamage(target, SpellSlot.R)
-                        > Prediction.Health.GetPrediction(target, (int)(Spells.R.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(target, (int)(rtraveltime))
                         && Spells.R.IsInRange(target) && Spells.R.IsReady())
                     {
                         if (Spells.R.GetType() == typeof(Spell.Skillshot))
                         {
-                            Spell.Skillshot Rx = Spells.R as Spell.Skillshot;
-                            Rx.GetPrediction(target);
-                            Rx.Cast(target);
+                            Spell.Skillshot rx = Spells.R as Spell.Skillshot;
+                            if (rx != null)
+                            {
+                                rx.GetPrediction(target);
+                                rx.Cast(target);
+                            }
                             return;
                         }
 
@@ -236,7 +246,7 @@
                                 Rx.StartCharging();
                             }
 
-                            if (Rx.Range == Rx.MaximumRange)
+                            if (Rx != null && Rx.Range == Rx.MaximumRange)
                             {
                                 Rx.Cast(target.Position);
                             }

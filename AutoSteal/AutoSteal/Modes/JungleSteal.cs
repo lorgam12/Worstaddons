@@ -52,13 +52,14 @@
                     if (ObjectManager.Player.CanAttack && ObjectManager.Player.GetAutoAttackDamage(mob) > mob.Health
                         && mob.IsInAutoAttackRange(ObjectManager.Player))
                     {
-                        Player.IssueOrder(GameObjectOrder.AutoAttack, mob);
+                        Player.IssueOrder(GameObjectOrder.AttackUnit, mob);
                         return;
                     }
                 }
 
                 if (Program.JungleStealMenu[champion + "QJ"].Cast<CheckBox>().CurrentValue)
                 {
+                    var traveltime = mob.Distance(ObjectManager.Player) / Spells.Q.Handle.SData.MissileSpeed + Spells.Q.CastDelay + Game.Ping / 2f / 1000;
                     if (Spells.QisToggle)
                     {
                         return;
@@ -66,14 +67,17 @@
 
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.Q)
-                        > Prediction.Health.GetPrediction(mob, (int)(Spells.Q.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(mob, (int)traveltime)
                         && Spells.Q.IsInRange(mob) && Spells.Q.IsReady())
                     {
                         if (Spells.Q.GetType() == typeof(Spell.Skillshot))
                         {
                             Spell.Skillshot Qx = Spells.Q as Spell.Skillshot;
-                            Qx.GetPrediction(mob);
-                            Qx.Cast(mob);
+                            if (Qx != null)
+                            {
+                                Qx.GetPrediction(mob);
+                                Qx.Cast(mob);
+                            }
                             return;
                         }
 
@@ -115,20 +119,24 @@
 
                 if (Program.JungleStealMenu[champion + "WJ"].Cast<CheckBox>().CurrentValue)
                 {
+                    var traveltime = mob.Distance(ObjectManager.Player) / Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay + Game.Ping / 2f / 1000;
                     if (Spells.WisToggle)
                     {
                         return;
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.W)
-                        > Prediction.Health.GetPrediction(mob, (int)(Spells.W.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(mob, (int)traveltime)
                         && Spells.W.IsInRange(mob) && Spells.W.IsReady())
                     {
                         if (Spells.W.GetType() == typeof(Spell.Skillshot))
                         {
                             Spell.Skillshot Wx = Spells.W as Spell.Skillshot;
-                            Wx.GetPrediction(mob);
-                            Wx.Cast(mob);
+                            if (Wx != null)
+                            {
+                                Wx.GetPrediction(mob);
+                                Wx.Cast(mob);
+                            }
                             return;
                         }
 
@@ -169,20 +177,24 @@
 
                 if (Program.JungleStealMenu[champion + "EJ"].Cast<CheckBox>().CurrentValue)
                 {
+                    var traveltime = mob.Distance(ObjectManager.Player) / Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay + Game.Ping / 2f / 1000;
                     if (Spells.EisToggle)
                     {
                         return;
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.E)
-                        > Prediction.Health.GetPrediction(mob, (int)(Spells.E.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(mob, (int)traveltime)
                         && Spells.E.IsInRange(mob) && Spells.E.IsReady())
                     {
                         if (Spells.E.GetType() == typeof(Spell.Skillshot))
                         {
                             Spell.Skillshot Ex = Spells.E as Spell.Skillshot;
-                            Ex.GetPrediction(mob);
-                            Ex.Cast(mob);
+                            if (Ex != null)
+                            {
+                                Ex.GetPrediction(mob);
+                                Ex.Cast(mob);
+                            }
                             return;
                         }
 
@@ -223,20 +235,24 @@
 
                 if (Program.JungleStealMenu[champion + "RJ"].Cast<CheckBox>().CurrentValue)
                 {
+                    var traveltime = mob.Distance(ObjectManager.Player) / Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay + Game.Ping / 2f / 1000;
                     if (Spells.RisToggle)
                     {
                         return;
                     }
                     if (ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.GetAutoAttackDamage(mob)
                         + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.R)
-                        > Prediction.Health.GetPrediction(mob, (int)(Spells.R.CastDelay * 1000))
+                        > Prediction.Health.GetPrediction(mob, (int)traveltime)
                         && Spells.R.IsInRange(mob) && Spells.R.IsReady())
                     {
                         if (Spells.R.GetType() == typeof(Spell.Skillshot))
                         {
                             Spell.Skillshot Rx = Spells.R as Spell.Skillshot;
-                            Rx.GetPrediction(mob);
-                            Rx.Cast(mob);
+                            if (Rx != null)
+                            {
+                                Rx.GetPrediction(mob);
+                                Rx.Cast(mob);
+                            }
                             return;
                         }
 
