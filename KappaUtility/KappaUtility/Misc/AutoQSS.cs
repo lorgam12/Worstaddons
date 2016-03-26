@@ -89,17 +89,16 @@
                                      && args.Buff.Type == BuffType.Poison)
                                  || (QssMenu["blind"].Cast<CheckBox>().CurrentValue && args.Buff.Type == BuffType.Blind)
                                  || (QssMenu["zed"].Cast<CheckBox>().CurrentValue
-                                     && Player.Instance.HasBuff("zedrtargetmark"))
+                                     && args.Buff.Name == "zedrtargetmark")
                                  || (QssMenu["vlad"].Cast<CheckBox>().CurrentValue
-                                     && Player.Instance.HasBuff("vladimirhemoplaguedebuff"))
+                                     && args.Buff.Name == "vladimirhemoplaguedebuff")
                                  || (QssMenu["liss"].Cast<CheckBox>().CurrentValue
-                                     && Player.Instance.HasBuff("LissandraREnemy2"))
+                                     && args.Buff.Name == "LissandraREnemy2")
                                  || (QssMenu["fizz"].Cast<CheckBox>().CurrentValue
-                                     && Player.Instance.HasBuff("fizzmarinerdoombomb"))
+                                     && args.Buff.Name == "fizzmarinerdoombomb")
                                  || (QssMenu["naut"].Cast<CheckBox>().CurrentValue
-                                     && Player.Instance.HasBuff("nautilusgrandlinetarget"))
-                                 || (QssMenu["fiora"].Cast<CheckBox>().CurrentValue
-                                     && Player.Instance.HasBuff("fiorarmark"));
+                                     && args.Buff.Name == "nautilusgrandlinetarget")
+                                 || (QssMenu["fiora"].Cast<CheckBox>().CurrentValue && args.Buff.Name == "fiorarmark");
                     var enemys = QssMenu["Rene"].Cast<Slider>().CurrentValue;
                     var hp = QssMenu["hp"].Cast<Slider>().CurrentValue;
                     var enemysrange = QssMenu["enemydetect"].Cast<Slider>().CurrentValue;
