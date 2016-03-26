@@ -172,7 +172,7 @@
 
             Q = new Spell.Active(SpellSlot.Q, 400);
             W = new Spell.Active(SpellSlot.W, 300);
-            E = new Spell.Skillshot(SpellSlot.E, 550, SkillShotType.Cone, 250, 100, 120);
+            E = new Spell.Skillshot(SpellSlot.E, 550, SkillShotType.Cone, 250, 600, 120);
             R = new Spell.Targeted(SpellSlot.R, 460);
 
             Game.OnUpdate += OnUpdate;
