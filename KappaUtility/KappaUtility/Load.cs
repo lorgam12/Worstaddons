@@ -175,7 +175,7 @@
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null || target == null)
+            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null || target == null && caster.IsEnemy)
             {
                 return;
             }
@@ -311,7 +311,7 @@
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null || target == null)
+            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null || target == null && caster.IsEnemy)
             {
                 return;
             }

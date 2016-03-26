@@ -113,7 +113,7 @@
             var miss = sender as MissileClient;
             if (miss != null && miss.IsValid)
             {
-                if (miss.SpellCaster.IsMe && miss.SpellCaster.IsValid && Q.Handle.ToggleState == 2)
+                if (miss.SpellCaster.IsMe && miss.SpellCaster.IsValid && miss.SData.Name.Contains("AurelionSolQMissile"))
                 {
                     QMissle = miss;
                 }
@@ -127,7 +127,7 @@
             {
                 return;
             }
-            if (miss.SpellCaster is AIHeroClient && miss.SpellCaster.IsValid && miss.SpellCaster.IsMe)
+            if (miss.SpellCaster is AIHeroClient && miss.SpellCaster.IsValid && miss.SpellCaster.IsMe && miss.SData.Name.Contains("AurelionSolQMissile"))
             {
                 QMissle = null;
             }
