@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-using EloBuddy;
-using EloBuddy.SDK;
-
-using GenesisSpellLibrary.Spells;
-
-namespace GenesisSpellLibrary
+﻿namespace AutoSteal.Library
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using AutoSteal.Library.Spells;
+
+    using EloBuddy;
+    using EloBuddy.SDK;
+
     public static class SpellManager
     {
         static SpellManager()

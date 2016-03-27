@@ -2,18 +2,20 @@
 {
     using System;
 
+    using AutoSteal.Library;
+
     using EloBuddy;
     using EloBuddy.SDK.Events;
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
-
-    using GenesisSpellLibrary;
 
     public class Program
     {
         public static Menu menuIni;
 
         public static Menu KillStealMenu;
+
+        public static Menu DrawMenu;
 
         public static Menu JungleStealMenu;
 
@@ -82,10 +84,27 @@
             JungleStealMenu.Add(champion + "crab", new CheckBox("Steal Crab "));
             JungleStealMenu.Add(champion + "murkwolf", new CheckBox("Steal Murkwolf "));
 
+            DrawMenu = menuIni.AddSubMenu("Debug", "Debug");
+            DrawMenu.AddGroupLabel("Debug Settings");
+            DrawMenu.Add(champion + "debug", new CheckBox("Enable Debug Drawings", false));
+            DrawMenu.AddGroupLabel("Position");
+            DrawMenu.Add("trackx", new Slider("Debug Position X", 0, 0, 100));
+            DrawMenu.Add("tracky", new Slider("Debug Position Y", 0, 0, 100));
+
             SpellManager.Initialize();
             SpellLibrary.Initialize();
 
+            Drawing.OnEndScene += Drawing_OnDraw;
             Game.OnUpdate += OnUpdate;
+        }
+
+        private static void Drawing_OnDraw(EventArgs args)
+        {
+            if (DrawMenu[Player.Instance.ChampionName + "debug"].Cast<CheckBox>().CurrentValue)
+            {
+                Modes.Draw.DebugKS();
+                Modes.Draw.DebugJS();
+            }
         }
 
         private static void OnUpdate(EventArgs args)

@@ -2,19 +2,24 @@
 {
     using System.Linq;
 
+    using Library;
+    using Library.Spells;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu.Values;
 
-    using GenesisSpellLibrary;
-    using GenesisSpellLibrary.Spells;
-
     internal class KillSteal
     {
+        public static int playerdamage;
+
+        public static AIHeroClient Targetxdd;
+
         protected static SpellBase Spells => SpellManager.CurrentSpells;
 
         public static void KS()
         {
+            playerdamage = (int)(ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.BaseAttackDamage);
             var champion = ObjectManager.Player.ChampionName;
             foreach (AIHeroClient target in
                 ObjectManager.Get<AIHeroClient>()
@@ -24,6 +29,7 @@
                         && hero.IsValid && hero.IsVisible && hero.IsEnemy && !hero.IsDead && !hero.IsZombie
                         && Program.KillStealMenu[champion + "Steal" + hero.BaseSkinName].Cast<CheckBox>().CurrentValue))
             {
+                Targetxdd = target;
                 if (Program.KillStealMenu[champion + "AAC"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.CanAttack
@@ -37,15 +43,15 @@
 
                 if (Program.KillStealMenu[champion + "QC"].Cast<CheckBox>().CurrentValue)
                 {
-                    var qtraveltime = target.Distance(ObjectManager.Player) / Spells.Q.Handle.SData.MissileSpeed + Spells.Q.CastDelay + Game.Ping / 2f / 1000;
-                    if (Spells.QisToggle)
+                    var qtraveltime = target.Distance(ObjectManager.Player) / Spells.Q.Handle.SData.MissileSpeed
+                                      + (Spells.Q.CastDelay) + Game.Ping / 2f / 1000;
+                    if (Spells.QisToggle || Spells.QisDash || Spells.QisCC)
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage
-                        + ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)
-                        > Prediction.Health.GetPrediction(target, (int)qtraveltime)
-                        && Spells.Q.IsInRange(target) && Spells.Q.IsReady())
+                    if (playerdamage + ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)
+                        > Prediction.Health.GetPrediction(target, (int)qtraveltime) && Spells.Q.IsInRange(target)
+                        && Spells.Q.IsReady())
                     {
                         if (Spells.Q.GetType() == typeof(Spell.Skillshot))
                         {
@@ -89,15 +95,15 @@
 
                 if (Program.KillStealMenu[champion + "WC"].Cast<CheckBox>().CurrentValue)
                 {
-                    var wtraveltime = target.Distance(ObjectManager.Player) / Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay + Game.Ping / 2f / 1000;
-                    if (Spells.WisToggle)
+                    var wtraveltime = target.Distance(ObjectManager.Player) / Spells.W.Handle.SData.MissileSpeed
+                                      + Spells.W.CastDelay + Game.Ping / 2f / 1000;
+                    if (Spells.WisToggle || Spells.WisDash || Spells.WisCC)
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage
-                        + ObjectManager.Player.GetSpellDamage(target, SpellSlot.W)
-                        > Prediction.Health.GetPrediction(target, (int)(wtraveltime))
-                        && Spells.W.IsInRange(target) && Spells.W.IsReady())
+                    if (playerdamage + ObjectManager.Player.GetSpellDamage(target, SpellSlot.W)
+                        > Prediction.Health.GetPrediction(target, (int)(wtraveltime)) && Spells.W.IsInRange(target)
+                        && Spells.W.IsReady())
                     {
                         if (Spells.W.GetType() == typeof(Spell.Skillshot))
                         {
@@ -147,15 +153,15 @@
 
                 if (Program.KillStealMenu[champion + "EC"].Cast<CheckBox>().CurrentValue)
                 {
-                    var etraveltime = target.Distance(ObjectManager.Player) / Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay + Game.Ping / 2f / 1000;
-                    if (Spells.EisToggle)
+                    var etraveltime = target.Distance(ObjectManager.Player) / Spells.E.Handle.SData.MissileSpeed
+                                      + Spells.E.CastDelay + Game.Ping / 2f / 1000;
+                    if (Spells.EisToggle || Spells.EisDash || Spells.EisCC)
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage
-                        + ObjectManager.Player.GetSpellDamage(target, SpellSlot.E)
-                        > Prediction.Health.GetPrediction(target, (int)(etraveltime))
-                        && Spells.E.IsInRange(target) && Spells.E.IsReady())
+                    if (playerdamage + ObjectManager.Player.GetSpellDamage(target, SpellSlot.E)
+                        > Prediction.Health.GetPrediction(target, (int)(etraveltime)) && Spells.E.IsInRange(target)
+                        && Spells.E.IsReady())
                     {
                         if (Spells.E.GetType() == typeof(Spell.Skillshot))
                         {
@@ -205,15 +211,15 @@
 
                 if (Program.KillStealMenu[champion + "RC"].Cast<CheckBox>().CurrentValue)
                 {
-                    var rtraveltime = target.Distance(ObjectManager.Player) / Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay + Game.Ping / 2f / 1000;
-                    if (Spells.RisToggle)
+                    var rtraveltime = target.Distance(ObjectManager.Player) / Spells.R.Handle.SData.MissileSpeed
+                                      + Spells.R.CastDelay + Game.Ping / 2f / 1000;
+                    if (Spells.RisToggle || Spells.RisDash || Spells.RisCC)
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage
-                        + ObjectManager.Player.GetSpellDamage(target, SpellSlot.R)
-                        > Prediction.Health.GetPrediction(target, (int)(rtraveltime))
-                        && Spells.R.IsInRange(target) && Spells.R.IsReady())
+                    if (playerdamage + ObjectManager.Player.GetSpellDamage(target, SpellSlot.R)
+                        > Prediction.Health.GetPrediction(target, (int)(rtraveltime)) && Spells.R.IsInRange(target)
+                        && Spells.R.IsReady())
                     {
                         if (Spells.R.GetType() == typeof(Spell.Skillshot))
                         {

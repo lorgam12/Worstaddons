@@ -1,16 +1,16 @@
-﻿using System;
-
-using EloBuddy;
-
-using GenesisSpellLibrary.Spells;
-
-namespace GenesisSpellLibrary
+﻿namespace AutoSteal.Library
 {
+    using System;
+
+    using AutoSteal.Library.Spells;
+
+    using EloBuddy;
+
     internal class SpellLibrary
     {
         public static SpellBase GetSpells(Champion heroChampion)
         {
-            Type championType = Type.GetType("GenesisSpellLibrary.Spells." + heroChampion);
+            Type championType = Type.GetType("AutoSteal.Library.Spells." + heroChampion);
             if (championType != null)
             {
                 return Activator.CreateInstance(championType) as SpellBase;

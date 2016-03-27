@@ -2,15 +2,17 @@
 {
     using System.Linq;
 
+    using AutoSteal.Library;
+    using AutoSteal.Library.Spells;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu.Values;
 
-    using GenesisSpellLibrary;
-    using GenesisSpellLibrary.Spells;
-
     internal class JungleSteal
     {
+        public static Obj_AI_Minion Mobxdd;
+
         protected static SpellBase Spells
         {
             get
@@ -26,8 +28,8 @@
                 ObjectManager.Get<Obj_AI_Minion>()
                     .Where(
                         jmob =>
-                        !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsHPBarRendered && jmob.IsMonster
-                        && jmob.IsValid && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie
+                        !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsMonster && jmob.IsValid
+                        && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie
                         && ((Program.JungleStealMenu[champion + "drake"].Cast<CheckBox>().CurrentValue
                              && jmob.BaseSkinName == "SRU_Dragon")
                             || (Program.JungleStealMenu[champion + "baron"].Cast<CheckBox>().CurrentValue
@@ -47,6 +49,7 @@
                             || (Program.JungleStealMenu[champion + "red"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Red"))))
             {
+                Mobxdd = mob;
                 if (Program.JungleStealMenu[champion + "AAJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (ObjectManager.Player.CanAttack && ObjectManager.Player.GetAutoAttackDamage(mob) > mob.Health
@@ -59,16 +62,16 @@
 
                 if (Program.JungleStealMenu[champion + "QJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    var traveltime = mob.Distance(ObjectManager.Player) / Spells.Q.Handle.SData.MissileSpeed + Spells.Q.CastDelay + Game.Ping / 2f / 1000;
-                    if (Spells.QisToggle)
+                    var traveltime = mob.Distance(ObjectManager.Player)
+                                     / (Spells.Q.Handle.SData.MissileSpeed + Spells.Q.CastDelay) + Game.Ping / 2f / 1000;
+                    if (Spells.QisToggle || Spells.QisDash || Spells.QisCC)
                     {
                         return;
                     }
 
-                    if (ObjectManager.Player.BaseAbilityDamage
-                        + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.Q)
-                        > Prediction.Health.GetPrediction(mob, (int)traveltime)
-                        && Spells.Q.IsInRange(mob) && Spells.Q.IsReady())
+                    if (KillSteal.playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.Q)
+                        > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.Q.IsInRange(mob)
+                        && Spells.Q.IsReady())
                     {
                         if (Spells.Q.GetType() == typeof(Spell.Skillshot))
                         {
@@ -119,15 +122,15 @@
 
                 if (Program.JungleStealMenu[champion + "WJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    var traveltime = mob.Distance(ObjectManager.Player) / Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay + Game.Ping / 2f / 1000;
-                    if (Spells.WisToggle)
+                    var traveltime = mob.Distance(ObjectManager.Player)
+                                     / (Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay) + Game.Ping / 2f / 1000;
+                    if (Spells.WisToggle || Spells.WisDash || Spells.WisCC)
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage
-                        + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.W)
-                        > Prediction.Health.GetPrediction(mob, (int)traveltime)
-                        && Spells.W.IsInRange(mob) && Spells.W.IsReady())
+                    if (KillSteal.playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.W)
+                        > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.W.IsInRange(mob)
+                        && Spells.W.IsReady())
                     {
                         if (Spells.W.GetType() == typeof(Spell.Skillshot))
                         {
@@ -177,15 +180,16 @@
 
                 if (Program.JungleStealMenu[champion + "EJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    var traveltime = mob.Distance(ObjectManager.Player) / Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay + Game.Ping / 2f / 1000;
-                    if (Spells.EisToggle)
+                    var traveltime = mob.Distance(ObjectManager.Player)
+                                     / (Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay) + Game.Ping / 2f / 1000;
+                    if (Spells.EisToggle || Spells.EisDash || Spells.EisCC)
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage
-                        + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.E)
-                        > Prediction.Health.GetPrediction(mob, (int)traveltime)
-                        && Spells.E.IsInRange(mob) && Spells.E.IsReady())
+
+                    if (KillSteal.playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.E)
+                        > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.E.IsInRange(mob)
+                        && Spells.E.IsReady())
                     {
                         if (Spells.E.GetType() == typeof(Spell.Skillshot))
                         {
@@ -235,15 +239,15 @@
 
                 if (Program.JungleStealMenu[champion + "RJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    var traveltime = mob.Distance(ObjectManager.Player) / Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay + Game.Ping / 2f / 1000;
-                    if (Spells.RisToggle)
+                    var traveltime = mob.Distance(ObjectManager.Player)
+                                     / (Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay) + Game.Ping / 2f / 1000;
+                    if (Spells.RisToggle || Spells.RisDash || Spells.RisCC)
                     {
                         return;
                     }
-                    if (ObjectManager.Player.BaseAbilityDamage
-                        + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.R)
-                        > Prediction.Health.GetPrediction(mob, (int)traveltime)
-                        && Spells.R.IsInRange(mob) && Spells.R.IsReady())
+                    if (KillSteal.playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.R)
+                        > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.R.IsInRange(mob)
+                        && Spells.R.IsReady())
                     {
                         if (Spells.R.GetType() == typeof(Spell.Skillshot))
                         {

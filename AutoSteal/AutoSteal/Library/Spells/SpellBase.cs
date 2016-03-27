@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-
-using EloBuddy;
-using EloBuddy.SDK;
-
-namespace GenesisSpellLibrary.Spells
+﻿namespace AutoSteal.Library.Spells
 {
+    using System;
+    using System.Collections.Generic;
+
+    using EloBuddy;
+    using EloBuddy.SDK;
+
     public abstract class SpellBase
     {
         public abstract Spell.SpellBase Q { get; set; }
