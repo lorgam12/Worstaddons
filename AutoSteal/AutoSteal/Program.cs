@@ -2,7 +2,7 @@
 {
     using System;
 
-    using AutoSteal.Library;
+    using Genesis.Library;
 
     using EloBuddy;
     using EloBuddy.SDK.Events;

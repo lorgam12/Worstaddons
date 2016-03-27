@@ -1,4 +1,4 @@
-namespace AutoSteal.Library.Spells
+namespace Genesis.Library.Spells
 {
     using System;
 

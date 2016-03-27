@@ -1,9 +1,9 @@
-﻿namespace AutoSteal.Library
+﻿namespace Genesis.Library
 {
     using System.Collections.Generic;
     using System.Linq;
 
-    using AutoSteal.Library.Spells;
+    using Genesis.Library.Spells;
 
     using EloBuddy;
     using EloBuddy.SDK;

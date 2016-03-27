@@ -2,8 +2,8 @@
 {
     using System.Linq;
 
-    using Library;
-    using Library.Spells;
+    using Genesis.Library;
+    using Genesis.Library.Spells;
 
     using EloBuddy;
     using EloBuddy.SDK;
