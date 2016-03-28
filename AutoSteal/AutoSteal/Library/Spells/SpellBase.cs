@@ -20,25 +20,25 @@
 
         public Dictionary<string, Func<AIHeroClient, Obj_AI_Base, bool>> LogicDictionary;
 
-        public bool QisCC = false;
+        public bool QisCc = false;
 
         public bool QisDash = false;
 
         public bool QisToggle = false;
 
-        public bool WisCC = false;
+        public bool WisCc = false;
 
         public bool WisDash = false;
 
         public bool WisToggle = false;
 
-        public bool EisCC = false;
+        public bool EisCc = false;
 
         public bool EisDash = false;
 
         public bool EisToggle = false;
 
-        public bool RisCC = false;
+        public bool RisCc = false;
 
         public bool RisDash = false;
 

@@ -11,7 +11,7 @@
 
     public class Program
     {
-        public static Menu menuIni;
+        public static Menu MenuIni;
 
         public static Menu KillStealMenu;
 
@@ -27,9 +27,9 @@
         public static void OnLoad(EventArgs args)
         {
             var champion = ObjectManager.Player.ChampionName;
-            menuIni = MainMenu.AddMenu("Auto Steal ", "Auto Steal");
+            MenuIni = MainMenu.AddMenu("Auto Steal ", "Auto Steal");
 
-            KillStealMenu = menuIni.AddSubMenu("Kill Steal ", "Kill Steal");
+            KillStealMenu = MenuIni.AddSubMenu("Kill Steal ", "Kill Steal");
             KillStealMenu.AddGroupLabel("Kill Steal Settings");
             KillStealMenu.Add(
                 champion + "EnableKST",
@@ -48,15 +48,17 @@
             KillStealMenu.AddGroupLabel("Select Champions");
             foreach (var enemy in ObjectManager.Get<AIHeroClient>())
             {
-                CheckBox cb = new CheckBox(enemy.BaseSkinName);
-                cb.CurrentValue = true;
+                var cb = new CheckBox(enemy.BaseSkinName) { CurrentValue = true };
                 if (enemy.Team != Player.Instance.Team)
                 {
                     KillStealMenu.Add(champion + "Steal" + enemy.BaseSkinName, cb);
                 }
             }
+            KillStealMenu.AddGroupLabel(champion + " Extra Settings");
+            KillStealMenu.AddSeparator();
+            KillStealMenu.Add(champion + "all", new CheckBox("Claculate All Enabled Spells Damage", false));
 
-            JungleStealMenu = menuIni.AddSubMenu("Jungle Steal ", "Jungle Steal");
+            JungleStealMenu = MenuIni.AddSubMenu("Jungle Steal ", "Jungle Steal");
             JungleStealMenu.AddGroupLabel("Jungle Steal Settings");
             JungleStealMenu.Add(
                 champion + "EnableJST",
@@ -71,6 +73,9 @@
             JungleStealMenu.Add(champion + "WJ", new CheckBox("Use W "));
             JungleStealMenu.Add(champion + "EJ", new CheckBox("Use E "));
             JungleStealMenu.Add(champion + "RJ", new CheckBox("Use R "));
+            JungleStealMenu.AddGroupLabel(champion + " Extra Settings");
+            JungleStealMenu.AddSeparator();
+            JungleStealMenu.Add(champion + "all", new CheckBox("Claculate All Enabled Spells Damage", false));
 
             JungleStealMenu.AddSeparator();
             JungleStealMenu.AddGroupLabel("Select Jungle Monsters");
@@ -84,12 +89,12 @@
             JungleStealMenu.Add(champion + "crab", new CheckBox("Steal Crab "));
             JungleStealMenu.Add(champion + "murkwolf", new CheckBox("Steal Murkwolf "));
 
-            DrawMenu = menuIni.AddSubMenu("Debug", "Debug");
+            DrawMenu = MenuIni.AddSubMenu("Debug", "Debug");
             DrawMenu.AddGroupLabel("Debug Settings");
             DrawMenu.Add(champion + "debug", new CheckBox("Enable Debug Drawings", false));
             DrawMenu.AddGroupLabel("Position");
-            DrawMenu.Add("trackx", new Slider("Debug Position X", 0, 0, 100));
-            DrawMenu.Add("tracky", new Slider("Debug Position Y", 0, 0, 100));
+            DrawMenu.Add("trackx", new Slider("Debug Position X"));
+            DrawMenu.Add("tracky", new Slider("Debug Position Y"));
 
             SpellManager.Initialize();
             SpellLibrary.Initialize();
@@ -102,8 +107,8 @@
         {
             if (DrawMenu[Player.Instance.ChampionName + "debug"].Cast<CheckBox>().CurrentValue)
             {
-                Modes.Draw.DebugKS();
-                Modes.Draw.DebugJS();
+                Modes.Draw.DebugKs();
+                Modes.Draw.DebugJs();
             }
         }
 
@@ -113,13 +118,13 @@
             if (KillStealMenu[champion + "EnableKST"].Cast<KeyBind>().CurrentValue
                 || KillStealMenu[champion + "EnableKSA"].Cast<KeyBind>().CurrentValue)
             {
-                Modes.KillSteal.KS();
+                Modes.KillSteal.Ks();
             }
 
             if (JungleStealMenu[champion + "EnableJST"].Cast<KeyBind>().CurrentValue
                 || JungleStealMenu[champion + "EnableJSA"].Cast<KeyBind>().CurrentValue)
             {
-                Modes.JungleSteal.JS();
+                Modes.JungleSteal.Js();
             }
         }
     }

@@ -23,9 +23,9 @@ namespace Genesis.Library.Spells
             this.W = new Spell.Targeted(SpellSlot.W, 625);
             this.E = new Spell.Active(SpellSlot.E);
             this.R = new Spell.Active(SpellSlot.R);
-            this.QisCC = true;
+            this.QisCc = true;
             this.WisDash = true;
-            this.WisCC = true;
+            this.WisCc = true;
             this.LogicDictionary = new Dictionary<string, Func<AIHeroClient, Obj_AI_Base, bool>>();
             this.LogicDictionary.Add("RLogic", RLogic);
         }

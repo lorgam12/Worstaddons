@@ -21,9 +21,9 @@ namespace Genesis.Library.Spells
             this.E = new Spell.Skillshot(SpellSlot.E, 1100, SkillShotType.Linear, 250, 1150, 70);
             this.R = new Spell.Skillshot(SpellSlot.R, 700, SkillShotType.Circular, 250, 1200, 500);
 
-            this.QisCC = true;
-            this.EisCC = true;
-            this.RisCC = true;
+            this.QisCc = true;
+            this.EisCc = true;
+            this.RisCc = true;
         }
     }
 }

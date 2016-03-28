@@ -20,7 +20,7 @@ namespace Genesis.Library.Spells
             this.W = new Spell.Skillshot(SpellSlot.W, 450, SkillShotType.Circular);
             this.E = new Spell.Skillshot(SpellSlot.E, 1200, SkillShotType.Linear, 250, 1600, 100);
             this.R = new Spell.Skillshot(SpellSlot.R, 300, SkillShotType.Linear, 500, 1000, 532);
-            this.RisCC = true;
+            this.RisCc = true;
             this.EisDash = true;
         }
     }

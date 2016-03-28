@@ -13,7 +13,7 @@
     {
         protected static SpellBase Spells => SpellManager.CurrentSpells;
 
-        public static void DebugJS()
+        public static void DebugJs()
         {
             var trackx = Program.DrawMenu["trackx"].Cast<Slider>().CurrentValue;
             var tracky = Program.DrawMenu["tracky"].Cast<Slider>().CurrentValue;
@@ -32,8 +32,8 @@
                               + Spells.E.CastDelay + Game.Ping / 2f / 1000;
             var rtraveltime = JungleSteal.Mobxdd.Distance(ObjectManager.Player) / Spells.R.Handle.SData.MissileSpeed
                               + Spells.R.CastDelay + Game.Ping / 2f / 1000;
-            var champion = ObjectManager.Player.ChampionName;
-            if ((KillSteal.playerdamage
+
+            if ((KillSteal.Playerdamage
                  + ObjectManager.Player.GetSpellDamage(JungleSteal.Mobxdd, SpellSlot.Q) + 750
                  <= Prediction.Health.GetPrediction(JungleSteal.Mobxdd, (int)qtraveltime)
                  && Spells.Q.IsInRange(JungleSteal.Mobxdd) && Spells.Q.IsReady())
@@ -59,7 +59,7 @@
             }
         }
 
-        public static void DebugKS()
+        public static void DebugKs()
         {
             var trackx = Program.DrawMenu["trackx"].Cast<Slider>().CurrentValue;
             var tracky = Program.DrawMenu["tracky"].Cast<Slider>().CurrentValue;
@@ -70,30 +70,30 @@
             {
                 return;
             }
-            var Qtraveltime = KillSteal.Targetxdd.Distance(ObjectManager.Player)
+            var qtraveltime = KillSteal.Targetxdd.Distance(ObjectManager.Player)
                               / (Spells.Q.Handle.SData.MissileSpeed + Spells.Q.CastDelay) + Game.Ping / 2f / 1000;
-            var Wtraveltime = KillSteal.Targetxdd.Distance(ObjectManager.Player)
+            var wtraveltime = KillSteal.Targetxdd.Distance(ObjectManager.Player)
                               / (Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay) + Game.Ping / 2f / 1000;
-            var Etraveltime = KillSteal.Targetxdd.Distance(ObjectManager.Player)
+            var etraveltime = KillSteal.Targetxdd.Distance(ObjectManager.Player)
                               / (Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay) + Game.Ping / 2f / 1000;
-            var Rtraveltime = KillSteal.Targetxdd.Distance(ObjectManager.Player)
+            var rtraveltime = KillSteal.Targetxdd.Distance(ObjectManager.Player)
                               / (Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay) + Game.Ping / 2f / 1000;
 
-            if ((KillSteal.playerdamage
+            if ((KillSteal.Playerdamage
                  + ObjectManager.Player.GetSpellDamage(KillSteal.Targetxdd, SpellSlot.Q) + 750
-                 >= Prediction.Health.GetPrediction(KillSteal.Targetxdd, (int)Qtraveltime)
+                 >= Prediction.Health.GetPrediction(KillSteal.Targetxdd, (int)qtraveltime)
                  && Spells.Q.IsInRange(KillSteal.Targetxdd) && Spells.Q.IsReady())
                 || (ObjectManager.Player.BaseAbilityDamage
                     + ObjectManager.Player.GetSpellDamage(KillSteal.Targetxdd, SpellSlot.W) + 750
-                    >= Prediction.Health.GetPrediction(KillSteal.Targetxdd, (int)(Wtraveltime))
+                    >= Prediction.Health.GetPrediction(KillSteal.Targetxdd, (int)(wtraveltime))
                     && Spells.W.IsInRange(KillSteal.Targetxdd) && Spells.W.IsReady())
                 || (ObjectManager.Player.BaseAbilityDamage
                     + ObjectManager.Player.GetSpellDamage(KillSteal.Targetxdd, SpellSlot.E) + 750
-                    >= Prediction.Health.GetPrediction(KillSteal.Targetxdd, (int)(Etraveltime))
+                    >= Prediction.Health.GetPrediction(KillSteal.Targetxdd, (int)(etraveltime))
                     && Spells.E.IsInRange(KillSteal.Targetxdd) && Spells.E.IsReady())
                 || (ObjectManager.Player.BaseAbilityDamage
                     + ObjectManager.Player.GetSpellDamage(KillSteal.Targetxdd, SpellSlot.R) + 750
-                    >= Prediction.Health.GetPrediction(KillSteal.Targetxdd, (int)(Rtraveltime))
+                    >= Prediction.Health.GetPrediction(KillSteal.Targetxdd, (int)(rtraveltime))
                     && Spells.R.IsInRange(KillSteal.Targetxdd) && Spells.R.IsReady()))
             {
                 Drawing.DrawText(

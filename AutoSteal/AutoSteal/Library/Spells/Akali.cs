@@ -20,7 +20,7 @@ namespace Genesis.Library.Spells
             this.W = new Spell.Skillshot(SpellSlot.W, 700, SkillShotType.Circular);
             this.E = new Spell.Active(SpellSlot.E, 325);
             this.R = new Spell.Targeted(SpellSlot.R, 700);
-            this.WisCC = true;
+            this.WisCc = true;
             this.RisDash = true;
         }
     }

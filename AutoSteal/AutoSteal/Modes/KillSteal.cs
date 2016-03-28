@@ -11,15 +11,15 @@
 
     internal class KillSteal
     {
-        public static int playerdamage;
+        public static int Playerdamage;
 
         public static AIHeroClient Targetxdd;
 
         protected static SpellBase Spells => SpellManager.CurrentSpells;
 
-        public static void KS()
+        public static void Ks()
         {
-            playerdamage = (int)(ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.BaseAttackDamage);
+            Playerdamage = (int)(ObjectManager.Player.BaseAbilityDamage + ObjectManager.Player.BaseAttackDamage);
             var champion = ObjectManager.Player.ChampionName;
             foreach (AIHeroClient target in
                 ObjectManager.Get<AIHeroClient>()
@@ -43,24 +43,21 @@
 
                 if (Program.KillStealMenu[champion + "QC"].Cast<CheckBox>().CurrentValue)
                 {
-                    var qtraveltime = target.Distance(ObjectManager.Player) / Spells.Q.Handle.SData.MissileSpeed
-                                      + (Spells.Q.CastDelay) + Game.Ping / 2f / 1000;
-                    if (Spells.QisToggle || Spells.QisDash || Spells.QisCC)
+                    if (Spells.QisToggle || Spells.QisDash || Spells.QisCc || Spells.Q == null)
                     {
                         return;
                     }
-                    if (playerdamage + ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)
-                        > Prediction.Health.GetPrediction(target, (int)qtraveltime) && Spells.Q.IsInRange(target)
+                    var qtraveltime = target.Distance(ObjectManager.Player) / Spells.Q.Handle.SData.MissileSpeed
+                                      + (Spells.Q.CastDelay) + Game.Ping / 2f / 1000;
+                    if (Playerdamage + ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)
+                        >= Prediction.Health.GetPrediction(target, (int)qtraveltime) && Spells.Q.IsInRange(target)
                         && Spells.Q.IsReady())
                     {
                         if (Spells.Q.GetType() == typeof(Spell.Skillshot))
                         {
-                            Spell.Skillshot Qx = Spells.Q as Spell.Skillshot;
-                            if (Qx != null)
-                            {
-                                Qx.GetPrediction(target);
-                                Qx.Cast(target);
-                            }
+                            var qx = Spells.Q as Spell.Skillshot;
+                            qx?.GetPrediction(target);
+                            qx?.Cast(target);
                             return;
                         }
 
@@ -72,15 +69,15 @@
 
                         if (Spells.Q.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spell.Chargeable Qx = Spells.Q as Spell.Chargeable;
-                            if (Qx != null && !Qx.IsCharging)
+                            var qx = Spells.Q as Spell.Chargeable;
+                            if (qx != null && !qx.IsCharging)
                             {
-                                Qx.StartCharging();
+                                qx.StartCharging();
                             }
 
-                            if (Qx.Range == Qx.MaximumRange)
+                            if (qx != null && qx.Range == qx.MaximumRange)
                             {
-                                Qx.Cast(target.Position);
+                                qx.Cast(target.Position);
                             }
                             return;
                         }
@@ -95,24 +92,21 @@
 
                 if (Program.KillStealMenu[champion + "WC"].Cast<CheckBox>().CurrentValue)
                 {
-                    var wtraveltime = target.Distance(ObjectManager.Player) / Spells.W.Handle.SData.MissileSpeed
-                                      + Spells.W.CastDelay + Game.Ping / 2f / 1000;
-                    if (Spells.WisToggle || Spells.WisDash || Spells.WisCC)
+                    if (Spells.WisToggle || Spells.WisDash || Spells.WisCc || Spells.W == null)
                     {
                         return;
                     }
-                    if (playerdamage + ObjectManager.Player.GetSpellDamage(target, SpellSlot.W)
-                        > Prediction.Health.GetPrediction(target, (int)(wtraveltime)) && Spells.W.IsInRange(target)
+                    var wtraveltime = target.Distance(ObjectManager.Player) / Spells.W.Handle.SData.MissileSpeed
+                                      + Spells.W.CastDelay + Game.Ping / 2f / 1000;
+                    if (Playerdamage + ObjectManager.Player.GetSpellDamage(target, SpellSlot.W)
+                        >= Prediction.Health.GetPrediction(target, (int)(wtraveltime)) && Spells.W.IsInRange(target)
                         && Spells.W.IsReady())
                     {
                         if (Spells.W.GetType() == typeof(Spell.Skillshot))
                         {
-                            Spell.Skillshot Wx = Spells.W as Spell.Skillshot;
-                            if (Wx != null)
-                            {
-                                Wx.GetPrediction(target);
-                                Wx.Cast(target);
-                            }
+                            var wx = Spells.W as Spell.Skillshot;
+                            wx?.GetPrediction(target);
+                            wx?.Cast(target);
                             return;
                         }
 
@@ -130,15 +124,15 @@
 
                         if (Spells.W.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spell.Chargeable Wx = Spells.W as Spell.Chargeable;
-                            if (Wx != null && !Wx.IsCharging)
+                            var wx = Spells.W as Spell.Chargeable;
+                            if (wx != null && !wx.IsCharging)
                             {
-                                Wx.StartCharging();
+                                wx.StartCharging();
                             }
 
-                            if (Wx != null && Wx.Range == Wx.MaximumRange)
+                            if (wx != null && wx.Range == wx.MaximumRange)
                             {
-                                Wx.Cast(target.Position);
+                                wx.Cast(target.Position);
                             }
                             return;
                         }
@@ -153,24 +147,21 @@
 
                 if (Program.KillStealMenu[champion + "EC"].Cast<CheckBox>().CurrentValue)
                 {
-                    var etraveltime = target.Distance(ObjectManager.Player) / Spells.E.Handle.SData.MissileSpeed
-                                      + Spells.E.CastDelay + Game.Ping / 2f / 1000;
-                    if (Spells.EisToggle || Spells.EisDash || Spells.EisCC)
+                    if (Spells.EisToggle || Spells.EisDash || Spells.EisCc || Spells.E == null)
                     {
                         return;
                     }
-                    if (playerdamage + ObjectManager.Player.GetSpellDamage(target, SpellSlot.E)
-                        > Prediction.Health.GetPrediction(target, (int)(etraveltime)) && Spells.E.IsInRange(target)
+                    var etraveltime = target.Distance(ObjectManager.Player) / Spells.E.Handle.SData.MissileSpeed
+                                      + Spells.E.CastDelay + Game.Ping / 2f / 1000;
+                    if (Playerdamage + ObjectManager.Player.GetSpellDamage(target, SpellSlot.E)
+                        >= Prediction.Health.GetPrediction(target, (int)(etraveltime)) && Spells.E.IsInRange(target)
                         && Spells.E.IsReady())
                     {
                         if (Spells.E.GetType() == typeof(Spell.Skillshot))
                         {
-                            Spell.Skillshot Ex = Spells.E as Spell.Skillshot;
-                            if (Ex != null)
-                            {
-                                Ex.GetPrediction(target);
-                                Ex.Cast(target);
-                            }
+                            var ex = Spells.E as Spell.Skillshot;
+                            ex?.GetPrediction(target);
+                            ex?.Cast(target);
                             return;
                         }
 
@@ -188,15 +179,15 @@
 
                         if (Spells.E.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spell.Chargeable Ex = Spells.E as Spell.Chargeable;
-                            if (Ex != null && !Ex.IsCharging)
+                            var ex = Spells.E as Spell.Chargeable;
+                            if (ex != null && !ex.IsCharging)
                             {
-                                Ex.StartCharging();
+                                ex.StartCharging();
                             }
 
-                            if (Ex != null && Ex.Range == Ex.MaximumRange)
+                            if (ex != null && ex.Range == ex.MaximumRange)
                             {
-                                Ex.Cast(target.Position);
+                                ex.Cast(target.Position);
                             }
                             return;
                         }
@@ -211,24 +202,21 @@
 
                 if (Program.KillStealMenu[champion + "RC"].Cast<CheckBox>().CurrentValue)
                 {
-                    var rtraveltime = target.Distance(ObjectManager.Player) / Spells.R.Handle.SData.MissileSpeed
-                                      + Spells.R.CastDelay + Game.Ping / 2f / 1000;
-                    if (Spells.RisToggle || Spells.RisDash || Spells.RisCC)
+                    if (Spells.RisToggle || Spells.RisDash || Spells.RisCc)
                     {
                         return;
                     }
-                    if (playerdamage + ObjectManager.Player.GetSpellDamage(target, SpellSlot.R)
-                        > Prediction.Health.GetPrediction(target, (int)(rtraveltime)) && Spells.R.IsInRange(target)
+                    var rtraveltime = target.Distance(ObjectManager.Player) / Spells.R.Handle.SData.MissileSpeed
+                                      + Spells.R.CastDelay + Game.Ping / 2f / 1000;
+                    if (Playerdamage + ObjectManager.Player.GetSpellDamage(target, SpellSlot.R)
+                        >= Prediction.Health.GetPrediction(target, (int)(rtraveltime)) && Spells.R.IsInRange(target)
                         && Spells.R.IsReady())
                     {
                         if (Spells.R.GetType() == typeof(Spell.Skillshot))
                         {
-                            Spell.Skillshot rx = Spells.R as Spell.Skillshot;
-                            if (rx != null)
-                            {
-                                rx.GetPrediction(target);
-                                rx.Cast(target);
-                            }
+                            var rx = Spells.R as Spell.Skillshot;
+                            rx?.GetPrediction(target);
+                            rx?.Cast(target);
                             return;
                         }
 
@@ -246,15 +234,15 @@
 
                         if (Spells.R.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spell.Chargeable Rx = Spells.R as Spell.Chargeable;
-                            if (Rx != null && !Rx.IsCharging)
+                            var rx = Spells.R as Spell.Chargeable;
+                            if (rx != null && !rx.IsCharging)
                             {
-                                Rx.StartCharging();
+                                rx.StartCharging();
                             }
 
-                            if (Rx != null && Rx.Range == Rx.MaximumRange)
+                            if (rx != null && rx.Range == rx.MaximumRange)
                             {
-                                Rx.Cast(target.Position);
+                                rx.Cast(target.Position);
                             }
                             return;
                         }
@@ -265,6 +253,13 @@
                             return;
                         }
                     }
+                }
+
+                if (Program.KillStealMenu[champion + "all"].Cast<CheckBox>().CurrentValue
+                    && Playerdamage + Misc.Damage.KsCalcDamage(target)
+                    >= Prediction.Health.GetPrediction(target, (int)(Misc.Damage.KsTravelTime(target))))
+                {
+
                 }
             }
         }

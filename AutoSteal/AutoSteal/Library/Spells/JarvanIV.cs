@@ -4,7 +4,7 @@ namespace Genesis.Library.Spells
     using EloBuddy.SDK;
     using EloBuddy.SDK.Enumerations;
 
-    public class JarvanIV : SpellBase
+    public class JarvanIv : SpellBase
     {
         public override sealed Spell.SpellBase Q { get; set; }
 
@@ -14,7 +14,7 @@ namespace Genesis.Library.Spells
 
         public override sealed Spell.SpellBase R { get; set; }
 
-        public JarvanIV()
+        public JarvanIv()
         {
             this.Q = new Spell.Skillshot(SpellSlot.Q, 830, SkillShotType.Linear);
             this.W = new Spell.Active(SpellSlot.W, 520);

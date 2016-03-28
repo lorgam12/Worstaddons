@@ -20,7 +20,7 @@ namespace Genesis.Library.Spells
             this.W = new Spell.Skillshot(SpellSlot.W, 800, SkillShotType.Circular, 0, int.MaxValue, 20);
             this.E = new Spell.Targeted(SpellSlot.E, 650);
             this.R = new Spell.Skillshot(SpellSlot.R, 600, SkillShotType.Circular, 0, int.MaxValue, 200);
-            this.QisCC = true;
+            this.QisCc = true;
         }
     }
 }

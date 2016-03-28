@@ -20,9 +20,9 @@ namespace Genesis.Library.Spells
             this.W = new Spell.Active(SpellSlot.W, 300);
             this.E = new Spell.Active(SpellSlot.E, 350);
             this.R = new Spell.Active(SpellSlot.R, 550);
-            this.QisCC = true;
+            this.QisCc = true;
             this.QisDash = true;
-            this.RisCC = true;
+            this.RisCc = true;
         }
     }
 }

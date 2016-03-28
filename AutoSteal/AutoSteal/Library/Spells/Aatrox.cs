@@ -39,10 +39,10 @@ namespace Genesis.Library.Spells
             this.E = new Spell.Skillshot(SpellSlot.E, 1000, SkillShotType.Linear, 250, 1200, 100)
                          { AllowedCollisionCount = int.MaxValue };
             this.R = new Spell.Active(SpellSlot.R);
-            this.QisCC = true;
+            this.QisCc = true;
             this.QisDash = true;
             this.WisToggle = true;
-            this.EisCC = true;
+            this.EisCc = true;
             this.LogicDictionary = new Dictionary<string, Func<AIHeroClient, Obj_AI_Base, bool>>();
             this.LogicDictionary.Add("RLogic", RLogic);
         }
