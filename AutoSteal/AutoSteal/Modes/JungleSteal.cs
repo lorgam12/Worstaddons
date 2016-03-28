@@ -13,15 +13,9 @@
     {
         public static Obj_AI_Minion Mobxdd;
 
-        protected static SpellBase Spells
-        {
-            get
-            {
-                return SpellManager.CurrentSpells;
-            }
-        }
+        protected static SpellBase Spells => SpellManager.CurrentSpells;
 
-        public static void JS()
+        public static void Js()
         {
             var champion = ObjectManager.Player.ChampionName;
             foreach (Obj_AI_Minion mob in
@@ -62,25 +56,23 @@
 
                 if (Program.JungleStealMenu[champion + "QJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    var traveltime = mob.Distance(ObjectManager.Player)
-                                     / (Spells.Q.Handle.SData.MissileSpeed + Spells.Q.CastDelay) + Game.Ping / 2f / 1000;
-                    if (Spells.QisToggle || Spells.QisDash || Spells.QisCC)
+                    if (Spells.QisToggle || Spells.QisDash || Spells.QisCc || Spells.Q == null)
                     {
                         return;
                     }
 
-                    if (KillSteal.playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.Q)
+                    var traveltime = mob.Distance(ObjectManager.Player)
+                                     / (Spells.Q.Handle.SData.MissileSpeed + Spells.Q.CastDelay) + Game.Ping / 2f / 1000;
+
+                    if (KillSteal.Playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.Q)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.Q.IsInRange(mob)
                         && Spells.Q.IsReady())
                     {
                         if (Spells.Q.GetType() == typeof(Spell.Skillshot))
                         {
-                            Spell.Skillshot Qx = Spells.Q as Spell.Skillshot;
-                            if (Qx != null)
-                            {
-                                Qx.GetPrediction(mob);
-                                Qx.Cast(mob);
-                            }
+                            var qx = Spells.Q as Spell.Skillshot;
+                            qx?.GetPrediction(mob);
+                            qx?.Cast(mob);
                             return;
                         }
 
@@ -98,15 +90,15 @@
 
                         if (Spells.Q.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spell.Chargeable Qx = Spells.Q as Spell.Chargeable;
-                            if (Qx != null && !Qx.IsCharging)
+                            var qx = Spells.Q as Spell.Chargeable;
+                            if (qx != null && !qx.IsCharging)
                             {
-                                Qx.StartCharging();
+                                qx.StartCharging();
                             }
 
-                            if (Qx != null && Qx.Range == Qx.MaximumRange)
+                            if (qx != null && qx.Range == qx.MaximumRange)
                             {
-                                Qx.Cast(mob.Position);
+                                qx.Cast(mob.Position);
                             }
 
                             return;
@@ -122,24 +114,23 @@
 
                 if (Program.JungleStealMenu[champion + "WJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    var traveltime = mob.Distance(ObjectManager.Player)
-                                     / (Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay) + Game.Ping / 2f / 1000;
-                    if (Spells.WisToggle || Spells.WisDash || Spells.WisCC)
+                    if (Spells.WisToggle || Spells.WisDash || Spells.WisCc || Spells.W == null)
                     {
                         return;
                     }
-                    if (KillSteal.playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.W)
+
+                    var traveltime = mob.Distance(ObjectManager.Player)
+                                     / (Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay) + Game.Ping / 2f / 1000;
+
+                    if (KillSteal.Playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.W)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.W.IsInRange(mob)
                         && Spells.W.IsReady())
                     {
                         if (Spells.W.GetType() == typeof(Spell.Skillshot))
                         {
-                            Spell.Skillshot Wx = Spells.W as Spell.Skillshot;
-                            if (Wx != null)
-                            {
-                                Wx.GetPrediction(mob);
-                                Wx.Cast(mob);
-                            }
+                            var wx = Spells.W as Spell.Skillshot;
+                            wx?.GetPrediction(mob);
+                            wx?.Cast(mob);
                             return;
                         }
 
@@ -157,15 +148,15 @@
 
                         if (Spells.W.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spell.Chargeable Wx = Spells.W as Spell.Chargeable;
-                            if (Wx != null && !Wx.IsCharging)
+                            var wx = Spells.W as Spell.Chargeable;
+                            if (wx != null && !wx.IsCharging)
                             {
-                                Wx.StartCharging();
+                                wx.StartCharging();
                             }
 
-                            if (Wx != null && Wx.Range == Wx.MaximumRange)
+                            if (wx != null && wx.Range == wx.MaximumRange)
                             {
-                                Wx.Cast(mob.Position);
+                                wx.Cast(mob.Position);
                             }
                             return;
                         }
@@ -180,25 +171,23 @@
 
                 if (Program.JungleStealMenu[champion + "EJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    var traveltime = mob.Distance(ObjectManager.Player)
-                                     / (Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay) + Game.Ping / 2f / 1000;
-                    if (Spells.EisToggle || Spells.EisDash || Spells.EisCC)
+                    if (Spells.EisToggle || Spells.EisDash || Spells.EisCc || Spells.E == null)
                     {
                         return;
                     }
 
-                    if (KillSteal.playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.E)
+                    var traveltime = mob.Distance(ObjectManager.Player)
+                                     / (Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay) + Game.Ping / 2f / 1000;
+
+                    if (KillSteal.Playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.E)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.E.IsInRange(mob)
                         && Spells.E.IsReady())
                     {
                         if (Spells.E.GetType() == typeof(Spell.Skillshot))
                         {
-                            Spell.Skillshot Ex = Spells.E as Spell.Skillshot;
-                            if (Ex != null)
-                            {
-                                Ex.GetPrediction(mob);
-                                Ex.Cast(mob);
-                            }
+                            var ex = Spells.E as Spell.Skillshot;
+                            ex?.GetPrediction(mob);
+                            ex?.Cast(mob);
                             return;
                         }
 
@@ -216,15 +205,15 @@
 
                         if (Spells.E.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spell.Chargeable Ex = Spells.E as Spell.Chargeable;
-                            if (Ex != null && !Ex.IsCharging)
+                            var ex = Spells.E as Spell.Chargeable;
+                            if (ex != null && !ex.IsCharging)
                             {
-                                Ex.StartCharging();
+                                ex.StartCharging();
                             }
 
-                            if (Ex != null && Ex.Range == Ex.MaximumRange)
+                            if (ex != null && ex.Range == ex.MaximumRange)
                             {
-                                Ex.Cast(mob.Position);
+                                ex.Cast(mob.Position);
                             }
                             return;
                         }
@@ -239,24 +228,23 @@
 
                 if (Program.JungleStealMenu[champion + "RJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    var traveltime = mob.Distance(ObjectManager.Player)
-                                     / (Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay) + Game.Ping / 2f / 1000;
-                    if (Spells.RisToggle || Spells.RisDash || Spells.RisCC)
+                    if (Spells.RisToggle || Spells.RisDash || Spells.RisCc || Spells.R == null)
                     {
                         return;
                     }
-                    if (KillSteal.playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.R)
+
+                    var traveltime = mob.Distance(ObjectManager.Player)
+                                     / (Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay) + Game.Ping / 2f / 1000;
+
+                    if (KillSteal.Playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.R)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.R.IsInRange(mob)
                         && Spells.R.IsReady())
                     {
                         if (Spells.R.GetType() == typeof(Spell.Skillshot))
                         {
-                            Spell.Skillshot Rx = Spells.R as Spell.Skillshot;
-                            if (Rx != null)
-                            {
-                                Rx.GetPrediction(mob);
-                                Rx.Cast(mob);
-                            }
+                            var rx = Spells.R as Spell.Skillshot;
+                            rx?.GetPrediction(mob);
+                            rx?.Cast(mob);
                             return;
                         }
 
@@ -274,15 +262,15 @@
 
                         if (Spells.R.GetType() == typeof(Spell.Chargeable))
                         {
-                            Spell.Chargeable Rx = Spells.R as Spell.Chargeable;
-                            if (Rx != null && !Rx.IsCharging)
+                            var rx = Spells.R as Spell.Chargeable;
+                            if (rx != null && !rx.IsCharging)
                             {
-                                Rx.StartCharging();
+                                rx.StartCharging();
                             }
 
-                            if (Rx != null && Rx.Range == Rx.MaximumRange)
+                            if (rx != null && rx.Range == rx.MaximumRange)
                             {
-                                Rx.Cast(mob.Position);
+                                rx.Cast(mob.Position);
                             }
                             return;
                         }
@@ -292,6 +280,13 @@
                             Spells.R.Cast(mob.Position);
                             return;
                         }
+                    }
+
+                    if (Program.JungleStealMenu[champion + "all"].Cast<CheckBox>().CurrentValue
+                        && KillSteal.Playerdamage + Misc.Damage.JsCalcDamage(mob)
+                        >= Prediction.Health.GetPrediction(mob, (int)(Misc.Damage.JsTravelTime(mob))))
+                    {
+
                     }
                 }
             }
