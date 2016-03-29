@@ -238,7 +238,9 @@ namespace AutoFarmer.Modes
         internal static void Orbwalker_OnPostAttack(AttackableUnit unit, EventArgs args)
         {
             var target = unit as Obj_AI_Base;
-            if (target is Obj_AI_Minion && Prediction.Health.GetPrediction(target, (int)(AutoFarm.Player.AttackDelay * 1000)) > AutoFarm.Player.GetAutoAttackDamage(target))
+            if (target is Obj_AI_Minion && Prediction.Health.GetPrediction(target, (int)(AutoFarm.Player.AttackDelay * 1000)) > AutoFarm.Player.GetAutoAttackDamage(target)
+                && (AutoFarm.Lc[AutoFarm.Player.ChampionName + "Enable"].Cast<KeyBind>().CurrentValue
+                || AutoFarm.Lc[AutoFarm.Player.ChampionName + "Enableactive"].Cast<KeyBind>().CurrentValue))
             {
                 if (AutoFarm.Lc.Get<ComboBox>(AutoFarm.Player.ChampionName + "Qmode").CurrentValue == 0
                     && AutoFarm.Lc[AutoFarm.Player.ChampionName + "Q"].Cast<CheckBox>().CurrentValue
