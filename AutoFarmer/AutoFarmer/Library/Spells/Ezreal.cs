@@ -16,7 +16,7 @@ namespace Genesis.Library.Spells
 
         public Ezreal()
         {
-            this.Q = new Spell.Skillshot(SpellSlot.Q, 1150, SkillShotType.Linear, 250, 2000, 60)
+            this.Q = new Spell.Skillshot(SpellSlot.Q, 1200, SkillShotType.Linear, 250, 2000, 60)
                          { AllowedCollisionCount = 0 };
             this.W = new Spell.Skillshot(SpellSlot.W, 1050, SkillShotType.Linear, 250, 1600, 80);
             this.E = new Spell.Skillshot(SpellSlot.E, 475, SkillShotType.Linear, 250, 2000, 80);
