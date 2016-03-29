@@ -88,18 +88,11 @@
             JungleStealMenu.Add(champion + "razorbeak", new CheckBox("Steal Razorbeak "));
             JungleStealMenu.Add(champion + "crab", new CheckBox("Steal Crab "));
             JungleStealMenu.Add(champion + "murkwolf", new CheckBox("Steal Murkwolf "));
-
-            DrawMenu = MenuIni.AddSubMenu("Debug", "Debug");
-            DrawMenu.AddGroupLabel("Debug Settings");
-            DrawMenu.Add(champion + "debug", new CheckBox("Enable Debug Drawings", false));
-            DrawMenu.AddGroupLabel("Position");
-            DrawMenu.Add("trackx", new Slider("Debug Position X"));
-            DrawMenu.Add("tracky", new Slider("Debug Position Y"));
+            
 
             SpellManager.Initialize();
             SpellLibrary.Initialize();
-
-            Drawing.OnEndScene += Drawing_OnDraw;
+            
             Game.OnUpdate += OnUpdate;
         }
 
