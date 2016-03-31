@@ -6,37 +6,11 @@ using EloBuddy;
 
 namespace Karthus
 {
-    internal class EnemyInfo
-    {
-        public AIHeroClient Player;
-
-        public int LastSeen;
-
-        //public int LastPinged;
-
-        public EnemyInfo(AIHeroClient player)
-        {
-            this.Player = player;
-        }
-    }
-
     internal class Helper
     {
-        public static int GameTimeTickCount
-        {
-            get
-            {
-                return (int)(Game.Time * 1000);
-            }
-        }
+        public static int GameTimeTickCount => (int)(Game.Time * 1000);
 
-        public static int TickCount
-        {
-            get
-            {
-                return Environment.TickCount & int.MaxValue;
-            }
-        }
+        public static int TickCount => Environment.TickCount & int.MaxValue;
 
         public static IEnumerable<AIHeroClient> EnemyTeam;
 

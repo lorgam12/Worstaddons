@@ -7,18 +7,6 @@
     using EloBuddy;
     using EloBuddy.SDK;
 
-    internal class Ti
-    {
-        public int timeCheck;
-
-        public Ti(AIHeroClient player)
-        {
-            this.Player = player;
-        }
-
-        public AIHeroClient Player { get; set; }
-    }
-
     internal class Check
     {
         public IEnumerable<AIHeroClient> ETeam;

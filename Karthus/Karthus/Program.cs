@@ -15,28 +15,6 @@ using EloBuddy.SDK.Rendering;
 
 namespace Karthus
 {
-    using
-    
-
-    static
-EntityManager;
-
-    using
-    static
-Gapcloser;
-
-    using
-    static
-Orbwalker;
-
-    using
-    static
-Prediction;
-
-    using
-    static
-Spell;
-
     using Color = Color;
     using RectangleF = RectangleF;
 
@@ -60,15 +38,15 @@ Spell;
 
         private static readonly AIHeroClient player = ObjectManager.Player;
 
-        public static Skillshot Q { get; private set; }
+        public static Spell.Skillshot Q { get; private set; }
 
-        public static Skillshot Q2 { get; private set; }
+        public static Spell.Skillshot Q2 { get; private set; }
 
-        public static Skillshot W { get; private set; }
+        public static Spell.Skillshot W { get; private set; }
 
-        public static Active E { get; private set; }
+        public static Spell.Active E { get; private set; }
 
-        public static Skillshot R { get; private set; }
+        public static Spell.Skillshot R { get; private set; }
 
         public static Menu UltMenu { get; private set; }
 
@@ -110,11 +88,11 @@ Spell;
 
             Check = new Check();
 
-            Q = new Skillshot(SpellSlot.Q, 875, SkillShotType.Circular, 1000, int.MaxValue, 160);
-            Q2 = new Skillshot(SpellSlot.Q, 875, SkillShotType.Circular, 650, int.MaxValue, 100);
-            W = new Skillshot(SpellSlot.W, 1000, SkillShotType.Circular, 500, int.MaxValue, 70);
-            E = new Active(SpellSlot.E, 510);
-            R = new Skillshot(SpellSlot.R, 25000, SkillShotType.Circular, 3000, int.MaxValue, int.MaxValue);
+            Q = new Spell.Skillshot(SpellSlot.Q, 875, SkillShotType.Circular, 1000, int.MaxValue, 160);
+            Q2 = new Spell.Skillshot(SpellSlot.Q, 875, SkillShotType.Circular, 650, int.MaxValue, 100);
+            W = new Spell.Skillshot(SpellSlot.W, 1000, SkillShotType.Circular, 500, int.MaxValue, 70);
+            E = new Spell.Active(SpellSlot.E, 510);
+            R = new Spell.Skillshot(SpellSlot.R, 25000, SkillShotType.Circular, 3000, int.MaxValue, int.MaxValue);
 
             menuIni = MainMenu.AddMenu("Karthus", "Karthus");
             menuIni.AddGroupLabel("Welcome to the Worst Karthus addon!");
@@ -132,15 +110,12 @@ Spell;
             UltMenu = menuIni.AddSubMenu("Ultimate");
             UltMenu.AddGroupLabel("Ultimate Settings");
             UltMenu.Add("UltKS", new CheckBox("Ultimate KillSteal R", false));
-            UltMenu.Add("UltMode", new ComboBox("Ult Logic", 0, "Kappa Logic", "Beaving Logic"));
+            UltMenu.Add("UltMode", new ComboBox("Ult Logic", 0, "Kappa Logic"));
             UltMenu.AddGroupLabel("Kappa Ultimate Logic Settings");
             UltMenu.Add("RnearE", new CheckBox("Block Ult when Enemies Near My Champion?"));
             UltMenu.Add("RnearEn", new Slider("Min Enemies Near to block Cast R", 1, 1, 5));
             UltMenu.Add("Rranged", new Slider("Range to detect Enemies to block Cast R", 1600, 100, 3000));
             UltMenu.AddLabel("Recommended Range (1600 >)");
-            UltMenu.AddSeparator();
-            UltMenu.AddGroupLabel("Beaving Ultimate Logic Settings (KarthusSharp L#)");
-            UltMenu.AddLabel("Auto Settings.");
 
             ComboMenu = menuIni.AddSubMenu("Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -212,10 +187,10 @@ Spell;
             Game.OnUpdate += Zigzag;
             Game.OnUpdate += OnUpdate;
             Drawing.OnDraw += OnDraw;
-            OnGapcloser += Gapcloser_OnGap;
+            Gapcloser.OnGapcloser += Gapcloser_OnGap;
         }
 
-        private static void Gapcloser_OnGap(AIHeroClient Sender, GapcloserEventArgs args)
+        private static void Gapcloser_OnGap(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
             if (!menuIni.Get<CheckBox>("Misc").CurrentValue || !MiscMenu.Get<CheckBox>("gapcloser").CurrentValue
                 || ObjectManager.Player.ManaPercent < MiscMenu.Get<Slider>("gapclosermana").CurrentValue
@@ -311,11 +286,11 @@ Spell;
             wTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
             eTarget = TargetSelector.GetTarget(E.Range, DamageType.Magical);
 
-            var flags = ActiveModesFlags;
-            if (flags.HasFlag(ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
+            var flags = Orbwalker.ActiveModesFlags;
+            if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
             {
-                DisableAttacking = ComboMenu.Get<CheckBox>("CUse_AA").CurrentValue
-                                   && player.Mana > Q.Handle.SData.Mana * 3;
+                Orbwalker.DisableAttacking = ComboMenu.Get<CheckBox>("CUse_AA").CurrentValue
+                                             && player.Mana > Q.Handle.SData.Mana * 3;
                 if (MiscMenu.Get<CheckBox>("SaveR").CurrentValue
                     && player.Mana - (SaveR() / 3) - 30 > R.Handle.SData.Mana && player.Level >= 6 && R.IsLearned)
                 {
@@ -328,9 +303,9 @@ Spell;
                 }
             }
 
-            if (flags.HasFlag(ActiveModes.LaneClear) && menuIni.Get<CheckBox>("LaneClear").CurrentValue)
+            if (flags.HasFlag(Orbwalker.ActiveModes.LaneClear) && menuIni.Get<CheckBox>("LaneClear").CurrentValue)
             {
-                DisableAttacking = false;
+                Orbwalker.DisableAttacking = false;
                 if (MiscMenu.Get<CheckBox>("SaveR").CurrentValue && player.Mana - (SaveR() / 3) > R.Handle.SData.Mana
                     && player.Level >= 6 && R.IsLearned)
                 {
@@ -343,9 +318,9 @@ Spell;
                 }
             }
 
-            if (flags.HasFlag(ActiveModes.JungleClear) && menuIni.Get<CheckBox>("JungleClear").CurrentValue)
+            if (flags.HasFlag(Orbwalker.ActiveModes.JungleClear) && menuIni.Get<CheckBox>("JungleClear").CurrentValue)
             {
-                DisableAttacking = false;
+                Orbwalker.DisableAttacking = false;
                 if (MiscMenu.Get<CheckBox>("SaveR").CurrentValue && player.Level >= 6 && R.IsLearned
                     && player.Mana - (SaveR() / 3) > R.Handle.SData.Mana)
                 {
@@ -358,10 +333,10 @@ Spell;
                 }
             }
 
-            if (flags.HasFlag(ActiveModes.Harass) && menuIni.Get<CheckBox>("Harass").CurrentValue)
+            if (flags.HasFlag(Orbwalker.ActiveModes.Harass) && menuIni.Get<CheckBox>("Harass").CurrentValue)
             {
-                DisableAttacking = HarassMenu.Get<CheckBox>("HUse_AA").CurrentValue
-                                   && Player.Instance.Mana < Q.Handle.SData.Mana * 3;
+                Orbwalker.DisableAttacking = HarassMenu.Get<CheckBox>("HUse_AA").CurrentValue
+                                             && Player.Instance.Mana < Q.Handle.SData.Mana * 3;
 
                 if (MiscMenu.Get<CheckBox>("SaveR").CurrentValue && player.Level >= 6 && R.IsLearned
                     && player.Mana - (SaveR() / 2) > R.Handle.SData.Mana)
@@ -375,17 +350,17 @@ Spell;
                 }
             }
 
-            if (flags.HasFlag(ActiveModes.LastHit) && menuIni.Get<CheckBox>("LastHit").CurrentValue)
+            if (flags.HasFlag(Orbwalker.ActiveModes.LastHit) && menuIni.Get<CheckBox>("LastHit").CurrentValue)
             {
                 if (LaneMenu.Get<CheckBox>("LAA").CurrentValue
                     && (Q.IsReady()
                         || ObjectManager.Player.ManaPercent >= LaneMenu.Get<Slider>("LHQPercent").CurrentValue))
                 {
-                    DisableAttacking = true;
+                    Orbwalker.DisableAttacking = true;
                 }
                 else
                 {
-                    DisableAttacking = false;
+                    Orbwalker.DisableAttacking = false;
                 }
 
                 if (MiscMenu.Get<CheckBox>("SaveR").CurrentValue && player.Level >= 6 && R.IsLearned
@@ -417,12 +392,6 @@ Spell;
                 && UltMenu.Get<CheckBox>("UltKS").CurrentValue && (R.IsLearned && R.IsReady()))
             {
                 Ult();
-            }
-
-            if (menuIni.Get<CheckBox>("Ultimate").CurrentValue && UltMenu.Get<ComboBox>("UltMode").CurrentValue == 1
-                && UltMenu.Get<CheckBox>("UltKS").CurrentValue && (R.IsLearned && R.IsReady()))
-            {
-                Ult2();
             }
         }
 
@@ -466,7 +435,7 @@ Spell;
                     Drawing.Width * 0.44f,
                     Drawing.Height * 0.8f,
                     System.Drawing.Color.Red,
-                    "R Blocked Enemies in Rage: " + enemieinsrange);
+                    "R Blocked Enemies in Range: " + enemieinsrange);
             }
 
             if (R.IsLearned)
@@ -519,8 +488,9 @@ Spell;
             {
                 float i = 0;
                 foreach (
-                    var hero in Heroes.Enemies.Where(hero => hero != null && hero.IsEnemy && !hero.IsMe && !hero.IsDead)
-                    )
+                    var hero in
+                        EntityManager.Heroes.Enemies.Where(
+                            hero => hero != null && hero.IsEnemy && !hero.IsMe && !hero.IsDead))
                 {
                     var champion = hero.ChampionName;
                     if (champion.Length > 12)
@@ -578,7 +548,11 @@ Spell;
                 return;
             }
 
-            var minions = MinionsAndMonsters.GetLaneMinions(UnitTeam.Enemy, Player.Instance.Position, E.Range).ToArray();
+            var minions =
+                EntityManager.MinionsAndMonsters.GetLaneMinions(
+                    EntityManager.UnitTeam.Enemy,
+                    Player.Instance.Position,
+                    E.Range).ToArray();
 
             if (!tc && (eTarget != null || (!nowE && minions.Count() != 0)))
             {
@@ -620,8 +594,10 @@ Spell;
                     nowE = false;
                     var minions =
                         new List<Obj_AI_Base>(
-                            MinionsAndMonsters.GetLaneMinions(UnitTeam.Enemy, Player.Instance.Position, E.Range)
-                                .ToArray());
+                            EntityManager.MinionsAndMonsters.GetLaneMinions(
+                                EntityManager.UnitTeam.Enemy,
+                                Player.Instance.Position,
+                                E.Range).ToArray());
                     minions.RemoveAll(x => x.Health <= 5);
                     minions.RemoveAll(
                         x =>
@@ -709,8 +685,8 @@ Spell;
 
         private static bool Combo()
         {
-            var flags = ActiveModesFlags;
-            if (flags.HasFlag(ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
+            var flags = Orbwalker.ActiveModesFlags;
+            if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
             {
                 var qm = ComboMenu.Get<CheckBox>("CUse_Q").CurrentValue;
                 var wm = ComboMenu.Get<CheckBox>("CUse_W").CurrentValue;
@@ -786,14 +762,14 @@ Spell;
             var canQ = LaneMenu.Get<CheckBox>("JUse_Q").CurrentValue && Q.IsReady();
             if (canQ && Q.IsReady() && player.ManaPercent >= LaneMenu.Get<Slider>("JQPercent").CurrentValue)
             {
-                var minions1 = MinionsAndMonsters.GetJungleMonsters();
+                var minions1 = EntityManager.MinionsAndMonsters.GetJungleMonsters();
                 if (minions1 == null || !minions1.Any())
                 {
                     return;
                 }
                 var location =
                     GetBestCircularFarmLocation(
-                        MinionsAndMonsters.GetJungleMonsters()
+                        EntityManager.MinionsAndMonsters.GetJungleMonsters()
                             .Where(x => x.Distance(Player.Instance) <= Q.Range)
                             .Select(xm => xm.ServerPosition.To2D())
                             .ToList(),
@@ -813,7 +789,7 @@ Spell;
             var canQ = LaneMenu.Get<CheckBox>("FUse_Q").CurrentValue && Q.IsReady();
             if (canQ && Q.IsReady() && player.ManaPercent >= LaneMenu.Get<Slider>("FQPercent").CurrentValue)
             {
-                var minions1 = MinionsAndMonsters.EnemyMinions;
+                var minions1 = EntityManager.MinionsAndMonsters.EnemyMinions;
                 if (minions1 == null || !minions1.Any())
                 {
                     return;
@@ -821,7 +797,7 @@ Spell;
 
                 var location =
                     GetBestCircularFarmLocation(
-                        MinionsAndMonsters.EnemyMinions.Where(x => x.Distance(Player.Instance) <= Q.Range)
+                        EntityManager.MinionsAndMonsters.EnemyMinions.Where(x => x.Distance(Player.Instance) <= Q.Range)
                             .Select(xm => xm.ServerPosition.To2D())
                             .ToList(),
                         Q.Width,
@@ -838,18 +814,19 @@ Spell;
             var canQ = LaneMenu.Get<CheckBox>("LUse_Q").CurrentValue && Q.IsReady();
             if (canQ && player.ManaPercent >= LaneMenu.Get<Slider>("LHQPercent").CurrentValue)
             {
-                var minions1 = MinionsAndMonsters.EnemyMinions;
+                var minions1 = EntityManager.MinionsAndMonsters.EnemyMinions;
                 if (minions1 == null || !minions1.Any())
                 {
                     return;
                 }
+
                 var location =
                     GetBestCircularFarmLocation(
-                        MinionsAndMonsters.EnemyMinions.Where(
+                        EntityManager.MinionsAndMonsters.EnemyMinions.Where(
                             x =>
                             x.Distance(Player.Instance) <= Q.Range && x.Health > 5 && (x.CountEnemiesInRange(155) == 0)
                             && !x.IsDead && x.IsValid
-                            && Health.GetPrediction(x, (int)(Q.CastDelay * 1000))
+                            && Prediction.Health.GetPrediction(x, (int)(Q.CastDelay * 1000))
                             < (2 * player.GetSpellDamage(x, SpellSlot.Q)))
                             .Select(xm => xm.ServerPosition.To2D())
                             .ToList(),
@@ -864,7 +841,7 @@ Spell;
 
             if (canQ && player.ManaPercent >= LaneMenu.Get<Slider>("FQPercent").CurrentValue)
             {
-                var minions1 = MinionsAndMonsters.EnemyMinions;
+                var minions1 = EntityManager.MinionsAndMonsters.EnemyMinions;
                 if (minions1 == null || !minions1.Any())
                 {
                     return;
@@ -872,10 +849,10 @@ Spell;
 
                 var location =
                     GetBestCircularFarmLocation(
-                        MinionsAndMonsters.EnemyMinions.Where(
+                        EntityManager.MinionsAndMonsters.EnemyMinions.Where(
                             x =>
                             x.Distance(Player.Instance) <= Q.Range && x.Health > 5 && !x.IsDead && x.IsValid
-                            && (Health.GetPrediction(x, (int)(Q.CastDelay * 1000))
+                            && (Prediction.Health.GetPrediction(x, (int)(Q.CastDelay * 1000))
                                 < player.GetSpellDamage(x, SpellSlot.Q)))
                             .Select(xm => xm.ServerPosition.To2D())
                             .ToList(),
@@ -896,159 +873,35 @@ Spell;
             var enemiesrange =
                 ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("Rranged").CurrentValue);
             var enemieinsrange = UltMenu.Get<Slider>("RnearEn").CurrentValue;
-            foreach (var target in
-                Check.TI.Where(
-                    x =>
-                    x.Player != null && x.Player.IsValid && !x.Player.IsDead && x.Player.IsEnemy
-                    && (!x.Player.HasBuff("kindrednodeathbuff") || !x.Player.HasBuff("Undying Rage")
-                        || !x.Player.HasBuff("JudicatorIntervention")) && !x.Player.IsZombie
-                    && player.GetSpellDamage(x.Player, SpellSlot.R)
-                    > Check.GetTargetHealth(x, (int)(R.CastDelay * 1000f)) && x.Player.CountAlliesInRange(750) < 1))
+            foreach (
+                var rtarget in
+                    from target in
+                        Check.TI.Where(
+                            x =>
+                            x.Player != null && x.Player.IsValid && !x.Player.IsDead && x.Player.IsEnemy
+                            && (!x.Player.HasBuff("kindrednodeathbuff") || !x.Player.HasBuff("Undying Rage")
+                                || !x.Player.HasBuff("JudicatorIntervention")) && !x.Player.IsZombie
+                            && player.GetSpellDamage(x.Player, SpellSlot.R)
+                            > Check.GetTargetHealth(x, (int)(R.CastDelay * 1000f))
+                            && x.Player.CountAlliesInRange(750) < 1)
+                    where
+                        target.Player != null
+                        && (target.Player.IsVisible
+                            || (!target.Player.IsVisible && time - Helper.GetPlayerInfo(target.Player).LastSeen < 3000))
+                    select TargetSelector.GetTarget(R.Range, DamageType.Magical))
             {
-                if (target.Player != null
-                    && (target.Player.IsVisible
-                        || (!target.Player.IsVisible && time - Helper.GetPlayerInfo(target.Player).LastSeen < 3000)))
+                if (UltMenu.Get<CheckBox>("RnearE").CurrentValue && enemieinsrange <= enemiesrange)
                 {
-                    var rtarget = TargetSelector.GetTarget(R.Range, DamageType.Magical);
-                    if (UltMenu.Get<CheckBox>("RnearE").CurrentValue && enemieinsrange <= enemiesrange)
-                    {
-                        R.Cast(rtarget.Position);
-                    }
-
-                    if (!UltMenu.Get<CheckBox>("RnearE").CurrentValue)
-                    {
-                        R.Cast(rtarget.Position);
-                    }
-
-                    if (player.IsZombie)
-                    {
-                        R.Cast(rtarget.Position);
-                    }
-                }
-            }
-
-            /*
-            var enemiesrange =
-                ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("Rranged").CurrentValue);
-            var enemieinsrange =
-                UltMenu.Get<Slider>("RnearEn").CurrentValue;
-            var aliesrange =
-                ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("RrangedA").CurrentValue);
-            var aliesinrange =
-                UltMenu.Get<Slider>("RnearAl").CurrentValue;
-
-            if (!R.IsReady() || Combo())
-            {
-                return;
-            }
-
-            var target = TargetSelector.GetTarget(R.Range, DamageType.Magical);
-            if (target != null && target.IsValid
-                && target.Health - 25 <= ObjectManager.Player.GetSpellDamage(target, SpellSlot.R)
-                && !target.HasBuff("kindrednodeathbuff") && !target.HasBuff("Undying Rage")
-                && !target.HasBuff("JudicatorIntervention") && !target.IsZombie && !target.IsDead)
-            {
-                if (UltMenu.Get<CheckBox>("RnearE").CurrentValue && enemieinsrange <= enemiesrange
-                    && !UltMenu.Get<CheckBox>("RnearA").CurrentValue)
-                {
-                    R.Cast(target.Position);
-                }
-                if (!UltMenu.Get<CheckBox>("RnearE").CurrentValue && aliesinrange <= aliesrange
-                    && UltMenu.Get<CheckBox>("RnearA").CurrentValue)
-                {
-                    R.Cast(target.Position);
+                    R.Cast(rtarget.Position);
                 }
 
-                if (UltMenu.Get<CheckBox>("RnearE").CurrentValue && aliesinrange <= aliesrange
-                    && enemieinsrange <= enemiesrange && UltMenu.Get<CheckBox>("RnearA").CurrentValue)
+                if (!UltMenu.Get<CheckBox>("RnearE").CurrentValue)
                 {
-                    R.Cast(target.Position);
+                    R.Cast(rtarget.Position);
                 }
 
-                if (!UltMenu.Get<CheckBox>("RnearE").CurrentValue && !UltMenu.Get<CheckBox>("RnearA").CurrentValue)
+                if (player.IsZombie)
                 {
-                    R.Cast(target.Position);
-                }
-            }
-            */
-        }
-
-        private static void Ult2()
-        {
-            // Beaving Ult logic.
-            if (!R.IsReady())
-            {
-                return;
-            }
-
-            var time = Helper.TickCount;
-
-            List<Obj_AI_Base> ultTargets = new List<Obj_AI_Base>();
-
-            foreach (var target in
-                Helper.EnemyInfo.Where(
-                    x => //need to check if recently recalled (for cases when no mana for baseult)
-                    x.Player.IsValid && !x.Player.IsDead && x.Player.IsEnemy &&
-                    //!(x.RecallInfo.Recall.Status == Packet.S2C.Recall.RecallStatus.RecallStarted && x.RecallInfo.GetRecallCountdown() < 3100) && //let BaseUlt handle this one
-                    ((!x.Player.IsVisible && time - x.LastSeen < 10000)
-                     || (x.Player.IsVisible && x.Player.IsValidTarget()))
-                    && ObjectManager.Player.GetSpellDamage(x.Player, SpellSlot.R)
-                    >= x.Player.TotalShieldHealth() + Helper.GetTargetHealth(x, (int)(R.CastDelay * 1000f))))
-            {
-                Ping(target.Player.Position.To2D());
-                if (target.Player.IsVisible || (!target.Player.IsVisible && time - target.LastSeen < 2750))
-                {
-                    //allies still attacking target? prevent overkill
-                    if (Helper.OwnTeam.Any(x => !x.IsMe && x.Distance(target.Player.Position) < 1100))
-                    {
-                        continue;
-                    }
-                }
-
-                if (player.IsZombie
-                    || !Helper.EnemyTeam.Any(
-                        x =>
-                        x.IsValid && !x.IsDead
-                        && (x.IsVisible || (!x.IsVisible && time - Helper.GetPlayerInfo(x).LastSeen < 2750))
-                        && ObjectManager.Player.Distance(x) < 1600 && !x.HasBuff("kindrednodeathbuff")
-                        && !x.HasBuff("Undying Rage") && !x.HasBuff("JudicatorIntervention") && !x.IsZombie))
-                {
-                    //any other enemies around? dont ult unless in passive form
-                    ultTargets.Add(target.Player);
-                }
-            }
-
-            int targets = ultTargets.Count();
-
-            if (targets > 0)
-            {
-                //dont ult if Zilean is nearby the target/is the target and his ult is up
-                var zilean =
-                    Helper.EnemyTeam.FirstOrDefault(
-                        x =>
-                        x.BaseSkinName == "Zilean"
-                        && (!x.HasBuff("kindrednodeathbuff") && !x.HasBuff("Undying Rage")
-                            && !x.HasBuff("JudicatorIntervention") && !x.IsZombie && x.IsVisible
-                            || (!x.IsVisible && time - Helper.GetPlayerInfo(x).LastSeen < 3000))
-                        && (x.Spellbook.CanUseSpell(SpellSlot.R) == SpellState.Ready
-                            || (x.Spellbook.GetSpell(SpellSlot.R).Level > 0
-                                && x.Spellbook.CanUseSpell(SpellSlot.R) == SpellState.Surpressed
-                                && x.Mana >= x.Spellbook.GetSpell(SpellSlot.R).SData.Mana)));
-
-                if (zilean != null)
-                {
-                    int inZileanRange = ultTargets.Count(x => x.Distance(zilean) < 2500);
-                    //if multiple, shoot regardless
-
-                    if (inZileanRange > 0)
-                    {
-                        targets--; //remove one target, because zilean can save one
-                    }
-                }
-
-                if (targets > 0)
-                {
-                    var rtarget = TargetSelector.GetTarget(R.Range, DamageType.Magical);
                     R.Cast(rtarget.Position);
                 }
             }
