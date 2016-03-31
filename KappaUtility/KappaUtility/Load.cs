@@ -129,6 +129,7 @@
             UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
             AutoReveal.OnLoad();
             AutoQSS.OnLoad();
+            GanksDetector.OnLoad();
             Tracker.OnLoad();
             Surrender.OnLoad();
             SkinHax.OnLoad();
@@ -138,17 +139,25 @@
             Defensive.OnLoad();
 
             Game.OnTick += Game_OnUpdate;
-            Drawing.OnEndScene += OnDraw;
+            Drawing.OnEndScene += OnEndScene;
+            Drawing.OnDraw += Drawing_OnDraw;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Obj_AI_Base.OnBasicAttack += OnBasicAttack;
         }
 
-        private static void OnDraw(EventArgs args)
+        private static void Drawing_OnDraw(EventArgs args)
         {
-            AutoReveal.Draw();
+            Spells.Drawings();
+            GanksDetector.OnDraw();
+        }
+
+        private static void OnEndScene(EventArgs args)
+        {
+            AutoReveal.Drawings();
             Tracker.Traps();
             Tracker.HPtrack();
             Tracker.track();
+            GanksDetector.OnEndScene();
         }
 
         private static void Game_OnUpdate(EventArgs args)
@@ -161,6 +170,7 @@
             }
 
             AutoReveal.Reveal();
+            GanksDetector.OnUpdate();
             Smite.Smiteopepi();
             Spells.Cast();
         }
@@ -175,7 +185,8 @@
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null || target == null && caster.IsEnemy)
+            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null
+                || target == null && caster.IsEnemy)
             {
                 return;
             }
@@ -311,7 +322,8 @@
             var caster = sender;
             var target = (AIHeroClient)args.Target;
 
-            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null || target == null && caster.IsEnemy)
+            if ((!(caster is AIHeroClient) && !(caster is Obj_AI_Turret)) || caster == null
+                || target == null && caster.IsEnemy)
             {
                 return;
             }

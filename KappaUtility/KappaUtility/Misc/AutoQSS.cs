@@ -88,8 +88,7 @@
                                  || (QssMenu["poison"].Cast<CheckBox>().CurrentValue
                                      && args.Buff.Type == BuffType.Poison)
                                  || (QssMenu["blind"].Cast<CheckBox>().CurrentValue && args.Buff.Type == BuffType.Blind)
-                                 || (QssMenu["zed"].Cast<CheckBox>().CurrentValue
-                                     && args.Buff.Name == "zedrtargetmark")
+                                 || (QssMenu["zed"].Cast<CheckBox>().CurrentValue && args.Buff.Name == "zedrtargetmark")
                                  || (QssMenu["vlad"].Cast<CheckBox>().CurrentValue
                                      && args.Buff.Name == "vladimirhemoplaguedebuff")
                                  || (QssMenu["liss"].Cast<CheckBox>().CurrentValue

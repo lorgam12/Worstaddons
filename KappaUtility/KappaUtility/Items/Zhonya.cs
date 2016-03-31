@@ -40,14 +40,15 @@
 
             if (Defensive.DefMenu["ZhonyasD"].Cast<CheckBox>().CurrentValue)
             {
-                foreach (
-                    var spell in
-                        DangerSpells.Where(spell => args.SData.Name == spell && caster.IsEnemy)
-                            .Where(spell => spell != null && args.SData.Name == spell))
+                foreach (var spell in
+                    DangerSpells.Where(spell => args.SData.Name == spell && caster.IsEnemy)
+                        .Where(spell => spell != null && args.SData.Name == spell))
                 {
-                    Core.DelayAction(() => Defensive.Zhonyas.Cast(), (int)sender.Spellbook.GetSpell(SpellSlot.R).SData.SpellCastTime * 2);
-                }
+                    Core.DelayAction(
+                        () => Defensive.Zhonyas.Cast(),
+                        (int)sender.Spellbook.GetSpell(SpellSlot.R).SData.SpellCastTime * 2);
                 }
             }
         }
     }
+}

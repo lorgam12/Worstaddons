@@ -10,7 +10,9 @@
     {
         public static void Smiteopepi()
         {
-            if (Spells.Smite != null)
+            if (Spells.Smite != null
+                && (Spells.SummMenu[Player.Instance.ChampionName + "EnableactiveSmite"].Cast<KeyBind>().CurrentValue
+                    || Spells.SummMenu[Player.Instance.ChampionName + "EnableSmite"].Cast<KeyBind>().CurrentValue))
             {
                 var smitemob = Spells.SummMenu["smitemob"].Cast<CheckBox>().CurrentValue && Spells.Smite.IsReady();
                 var smitecombo = Spells.SummMenu["smitecombo"].Cast<CheckBox>().CurrentValue && Spells.Smite.IsReady();

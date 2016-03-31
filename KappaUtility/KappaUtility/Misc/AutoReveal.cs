@@ -123,7 +123,7 @@
             GameObject.OnDelete += GameObject_OnDelete;
         }
 
-        internal static void Draw()
+        internal static void Drawings()
         {
             var targets = EntityManager.Heroes.Enemies.Where(x => !x.IsDead);
             foreach (var target in targets)

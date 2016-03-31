@@ -54,7 +54,7 @@
             }
 
             TrackMenu.Add("Distance", new Slider("WayPoints Detection Range", 1000, 0, 5000));
-            TrackMenu.AddGroupLabel("Drawings Settings");
+            TrackMenu.AddGroupLabel("Draw" + "ings Settings");
             TrackMenu.Add("trackx", new Slider("Tracker Position X", 0, 0, 100));
             TrackMenu.Add("tracky", new Slider("Tracker Position Y", 0, 0, 100));
 
