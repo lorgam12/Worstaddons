@@ -26,10 +26,10 @@
             QssMenu.Add("enable", new CheckBox("Enable", false));
             QssMenu.Add("Mercurial", new CheckBox("Use Mercurial Scimitar", false));
             QssMenu.Add("Quicksilver", new CheckBox("Use Quicksilver Sash", false));
-            if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerCleanse")) != null)
+            if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerBoost")) != null)
             {
                 QssMenu.Add("Cleanse", new CheckBox("Use Cleanse Spell", false));
-                Cleanse = new Spell.Active(Player.Instance.GetSpellSlotFromName("SummonerCleanse"));
+                Cleanse = new Spell.Active(Player.Instance.GetSpellSlotFromName("SummonerBoost"));
             }
 
             QssMenu.AddSeparator();
