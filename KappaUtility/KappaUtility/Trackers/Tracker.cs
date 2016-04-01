@@ -60,7 +60,7 @@
 
             foreach (var hero in ObjectManager.Get<AIHeroClient>())
             {
-                Recalls.Add(new Recall(hero, RecallStatus.Active));
+                Recalls.Add(new Recall(hero, RecallStatus.Inactive));
             }
 
             Teleport.OnTeleport += OnTeleport;
@@ -402,14 +402,17 @@
                 {
                     continue;
                 }
-
+                timer += hero.Position.Distance(hero.Path.LastOrDefault()) / hero.MoveSpeed;
+                if (timer > 5000)
+                {
+                    return;
+                }
                 Drawing.DrawLine(
                     hero.Position.WorldToScreen(),
                     hero.Path.LastOrDefault().WorldToScreen(),
                     2,
                     Color.White);
                 Circle.Draw(SharpDX.Color.White, 50, hero.Path.LastOrDefault());
-                timer += hero.Position.Distance(hero.Path.LastOrDefault()) / hero.MoveSpeed;
                 Drawing.DrawText(
                     Drawing.WorldToScreen(hero.Path.LastOrDefault()) - new Vector2(25, -20),
                     Color.White,
