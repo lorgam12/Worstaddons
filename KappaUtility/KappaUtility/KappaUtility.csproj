@@ -53,6 +53,7 @@
     <Compile Include="Items\Potions.cs" />
     <Compile Include="Items\Zhonya.cs" />
     <Compile Include="Load.cs" />
+    <Compile Include="Misc\AutoLvlUp.cs" />
     <Compile Include="Misc\AutoQSS.cs" />
     <Compile Include="Misc\AutoReveal.cs" />
     <Compile Include="Misc\SkinHax.cs" />

@@ -102,8 +102,8 @@
                     var hp = QssMenu["hp"].Cast<Slider>().CurrentValue;
                     var enemysrange = QssMenu["enemydetect"].Cast<Slider>().CurrentValue;
                     var delay = QssMenu["human"].Cast<Slider>().CurrentValue;
-                    if (debuff && ObjectManager.Player.HealthPercent <= hp
-                        && enemys >= ObjectManager.Player.Position.CountEnemiesInRange(enemysrange))
+                    if (debuff && Player.Instance.HealthPercent <= hp
+                        && enemys >= Player.Instance.Position.CountEnemiesInRange(enemysrange))
                     {
                         Core.DelayAction(QssCast, delay);
                     }

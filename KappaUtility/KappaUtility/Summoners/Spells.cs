@@ -53,7 +53,7 @@
                 }
 
                 SummMenu.AddSeparator();
-                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("SummonerDot"), 600);
+                Ignite = new Spell.Targeted(Player.Instance.GetSpellSlotFromName("SummonerDot"), 600);
             }
 
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerBarrier")) != null)
@@ -67,7 +67,7 @@
                     new KeyBind("Enable Barrier Active", false, KeyBind.BindTypes.HoldActive));
                 SummMenu.Add("barrierme", new Slider("Use On My Health %", 30, 0, 100));
                 SummMenu.AddSeparator();
-                Barrier = new Spell.Active(ObjectManager.Player.GetSpellSlotFromName("SummonerBarrier"));
+                Barrier = new Spell.Active(Player.Instance.GetSpellSlotFromName("SummonerBarrier"));
             }
 
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerHeal")) != null)
@@ -93,7 +93,7 @@
                 }
 
                 SummMenu.AddSeparator();
-                Heal = new Spell.Active(ObjectManager.Player.GetSpellSlotFromName("SummonerHeal"), 850);
+                Heal = new Spell.Active(Player.Instance.GetSpellSlotFromName("SummonerHeal"), 850);
             }
 
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerExhaust")) != null)
@@ -118,7 +118,7 @@
                     }
                 }
 
-                Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("SummonerExhaust"), 650);
+                Exhaust = new Spell.Targeted(Player.Instance.GetSpellSlotFromName("SummonerExhaust"), 650);
             }
 
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerSmite")) != null)
@@ -155,7 +155,7 @@
                 SummMenu.Add("crab", new CheckBox(" Crab "));
                 SummMenu.Add("murkwolf", new CheckBox(" Murkwolf "));
                 SummMenu.AddSeparator();
-                Smite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("SummonerSmite"), 500);
+                Smite = new Spell.Targeted(Player.Instance.GetSpellSlotFromName("SummonerSmite"), 500);
             }
         }
 

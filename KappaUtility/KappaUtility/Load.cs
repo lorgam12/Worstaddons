@@ -127,8 +127,9 @@
         private static void OnLoad(EventArgs args)
         {
             UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
-            AutoReveal.OnLoad();
+            AutoLvlUp.OnLoad();
             AutoQSS.OnLoad();
+            AutoReveal.OnLoad();
             GanksDetector.OnLoad();
             Tracker.OnLoad();
             Surrender.OnLoad();
@@ -168,11 +169,18 @@
                 Offensive.Items();
                 Defensive.Items();
             }
-
-            AutoReveal.Reveal();
-            GanksDetector.OnUpdate();
-            Smite.Smiteopepi();
-            Spells.Cast();
+            try
+            {
+                AutoReveal.Reveal();
+                AutoLvlUp.Levelup();
+                GanksDetector.OnUpdate();
+                Smite.Smiteopepi();
+                Spells.Cast();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -193,7 +201,7 @@
 
             if (target.IsValidTarget(Defensive.FOTM.Range) && _FaceOfTheMountainc)
             {
-                if (target.HealthPercent < _FaceOfTheMountainh)
+                if (target != null && target.HealthPercent < _FaceOfTheMountainh)
                 {
                     Defensive.FOTM.Cast(target);
                 }
@@ -206,7 +214,7 @@
 
             if (target.IsValidTarget(Defensive.Solari.Range) && _Solaric)
             {
-                if (target.HealthPercent < _Solarih)
+                if (target != null && target.HealthPercent < _Solarih)
                 {
                     Defensive.Solari.Cast();
                 }
@@ -217,7 +225,7 @@
                 }
             }
 
-            if (target.IsMe)
+            if (target != null && target.IsMe)
             {
                 if (_Refillablec)
                 {

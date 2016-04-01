@@ -90,12 +90,11 @@
             var heros =
                 EntityManager.Heroes.AllHeroes.Where(
                     x => x.IsInRange(Player.Instance.Position, range) && !x.IsDead && !x.IsInvulnerable && !x.IsMe);
-            foreach (
-                var hero in
-                    heros.Where(
-                        hero =>
-                        hero != null && Detect(hero) && hero.IsInRange(Player.Instance.Position, range)
-                        && hero.IsHPBarRendered))
+            foreach (var hero in
+                heros.Where(
+                    hero =>
+                    hero != null && Detect(hero) && hero.IsInRange(Player.Instance.Position, range)
+                    && hero.IsHPBarRendered))
             {
                 if (Game.Time - EnterTime > cd)
                 {
