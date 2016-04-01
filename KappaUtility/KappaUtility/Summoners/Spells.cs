@@ -37,7 +37,7 @@
                 SummMenu.AddGroupLabel("Ignite Settings");
                 SummMenu.Add(
                     Player.Instance.ChampionName + "EnableIgnite",
-                    new KeyBind("Enable Ignite Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
+                    new KeyBind("Enable Ignite Toggle", false, KeyBind.BindTypes.PressToggle, 'M'));
                 SummMenu.Add(
                     Player.Instance.ChampionName + "EnableactiveIgnite",
                     new KeyBind("Enable Ignite Active", false, KeyBind.BindTypes.HoldActive));
@@ -61,7 +61,7 @@
                 SummMenu.AddGroupLabel("Barrier Settings");
                 SummMenu.Add(
                     Player.Instance.ChampionName + "EnableBarrier",
-                    new KeyBind("Enable Barrier Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
+                    new KeyBind("Enable Barrier Toggle", false, KeyBind.BindTypes.PressToggle, 'M'));
                 SummMenu.Add(
                     Player.Instance.ChampionName + "EnableactiveBarrier",
                     new KeyBind("Enable Barrier Active", false, KeyBind.BindTypes.HoldActive));
@@ -75,7 +75,7 @@
                 SummMenu.AddGroupLabel("Heal Settings");
                 SummMenu.Add(
                     Player.Instance.ChampionName + "EnableHeal",
-                    new KeyBind("Enable Heal Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
+                    new KeyBind("Enable Heal Toggle", false, KeyBind.BindTypes.PressToggle, 'M'));
                 SummMenu.Add(
                     Player.Instance.ChampionName + "EnableactiveHeal",
                     new KeyBind("Enable Heal Active", false, KeyBind.BindTypes.HoldActive));

@@ -129,6 +129,7 @@
             UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
             AutoLvlUp.OnLoad();
             AutoQSS.OnLoad();
+            AutoTear.OnLoad();
             AutoReveal.OnLoad();
             GanksDetector.OnLoad();
             Tracker.OnLoad();
@@ -173,6 +174,7 @@
             {
                 AutoReveal.Reveal();
                 AutoLvlUp.Levelup();
+                AutoTear.OnUpdate();
                 GanksDetector.OnUpdate();
                 Smite.Smiteopepi();
                 Spells.Cast();

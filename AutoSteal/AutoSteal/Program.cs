@@ -92,7 +92,6 @@
 
             SpellManager.Initialize();
             SpellLibrary.Initialize();
-            
             Game.OnUpdate += OnUpdate;
         }
 

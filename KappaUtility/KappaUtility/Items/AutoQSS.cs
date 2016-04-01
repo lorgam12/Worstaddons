@@ -1,6 +1,6 @@
-﻿namespace KappaUtility.Misc
+﻿namespace KappaUtility.Items
 {
-    using System;
+    using System.Linq;
 
     using EloBuddy;
     using EloBuddy.SDK;
@@ -9,6 +9,10 @@
 
     internal class AutoQSS
     {
+        public static Spell.Active Cleanse;
+
+        public static bool Cleaned;
+
         protected static readonly Item Mercurial_Scimitar = new Item(ItemId.Mercurial_Scimitar);
 
         protected static readonly Item Quicksilver_Sash = new Item(ItemId.Quicksilver_Sash);
@@ -22,7 +26,14 @@
             QssMenu.Add("enable", new CheckBox("Enable", false));
             QssMenu.Add("Mercurial", new CheckBox("Use Mercurial Scimitar", false));
             QssMenu.Add("Quicksilver", new CheckBox("Use Quicksilver Sash", false));
-            QssMenu.AddLabel("Debuffs Settings:");
+            if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerCleanse")) != null)
+            {
+                QssMenu.Add("Cleanse", new CheckBox("Use Cleanse Spell", false));
+                Cleanse = new Spell.Active(Player.Instance.GetSpellSlotFromName("SummonerCleanse"));
+            }
+
+            QssMenu.AddSeparator();
+            QssMenu.AddGroupLabel("Debuffs Settings:");
             QssMenu.Add("blind", new CheckBox("Use On Blinds?", false));
             QssMenu.Add("charm", new CheckBox("Use On Charms?", false));
             QssMenu.Add("disarm", new CheckBox("Use On Disarm?", false));
@@ -41,7 +52,9 @@
             QssMenu.Add("tunt", new CheckBox("Use On Taunts?", false));
             QssMenu.Add("poly", new CheckBox("Use On Polymorph?", false));
             QssMenu.Add("poison", new CheckBox("Use On Poisons?", false));
-            QssMenu.AddLabel("Ults Settings:");
+
+            QssMenu.AddSeparator();
+            QssMenu.AddGroupLabel("Ults Settings:");
             QssMenu.Add("liss", new CheckBox("Use On Lissandra Ult?", false));
             QssMenu.Add("naut", new CheckBox("Use On Nautilus Ult?", false));
             QssMenu.Add("zed", new CheckBox("Use On Zed Ult?", false));
@@ -53,10 +66,10 @@
             QssMenu.Add("human", new Slider("Humanizer Delay", 150, 0, 1500));
             QssMenu.Add("Rene", new Slider("Enemies Near to Cast", 1, 0, 5));
             QssMenu.Add("enemydetect", new Slider("Enemies Detect Range", 1000, 0, 2000));
-            Obj_AI_Base.OnBuffGain += OnUpdate;
+            Obj_AI_Base.OnBuffGain += OnBuffGain;
         }
 
-        private static void OnUpdate(Obj_AI_Base sender, Obj_AI_BaseBuffGainEventArgs args)
+        private static void OnBuffGain(Obj_AI_Base sender, Obj_AI_BaseBuffGainEventArgs args)
         {
             if (QssMenu["enable"].Cast<CheckBox>().CurrentValue)
             {
@@ -105,6 +118,7 @@
                     if (debuff && Player.Instance.HealthPercent <= hp
                         && enemys >= Player.Instance.Position.CountEnemiesInRange(enemysrange))
                     {
+                        Cleaned = false;
                         Core.DelayAction(QssCast, delay);
                     }
                 }
@@ -113,16 +127,27 @@
 
         public static void QssCast()
         {
-            if (Quicksilver_Sash.IsOwned() && Quicksilver_Sash.IsReady()
-                && QssMenu["Quicksilver"].Cast<CheckBox>().CurrentValue)
+            if (Cleaned == false)
             {
-                Quicksilver_Sash.Cast();
-            }
+                if (Quicksilver_Sash.IsOwned() && Quicksilver_Sash.IsReady()
+                    && QssMenu["Quicksilver"].Cast<CheckBox>().CurrentValue)
+                {
+                    Quicksilver_Sash.Cast();
+                    Cleaned = true;
+                }
 
-            if (Mercurial_Scimitar.IsOwned() && Mercurial_Scimitar.IsReady()
-                && QssMenu["Mercurial"].Cast<CheckBox>().CurrentValue)
-            {
-                Mercurial_Scimitar.Cast();
+                if (Mercurial_Scimitar.IsOwned() && Mercurial_Scimitar.IsReady()
+                    && QssMenu["Mercurial"].Cast<CheckBox>().CurrentValue)
+                {
+                    Mercurial_Scimitar.Cast();
+                    Cleaned = true;
+                }
+
+                if (QssMenu["Cleanse"].Cast<CheckBox>().CurrentValue && Cleanse.IsReady() && Cleanse != null)
+                {
+                    Cleanse.Cast();
+                    Cleaned = true;
+                }
             }
         }
     }

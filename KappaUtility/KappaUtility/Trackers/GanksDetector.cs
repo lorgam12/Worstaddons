@@ -66,8 +66,7 @@
                     x =>
                     x.IsInRange(Player.Instance.Position, range) && !x.IsDead && !x.IsInvulnerable && Detect(x)
                     && !x.IsMe);
-            foreach (
-                var hero in heros.Where(hero => hero != null && Game.Time - DrawDuration < cd && hero.IsHPBarRendered))
+            foreach (var hero in heros.Where(hero => hero != null && Game.Time - DrawDuration < cd))
             {
                 var c = hero.IsAlly ? Color.FromArgb(125, 0, 255, 0) : Color.FromArgb(125, 255, 0, 0);
                 Drawing.DrawLine(
@@ -91,10 +90,7 @@
                 EntityManager.Heroes.AllHeroes.Where(
                     x => x.IsInRange(Player.Instance.Position, range) && !x.IsDead && !x.IsInvulnerable && !x.IsMe);
             foreach (var hero in
-                heros.Where(
-                    hero =>
-                    hero != null && Detect(hero) && hero.IsInRange(Player.Instance.Position, range)
-                    && hero.IsHPBarRendered))
+                heros.Where(hero => hero != null && Detect(hero) && hero.IsInRange(Player.Instance.Position, range)))
             {
                 if (Game.Time - EnterTime > cd)
                 {
@@ -131,8 +127,7 @@
                     x =>
                     x.IsInRange(Player.Instance.Position, range) && !x.IsDead && !x.IsInvulnerable && Detect(x)
                     && !x.IsMe);
-            foreach (
-                var hero in heros.Where(hero => hero != null && Game.Time - DrawDuration < cd && hero.IsHPBarRendered))
+            foreach (var hero in heros.Where(hero => hero != null && Game.Time - DrawDuration < cd))
             {
                 var c = hero.IsAlly ? Color.FromArgb(125, 0, 255, 0) : Color.FromArgb(125, 255, 0, 0);
                 Drawing.DrawLine(

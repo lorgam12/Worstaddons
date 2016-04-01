@@ -271,12 +271,11 @@
             float timer = 0;
             float i = 0;
 
-            foreach (
-                var champ in
-                    Recalls.Where(
-                        hero =>
-                        hero != null && hero.Unit.IsEnemy
-                        && !TrackMenu["DontTrack" + hero.Unit.BaseSkinName].Cast<CheckBox>().CurrentValue))
+            foreach (var champ in
+                Recalls.Where(
+                    hero =>
+                    hero != null && hero.Unit.IsEnemy
+                    && !TrackMenu["DontTrack" + hero.Unit.BaseSkinName].Cast<CheckBox>().CurrentValue))
             {
                 var hero = champ.Unit;
                 if (TrackMenu["Track"].Cast<CheckBox>().CurrentValue)

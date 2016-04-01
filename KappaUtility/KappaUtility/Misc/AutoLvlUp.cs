@@ -36,47 +36,7 @@
                     "R > W > E > Q",
                     "R > E > Q > W",
                     "R > E > W > Q"));
-            levels.OnValueChange += delegate
-                {
-                    switch (levels.Cast<ComboBox>().CurrentValue)
-                    {
-                        case 0:
-                            {
-                                LevelSet = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 3, 2, 3, 4, 3, 3 };
-                            }
-                            break;
-
-                        case 1:
-                            {
-                                LevelSet = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 2, 3, 2, 4, 2, 2 };
-                            }
-                            break;
-
-                        case 2:
-                            {
-                                LevelSet = new[] { 2, 1, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 3, 1, 3, 4, 3, 3 };
-                            }
-                            break;
-
-                        case 3:
-                            {
-                                LevelSet = new[] { 2, 3, 1, 2, 2, 4, 2, 3, 2, 3, 4, 3, 1, 3, 1, 4, 1, 1 };
-                            }
-                            break;
-
-                        case 4:
-                            {
-                                LevelSet = new[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 2, 1, 2, 4, 2, 2 };
-                            }
-                            break;
-
-                        case 5:
-                            {
-                                LevelSet = new[] { 3, 2, 1, 3, 3, 4, 3, 2, 3, 2, 4, 2, 1, 2, 1, 4, 1, 1 };
-                            }
-                            break;
-                    }
-                };
+            levels.OnValueChange += delegate { Getset(); };
             LevelMenu.AddSeparator();
             LevelMenu.AddGroupLabel("Humanizer Delay [Not Implemented yet]");
             LevelMenu.Add("min", new Slider("Min LevelUP Delay", 1000, 0, 2500));
@@ -86,6 +46,11 @@
         }
 
         internal static void loadfirstset()
+        {
+            Getset();
+        }
+
+        internal static void Getset()
         {
             switch (levels.Cast<ComboBox>().CurrentValue)
             {
