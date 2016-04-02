@@ -75,6 +75,7 @@
             FleeMenu = menuIni.AddSubMenu("Flee");
             FleeMenu.AddGroupLabel("Flee Settings");
             FleeMenu.Add("Q", new CheckBox("Use Q"));
+            FleeMenu.Add("Qgap", new CheckBox("Use Q On GapClosers"));
 
             ManaMenu = menuIni.AddSubMenu("Mana Manager");
             ManaMenu.AddGroupLabel("Harass");

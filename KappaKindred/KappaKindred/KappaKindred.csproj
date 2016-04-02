@@ -47,9 +47,12 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Evade\SpellData.cs" />
+    <Compile Include="Evade\SpellDatabase.cs" />
     <Compile Include="Events\OnBasicAttack.cs" />
     <Compile Include="Events\OnDamage.cs" />
     <Compile Include="Events\OnDraw.cs" />
+    <Compile Include="Events\OnGapcloser.cs" />
     <Compile Include="Events\OnPostAttack.cs" />
     <Compile Include="Events\OnProcessSpellCast.cs" />
     <Compile Include="Events\OnUpdate.cs" />
