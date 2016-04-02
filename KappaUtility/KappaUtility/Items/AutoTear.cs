@@ -7,6 +7,8 @@
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
 
+    using KappaUtility.Summoners;
+
     internal class AutoTear
     {
         public static readonly Item Tear = new Item(ItemId.Tear_of_the_Goddess);
@@ -63,7 +65,7 @@
                             || ((Manacs.IsOwned() || Mana.IsOwned())
                                 && TearMenu[Player.Instance.ChampionName + "mana"].Cast<CheckBox>().CurrentValue);
                 var items2 = Sera.IsOwned() || Mura.IsOwned();
-                var minions = EntityManager.MinionsAndMonsters.EnemyMinions.Where(x => !x.IsDead && !x.IsInvulnerable);
+                var minions = EntityManager.MinionsAndMonsters.EnemyMinions;
 
                 foreach (var minion in
                     minions.Where(
@@ -110,54 +112,22 @@
                        && TearMenu[Player.Instance.ChampionName + "R"].Cast<CheckBox>().CurrentValue;
             if (useQ)
             {
-                if (!target.IsValidTarget(Player.GetSpell(SpellSlot.Q).SData.CastRange))
-                {
-                    Player.CastSpell(SpellSlot.Q, Player.Instance);
-                }
-
-                if (target.IsValidTarget(Player.GetSpell(SpellSlot.Q).SData.CastRange))
-                {
-                    Player.CastSpell(SpellSlot.Q, target);
-                }
+                Player.CastSpell(SpellSlot.Q, Game.CursorPos);
             }
 
             if (useW)
             {
-                if (!target.IsValidTarget(Player.GetSpell(SpellSlot.W).SData.CastRange))
-                {
-                    Player.CastSpell(SpellSlot.W, Player.Instance);
-                }
-
-                if (target.IsValidTarget(Player.GetSpell(SpellSlot.W).SData.CastRange))
-                {
-                    Player.CastSpell(SpellSlot.W, target);
-                }
+                Player.CastSpell(SpellSlot.W, Game.CursorPos);
             }
 
             if (useE)
             {
-                if (!target.IsValidTarget(Player.GetSpell(SpellSlot.E).SData.CastRange))
-                {
-                    Player.CastSpell(SpellSlot.E, Player.Instance);
-                }
-
-                if (target.IsValidTarget(Player.GetSpell(SpellSlot.E).SData.CastRange))
-                {
-                    Player.CastSpell(SpellSlot.E, target);
-                }
+                Player.CastSpell(SpellSlot.E, Game.CursorPos);
             }
 
             if (useR)
             {
-                if (!target.IsValidTarget(Player.GetSpell(SpellSlot.R).SData.CastRange))
-                {
-                    Player.CastSpell(SpellSlot.R, Player.Instance);
-                }
-
-                if (target.IsValidTarget(Player.GetSpell(SpellSlot.R).SData.CastRange))
-                {
-                    Player.CastSpell(SpellSlot.R, target);
-                }
+                Player.CastSpell(SpellSlot.R, Game.CursorPos);
             }
         }
     }
