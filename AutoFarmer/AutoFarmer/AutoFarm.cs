@@ -40,8 +40,14 @@
 
             Lh = MenuIni.AddSubMenu("LastHit ", "LastHit");
             Lh.AddGroupLabel("LastHit Settings");
-            Lh.Add(Player.ChampionName + "Enable", new KeyBind("Enable LastHit Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
-            Lh.Add(Player.ChampionName + "Enableactive", new KeyBind("Enable LastHit Active", false, KeyBind.BindTypes.HoldActive));
+            Lh.Add(
+                Player.ChampionName + "Enable",
+                new KeyBind("Enable LastHit Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
+            Lh.Add(
+                Player.ChampionName + "Enableactive",
+                new KeyBind("Enable LastHit Active", false, KeyBind.BindTypes.HoldActive));
+            Lh.Add(Player.ChampionName + "combo", new CheckBox("Disable When Combo is active "));
+            Lh.Add(Player.ChampionName + "harass", new CheckBox("Disable When Harass is active "));
             Lh.AddSeparator();
             Lh.AddGroupLabel("Spells Settings");
             Lh.Add(Player.ChampionName + "Qmode", new ComboBox("Q Mode", 0, "UnKillable Minions", "LastHit"));
@@ -61,6 +67,8 @@
             Lc.Add(
                 Player.ChampionName + "Enableactive",
                 new KeyBind("Enable LaneClear Active", false, KeyBind.BindTypes.HoldActive));
+            Lc.Add(Player.ChampionName + "combo", new CheckBox("Disable When Combo is active "));
+            Lc.Add(Player.ChampionName + "harass", new CheckBox("Disable When Harass is active "));
             Lc.AddSeparator();
             Lc.AddGroupLabel("Spells Settings");
             Lc.Add(Player.ChampionName + "Qmode", new ComboBox("Q Mode", 0, "OnAfterAttack", "Always"));
@@ -99,11 +107,36 @@
             if (Lc[Player.ChampionName + "Enable"].Cast<KeyBind>().CurrentValue
                 || Lc[Player.ChampionName + "Enableactive"].Cast<KeyBind>().CurrentValue)
             {
+                if (Lc[Player.ChampionName + "combo"].Cast<CheckBox>().CurrentValue
+                    && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                {
+                    return;
+                }
+
+                if (Lc[Player.ChampionName + "harass"].Cast<CheckBox>().CurrentValue
+                    && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                {
+                    return;
+                }
+
                 LaneClear.Clear();
             }
+
             if (Lh[Player.ChampionName + "Enable"].Cast<KeyBind>().CurrentValue
                 || Lh[Player.ChampionName + "Enableactive"].Cast<KeyBind>().CurrentValue)
             {
+                if (Lh[Player.ChampionName + "combo"].Cast<CheckBox>().CurrentValue
+                    && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                {
+                    return;
+                }
+
+                if (Lh[Player.ChampionName + "harass"].Cast<CheckBox>().CurrentValue
+                    && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                {
+                    return;
+                }
+
                 LastHit.Last();
             }
         }

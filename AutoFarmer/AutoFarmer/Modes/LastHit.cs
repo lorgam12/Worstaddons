@@ -22,7 +22,8 @@
                 if (AutoFarm.Lh.Get<ComboBox>(AutoFarm.Player.ChampionName + "Qmode").CurrentValue == 1
                     && AutoFarm.Lh[AutoFarm.Player.ChampionName + "Q"].Cast<CheckBox>().CurrentValue
                     && Player.Instance.ManaPercent
-                    >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "Q"].Cast<Slider>().CurrentValue && Spells.Q.IsReady())
+                    >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "Q"].Cast<Slider>().CurrentValue
+                    && Spells.Q.IsReady())
                 {
                     if (Spells.QisToggle || Spells.QisDash || Spells.QisCc || Spells.Q == null)
                     {
@@ -74,7 +75,8 @@
                 if (AutoFarm.Lh.Get<ComboBox>(AutoFarm.Player.ChampionName + "Wmode").CurrentValue == 1
                     && AutoFarm.Lh[AutoFarm.Player.ChampionName + "W"].Cast<CheckBox>().CurrentValue
                     && Player.Instance.ManaPercent
-                    >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "W"].Cast<Slider>().CurrentValue && Spells.W.IsReady())
+                    >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "W"].Cast<Slider>().CurrentValue
+                    && Spells.W.IsReady())
                 {
                     if (Spells.WisToggle || Spells.WisDash || Spells.WisCc || Spells.W == null)
                     {
@@ -133,7 +135,8 @@
                 if (AutoFarm.Lh.Get<ComboBox>(AutoFarm.Player.ChampionName + "Emode").CurrentValue == 1
                     && AutoFarm.Lh[AutoFarm.Player.ChampionName + "E"].Cast<CheckBox>().CurrentValue
                     && Player.Instance.ManaPercent
-                    >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "E"].Cast<Slider>().CurrentValue && Spells.E.IsReady())
+                    >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "E"].Cast<Slider>().CurrentValue
+                    && Spells.E.IsReady())
                 {
                     if (Spells.EisToggle || Spells.EisDash || Spells.EisCc || Spells.E == null)
                     {
@@ -262,7 +265,8 @@
             {
                 if (AutoFarm.Lh.Get<ComboBox>(AutoFarm.Player.ChampionName + "Qmode").CurrentValue == 0
                     && AutoFarm.Lh[AutoFarm.Player.ChampionName + "Q"].Cast<CheckBox>().CurrentValue
-                    && Player.Instance.ManaPercent >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "Q"].Cast<Slider>().CurrentValue
+                    && Player.Instance.ManaPercent
+                    >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "Q"].Cast<Slider>().CurrentValue
                     && Spells.Q.IsReady())
                 {
                     if (Spells.QisToggle || Spells.QisDash || Spells.QisCc || Spells.Q == null)
@@ -314,7 +318,8 @@
 
                 if (AutoFarm.Lh.Get<ComboBox>(AutoFarm.Player.ChampionName + "Wmode").CurrentValue == 0
                     && AutoFarm.Lh[AutoFarm.Player.ChampionName + "W"].Cast<CheckBox>().CurrentValue
-                    && Player.Instance.ManaPercent >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "W"].Cast<Slider>().CurrentValue
+                    && Player.Instance.ManaPercent
+                    >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "W"].Cast<Slider>().CurrentValue
                     && Spells.W.IsReady())
                 {
                     if (Spells.WisToggle || Spells.WisDash || Spells.WisCc || Spells.W == null)
@@ -322,7 +327,8 @@
                         return;
                     }
                     if (ObjectManager.Player.GetSpellDamage(target, SpellSlot.W)
-                        > Prediction.Health.GetPrediction(target, (int)(Spells.W.CastDelay)) && Spells.W.IsInRange(target))
+                        > Prediction.Health.GetPrediction(target, (int)(Spells.W.CastDelay))
+                        && Spells.W.IsInRange(target))
                     {
                         if (Spells.W.GetType() == typeof(Spell.Skillshot))
                         {
@@ -372,7 +378,8 @@
 
                 if (AutoFarm.Lh.Get<ComboBox>(AutoFarm.Player.ChampionName + "Emode").CurrentValue == 0
                     && AutoFarm.Lh[AutoFarm.Player.ChampionName + "E"].Cast<CheckBox>().CurrentValue
-                    && Player.Instance.ManaPercent >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "E"].Cast<Slider>().CurrentValue
+                    && Player.Instance.ManaPercent
+                    >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "E"].Cast<Slider>().CurrentValue
                     && Spells.E.IsReady())
                 {
                     if (Spells.EisToggle || Spells.EisDash || Spells.EisCc || Spells.E == null)
@@ -431,7 +438,8 @@
 
                 if (AutoFarm.Lh.Get<ComboBox>(AutoFarm.Player.ChampionName + "Rmode").CurrentValue == 0
                     && AutoFarm.Lh[AutoFarm.Player.ChampionName + "R"].Cast<CheckBox>().CurrentValue
-                    && Player.Instance.ManaPercent >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "R"].Cast<Slider>().CurrentValue)
+                    && Player.Instance.ManaPercent
+                    >= AutoFarm.ManaMenu[AutoFarm.Player.ChampionName + "R"].Cast<Slider>().CurrentValue)
                 {
                     if (Spells.RisToggle || Spells.RisDash || Spells.RisCc || Spells.R == null)
                     {
