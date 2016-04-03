@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Khappa_Zix
+﻿namespace Khappa_Zix.Load
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Enumerations;
     using EloBuddy.SDK.Events;
     using EloBuddy.SDK.Rendering;
 
-    using Modes;
+    using Khappa_Zix.Modes;
 
     using SharpDX;
 
-    class Load
+    internal class Load
     {
         public static Spell.Targeted Q { get; private set; }
 
@@ -34,8 +34,7 @@ namespace Khappa_Zix
 
         internal static bool EvolvedQ, EvolvedW, EvolvedE, EvolvedR;
 
-
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += Loading_OnLoadingComplete;
         }
@@ -67,7 +66,13 @@ namespace Khappa_Zix
 
         internal static bool IsIsolated(Obj_AI_Base target)
         {
-            return !ObjectManager.Get<Obj_AI_Base>().Any(x => x.NetworkId != target.NetworkId && x.Team == target.Team && x.Distance(target) <= 500 && (x.Type == GameObjectType.AIHeroClient || x.Type == GameObjectType.obj_AI_Minion || x.Type == GameObjectType.obj_AI_Turret));
+            return
+                !ObjectManager.Get<Obj_AI_Base>()
+                     .Any(
+                         x =>
+                         x.NetworkId != target.NetworkId && x.Team == target.Team && x.Distance(target) <= 500
+                         && (x.Type == GameObjectType.AIHeroClient || x.Type == GameObjectType.obj_AI_Minion
+                             || x.Type == GameObjectType.obj_AI_Turret));
         }
 
         internal List<AIHeroClient> GetIsolatedTargets()
@@ -75,12 +80,16 @@ namespace Khappa_Zix
             var validtargets = HeroList.Where(h => h.IsValidTarget(E.Range) && IsIsolated(h)).ToList();
             return validtargets;
         }
-        
+
         internal static double GetQDamage(Obj_AI_Base target)
         {
             if (Q.Range < 326)
             {
-                return 0.984 * player.GetSpellDamage(target, SpellSlot.Q, (DamageLibrary.SpellStages)(IsIsolated(target) ? 1 : 0));
+                return 0.984
+                       * player.GetSpellDamage(
+                           target,
+                           SpellSlot.Q,
+                           (DamageLibrary.SpellStages)(IsIsolated(target) ? 1 : 0));
             }
 
             if (Q.Range > 325)

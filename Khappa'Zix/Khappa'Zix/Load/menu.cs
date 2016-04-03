@@ -1,9 +1,9 @@
-﻿namespace Khappa_Zix
+﻿namespace Khappa_Zix.Load
 {
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
 
-    class menu
+    internal class menu
     {
         public static Menu MenuIni, Combo, HarassMenu, Clear, Jump, Draw;
 

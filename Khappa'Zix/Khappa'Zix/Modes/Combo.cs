@@ -7,6 +7,8 @@
     using EloBuddy.SDK.Enumerations;
     using EloBuddy.SDK.Menu.Values;
 
+    using Khappa_Zix.Load;
+
     internal class Combo
     {
         public static HitChance hitchance;
@@ -41,11 +43,14 @@
             }
             var target =
                 EntityManager.Heroes.Enemies.FirstOrDefault(
-                    x => x.IsValidTarget(Load.W.Range) && !x.IsZombie && !x.IsInvulnerable && !x.HasBuffOfType(BuffType.PhysicalImmunity));
+                    x =>
+                    x.IsValidTarget(Load.W.Range) && !x.IsZombie && !x.IsInvulnerable
+                    && !x.HasBuffOfType(BuffType.PhysicalImmunity));
 
             if (target != null)
             {
-                if (doubleJump && target.IsValidTarget(Load.Q.Range) && (Load.GetQDamage(target) >= target.Health
+                if (doubleJump && target.IsValidTarget(Load.Q.Range)
+                    && (Load.GetQDamage(target) >= target.Health
                         || Player.Instance.GetSpellDamage(target, SpellSlot.W) >= target.Health))
                 {
                     return;

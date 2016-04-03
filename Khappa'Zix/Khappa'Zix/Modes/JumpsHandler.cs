@@ -7,6 +7,8 @@
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu.Values;
 
+    using Khappa_Zix.Load;
+
     using SharpDX;
 
     internal class JumpsHandler
@@ -41,7 +43,7 @@
             }
 
             if (!firstjump && collFlags != CollisionFlags.Wall)
-            {   
+            {
                 return Player.Instance.ServerPosition.Extend(bases.Position, Load.E.Range).To3D();
             }
 
@@ -75,13 +77,13 @@
                         Chat.Print("first jump");
                         Core.DelayAction(
                             () =>
-                            {
-                                Jumppoint2 = GetJumpPoint(checkQKillable, false);
-                                Load.E.Cast(Jumppoint2);
-                                Chat.Print("second jump");
+                                {
+                                    Jumppoint2 = GetJumpPoint(checkQKillable, false);
+                                    Load.E.Cast(Jumppoint2);
+                                    Chat.Print("second jump");
 
-                                Jumping = false;
-                            },
+                                    Jumping = false;
+                                },
                             Edelay + Game.Ping);
                     }
                 }
