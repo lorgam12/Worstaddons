@@ -11,8 +11,6 @@
     {
         public static Spell.Active Cleanse;
 
-        public static bool Cleaned;
-
         protected static readonly Item Mercurial_Scimitar = new Item(ItemId.Mercurial_Scimitar);
 
         protected static readonly Item Quicksilver_Sash = new Item(ItemId.Quicksilver_Sash);
@@ -118,7 +116,6 @@
                     if (debuff && Player.Instance.HealthPercent <= hp
                         && enemys >= Player.Instance.Position.CountEnemiesInRange(enemysrange))
                     {
-                        Cleaned = false;
                         Core.DelayAction(QssCast, delay);
                     }
                 }
@@ -127,26 +124,23 @@
 
         public static void QssCast()
         {
-            if (Cleaned == false)
-            {
                 if (Quicksilver_Sash.IsOwned() && Quicksilver_Sash.IsReady()
                     && QssMenu["Quicksilver"].Cast<CheckBox>().CurrentValue)
                 {
                     Quicksilver_Sash.Cast();
-                    Cleaned = true;
                 }
 
                 if (Mercurial_Scimitar.IsOwned() && Mercurial_Scimitar.IsReady()
                     && QssMenu["Mercurial"].Cast<CheckBox>().CurrentValue)
                 {
                     Mercurial_Scimitar.Cast();
-                    Cleaned = true;
                 }
 
-                if (QssMenu["Cleanse"].Cast<CheckBox>().CurrentValue && Cleanse.IsReady() && Cleanse != null)
+            if (Cleanse != null)
+            {
+                if (QssMenu["Cleanse"].Cast<CheckBox>().CurrentValue && Cleanse.IsReady())
                 {
                     Cleanse.Cast();
-                    Cleaned = true;
                 }
             }
         }

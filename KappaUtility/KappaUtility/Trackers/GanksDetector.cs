@@ -17,7 +17,9 @@
 
         private static float EnterTime;
 
-        private static int LastPing;
+        private static float Allypingtimer;
+
+        private static float Enemypingtimer;
 
         public static Menu GankMenu { get; private set; }
 
@@ -65,8 +67,8 @@
                 EntityManager.Heroes.AllHeroes.Where(
                     x =>
                     x.IsInRange(Player.Instance.Position, range) && !x.IsDead && !x.IsInvulnerable && Detect(x)
-                    && !x.IsMe);
-            foreach (var hero in heros.Where(hero => hero != null && Game.Time - DrawDuration < cd))
+                    && !x.IsMe && Game.Time - DrawDuration < cd);
+            foreach (var hero in heros.Where(hero => hero != null))
             {
                 var c = hero.IsAlly ? Color.FromArgb(125, 0, 255, 0) : Color.FromArgb(125, 255, 0, 0);
                 Drawing.DrawLine(
@@ -95,17 +97,30 @@
                 if (Game.Time - EnterTime > cd)
                 {
                     DrawDuration = Game.Time;
-                    if (GankMenu["ping"].Cast<CheckBox>().CurrentValue)
+                    if (hero.IsAlly)
                     {
-                        if (hero.IsAlly)
+                        if (GankMenu["ping"].Cast<CheckBox>().CurrentValue)
                         {
-                            TacticalMap.ShowPing(PingCategory.OnMyWay, hero, true);
+                            if (Game.Time - Allypingtimer > cd)
+                            {
+                                TacticalMap.ShowPing(PingCategory.OnMyWay, hero, true);
+                            }
                         }
 
-                        if (hero.IsEnemy)
+                        Allypingtimer = Game.Time;
+                    }
+
+                    if (hero.IsEnemy)
+                    {
+                        if (GankMenu["ping"].Cast<CheckBox>().CurrentValue)
                         {
-                            TacticalMap.ShowPing(PingCategory.Danger, hero, true);
+                            if (Game.Time - Enemypingtimer > cd)
+                            {
+                                TacticalMap.ShowPing(PingCategory.Danger, hero, true);
+                            }
                         }
+
+                        Enemypingtimer = Game.Time;
                     }
                 }
 
@@ -126,8 +141,8 @@
                 EntityManager.Heroes.AllHeroes.Where(
                     x =>
                     x.IsInRange(Player.Instance.Position, range) && !x.IsDead && !x.IsInvulnerable && Detect(x)
-                    && !x.IsMe);
-            foreach (var hero in heros.Where(hero => hero != null && Game.Time - DrawDuration < cd))
+                    && Game.Time - DrawDuration < cd && !x.IsMe);
+            foreach (var hero in heros.Where(hero => hero != null))
             {
                 var c = hero.IsAlly ? Color.FromArgb(125, 0, 255, 0) : Color.FromArgb(125, 255, 0, 0);
                 Drawing.DrawLine(

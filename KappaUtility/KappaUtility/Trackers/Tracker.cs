@@ -366,7 +366,7 @@
                             if (champ.Status == RecallStatus.Active && (int)(recallpercent * 100) != 100)
                             {
                                 Drawing.DrawText(
-                                    (Drawing.Width * 0.23f) + (trackx * 20),
+                                    (Drawing.Width * 0.22f) + (trackx * 20),
                                     (Drawing.Height * 0.1f) + (tracky * 10) + i,
                                     color,
                                     "Recalling " + (int)(recallpercent * 100) + "%");
@@ -375,7 +375,7 @@
                             if (champ.Status == RecallStatus.Finished)
                             {
                                 Drawing.DrawText(
-                                    (Drawing.Width * 0.23f) + (trackx * 20),
+                                    (Drawing.Width * 0.22f) + (trackx * 20),
                                     (Drawing.Height * 0.1f) + (tracky * 10) + i,
                                     color,
                                     "Recall Finished ");
@@ -384,7 +384,7 @@
                             if (champ.Status == RecallStatus.Abort && (int)(recallpercent * 100) != 100)
                             {
                                 Drawing.DrawText(
-                                    (Drawing.Width * 0.23f) + (trackx * 20),
+                                    (Drawing.Width * 0.22f) + (trackx * 20),
                                     (Drawing.Height * 0.1f) + (tracky * 10) + i,
                                     color,
                                     "Recall Aborted ");
@@ -403,10 +403,11 @@
                     continue;
                 }
                 timer += hero.Position.Distance(hero.Path.LastOrDefault()) / hero.MoveSpeed;
-                if (timer > 5000)
+                if ((int)timer > 500 || hero.IsDead)
                 {
                     return;
                 }
+
                 Drawing.DrawLine(
                     hero.Position.WorldToScreen(),
                     hero.Path.LastOrDefault().WorldToScreen(),
