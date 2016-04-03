@@ -22,14 +22,13 @@
             Combo.AddSeparator();
             Combo.AddGroupLabel("E Settings");
             Combo.Add("dis", new Slider("Use if Distance to target is > {0}", 400, 0, 850));
-            Combo.Add("delay", new Slider("2nd E Delay {0}", 150, 0, 300));
             Combo.AddSeparator();
             Combo.AddGroupLabel("Extra Settings");
             Combo.Add("hitchance", new ComboBox("HitChance", 0, "High", "Medium", "Low"));
 
-            Combo = MenuIni.AddSubMenu("DoubleJump ", "DoubleJump");
+            Jump = MenuIni.AddSubMenu("DoubleJump ", "DoubleJump");
             Jump.AddGroupLabel("E Settings");
-            Combo.Add("double", new CheckBox("Use E DoubleJump"));
+            Jump.Add("double", new CheckBox("Use E DoubleJump"));
             Jump.Add("delay", new Slider("2nd E Delay {0}", 150, 0, 300));
 
             Draw = MenuIni.AddSubMenu("Drawings ", "Drawings");
