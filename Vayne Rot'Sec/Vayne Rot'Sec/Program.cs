@@ -92,7 +92,7 @@ namespace Vayne_Rot_Sec
                                 ZZrot.Cast(
                                     Target.Position.To2D().Extend(Player.Instance.ServerPosition.To2D(), -100).To3D());
                             },
-                        100);
+                        RotSec["delay"].Cast<Slider>().CurrentValue);
                 }
             }
         }
