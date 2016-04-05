@@ -19,6 +19,41 @@
 
         public static readonly Item Biscuit = new Item((int)ItemId.Total_Biscuit_of_Rejuvenation);
 
+        public static int Corruptingh => PotMenu["CPH"].Cast<Slider>().CurrentValue;
+
+        public static int Healthh => PotMenu["HPH"].Cast<Slider>().CurrentValue;
+
+        public static int Huntersh => PotMenu["HPSH"].Cast<Slider>().CurrentValue;
+
+        public static int Refillableh => PotMenu["RPH"].Cast<Slider>().CurrentValue;
+
+        public static int Biscuith => PotMenu["BPH"].Cast<Slider>().CurrentValue;
+
+        public static bool Corruptingc
+            =>
+                PotMenu["CP"].Cast<CheckBox>().CurrentValue && Potions.Corrupting.IsOwned()
+                && Corrupting.IsReady();
+
+        public static bool Healthc
+            =>
+                PotMenu["HP"].Cast<CheckBox>().CurrentValue && Health.IsOwned()
+                && Health.IsReady();
+
+        public static bool Huntersc
+            =>
+                PotMenu["HPS"].Cast<CheckBox>().CurrentValue && Hunters.IsOwned()
+                && Hunters.IsReady();
+
+        public static bool Refillablec
+            =>
+                PotMenu["RP"].Cast<CheckBox>().CurrentValue && Refillable.IsOwned()
+                && Refillable.IsReady();
+
+        public static bool Biscuitc
+            =>
+                PotMenu["BP"].Cast<CheckBox>().CurrentValue && Biscuit.IsOwned()
+                && Biscuit.IsReady();
+
         internal static void OnLoad()
         {
             PotMenu = Load.UtliMenu.AddSubMenu("Potions");

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
 
     using EloBuddy;
@@ -32,16 +31,21 @@
         internal static void OnLoad()
         {
             TrackMenu = Load.UtliMenu.AddSubMenu("Tracker");
-            TrackMenu.AddGroupLabel("Surrender Tracker");
-            TrackMenu.Add("Trackally", new CheckBox("Track Allies Surrender", false));
-            TrackMenu.Add("Trackenemy", new CheckBox("Track Enemies Surrender", false));
-            TrackMenu.AddSeparator();
             TrackMenu.AddGroupLabel("Tracker Settings");
             TrackMenu.Add("Track", new CheckBox("Track Enemies Status", false));
             TrackMenu.Add("trackrecalls", new CheckBox("Track Enemies Recalls", false));
             TrackMenu.Add("Tracktraps", new CheckBox("Track Enemy Traps [BETA]", false));
             TrackMenu.Add("Trackping", new CheckBox("Ping On Killable Enemies (Local)", false));
             TrackMenu.Add("Trackway", new CheckBox("Track Enemy WayPoints", false));
+            TrackMenu.AddSeparator();
+            TrackMenu.AddGroupLabel("Surrender Tracker");
+            TrackMenu.Add("Trackally", new CheckBox("Track Allies Surrender", false));
+            TrackMenu.Add("Trackenemy", new CheckBox("Track Enemies Surrender", false));
+            TrackMenu.Add("Distance", new Slider("WayPoints Detection Range", 1000, 0, 5000));
+            TrackMenu.AddSeparator();
+            TrackMenu.AddGroupLabel("Drawings Settings");
+            TrackMenu.Add("trackx", new Slider("Tracker Position X", 0, 0, 100));
+            TrackMenu.Add("tracky", new Slider("Tracker Position Y", 0, 0, 100));
             TrackMenu.AddSeparator();
             TrackMenu.AddGroupLabel("Don't Track:");
             foreach (var enemy in ObjectManager.Get<AIHeroClient>())
@@ -53,21 +57,12 @@
                 }
             }
 
-            TrackMenu.Add("Distance", new Slider("WayPoints Detection Range", 1000, 0, 5000));
-            TrackMenu.AddGroupLabel("Draw" + "ings Settings");
-            TrackMenu.Add("trackx", new Slider("Tracker Position X", 0, 0, 100));
-            TrackMenu.Add("tracky", new Slider("Tracker Position Y", 0, 0, 100));
-
             foreach (var hero in ObjectManager.Get<AIHeroClient>())
             {
                 Recalls.Add(new Recall(hero, RecallStatus.Inactive));
             }
 
             Teleport.OnTeleport += OnTeleport;
-        }
-
-        internal static void OnUpdate()
-        {
         }
 
         public static void track()
@@ -137,75 +132,6 @@
             }
 
             return (int)damage;
-        }
-
-        internal static void Traps()
-        {
-            if (!TrackMenu["Tracktraps"].Cast<CheckBox>().CurrentValue)
-            {
-                return;
-            }
-
-            var traps = ObjectManager.Get<Obj_AI_Minion>();
-            {
-                foreach (var trap in traps.Where(trap => trap != null))
-                {
-                    switch (trap.Name)
-                    {
-                        case "Cupcake Trap":
-                            Drawing.DrawText(
-                                Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
-                                Color.White,
-                                "Caitlyn Trap",
-                                2);
-                            Circle.Draw(SharpDX.Color.Purple, trap.BoundingRadius + 10, trap.Position);
-                            break;
-
-                        case "Noxious Trap":
-                            if (trap.BaseSkinName == "NidaleeSpear")
-                            {
-                                var endTime = Math.Max(0, -Game.Time + 120);
-                                Drawing.DrawText(
-                                    Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
-                                    Color.White,
-                                    "Nidalee Trap",
-                                    2);
-                                Circle.Draw(SharpDX.Color.Green, trap.BoundingRadius + 25, trap.Position);
-                            }
-
-                            if (trap.BaseSkinName == "TeemoMushroom")
-                            {
-                                if (trap.GetBuff("BantamTrap") != null)
-                                {
-                                    var endTime = Math.Max(0, trap.GetBuff("BantamTrap").EndTime - Game.Time);
-                                    Drawing.DrawText(
-                                        Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
-                                        Color.White,
-                                        "Teemo Mushroom Expire: "
-                                        + Convert.ToString(endTime, CultureInfo.InstalledUICulture),
-                                        2);
-                                }
-
-                                Circle.Draw(SharpDX.Color.Green, trap.BoundingRadius * 3, trap.Position);
-                            }
-                            break;
-
-                        case "Jack In The Box":
-                            if (trap.GetBuff("JackInTheBox") != null)
-                            {
-                                var endTime = Math.Max(0, trap.GetBuff("JackInTheBox").EndTime - Game.Time);
-                                Drawing.DrawText(
-                                    Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
-                                    Color.White,
-                                    "Shaco Box Expire: " + Convert.ToString(endTime, CultureInfo.InvariantCulture),
-                                    2);
-                            }
-
-                            Circle.Draw(SharpDX.Color.Green, trap.BoundingRadius * 15, trap.Position);
-                            break;
-                    }
-                }
-            }
         }
 
         private static void OnTeleport(Obj_AI_Base sender, Teleport.TeleportEventArgs args)

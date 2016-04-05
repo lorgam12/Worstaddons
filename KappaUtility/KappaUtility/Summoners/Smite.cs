@@ -6,6 +6,8 @@
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu.Values;
 
+    using Common;
+
     internal class Smite
     {
         public static void Smiteopepi()
@@ -15,7 +17,7 @@
                     || Spells.SummMenu[Player.Instance.ChampionName + "EnableSmite"].Cast<KeyBind>().CurrentValue))
             {
                 var smitemob = Spells.SummMenu["smitemob"].Cast<CheckBox>().CurrentValue && Spells.Smite.IsReady();
-                var smitecombo = Spells.SummMenu["smitecombo"].Cast<CheckBox>().CurrentValue && Spells.Smite.IsReady();
+                var smitecombo = Spells.SummMenu["smitecombo"].Cast<CheckBox>().CurrentValue && Spells.Smite.IsReady() && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo);
                 var smiteks = Spells.SummMenu["smiteks"].Cast<CheckBox>().CurrentValue && Spells.Smite.IsReady();
 
                 foreach (var mob in
@@ -23,7 +25,7 @@
                         .Where(
                             jmob =>
                             !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsHPBarRendered && jmob.IsMonster
-                            && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie
+                            && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie && jmob.IsKillable()
                             && ((Spells.SummMenu["drake"].Cast<CheckBox>().CurrentValue
                                  && jmob.BaseSkinName == "SRU_Dragon")
                                 || (Spells.SummMenu["baron"].Cast<CheckBox>().CurrentValue
@@ -65,7 +67,7 @@
                         Spells.Smite.Cast(target);
                     }
 
-                    if (smiteks
+                    if (smiteks && target.IsKillable()
                         && Player.Instance.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Smite)
                         > target.TotalShieldHealth())
                     {

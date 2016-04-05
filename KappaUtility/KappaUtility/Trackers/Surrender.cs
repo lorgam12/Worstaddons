@@ -23,12 +23,12 @@
             {
                 if (args.Type == SurrenderVoteType.Yes)
                 {
-                    Chat.Print("[Ally] " + sender.BaseSkinName + " Voted Yes On Surrender");
+                    Chat.Print("[Ally] ", System.Drawing.Color.Green + sender.BaseSkinName + " Voted Yes On Surrender");
                 }
 
                 if (args.Type == SurrenderVoteType.No)
                 {
-                    Chat.Print("[Ally] " + sender.BaseSkinName + " Voted No On Surrender");
+                    Chat.Print("[Ally] ", System.Drawing.Color.Green + sender.BaseSkinName + " Voted No On Surrender");
                 }
             }
 
@@ -36,12 +36,12 @@
             {
                 if (args.Type == SurrenderVoteType.Yes)
                 {
-                    Chat.Print("[Enemy] " + sender.BaseSkinName + " Voted Yes On Surrender");
+                    Chat.Print("[Enemy] ", System.Drawing.Color.Red + sender.BaseSkinName + " Voted Yes On Surrender");
                 }
 
                 if (args.Type == SurrenderVoteType.No)
                 {
-                    Chat.Print("[Enemy] " + sender.BaseSkinName + " Voted No On Surrender");
+                    Chat.Print("[Enemy] ", System.Drawing.Color.Red + sender.BaseSkinName + " Voted No On Surrender");
                 }
             }
         }

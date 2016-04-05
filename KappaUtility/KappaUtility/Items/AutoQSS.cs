@@ -124,17 +124,17 @@
 
         public static void QssCast()
         {
-                if (Quicksilver_Sash.IsOwned() && Quicksilver_Sash.IsReady()
-                    && QssMenu["Quicksilver"].Cast<CheckBox>().CurrentValue)
-                {
-                    Quicksilver_Sash.Cast();
-                }
+            if (Quicksilver_Sash.IsOwned() && Quicksilver_Sash.IsReady()
+                && QssMenu["Quicksilver"].Cast<CheckBox>().CurrentValue)
+            {
+                Quicksilver_Sash.Cast();
+            }
 
-                if (Mercurial_Scimitar.IsOwned() && Mercurial_Scimitar.IsReady()
-                    && QssMenu["Mercurial"].Cast<CheckBox>().CurrentValue)
-                {
-                    Mercurial_Scimitar.Cast();
-                }
+            if (Mercurial_Scimitar.IsOwned() && Mercurial_Scimitar.IsReady()
+                && QssMenu["Mercurial"].Cast<CheckBox>().CurrentValue)
+            {
+                Mercurial_Scimitar.Cast();
+            }
 
             if (Cleanse != null)
             {

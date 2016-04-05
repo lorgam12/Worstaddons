@@ -8,6 +8,8 @@
     using EloBuddy.SDK.Menu.Values;
     using EloBuddy.SDK.Rendering;
 
+    using KappaUtility.Common;
+
     using SharpDX;
 
     internal class Spells
@@ -155,7 +157,15 @@
                 SummMenu.Add("crab", new CheckBox(" Crab "));
                 SummMenu.Add("murkwolf", new CheckBox(" Murkwolf "));
                 SummMenu.AddSeparator();
-                Smite = new Spell.Targeted(Player.Instance.GetSpellSlotFromName("SummonerSmite"), 500);
+                if (Player.Instance.Spellbook.GetSpell(SpellSlot.Summoner1).Name.ToLower().Contains("summonersmite"))
+                {
+                    Smite = new Spell.Targeted(SpellSlot.Summoner1, 555);
+                }
+
+                if (Player.Instance.Spellbook.GetSpell(SpellSlot.Summoner2).Name.ToLower().Contains("summonersmite"))
+                {
+                    Smite = new Spell.Targeted(SpellSlot.Summoner2, 555);
+                }
             }
         }
 
@@ -207,7 +217,7 @@
         {
             var target =
                 ObjectManager.Get<AIHeroClient>()
-                    .FirstOrDefault(enemy => enemy.IsValid && enemy.IsEnemy && enemy.IsVisible);
+                    .FirstOrDefault(enemy => enemy.IsValid && enemy.IsEnemy && enemy.IsVisible && !enemy.IsDead && enemy.IsKillable());
 
             var ally = ObjectManager.Get<AIHeroClient>().FirstOrDefault(a => a.IsValid && a.IsAlly && a.IsVisible);
 
@@ -222,7 +232,7 @@
                     && Player.Instance.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
                     >= target.TotalShieldHealth() + (target.HPRegenRate * 3))
                 {
-                    if (target.IsValidTarget(Ignite.Range) && !target.IsDead
+                    if (target.IsValidTarget(Ignite.Range)
                         && !SummMenu["DontIgnite" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                     {
                         Ignite.Cast(target);
