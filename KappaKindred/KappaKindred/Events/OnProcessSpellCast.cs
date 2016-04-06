@@ -30,17 +30,22 @@
                 return;
             }
 
-            if (target.IsValidTarget(Spells.R.Range) && Rally)
+            if (!Player.Instance.IsInRange(target, Spells.R.Range))
+            {
+                return;
+            }
+
+            if (!target.IsValidTarget(Spells.R.Range) && Rally)
             {
                 if (target.HealthPercent <= Rallyh)
                 {
-                    Spells.R.Cast(target);
+                    Spells.R.Cast();
                 }
 
                 if (caster.BaseAttackDamage >= target.TotalShieldHealth()
                     || caster.BaseAbilityDamage >= target.TotalShieldHealth())
                 {
-                    Spells.R.Cast(target);
+                    Spells.R.Cast();
                 }
             }
         }

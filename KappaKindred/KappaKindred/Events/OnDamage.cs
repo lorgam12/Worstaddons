@@ -30,12 +30,14 @@
                 return;
             }
 
-            if (target.IsValidTarget(Spells.R.Range))
+            if (!Player.Instance.IsInRange(target, Spells.R.Range))
             {
-                if (Rally && target.HealthPercent <= Rallyh)
-                {
-                    Spells.R.Cast(target);
-                }
+                return;
+            }
+
+            if (Rally && target.HealthPercent <= Rallyh)
+            {
+                Spells.R.Cast();
             }
         }
     }

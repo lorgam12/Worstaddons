@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Evade\SpellData.cs" />
     <Compile Include="Evade\SpellDatabase.cs" />
+    <Compile Include="Evade\SpellType.cs" />
     <Compile Include="Events\OnBasicAttack.cs" />
     <Compile Include="Events\OnDamage.cs" />
     <Compile Include="Events\OnDraw.cs" />

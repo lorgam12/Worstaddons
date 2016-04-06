@@ -30,16 +30,20 @@
                 return;
             }
 
-            if (target.IsValidTarget(Spells.R.Range) && Rally)
+            if (!Player.Instance.IsInRange(target, Spells.R.Range))
+            {
+                return;
+            }
+            if (Rally)
             {
                 if (target.HealthPercent <= Rallyh)
                 {
-                    Spells.R.Cast(target);
+                    Spells.R.Cast();
                 }
 
                 if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
                 {
-                    Spells.R.Cast(target);
+                    Spells.R.Cast();
                 }
             }
         }
