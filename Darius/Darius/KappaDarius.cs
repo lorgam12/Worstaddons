@@ -20,6 +20,8 @@
     {
         public const string ChampName = "Darius";
 
+        public static int passiveCounter;
+
         public static readonly Item Hydra = new Item(ItemId.Ravenous_Hydra_Melee_Only, 250f);
 
         public static readonly Item Titanic = new Item(ItemId.Titanic_Hydra, Player.Instance.GetAutoAttackRange());
@@ -60,8 +62,6 @@
 
         public static Spell.Targeted Ignite;
 
-        private static readonly AIHeroClient player = ObjectManager.Player;
-
         public static HpBarIndicator Hpi = new HpBarIndicator();
 
         private static void Main(string[] args)
@@ -71,7 +71,7 @@
 
         private static void OnLoad(EventArgs args)
         {
-            if (player.ChampionName != ChampName)
+            if (Player.Instance.ChampionName != ChampName)
             {
                 return;
             }
@@ -97,6 +97,7 @@
             QMenu.AddGroupLabel("Extra Settings");
             QMenu.Add("QE", new CheckBox("Always Q Before E", false));
             QMenu.Add("Stick", new CheckBox("Stick to Target while Casting Q"));
+            QMenu.Add("QAA", new CheckBox("No Q If can AA", false));
             QMenu.Add("range", new CheckBox("Dont Cast Q when Enemy in AA range", false));
             QMenu.Add("Flee", new CheckBox("Q On Flee (Ignores Stick to target)"));
             QMenu.Add("QFlee", new Slider("Cast Q flee When HP is below %", 90, 0, 100));
@@ -125,6 +126,7 @@
             RMenu.Add("count", new Slider("Cast R On Stacks >=", 5, 0, 5));
             RMenu.Add("SaveR", new CheckBox("Dont Ult if target killable with AA", false));
             RMenu.Add("SR", new Slider("Dont Use Ult if target can be kill With X AA", 1, 0, 6));
+            RMenu.Add("semiR", new KeyBind("Semi-Auto R", false, KeyBind.BindTypes.HoldActive));
 
             KillStealMenu = menuIni.AddSubMenu("KillSteal");
             KillStealMenu.AddGroupLabel("KillSteal Settings");
@@ -172,7 +174,7 @@
 
             Q = new Spell.Active(SpellSlot.Q, 400);
             W = new Spell.Active(SpellSlot.W, 300);
-            E = new Spell.Skillshot(SpellSlot.E, 550, SkillShotType.Cone, 250, 600, 120);
+            E = new Spell.Skillshot(SpellSlot.E, 550, SkillShotType.Cone, 250, 666, 100);
             R = new Spell.Targeted(SpellSlot.R, 460);
 
             Game.OnUpdate += OnUpdate;
@@ -199,7 +201,7 @@
 
         private static void Obj_AI_Base_OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (args.SData.Name.ToLower().Contains("itemtiamatcleave"))
+            if (args.SData.Name.ToLower().Contains("itemtiamatcleave") && sender.IsMe)
             {
                 Orbwalker.ResetAutoAttack();
             }
@@ -207,8 +209,12 @@
 
         internal static void OnAfterAttack(AttackableUnit unit, EventArgs args)
         {
+            if (!(unit is AIHeroClient))
+            {
+                return;
+            }
             var target = TargetSelector.GetTarget(W.Range, DamageType.True);
-            var hero = unit as AIHeroClient;
+            var hero = (AIHeroClient)unit;
             var Wcombo = WMenu["Combo"].Cast<CheckBox>().CurrentValue;
             if (hero == null || !hero.IsValid || hero.Type != GameObjectType.AIHeroClient)
             {
@@ -233,26 +239,31 @@
                         }
                     }
 
-                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Hydra.IsReady() && Hydra.IsOwned(player)
-                        && target.IsValidTarget(Hydra.Range))
+                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Hydra.IsReady()
+                        && Hydra.IsOwned(Player.Instance) && target.IsValidTarget(Hydra.Range))
                     {
                         Hydra.Cast();
                     }
 
-                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Timat.IsReady() && Timat.IsOwned(player)
-                        && target.IsValidTarget(Timat.Range))
+                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Timat.IsReady()
+                        && Timat.IsOwned(Player.Instance) && target.IsValidTarget(Timat.Range))
                     {
                         Timat.Cast();
                     }
 
-                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Titanic.IsReady() && Titanic.IsOwned(player)
-                        && target.IsValidTarget(Titanic.Range))
+                    if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Titanic.IsReady()
+                        && Titanic.IsOwned(Player.Instance) && target.IsValidTarget(Titanic.Range))
                     {
                         if (Titanic.Cast())
                         {
                             Orbwalker.ResetAutoAttack();
                             Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                         }
+                    }
+                    if (QMenu["Combo"].Cast<CheckBox>().CurrentValue
+                        && (QMenu["QAA"].Cast<CheckBox>().CurrentValue && Q.IsReady()) && !W.IsReady())
+                    {
+                        Q.Cast();
                     }
                 }
             }
@@ -262,7 +273,7 @@
         {
             var lanemana = ManaMenu["lanemana"].Cast<Slider>().CurrentValue;
             var harassmana = ManaMenu["harassmana"].Cast<Slider>().CurrentValue;
-            if (player.IsDead || MenuGUI.IsChatOpen || player.IsRecalling())
+            if (Player.Instance.IsDead || MenuGUI.IsChatOpen || Player.Instance.IsRecalling())
             {
                 return;
             }
@@ -294,7 +305,7 @@
             }
 
             if (QMenu["Qaoe"].Cast<CheckBox>().CurrentValue
-                && player.CountEnemiesInRange(Q.Range) >= QMenu["Qhit"].Cast<Slider>().CurrentValue)
+                && Player.Instance.CountEnemiesInRange(Q.Range) >= QMenu["Qhit"].Cast<Slider>().CurrentValue)
             {
                 Q.Cast();
             }
@@ -352,10 +363,10 @@
 
                 if (Wclear)
                 {
-                    if (!player.CanAttack && minion.IsValidTarget() && W.IsReady()
-                        && player.Distance(minion.ServerPosition) <= 225f
-                        && player.GetSpellDamage(minion, SpellSlot.W) + player.GetAutoAttackDamage(minion)
-                        >= minion.TotalShieldHealth())
+                    if (minion.IsInAutoAttackRange(Player.Instance) && minion.IsValidTarget() && W.IsReady()
+                        && Player.Instance.Distance(minion.ServerPosition) <= 225f
+                        && Player.Instance.GetSpellDamage(minion, SpellSlot.W)
+                        + Player.Instance.GetAutoAttackDamage(minion) >= minion.TotalShieldHealth())
                     {
                         W.Cast();
                         Player.IssueOrder(GameObjectOrder.AttackUnit, minion);
@@ -368,9 +379,9 @@
         {
             var hp = QMenu["QFlee"].Cast<Slider>().CurrentValue;
             var Qflee = QMenu["Flee"].Cast<CheckBox>().CurrentValue && Q.IsReady();
-            if (Qflee && player.HealthPercent < hp)
+            if (Qflee && Player.Instance.HealthPercent < hp)
             {
-                if (player.CountEnemiesInRange(Q.Range) >= 1)
+                if (Player.Instance.CountEnemiesInRange(Q.Range) >= 1)
                 {
                     Q.Cast();
                 }
@@ -404,7 +415,7 @@
 
                     var pred = E.GetPrediction(target);
                     // Credits cancerous
-                    int passiveCounter = target.GetBuffCount("DariusHemo") <= 0 ? 0 : target.GetBuffCount("DariusHemo");
+                    passiveCounter = target.GetBuffCount("DariusHemo") <= 0 ? 0 : target.GetBuffCount("DariusHemo");
                     if (RDmg(target, passiveCounter) >= target.Health + PassiveDmg(target, 1))
                     {
                         if (target.IsValidTarget(R.Range))
@@ -413,17 +424,17 @@
                         }
 
                         if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
-                            && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
+                            && Player.Instance.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
                         {
                             E.Cast(pred.CastPosition);
                         }
                     }
 
                     if (target.IsValidTarget(R.Range)
-                        && target.TotalShieldHealth() < player.GetSpellDamage(target, SpellSlot.R))
+                        && target.TotalShieldHealth() < Player.Instance.GetSpellDamage(target, SpellSlot.R))
                     {
                         if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
-                            && player.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
+                            && Player.Instance.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
                         {
                             E.Cast(pred.CastPosition);
                         }
@@ -442,20 +453,20 @@
                     var IG = KillStealMenu["IG"].Cast<CheckBox>().CurrentValue;
                     var IGP = KillStealMenu["IGP"].Cast<CheckBox>().CurrentValue;
                     if (IGP && target.IsValidTarget(Ignite.Range)
-                        && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
+                        && Player.Instance.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
                         + PassiveDmg(target, target.GetBuffCount("DariusHemo"))
                         > target.TotalShieldHealth() + target.HPRegenRate)
                     {
                         if (PassiveDmg(target, target.GetBuffCount("DariusHemo"))
                             < target.TotalShieldHealth() + (target.HPRegenRate * 4)
-                            && !target.IsValidTarget(player.GetAutoAttackRange()))
+                            && !target.IsValidTarget(Player.Instance.GetAutoAttackRange()))
                         {
                             Ignite.Cast(target);
                         }
 
                         if (PassiveDmg(target, target.GetBuffCount("DariusHemo")) < target.TotalShieldHealth())
                         {
-                            if (target.TotalShieldHealth() > player.TotalShieldHealth())
+                            if (target.TotalShieldHealth() > Player.Instance.TotalShieldHealth())
                             {
                                 Ignite.Cast(target);
                             }
@@ -463,9 +474,9 @@
                     }
 
                     if (IG && target.IsValidTarget(Ignite.Range)
-                        && player.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
+                        && Player.Instance.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
                         > target.TotalShieldHealth() + (target.HPRegenRate * 4)
-                        && !target.IsValidTarget(player.GetAutoAttackRange()))
+                        && !target.IsValidTarget(Player.Instance.GetAutoAttackRange()))
                     {
                         Ignite.Cast(target);
                     }
@@ -484,24 +495,30 @@
 
             if (target != null)
             {
+                if (QMenu["QAA"].Cast<CheckBox>().CurrentValue && Q.IsReady()
+                    && Player.Instance.IsInAutoAttackRange(target) && Player.Instance.CanAttack)
+                {
+                    return;
+                }
+
                 if (flags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
-                    if (Qcombo)
+                    if (Qcombo && target.IsValidTarget(Q.Range))
                     {
-                        if (Qrange && target.IsValidTarget(Q.Range))
+                        if (Qrange)
                         {
-                            if (!player.IsInAutoAttackRange(target))
+                            if (!Player.Instance.IsInAutoAttackRange(target))
                             {
                                 Q.Cast();
                             }
                         }
 
-                        if (!Qrange && target.IsValidTarget(Q.Range))
+                        if (!Qrange)
                         {
                             Q.Cast();
                         }
 
-                        if (player.GetSpellDamage(target, SpellSlot.Q) > target.TotalShieldHealth())
+                        if (Player.Instance.GetSpellDamage(target, SpellSlot.Q) > target.TotalShieldHealth())
                         {
                             Q.Cast();
                         }
@@ -510,11 +527,11 @@
 
                 if (flags.HasFlag(Orbwalker.ActiveModes.Harass))
                 {
-                    if (Qharass)
+                    if (Qharass && target.IsValidTarget(Q.Range))
                     {
                         if (flags.HasFlag(Orbwalker.ActiveModes.Harass))
                         {
-                            if (target.IsValidTarget(Q.Range) && !target.IsInAutoAttackRange(player))
+                            if (!target.IsInAutoAttackRange(Player.Instance))
                             {
                                 Q.Cast();
                             }
@@ -524,7 +541,7 @@
 
                 if (QMenu["Stick"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (player.HasBuff("RumbleDangerZone") && target.IsValidTarget(Q.Range)
+                    if (Player.Instance.HasBuff("RumbleDangerZone") && target.IsValidTarget(Q.Range)
                         && !target.IsUnderEnemyturret() && !target.IsUnderHisturret())
                     {
                         Player.IssueOrder(GameObjectOrder.MoveTo, target.Position);
@@ -549,13 +566,13 @@
                     {
                         if (!WMenu["AAr"].Cast<CheckBox>().CurrentValue)
                         {
-                            if (player.IsInAutoAttackRange(target) && W.IsReady())
+                            if (Player.Instance.IsInAutoAttackRange(target) && W.IsReady())
                             {
                                 Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                                 W.Cast();
                             }
 
-                            if (player.HasBuff("DariusNoxianTacticsActive"))
+                            if (Player.Instance.HasBuff("DariusNoxianTacticsActive"))
                             {
                                 Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                             }
@@ -601,7 +618,8 @@
                         if (target.IsValidTarget(E.Range))
                         {
                             if (Q.IsReady() && target.IsValidTarget(Q.Range) && Qcombo
-                                || !Q.IsReady() && target.IsInRange(player, player.GetAutoAttackRange()))
+                                || !Q.IsReady()
+                                && target.IsInRange(Player.Instance, Player.Instance.GetAutoAttackRange()))
                             {
                                 return;
                             }
@@ -618,7 +636,7 @@
                     {
                         if (target.IsValidTarget(E.Range)
                             && ((Q.IsReady() && !target.IsValidTarget(Q.Range))
-                                || (!Q.IsReady() && target.IsInAutoAttackRange(player))))
+                                || (!Q.IsReady() && target.IsInAutoAttackRange(Player.Instance))))
                         {
                             var pred = E.GetPrediction(target);
                             E.Cast(pred.CastPosition);
@@ -636,7 +654,11 @@
             var rt = TargetSelector.GetTarget(R.Range, DamageType.True);
             var Rcombo = RMenu["Combo"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var Rstack = RMenu["stack"].Cast<CheckBox>().CurrentValue && R.IsReady();
-
+            var SemiR = RMenu["semiR"].Cast<KeyBind>().CurrentValue && R.IsReady();
+            var SemiRtarget =
+                EntityManager.Heroes.Enemies.Where(x => x.IsValidTarget(R.Range) && x != null)
+                    .OrderByDescending(x => RDmg(x, passiveCounter))
+                    .FirstOrDefault();
             if (rt != null)
             {
                 if (!rt.HasBuff("kindredrnodeathbuff") && !rt.HasBuff("JudicatorIntervention")
@@ -649,9 +671,15 @@
                         return;
                     }
 
+                    if (SemiR)
+                    {
+                        R.Cast(SemiRtarget);
+                    }
+
                     if (Rcombo)
                     {
-                        if (rt.IsValidTarget(R.Range) && player.GetSpellDamage(rt, SpellSlot.R) > rt.TotalShieldHealth())
+                        if (rt.IsValidTarget(R.Range)
+                            && Player.Instance.GetSpellDamage(rt, SpellSlot.R) > rt.TotalShieldHealth())
                         {
                             R.Cast(rt);
                         }
@@ -676,28 +704,28 @@
                 return;
             }
 
-            if (Botrk.IsReady() && Botrk.IsOwned(player) && target.IsValidTarget(Botrk.Range)
+            if (Botrk.IsReady() && Botrk.IsOwned(Player.Instance) && target.IsValidTarget(Botrk.Range)
                 && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue
                 && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
             {
                 Botrk.Cast(target);
             }
 
-            if (Botrk.IsReady() && Botrk.IsOwned(player) && target.IsValidTarget(Botrk.Range)
+            if (Botrk.IsReady() && Botrk.IsOwned(Player.Instance) && target.IsValidTarget(Botrk.Range)
                 && target.HealthPercent <= ItemsMenu["oL"].Cast<Slider>().CurrentValue
                 && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
             {
                 Botrk.Cast(target);
             }
 
-            if (Cutlass.IsReady() && Cutlass.IsOwned(player) && target.IsValidTarget(Cutlass.Range)
+            if (Cutlass.IsReady() && Cutlass.IsOwned(Player.Instance) && target.IsValidTarget(Cutlass.Range)
                 && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue
                 && ItemsMenu["UseBilge"].Cast<CheckBox>().CurrentValue)
             {
                 Cutlass.Cast(target);
             }
 
-            if (Youmuu.IsReady() && Youmuu.IsOwned(player) && target.IsValidTarget(Q.Range)
+            if (Youmuu.IsReady() && Youmuu.IsOwned(Player.Instance) && target.IsValidTarget(Q.Range)
                 && ItemsMenu["useGhostblade"].Cast<CheckBox>().CurrentValue)
             {
                 Youmuu.Cast();
@@ -803,7 +831,6 @@
                             ene != null && !ene.IsDead && ene.IsEnemy && ene.IsVisible && ene.IsValid
                             && ene.IsHPBarRendered))
                 {
-                    int passiveCounter = enemy.GetBuffCount("DariusHemo") <= 0 ? 0 : enemy.GetBuffCount("DariusHemo");
                     if (DrawMenu["DrawD"].Cast<CheckBox>().CurrentValue && enemy.IsVisible)
                     {
                         Hpi.unit = enemy;
