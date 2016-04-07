@@ -97,7 +97,7 @@
             QMenu.AddGroupLabel("Extra Settings");
             QMenu.Add("QE", new CheckBox("Always Q Before E", false));
             QMenu.Add("Stick", new CheckBox("Stick to Target while Casting Q"));
-            QMenu.Add("QAA", new CheckBox("No Q If can AA", false));
+            QMenu.Add("QAA", new CheckBox("Use Q if AA is in Cooldown", false));
             QMenu.Add("range", new CheckBox("Dont Cast Q when Enemy in AA range", false));
             QMenu.Add("Flee", new CheckBox("Q On Flee (Ignores Stick to target)"));
             QMenu.Add("QFlee", new Slider("Cast Q flee When HP is below %", 90, 0, 100));
