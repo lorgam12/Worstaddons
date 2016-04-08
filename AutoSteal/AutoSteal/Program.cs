@@ -13,11 +13,15 @@
     {
         public static Menu MenuIni;
 
+        public static Menu Special;
+
         public static Menu KillStealMenu;
 
         public static Menu DrawMenu;
 
         public static Menu JungleStealMenu;
+
+        public static AIHeroClient player = ObjectManager.Player;
 
         private static void Main(string[] args)
         {
@@ -56,7 +60,7 @@
             }
             KillStealMenu.AddGroupLabel(champion + " Extra Settings");
             KillStealMenu.AddSeparator();
-            KillStealMenu.Add(champion + "all", new CheckBox("Claculate All Enabled Spells Damage", false));
+            KillStealMenu.Add(champion + "all", new CheckBox("Calculate All Enabled Spells Damage", false));
 
             JungleStealMenu = MenuIni.AddSubMenu("Jungle Steal ", "Jungle Steal");
             JungleStealMenu.AddGroupLabel("Jungle Steal Settings");
@@ -75,8 +79,7 @@
             JungleStealMenu.Add(champion + "RJ", new CheckBox("Use R "));
             JungleStealMenu.AddGroupLabel(champion + " Extra Settings");
             JungleStealMenu.AddSeparator();
-            JungleStealMenu.Add(champion + "all", new CheckBox("Claculate All Enabled Spells Damage", false));
-
+            JungleStealMenu.Add(champion + "all", new CheckBox("Calculate All Enabled Spells Damage", false));
             JungleStealMenu.AddSeparator();
             JungleStealMenu.AddGroupLabel("Select Jungle Monsters");
             JungleStealMenu.Add(champion + "blue", new CheckBox("Steal Blue "));
@@ -88,7 +91,13 @@
             JungleStealMenu.Add(champion + "razorbeak", new CheckBox("Steal Razorbeak "));
             JungleStealMenu.Add(champion + "crab", new CheckBox("Steal Crab "));
             JungleStealMenu.Add(champion + "murkwolf", new CheckBox("Steal Murkwolf "));
-            
+
+            if (Game.Type == GameType.Ascension)
+            {
+                Special = MenuIni.AddSubMenu("Ascension Stealer ", "Ascension Stealer");
+                Special.AddGroupLabel("Ascension Stealer Settings");
+                Special.Add(champion + "Ascension", new CheckBox("Steal Ascension Mob"));
+            }
 
             SpellManager.Initialize();
             SpellLibrary.Initialize();

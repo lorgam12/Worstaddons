@@ -9,7 +9,7 @@
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu.Values;
 
-    internal class JungleSteal
+    internal class JungleSteal : Program
     {
         public static Obj_AI_Minion Mobxdd;
 
@@ -17,54 +17,56 @@
 
         public static void Js()
         {
-            var champion = ObjectManager.Player.ChampionName;
+            var champion = player.ChampionName;
             foreach (Obj_AI_Minion mob in
                 ObjectManager.Get<Obj_AI_Minion>()
                     .Where(
                         jmob =>
                         !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsMonster && jmob.IsValid
                         && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie
-                        && ((Program.JungleStealMenu[champion + "drake"].Cast<CheckBox>().CurrentValue
+                        && ((JungleStealMenu[champion + "drake"].Cast<CheckBox>().CurrentValue
                              && jmob.BaseSkinName == "SRU_Dragon")
-                            || (Program.JungleStealMenu[champion + "baron"].Cast<CheckBox>().CurrentValue
+                            || (JungleStealMenu[champion + "baron"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Baron")
-                            || (Program.JungleStealMenu[champion + "gromp"].Cast<CheckBox>().CurrentValue
+                            || (JungleStealMenu[champion + "gromp"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Gromp")
-                            || (Program.JungleStealMenu[champion + "krug"].Cast<CheckBox>().CurrentValue
+                            || (JungleStealMenu[champion + "krug"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Krug")
-                            || (Program.JungleStealMenu[champion + "razorbeak"].Cast<CheckBox>().CurrentValue
+                            || (JungleStealMenu[champion + "razorbeak"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Razorbeak")
-                            || (Program.JungleStealMenu[champion + "crab"].Cast<CheckBox>().CurrentValue
+                            || (JungleStealMenu[champion + "crab"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "Sru_Crab")
-                            || (Program.JungleStealMenu[champion + "murkwolf"].Cast<CheckBox>().CurrentValue
+                            || (JungleStealMenu[champion + "murkwolf"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Murkwolf")
-                            || (Program.JungleStealMenu[champion + "blue"].Cast<CheckBox>().CurrentValue
+                            || (JungleStealMenu[champion + "blue"].Cast<CheckBox>().CurrentValue
                                 && jmob.BaseSkinName == "SRU_Blue")
-                            || (Program.JungleStealMenu[champion + "red"].Cast<CheckBox>().CurrentValue
-                                && jmob.BaseSkinName == "SRU_Red"))))
+                            || (JungleStealMenu[champion + "red"].Cast<CheckBox>().CurrentValue
+                                && jmob.BaseSkinName == "SRU_Red")
+                            || (Special[champion + "Ascension"].Cast<CheckBox>().CurrentValue
+                                && jmob.BaseSkinName == "AscXerath"))))
             {
                 Mobxdd = mob;
-                if (Program.JungleStealMenu[champion + "AAJ"].Cast<CheckBox>().CurrentValue)
+                if (JungleStealMenu[champion + "AAJ"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (ObjectManager.Player.CanAttack && ObjectManager.Player.GetAutoAttackDamage(mob) > mob.Health
-                        && mob.IsInAutoAttackRange(ObjectManager.Player))
+                    if (player.CanAttack && player.GetAutoAttackDamage(mob) > mob.Health
+                        && mob.IsInAutoAttackRange(player))
                     {
                         Player.IssueOrder(GameObjectOrder.AttackUnit, mob);
                         return;
                     }
                 }
 
-                if (Program.JungleStealMenu[champion + "QJ"].Cast<CheckBox>().CurrentValue)
+                if (JungleStealMenu[champion + "QJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (Spells.QisToggle || Spells.QisDash || Spells.QisCc || Spells.Q == null)
                     {
                         return;
                     }
 
-                    var traveltime = mob.Distance(ObjectManager.Player)
-                                     / (Spells.Q.Handle.SData.MissileSpeed + Spells.Q.CastDelay) + Game.Ping / 2f / 1000;
+                    var traveltime = mob.Distance(player) / (Spells.Q.Handle.SData.MissileSpeed + Spells.Q.CastDelay)
+                                     + Game.Ping / 2f / 1000;
 
-                    if (KillSteal.Playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.Q)
+                    if (KillSteal.Playerdamage + player.GetSpellDamage(mob, SpellSlot.Q)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.Q.IsInRange(mob)
                         && Spells.Q.IsReady())
                     {
@@ -112,17 +114,17 @@
                     }
                 }
 
-                if (Program.JungleStealMenu[champion + "WJ"].Cast<CheckBox>().CurrentValue)
+                if (JungleStealMenu[champion + "WJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (Spells.WisToggle || Spells.WisDash || Spells.WisCc || Spells.W == null)
                     {
                         return;
                     }
 
-                    var traveltime = mob.Distance(ObjectManager.Player)
-                                     / (Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay) + Game.Ping / 2f / 1000;
+                    var traveltime = mob.Distance(player) / (Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay)
+                                     + Game.Ping / 2f / 1000;
 
-                    if (KillSteal.Playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.W)
+                    if (KillSteal.Playerdamage + player.GetSpellDamage(mob, SpellSlot.W)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.W.IsInRange(mob)
                         && Spells.W.IsReady())
                     {
@@ -169,17 +171,17 @@
                     }
                 }
 
-                if (Program.JungleStealMenu[champion + "EJ"].Cast<CheckBox>().CurrentValue)
+                if (JungleStealMenu[champion + "EJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (Spells.EisToggle || Spells.EisDash || Spells.EisCc || Spells.E == null)
                     {
                         return;
                     }
 
-                    var traveltime = mob.Distance(ObjectManager.Player)
-                                     / (Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay) + Game.Ping / 2f / 1000;
+                    var traveltime = mob.Distance(player) / (Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay)
+                                     + Game.Ping / 2f / 1000;
 
-                    if (KillSteal.Playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.E)
+                    if (KillSteal.Playerdamage + player.GetSpellDamage(mob, SpellSlot.E)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.E.IsInRange(mob)
                         && Spells.E.IsReady())
                     {
@@ -226,17 +228,17 @@
                     }
                 }
 
-                if (Program.JungleStealMenu[champion + "RJ"].Cast<CheckBox>().CurrentValue)
+                if (JungleStealMenu[champion + "RJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (Spells.RisToggle || Spells.RisDash || Spells.RisCc || Spells.R == null)
                     {
                         return;
                     }
 
-                    var traveltime = mob.Distance(ObjectManager.Player)
-                                     / (Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay) + Game.Ping / 2f / 1000;
+                    var traveltime = mob.Distance(player) / (Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay)
+                                     + Game.Ping / 2f / 1000;
 
-                    if (KillSteal.Playerdamage + ObjectManager.Player.GetSpellDamage(mob, SpellSlot.R)
+                    if (KillSteal.Playerdamage + player.GetSpellDamage(mob, SpellSlot.R)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.R.IsInRange(mob)
                         && Spells.R.IsReady())
                     {
@@ -282,11 +284,10 @@
                         }
                     }
 
-                    if (Program.JungleStealMenu[champion + "all"].Cast<CheckBox>().CurrentValue
+                    if (JungleStealMenu[champion + "all"].Cast<CheckBox>().CurrentValue
                         && KillSteal.Playerdamage + Misc.Damage.JsCalcDamage(mob)
                         >= Prediction.Health.GetPrediction(mob, (int)(Misc.Damage.JsTravelTime(mob))))
                     {
-
                     }
                 }
             }

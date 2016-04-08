@@ -33,8 +33,7 @@
             var rtraveltime = JungleSteal.Mobxdd.Distance(ObjectManager.Player) / Spells.R.Handle.SData.MissileSpeed
                               + Spells.R.CastDelay + Game.Ping / 2f / 1000;
 
-            if ((KillSteal.Playerdamage
-                 + ObjectManager.Player.GetSpellDamage(JungleSteal.Mobxdd, SpellSlot.Q) + 750
+            if ((KillSteal.Playerdamage + ObjectManager.Player.GetSpellDamage(JungleSteal.Mobxdd, SpellSlot.Q) + 750
                  <= Prediction.Health.GetPrediction(JungleSteal.Mobxdd, (int)qtraveltime)
                  && Spells.Q.IsInRange(JungleSteal.Mobxdd) && Spells.Q.IsReady())
                 || (ObjectManager.Player.BaseAbilityDamage
@@ -79,8 +78,7 @@
             var rtraveltime = KillSteal.Targetxdd.Distance(ObjectManager.Player)
                               / (Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay) + Game.Ping / 2f / 1000;
 
-            if ((KillSteal.Playerdamage
-                 + ObjectManager.Player.GetSpellDamage(KillSteal.Targetxdd, SpellSlot.Q) + 750
+            if ((KillSteal.Playerdamage + ObjectManager.Player.GetSpellDamage(KillSteal.Targetxdd, SpellSlot.Q) + 750
                  >= Prediction.Health.GetPrediction(KillSteal.Targetxdd, (int)qtraveltime)
                  && Spells.Q.IsInRange(KillSteal.Targetxdd) && Spells.Q.IsReady())
                 || (ObjectManager.Player.BaseAbilityDamage
