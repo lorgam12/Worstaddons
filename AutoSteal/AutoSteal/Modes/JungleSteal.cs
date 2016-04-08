@@ -9,6 +9,8 @@
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu.Values;
 
+    using Misc;
+
     internal class JungleSteal : Program
     {
         public static Obj_AI_Minion Mobxdd;
@@ -23,7 +25,7 @@
                     .Where(
                         jmob =>
                         !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsMonster && jmob.IsValid
-                        && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie
+                        && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie && jmob.IsKillable()
                         && ((JungleStealMenu[champion + "drake"].Cast<CheckBox>().CurrentValue
                              && jmob.BaseSkinName == "SRU_Dragon")
                             || (JungleStealMenu[champion + "baron"].Cast<CheckBox>().CurrentValue

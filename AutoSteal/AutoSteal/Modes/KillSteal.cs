@@ -2,6 +2,8 @@
 {
     using System.Linq;
 
+    using AutoSteal.Misc;
+
     using Genesis.Library;
     using Genesis.Library.Spells;
 
@@ -27,7 +29,7 @@
                         hero =>
                         hero != null && hero.IsHPBarRendered && !hero.HasBuffOfType(BuffType.Invulnerability)
                         && hero.IsValid && hero.IsVisible && hero.IsEnemy && !hero.IsDead && !hero.IsZombie
-                        && KillStealMenu[champion + "Steal" + hero.BaseSkinName].Cast<CheckBox>().CurrentValue))
+                        && KillStealMenu[champion + "Steal" + hero.BaseSkinName].Cast<CheckBox>().CurrentValue && hero.IsKillable()))
             {
                 Targetxdd = target;
                 if (KillStealMenu[champion + "AAC"].Cast<CheckBox>().CurrentValue)
