@@ -15,8 +15,7 @@
             var minion =
                 EntityManager.MinionsAndMonsters.EnemyMinions.Where(x => x.IsValidTarget(W.Range))
                     .OrderByDescending(x => x.Health)
-                    .FirstOrDefault(x => x != null);
-
+                    .LastOrDefault(x => x != null);
             if (minion == null)
             {
                 return;
@@ -56,7 +55,7 @@
             var minion =
                 EntityManager.MinionsAndMonsters.EnemyMinions.Where(x => x.IsValidTarget(W.Range))
                     .OrderByDescending(x => x.Health)
-                    .FirstOrDefault(x => x != null);
+                    .LastOrDefault(x => x != null);
             if (minion == null)
             {
                 return;
