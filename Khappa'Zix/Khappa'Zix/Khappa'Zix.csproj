@@ -49,8 +49,13 @@
   <ItemGroup>
     <Compile Include="Load\Load.cs" />
     <Compile Include="Load\menu.cs" />
+    <Compile Include="Misc\Drawings.cs" />
+    <Compile Include="Misc\Misc.cs" />
+    <Compile Include="Modes\Clear.cs" />
     <Compile Include="Modes\Combo.cs" />
+    <Compile Include="Modes\Harass.cs" />
     <Compile Include="Modes\JumpsHandler.cs" />
+    <Compile Include="Modes\KillSteal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

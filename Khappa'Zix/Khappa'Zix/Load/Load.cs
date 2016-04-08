@@ -1,18 +1,17 @@
 ﻿namespace Khappa_Zix.Load
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
 
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Enumerations;
     using EloBuddy.SDK.Events;
-    using EloBuddy.SDK.Rendering;
+    using EloBuddy.SDK.Menu.Values;
 
-    using Khappa_Zix.Modes;
+    using Misc;
 
-    using SharpDX;
+    using Modes;
 
     internal class Load
     {
@@ -24,12 +23,6 @@
 
         public static Spell.Active R { get; private set; }
 
-        internal static List<Vector3> EnemyTurretPositions = new List<Vector3>();
-
-        internal static Vector3 Jumppoint1, Jumppoint2;
-
-        internal static List<AIHeroClient> HeroList;
-
         internal static readonly AIHeroClient player = ObjectManager.Player;
 
         internal static bool EvolvedQ, EvolvedW, EvolvedE, EvolvedR;
@@ -40,11 +33,6 @@
         }
 
         private static void Loading_OnLoadingComplete(EventArgs args)
-        {
-            OnLoad();
-        }
-
-        private static void OnLoad()
         {
             if (player.ChampionName != "Khazix")
             {
@@ -59,9 +47,20 @@
             menu.Load();
             Game.OnUpdate += Game_OnUpdate;
             Game.OnUpdate += JumpsHandler.JumpLogic;
+            Player.OnIssueOrder += Player_OnIssueOrder;
+            Obj_AI_Base.OnBasicAttack += JumpsHandler.Obj_AI_Base_OnBasicAttack;
             Orbwalker.OnPreAttack += JumpsHandler.Orbwalker_OnPreAttack;
             Spellbook.OnCastSpell += JumpsHandler.Spellbook_OnCastSpell;
-            Drawing.OnDraw += Drawing_OnDraw;
+            Drawing.OnDraw += Drawings.Drawing_OnDraw;
+        }
+
+        private static void Player_OnIssueOrder(Obj_AI_Base sender, PlayerIssueOrderEventArgs args)
+        {
+            if (sender.IsMe && args.Order == GameObjectOrder.AttackUnit && player.HasBuff("KhazixRStealth")
+                && menu.Combo["NoAA"].Cast<CheckBox>().CurrentValue)
+            {
+                args.Process = false;
+            }
         }
 
         internal static bool IsIsolated(Obj_AI_Base target)
@@ -73,12 +72,6 @@
                          x.NetworkId != target.NetworkId && x.Team == target.Team && x.Distance(target) <= 500
                          && (x.Type == GameObjectType.AIHeroClient || x.Type == GameObjectType.obj_AI_Minion
                              || x.Type == GameObjectType.obj_AI_Turret));
-        }
-
-        internal List<AIHeroClient> GetIsolatedTargets()
-        {
-            var validtargets = HeroList.Where(h => h.IsValidTarget(E.Range) && IsIsolated(h)).ToList();
-            return validtargets;
         }
 
         internal static double GetQDamage(Obj_AI_Base target)
@@ -106,19 +99,18 @@
             return 0;
         }
 
-        private static void Drawing_OnDraw(EventArgs args)
-        {
-            Circle.Draw(Color.OrangeRed, Q.Range, player.Position);
-            Circle.Draw(Color.OrangeRed, W.Range, player.Position);
-            Circle.Draw(Color.OrangeRed, E.Range, player.Position);
-        }
-
         private static void Game_OnUpdate(EventArgs args)
         {
             if (!EvolvedQ && player.HasBuff("khazixqevo"))
             {
                 Q.Range = 375;
                 EvolvedQ = true;
+            }
+
+            if (!EvolvedW && player.HasBuff("khazixwevo"))
+            {
+                W = new Spell.Skillshot(SpellSlot.W, 1000, SkillShotType.Linear, 225, 828, 100);
+                EvolvedW = true;
             }
 
             if (!EvolvedE && player.HasBuff("khazixeevo"))
@@ -137,6 +129,32 @@
             {
                 Combo.Start();
             }
+
+            if (flags.HasFlag(Orbwalker.ActiveModes.Harass)
+                && menu.Mana["harass"].Cast<Slider>().CurrentValue < player.ManaPercent)
+            {
+                Harass.Start();
+            }
+
+            if (flags.HasFlag(Orbwalker.ActiveModes.LaneClear)
+                && menu.Mana["lane"].Cast<Slider>().CurrentValue < player.ManaPercent)
+            {
+                Clear.LaneClear();
+            }
+
+            if (flags.HasFlag(Orbwalker.ActiveModes.LastHit)
+                && menu.Mana["last"].Cast<Slider>().CurrentValue < player.ManaPercent)
+            {
+                Clear.LastHit();
+            }
+
+            if (flags.HasFlag(Orbwalker.ActiveModes.JungleClear)
+                && menu.Mana["jungle"].Cast<Slider>().CurrentValue < player.ManaPercent)
+            {
+                Clear.JungleClear();
+            }
+
+            KillSteal.Steal();
         }
     }
 }
