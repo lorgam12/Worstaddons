@@ -1,7 +1,5 @@
 ﻿namespace Khappa_Zix.Modes
 {
-    using System.Linq;
-
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu.Values;
@@ -10,7 +8,7 @@
 
     using Misc;
 
-    internal class Combo
+    internal class Combo : Load
     {
         public static bool Jumping;
 
@@ -20,88 +18,80 @@
 
         internal static void Start()
         {
-            var target =
-                EntityManager.Heroes.Enemies.FirstOrDefault(
-                    x => !x.IsZombie && !x.IsInvulnerable && !x.IsDead && !x.HasBuffOfType(BuffType.PhysicalImmunity));
+            var target = TargetSelector.GetTarget(W.Range, DamageType.Physical);
 
-            if (target != null)
+            if (target != null && !target.IsZombie && !target.IsInvulnerable
+                && !target.HasBuffOfType(BuffType.PhysicalImmunity))
             {
-                var Distance = Load.player.Distance(target);
+                var Distance = player.Distance(target);
 
-                if (doubleJump && target.IsValidTarget(Load.Q.Range)
-                    && (Load.GetQDamage(target) >= target.Health
-                        || Load.player.GetSpellDamage(target, SpellSlot.W) >= target.Health))
+                if (doubleJump && target.IsValidTarget(Q.Range)
+                    && (GetQDamage(target) >= target.Health
+                        || player.GetSpellDamage(target, SpellSlot.W) >= target.Health))
                 {
                     return;
                 }
 
-                if (Load.W.IsReady() && target.IsValidTarget(Load.W.Range)
-                    && menu.Combo["W"].Cast<CheckBox>().CurrentValue)
+                if (W.IsReady() && target.IsValidTarget(W.Range) && menu.Combo["W"].Cast<CheckBox>().CurrentValue)
                 {
-                    var pred = Load.W.GetPrediction(target).HitChance >= Misc.hitchance;
+                    var pred = W.GetPrediction(target).HitChance >= Misc.hitchance;
                     if (pred)
                     {
-                        Load.W.Cast(Load.W.GetPrediction(target).CastPosition);
+                        W.Cast(W.GetPrediction(target).CastPosition);
                     }
                 }
 
-                if (Load.Q.IsReady() && target.IsValidTarget(Load.Q.Range)
-                    && menu.Combo["Q"].Cast<CheckBox>().CurrentValue)
+                if (Q.IsReady() && target.IsValidTarget(Q.Range) && menu.Combo["Q"].Cast<CheckBox>().CurrentValue)
                 {
-                    Load.Q.Cast(target);
+                    Q.Cast(target);
                 }
 
-                if (Load.E.IsReady() && target.IsValidTarget(Load.E.Range) && Load.Q.IsReady()
-                    && !target.IsValidTarget(Load.Q.Range - 50) && menu.Combo["E"].Cast<CheckBox>().CurrentValue)
+                if (E.IsReady() && target.IsValidTarget(E.Range) && Q.IsReady() && !target.IsValidTarget(Q.Range - 50)
+                    && menu.Combo["E"].Cast<CheckBox>().CurrentValue)
                 {
-                    var pred = Load.E.GetPrediction(target).HitChance >= Misc.hitchance;
+                    var pred = E.GetPrediction(target).HitChance >= Misc.hitchance;
 
-                    if ((Load.E.GetPrediction(target).CastPosition.IsUnderTurret() && target.IsUnderEnemyturret()
+                    if ((E.GetPrediction(target).CastPosition.IsUnderTurret() && target.IsUnderEnemyturret()
                          && !menu.Combo["Edive"].Cast<CheckBox>().CurrentValue)
                         || target.CountEnemiesInRange(600) >= menu.Combo["safe"].Cast<Slider>().CurrentValue)
                     {
                         return;
                     }
 
-                    if (pred && Load.player.Distance(target) > Dis)
+                    if (pred && player.Distance(target) > Dis)
                     {
-                        Load.E.Cast(Load.E.GetPrediction(target).CastPosition);
+                        E.Cast(E.GetPrediction(target).CastPosition);
                     }
                 }
 
-                if (!menu.Combo["useR"].Cast<CheckBox>().CurrentValue)
+                if (!menu.Combo["useR"].Cast<CheckBox>().CurrentValue
+                    || (menu.Combo["R"].Cast<CheckBox>().CurrentValue || !R.IsReady() || Q.IsReady() || W.IsReady()
+                        || E.IsReady()))
                 {
                     return;
                 }
 
-                if (menu.Combo["R"].Cast<CheckBox>().CurrentValue && Load.R.IsReady() && !Load.Q.IsReady()
-                    && !Load.W.IsReady() && !Load.E.IsReady())
+                if (menu.Combo["Rmode"].Cast<ComboBox>().CurrentValue == 0 && R.IsReady())
                 {
-                    Load.R.Cast();
-                }
-
-                if (menu.Combo["Rmode"].Cast<ComboBox>().CurrentValue == 0 && Load.R.IsReady())
-                {
-                    if ((Load.Q.IsReady() || Load.W.IsReady() || Load.E.IsReady()) && Load.player.ManaPercent >= 15)
+                    if ((Q.IsReady() || W.IsReady() || E.IsReady()) && player.ManaPercent >= 15)
                     {
-                        if (Distance <= Load.E.Range + Load.Q.Range - 25 + (Load.player.MoveSpeed * 0.7)
-                            && Distance > Load.Q.Range && Load.E.IsReady())
+                        if (Distance <= E.Range + Q.Range - 25 + (player.MoveSpeed * 0.7) && Distance > Q.Range
+                            && E.IsReady())
                         {
-                            Load.R.Cast();
+                            R.Cast();
                         }
                     }
                 }
 
-                if (menu.Combo["Rmode"].Cast<ComboBox>().CurrentValue == 1 && Load.R.IsReady()
-                    && target.IsValidTarget(Load.Q.Range + 25))
+                if (menu.Combo["Rmode"].Cast<ComboBox>().CurrentValue == 1 && R.IsReady()
+                    && target.IsValidTarget(Q.Range + 25))
                 {
-                    Load.R.Cast();
+                    R.Cast();
                 }
 
-                if (menu.Combo["danger"].Cast<Slider>().CurrentValue >= Load.player.CountEnemiesInRange(550)
-                    && Load.R.IsReady())
+                if (menu.Combo["danger"].Cast<Slider>().CurrentValue >= player.CountEnemiesInRange(550) && R.IsReady())
                 {
-                    Load.R.Cast();
+                    R.Cast();
                 }
             }
         }

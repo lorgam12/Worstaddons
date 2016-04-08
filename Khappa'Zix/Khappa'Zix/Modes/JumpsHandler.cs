@@ -66,7 +66,7 @@
                 {
                     case 0:
                         {
-                            if (collFlags != CollisionFlags.Wall)
+                            if (collFlags != CollisionFlags.Wall && bases != null)
                             {
                                 player.ServerPosition.Extend(bases.Position, E.Range).To3D();
                             }
@@ -75,6 +75,7 @@
                     case 1:
                         {
                             if (blockE
+                                && ally != null
                                 & NavMesh.GetCollisionFlags(player.Position.Extend(ally.Position, E.Range))
                                 == CollisionFlags.Wall)
                             {
@@ -96,7 +97,7 @@
                         break;
                     case 3:
                         {
-                            if (blockE
+                            if (blockE && target != null
                                 && NavMesh.GetCollisionFlags(player.Position.Extend(target.Position, E.Range))
                                 == CollisionFlags.Wall)
                             {
@@ -114,7 +115,7 @@
                 {
                     case 0:
                         {
-                            if (collFlags != CollisionFlags.Wall)
+                            if (collFlags != CollisionFlags.Wall && bases != null)
                             {
                                 player.ServerPosition.Extend(bases.Position, E.Range).To3D();
                             }
@@ -123,6 +124,7 @@
                     case 1:
                         {
                             if (blockE
+                                && ally != null
                                 & NavMesh.GetCollisionFlags(player.Position.Extend(ally.Position, E.Range))
                                 == CollisionFlags.Wall)
                             {
@@ -144,7 +146,7 @@
                         break;
                     case 3:
                         {
-                            if (blockE
+                            if (blockE && target != null
                                 && NavMesh.GetCollisionFlags(player.Position.Extend(target.Position, E.Range))
                                 == CollisionFlags.Wall)
                             {
@@ -172,7 +174,7 @@
                     x =>
                     Vector3.Distance(player.ServerPosition, x.ServerPosition) < Q.Range - 25 && GetQDamage(x) > x.Health);
 
-            if (checkQKillable != null)
+            if (checkQKillable != null && checkQKillable.IsValidTarget(Q.Range))
             {
                 if (Q.IsReady() && E.IsReady())
                 {
