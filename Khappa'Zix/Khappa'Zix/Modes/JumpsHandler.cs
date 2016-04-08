@@ -66,7 +66,7 @@
                 {
                     case 0:
                         {
-                            if (collFlags != CollisionFlags.Wall && bases != null)
+                            if (bases != null)
                             {
                                 player.ServerPosition.Extend(bases.Position, E.Range).To3D();
                             }
@@ -74,36 +74,23 @@
                         break;
                     case 1:
                         {
-                            if (blockE
-                                && ally != null
-                                & NavMesh.GetCollisionFlags(player.Position.Extend(ally.Position, E.Range))
-                                == CollisionFlags.Wall)
+                            if (ally != null)
                             {
-                                return new Vector3();
+                                player.ServerPosition.Extend(ally.Position, E.Range).To3D();
                             }
-                            player.ServerPosition.Extend(ally.Position, E.Range).To3D();
                         }
                         break;
                     case 2:
                         {
-                            if (blockE
-                                && NavMesh.GetCollisionFlags(player.Position.Extend(Game.CursorPos, E.Range))
-                                == CollisionFlags.Wall)
-                            {
-                                return new Vector3();
-                            }
                             player.ServerPosition.Extend(Game.CursorPos, E.Range).To3D();
                         }
                         break;
                     case 3:
                         {
-                            if (blockE && target != null
-                                && NavMesh.GetCollisionFlags(player.Position.Extend(target.Position, E.Range))
-                                == CollisionFlags.Wall)
+                            if (target != null)
                             {
-                                return new Vector3();
+                                player.ServerPosition.Extend(target.Position, E.Range).To3D();
                             }
-                            player.ServerPosition.Extend(target.Position, E.Range).To3D();
                         }
                         break;
                 }
@@ -115,7 +102,7 @@
                 {
                     case 0:
                         {
-                            if (collFlags != CollisionFlags.Wall && bases != null)
+                            if (bases != null)
                             {
                                 player.ServerPosition.Extend(bases.Position, E.Range).To3D();
                             }
@@ -123,36 +110,23 @@
                         break;
                     case 1:
                         {
-                            if (blockE
-                                && ally != null
-                                & NavMesh.GetCollisionFlags(player.Position.Extend(ally.Position, E.Range))
-                                == CollisionFlags.Wall)
+                            if (ally != null)
                             {
-                                return new Vector3();
+                                player.ServerPosition.Extend(ally.Position, E.Range).To3D();
                             }
-                            player.ServerPosition.Extend(ally.Position, E.Range).To3D();
                         }
                         break;
                     case 2:
                         {
-                            if (blockE
-                                && NavMesh.GetCollisionFlags(player.Position.Extend(Game.CursorPos, E.Range))
-                                == CollisionFlags.Wall)
-                            {
-                                return new Vector3();
-                            }
                             player.ServerPosition.Extend(Game.CursorPos, E.Range).To3D();
                         }
                         break;
                     case 3:
                         {
-                            if (blockE && target != null
-                                && NavMesh.GetCollisionFlags(player.Position.Extend(target.Position, E.Range))
-                                == CollisionFlags.Wall)
+                            if (target != null)
                             {
-                                return new Vector3();
+                                player.ServerPosition.Extend(target.Position, E.Range).To3D();
                             }
-                            player.ServerPosition.Extend(target.Position, E.Range).To3D();
                         }
                         break;
                 }
@@ -178,18 +152,22 @@
             {
                 if (Q.IsReady() && E.IsReady())
                 {
-                    Jumping = true;
                     Jumppoint1 = GetJumpPoint(checkQKillable);
+                    if (NavMesh.GetCollisionFlags(Jumppoint1) == CollisionFlags.Wall && blockE)
+                    {
+                        return;
+                    }
                     E.Cast(Jumppoint1);
                     Q.Cast(checkQKillable);
-                    Chat.Print("first jump");
                     Core.DelayAction(
                         () =>
                             {
                                 Jumppoint2 = GetJumpPoint(checkQKillable, false);
+                                if (NavMesh.GetCollisionFlags(Jumppoint2) == CollisionFlags.Wall && blockE)
+                                {
+                                    return;
+                                }
                                 E.Cast(Jumppoint2);
-                                Chat.Print("second jump");
-                                Jumping = false;
                             },
                         Edelay + Game.Ping);
                 }

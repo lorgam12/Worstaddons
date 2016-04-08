@@ -13,7 +13,7 @@
 
             Jump = MenuIni.AddSubMenu("JumpsHandler ", "JumpsHandler");
             Jump.AddGroupLabel("E Settings");
-            Jump.Add("double", new CheckBox("Use E DoubleJump"));
+            Jump.Add("double", new CheckBox("Use E DoubleJump", false));
             Jump.Add("block", new CheckBox("Block if will land on a wall"));
             Jump.Add("delay", new Slider("2nd E Delay {0}", 150, 0, 300));
             Jump.AddGroupLabel("1st Jump");
