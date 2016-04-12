@@ -51,9 +51,9 @@
                 return;
             }
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 700, SkillShotType.Circular, 420, 800, 180);
-            W = new Spell.Active(SpellSlot.W, 675);
-            R = new Spell.Skillshot(SpellSlot.R, 1550, SkillShotType.Linear, 250, 1750, 180);
+            Q = new Spell.Skillshot(SpellSlot.Q, (uint)650f, SkillShotType.Linear, 250, 850, 180);
+            W = new Spell.Active(SpellSlot.W, 725);
+            R = new Spell.Skillshot(SpellSlot.R, 1500, SkillShotType.Linear, 250, 1750, 180);
 
             menuIni = MainMenu.AddMenu("AurelionSol", "AurelionSol");
             menuIni.AddGroupLabel("Welcome to the Worst AurelionSol addon!");
@@ -152,8 +152,9 @@
             }
 
             var qsize = QMissle?.StartPosition.Distance(QMissle.Position);
-            if (QMissle?.Position.CountEnemiesInRange((float)((qsize + Q.Width) / 15))
-                >= MiscMenu.Get<Slider>("AQ").CurrentValue && Q.Handle.ToggleState == 2)
+            var f = (qsize + Q.Width) / 16;
+            if (f != null && (QMissle?.Position.CountEnemiesInRange((float)f)
+                                                   >= MiscMenu.Get<Slider>("AQ").CurrentValue && Q.Handle.ToggleState == 2))
             {
                 Q.Cast(Game.CursorPos);
             }
@@ -180,7 +181,7 @@
                 if (Q.Handle.ToggleState == 2)
                 {
                     var qsize = QMissle.StartPosition.Distance(QMissle.Position);
-                    if (QMissle.Position.IsInRange(Sender, (qsize + Q.Width) / 15))
+                    if (QMissle.Position.IsInRange(Sender, (qsize + Q.Width) / 16))
                     {
                         Q.Cast(Game.CursorPos);
                     }
@@ -220,7 +221,7 @@
                 if (DrawMenu.Get<CheckBox>("QS").CurrentValue && QMissle != null)
                 {
                     var Qsize = QMissle.StartPosition.Distance(QMissle.Position);
-                    Circle.Draw(Color.White, Q.Width + Qsize / 15, QMissle.Position);
+                    Circle.Draw(Color.White, Q.Width + Qsize / 16, QMissle.Position);
                 }
             }
         }
@@ -242,7 +243,7 @@
                         if (Q.Handle.ToggleState == 2)
                         {
                             var qsize = QMissle.StartPosition.Distance(QMissle.Position);
-                            if (QMissle.Position.IsInRange(target, (qsize + Q.Width) / 15))
+                            if (QMissle.Position.IsInRange(target, (qsize + Q.Width) / 16))
                             {
                                 Q.Cast(Game.CursorPos);
                             }
@@ -281,7 +282,7 @@
                 if (Q.Handle.ToggleState == 2 && QMissle != null)
                 {
                     var qsize = QMissle.StartPosition.Distance(QMissle.Position);
-                    if (QMissle.Position.IsInRange(Qtarget, (qsize + Q.Width) / 15))
+                    if (QMissle.Position.IsInRange(Qtarget, (qsize + Q.Width) / 16))
                     {
                         Q.Cast(Game.CursorPos);
                     }
@@ -343,7 +344,7 @@
                     Q.Cast(pred.CastPosition);
                 }
 
-                if (QMissle.Position.IsInRange(Qtarget, (qsize + Q.Width) / 15) && Q.Handle.ToggleState == 2)
+                if (QMissle.Position.IsInRange(Qtarget, (qsize + Q.Width) / 16) && Q.Handle.ToggleState == 2)
                 {
                     Q.Cast(Game.CursorPos);
                 }
