@@ -12,7 +12,7 @@
 
     using Color = System.Drawing.Color;
 
-    class Traps
+    internal class Traps
     {
         internal static void Draw()
         {
@@ -23,16 +23,12 @@
 
             var traps = ObjectManager.Get<Obj_AI_Minion>();
             {
-                foreach (var trap in traps.Where(trap => trap != null))
+                foreach (var trap in traps.Where(trap => trap != null && trap.IsEnemy))
                 {
                     switch (trap.Name)
                     {
                         case "Cupcake Trap":
-                            Drawing.DrawText(
-                                Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
-                                Color.White,
-                                "Caitlyn Trap",
-                                2);
+                            Drawing.DrawText(Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30), Color.White, "Caitlyn Trap", 2);
                             Circle.Draw(SharpDX.Color.Purple, trap.BoundingRadius + 10, trap.Position);
                             break;
 
@@ -40,11 +36,7 @@
                             if (trap.BaseSkinName == "NidaleeSpear")
                             {
                                 var endTime = Math.Max(0, -Game.Time + 120);
-                                Drawing.DrawText(
-                                    Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
-                                    Color.White,
-                                    "Nidalee Trap",
-                                    2);
+                                Drawing.DrawText(Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30), Color.White, "Nidalee Trap", 2);
                                 Circle.Draw(SharpDX.Color.Green, trap.BoundingRadius + 25, trap.Position);
                             }
 
@@ -56,8 +48,7 @@
                                     Drawing.DrawText(
                                         Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
                                         Color.White,
-                                        "Teemo Mushroom Expire: "
-                                        + Convert.ToString(endTime, CultureInfo.InstalledUICulture),
+                                        "Teemo Mushroom Expire: " + Convert.ToString(endTime, CultureInfo.InstalledUICulture),
                                         2);
                                 }
 

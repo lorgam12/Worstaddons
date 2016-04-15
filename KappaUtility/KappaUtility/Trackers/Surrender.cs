@@ -1,9 +1,7 @@
-﻿namespace KappaUtility.Misc
+﻿namespace KappaUtility.Trackers
 {
     using EloBuddy;
     using EloBuddy.SDK.Menu.Values;
-
-    using Trackers;
 
     internal class Surrender
     {
@@ -23,12 +21,12 @@
             {
                 if (args.Type == SurrenderVoteType.Yes)
                 {
-                    Chat.Print("[Ally] ", System.Drawing.Color.Green + sender.BaseSkinName + " Voted Yes On Surrender");
+                    Chat.Print("[Ally] " + sender.BaseSkinName + " Voted Yes On Surrender", System.Drawing.Color.Green);
                 }
 
                 if (args.Type == SurrenderVoteType.No)
                 {
-                    Chat.Print("[Ally] ", System.Drawing.Color.Green + sender.BaseSkinName + " Voted No On Surrender");
+                    Chat.Print("[Ally] " + sender.BaseSkinName + " Voted No On Surrender", System.Drawing.Color.Green);
                 }
             }
 
@@ -36,12 +34,12 @@
             {
                 if (args.Type == SurrenderVoteType.Yes)
                 {
-                    Chat.Print("[Enemy] ", System.Drawing.Color.Red + sender.BaseSkinName + " Voted Yes On Surrender");
+                    Chat.Print("[Enemy] " + sender.BaseSkinName + " Voted Yes On Surrender", System.Drawing.Color.Red);
                 }
 
                 if (args.Type == SurrenderVoteType.No)
                 {
-                    Chat.Print("[Enemy] ", System.Drawing.Color.Red + sender.BaseSkinName + " Voted No On Surrender");
+                    Chat.Print("[Enemy] " + sender.BaseSkinName + " Voted No On Surrender", System.Drawing.Color.Red);
                 }
             }
         }

@@ -1,14 +1,47 @@
 ﻿namespace KappaUtility.Misc
 {
-    using System;
-
     using EloBuddy;
+    using EloBuddy.SDK;
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
 
     internal class AutoLvlUp
     {
-        public static ComboBox levels;
+        public static Slider level1;
+
+        public static Slider level2;
+
+        public static Slider level3;
+
+        public static Slider level4;
+
+        public static Slider level5;
+
+        public static Slider level6;
+
+        public static Slider level7;
+
+        public static Slider level8;
+
+        public static Slider level9;
+
+        public static Slider level10;
+
+        public static Slider level11;
+
+        public static Slider level12;
+
+        public static Slider level13;
+
+        public static Slider level14;
+
+        public static Slider level15;
+
+        public static Slider level16;
+
+        public static Slider level17;
+
+        public static Slider level18;
 
         public static int[] LevelSet;
 
@@ -22,25 +55,69 @@
         {
             LevelMenu = Load.UtliMenu.AddSubMenu("AutoLvlUP");
             LevelMenu.AddGroupLabel("AutoLeveler Settings");
-            LevelMenu.Add(Player.Instance.ChampionName + "enable", new CheckBox("Enable", false));
+            LevelMenu.Add(Player.Instance.ChampionName + "enable1", new CheckBox("Enable", false));
             LevelMenu.AddSeparator();
             LevelMenu.AddGroupLabel("Level Sets");
-            levels = LevelMenu.Add(
-                Player.Instance.ChampionName + "sets",
-                new ComboBox(
-                    "Level Sets",
-                    0,
-                    "R > Q > W > E",
-                    "R > Q > E > W",
-                    "R > W > Q > E",
-                    "R > W > E > Q",
-                    "R > E > Q > W",
-                    "R > E > W > Q"));
-            levels.OnValueChange += delegate { Getset(); };
+            LevelMenu.AddLabel("Q = 1 | W = 2 | E = 3 | R = 4");
             LevelMenu.AddSeparator();
-            LevelMenu.AddGroupLabel("Humanizer Delay [Not Implemented yet]");
-            LevelMenu.Add("min", new Slider("Min LevelUP Delay", 1000, 0, 2500));
-            LevelMenu.Add("max", new Slider("Max LevelUP Delay", 2501, 2501, 5000));
+
+            level1 = LevelMenu.Add("1", new Slider("Level 1", 1, 1, 4));
+            level1.OnValueChange += delegate { Getset(); };
+
+            level2 = LevelMenu.Add("2", new Slider("Level 2", 2, 1, 4));
+            level2.OnValueChange += delegate { Getset(); };
+
+            level3 = LevelMenu.Add("3", new Slider("Level 3", 3, 1, 4));
+            level3.OnValueChange += delegate { Getset(); };
+
+            level4 = LevelMenu.Add("4", new Slider("Level 4", 1, 1, 4));
+            level4.OnValueChange += delegate { Getset(); };
+
+            level5 = LevelMenu.Add("5", new Slider("Level 5", 1, 1, 4));
+            level5.OnValueChange += delegate { Getset(); };
+
+            level6 = LevelMenu.Add("6", new Slider("Level 6", 4, 1, 4));
+            level5.OnValueChange += delegate { Getset(); };
+
+            level7 = LevelMenu.Add("7", new Slider("Level 7", 1, 1, 4));
+            level7.OnValueChange += delegate { Getset(); };
+
+            level8 = LevelMenu.Add("8", new Slider("Level 8", 2, 1, 4));
+            level8.OnValueChange += delegate { Getset(); };
+
+            level9 = LevelMenu.Add("9", new Slider("Level 9", 1, 1, 4));
+            level9.OnValueChange += delegate { Getset(); };
+
+            level10 = LevelMenu.Add("10", new Slider("Level 10", 2, 1, 4));
+            level10.OnValueChange += delegate { Getset(); };
+
+            level11 = LevelMenu.Add("11", new Slider("Level 11", 4, 1, 4));
+            level11.OnValueChange += delegate { Getset(); };
+
+            level12 = LevelMenu.Add("12", new Slider("Level 12", 2, 1, 4));
+            level12.OnValueChange += delegate { Getset(); };
+
+            level13 = LevelMenu.Add("13", new Slider("Level 13", 3, 1, 4));
+            level13.OnValueChange += delegate { Getset(); };
+
+            level14 = LevelMenu.Add("14", new Slider("Level 14", 2, 1, 4));
+            level14.OnValueChange += delegate { Getset(); };
+
+            level15 = LevelMenu.Add("15", new Slider("Level 15", 3, 1, 4));
+            level15.OnValueChange += delegate { Getset(); };
+
+            level16 = LevelMenu.Add("16", new Slider("Level 16", 4, 1, 4));
+            level16.OnValueChange += delegate { Getset(); };
+
+            level17 = LevelMenu.Add("17", new Slider("Level 17", 3, 1, 4));
+            level17.OnValueChange += delegate { Getset(); };
+
+            level18 = LevelMenu.Add("18", new Slider("Level 18", 3, 1, 4));
+            level18.OnValueChange += delegate { Getset(); };
+
+            LevelMenu.AddSeparator();
+            LevelMenu.AddGroupLabel("Leveling Delay");
+            LevelMenu.Add("delay", new Slider("LevelUP Delay {0} sec", 5, 0, 15));
 
             loadfirstset();
         }
@@ -52,49 +129,20 @@
 
         internal static void Getset()
         {
-            switch (levels.Cast<ComboBox>().CurrentValue)
-            {
-                case 0:
-                    {
-                        LevelSet = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 3, 2, 3, 4, 3, 3 };
-                    }
-                    break;
-
-                case 1:
-                    {
-                        LevelSet = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 2, 3, 2, 4, 2, 2 };
-                    }
-                    break;
-
-                case 2:
-                    {
-                        LevelSet = new[] { 2, 1, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 3, 1, 3, 4, 3, 3 };
-                    }
-                    break;
-
-                case 3:
-                    {
-                        LevelSet = new[] { 2, 3, 1, 2, 2, 4, 2, 3, 2, 3, 4, 3, 1, 3, 1, 4, 1, 1 };
-                    }
-                    break;
-
-                case 4:
-                    {
-                        LevelSet = new[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 2, 1, 2, 4, 2, 2 };
-                    }
-                    break;
-
-                case 5:
-                    {
-                        LevelSet = new[] { 3, 2, 1, 3, 3, 4, 3, 2, 3, 2, 4, 2, 1, 2, 1, 4, 1, 1 };
-                    }
-                    break;
-            }
+            LevelSet = new[]
+                           {
+                               level1.Cast<Slider>().CurrentValue, level2.Cast<Slider>().CurrentValue, level3.Cast<Slider>().CurrentValue,
+                               level4.Cast<Slider>().CurrentValue, level5.Cast<Slider>().CurrentValue, level6.Cast<Slider>().CurrentValue,
+                               level7.Cast<Slider>().CurrentValue, level8.Cast<Slider>().CurrentValue, level9.Cast<Slider>().CurrentValue,
+                               level10.Cast<Slider>().CurrentValue, level11.Cast<Slider>().CurrentValue, level12.Cast<Slider>().CurrentValue,
+                               level13.Cast<Slider>().CurrentValue, level14.Cast<Slider>().CurrentValue, level15.Cast<Slider>().CurrentValue,
+                               level16.Cast<Slider>().CurrentValue, level17.Cast<Slider>().CurrentValue, level18.Cast<Slider>().CurrentValue
+                           };
         }
 
         internal static void Levelup()
         {
-            if (!LevelMenu[Player.Instance.ChampionName + "enable"].Cast<CheckBox>().CurrentValue)
+            if (!LevelMenu[Player.Instance.ChampionName + "enable1"].Cast<CheckBox>().CurrentValue)
             {
                 return;
             }
@@ -103,12 +151,6 @@
             int wL = Player.Instance.Spellbook.GetSpell(SpellSlot.W).Level + WOff;
             int eL = Player.Instance.Spellbook.GetSpell(SpellSlot.E).Level + EOff;
             int rL = Player.Instance.Spellbook.GetSpell(SpellSlot.R).Level + ROff;
-
-            var min = LevelMenu["min"].Cast<Slider>().CurrentValue;
-            var max = LevelMenu["max"].Cast<Slider>().CurrentValue;
-
-            Random rnd = new Random();
-            int random = rnd.Next(min, max);
 
             level = new[] { 0, 0, 0, 0 };
             if (qL + wL + eL + rL < Player.Instance.Level)
@@ -120,23 +162,29 @@
                         level[LevelSet[i] - 1] = level[LevelSet[i] - 1] + 1;
                     }
                 }
+
                 if (qL < level[0])
                 {
-                    ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
+                    levelup(SpellSlot.Q);
                 }
                 if (wL < level[1])
                 {
-                    ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
+                    levelup(SpellSlot.W);
                 }
                 if (eL < level[2])
                 {
-                    ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
+                    levelup(SpellSlot.E);
                 }
                 if (rL < level[3])
                 {
-                    ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
+                    levelup(SpellSlot.R);
                 }
             }
+        }
+
+        internal static void levelup(SpellSlot slot)
+        {
+            Core.DelayAction(() => { ObjectManager.Player.Spellbook.LevelSpell(slot); }, LevelMenu["delay"].Cast<Slider>().CurrentValue * 1000);
         }
     }
 }

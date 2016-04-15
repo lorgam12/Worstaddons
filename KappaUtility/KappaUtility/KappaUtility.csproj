@@ -59,6 +59,7 @@
     <Compile Include="Misc\AutoReveal.cs" />
     <Compile Include="Items\AutoTear.cs" />
     <Compile Include="Misc\SkinHax.cs" />
+    <Compile Include="Summoners\Flash.cs" />
     <Compile Include="Trackers\Surrender.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Summoners\Smite.cs" />

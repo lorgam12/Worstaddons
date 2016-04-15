@@ -6,7 +6,6 @@
     using EloBuddy.SDK;
     using EloBuddy.SDK.Events;
     using EloBuddy.SDK.Menu;
-    using EloBuddy.SDK.Menu.Values;
 
     using Items;
 
@@ -27,25 +26,26 @@
 
         private static void OnLoad(EventArgs args)
         {
-                UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
-                AutoLvlUp.OnLoad();
-                AutoQSS.OnLoad();
-                AutoTear.OnLoad();
-                AutoReveal.OnLoad();
-                GanksDetector.OnLoad();
-                Tracker.OnLoad();
-                Surrender.OnLoad();
-                SkinHax.OnLoad();
-                Spells.OnLoad();
-                Potions.OnLoad();
-                Offensive.OnLoad();
-                Defensive.OnLoad();
+            UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
+            AutoLvlUp.OnLoad();
+            AutoQSS.OnLoad();
+            AutoTear.OnLoad();
+            AutoReveal.OnLoad();
+            GanksDetector.OnLoad();
+            Tracker.OnLoad();
+            Surrender.OnLoad();
+            SkinHax.OnLoad();
+            Spells.OnLoad();
+            Flash.FOnLoad();
+            Potions.OnLoad();
+            Offensive.OnLoad();
+            Defensive.OnLoad();
 
-                Game.OnTick += GameOnTick;
-                Drawing.OnEndScene += OnEndScene;
-                Drawing.OnDraw += DrawingOnDraw;
-                Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
-                Obj_AI_Base.OnBasicAttack += OnBasicAttack;
+            Game.OnTick += GameOnTick;
+            Drawing.OnEndScene += OnEndScene;
+            Drawing.OnDraw += DrawingOnDraw;
+            Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
+            Obj_AI_Base.OnBasicAttack += OnBasicAttack;
         }
 
         private static void DrawingOnDraw(EventArgs args)
@@ -140,74 +140,6 @@
 
                 if (target.IsMe)
                 {
-                    if (!Player.Instance.IsRecalling())
-                    {
-                        if (Potions.Refillablec)
-                        {
-                            if (target.HealthPercent <= Potions.Refillableh)
-                            {
-                                Potions.Refillable.Cast();
-                            }
-
-                            if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                            {
-                                Potions.Refillable.Cast();
-                            }
-                        }
-
-                        if (Potions.Healthc)
-                        {
-                            if (target.HealthPercent <= Potions.Healthh)
-                            {
-                                Potions.Health.Cast();
-                            }
-
-                            if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                            {
-                                Potions.Health.Cast();
-                            }
-                        }
-
-                        if (Potions.Huntersc)
-                        {
-                            if (target.HealthPercent <= Potions.Huntersh)
-                            {
-                                Potions.Hunters.Cast();
-                            }
-
-                            if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                            {
-                                Potions.Hunters.Cast();
-                            }
-                        }
-
-                        if (Potions.Biscuitc)
-                        {
-                            if (target.HealthPercent <= Potions.Biscuith)
-                            {
-                                Potions.Biscuit.Cast();
-                            }
-
-                            if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                            {
-                                Potions.Biscuit.Cast();
-                            }
-                        }
-
-                        if (Potions.Corruptingc)
-                        {
-                            if (target.HealthPercent <= Potions.Corruptingh)
-                            {
-                                Potions.Corrupting.Cast();
-                            }
-
-                            if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                            {
-                                Potions.Corrupting.Cast();
-                            }
-                        }
-                    }
-
                     if (Defensive.Seraphc)
                     {
                         if (target.HealthPercent <= Defensive.Seraphh)
@@ -256,8 +188,7 @@
                         Defensive.FOTM.Cast(target);
                     }
 
-                    if (caster.BaseAttackDamage >= target.TotalShieldHealth()
-                        || caster.BaseAbilityDamage >= target.TotalShieldHealth())
+                    if (caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth())
                     {
                         Defensive.FOTM.Cast(target);
                     }
@@ -270,8 +201,7 @@
                         Defensive.Solari.Cast();
                     }
 
-                    if (caster.BaseAttackDamage >= target.TotalShieldHealth()
-                        || caster.BaseAbilityDamage >= target.TotalShieldHealth())
+                    if (caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth())
                     {
                         Defensive.Solari.Cast();
                     }
@@ -279,74 +209,6 @@
 
                 if (target.IsMe)
                 {
-                    if (!Player.Instance.IsRecalling())
-                    {
-                        if (Potions.Refillablec)
-                        {
-                            if (target.HealthPercent <= Potions.Refillableh)
-                            {
-                                Potions.Refillable.Cast();
-                            }
-
-                            if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                            {
-                                Potions.Refillable.Cast();
-                            }
-                        }
-
-                        if (Potions.Healthc)
-                        {
-                            if (target.HealthPercent <= Potions.Healthh)
-                            {
-                                Potions.Health.Cast();
-                            }
-
-                            if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                            {
-                                Potions.Health.Cast();
-                            }
-                        }
-
-                        if (Potions.Huntersc)
-                        {
-                            if (target.HealthPercent <= Potions.Huntersh)
-                            {
-                                Potions.Hunters.Cast();
-                            }
-
-                            if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                            {
-                                Potions.Hunters.Cast();
-                            }
-                        }
-
-                        if (Potions.Biscuitc)
-                        {
-                            if (target.HealthPercent <= Potions.Biscuith)
-                            {
-                                Potions.Biscuit.Cast();
-                            }
-
-                            if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                            {
-                                Potions.Biscuit.Cast();
-                            }
-                        }
-
-                        if (Potions.Corruptingc)
-                        {
-                            if (target.HealthPercent <= Potions.Corruptingh)
-                            {
-                                Potions.Corrupting.Cast();
-                            }
-
-                            if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                            {
-                                Potions.Corrupting.Cast();
-                            }
-                        }
-                    }
-
                     if (Defensive.Seraphc)
                     {
                         if (target.HealthPercent <= Defensive.Seraphh)
@@ -354,8 +216,7 @@
                             Defensive.Seraph.Cast();
                         }
 
-                        if (caster.BaseAttackDamage >= target.TotalShieldHealth()
-                            || caster.BaseAbilityDamage >= target.TotalShieldHealth())
+                        if (caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth())
                         {
                             Defensive.Seraph.Cast();
                         }
@@ -368,8 +229,7 @@
                             Defensive.Zhonyas.Cast();
                         }
 
-                        if (caster.BaseAttackDamage >= target.TotalShieldHealth()
-                            || caster.BaseAbilityDamage >= target.TotalShieldHealth())
+                        if (caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth())
                         {
                             Defensive.Zhonyas.Cast();
                         }

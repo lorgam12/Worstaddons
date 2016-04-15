@@ -25,26 +25,13 @@
 
         public static int Zhonyash => DefMenu["Zhonyash"].Cast<Slider>().CurrentValue;
 
+        public static bool Seraphc => DefMenu["Seraph"].Cast<CheckBox>().CurrentValue && Seraph.IsOwned() && Seraph.IsReady();
 
-        public static bool Seraphc
-            =>
-                DefMenu["Seraph"].Cast<CheckBox>().CurrentValue && Seraph.IsOwned()
-                && Seraph.IsReady();
+        public static bool Solaric => DefMenu["Solari"].Cast<CheckBox>().CurrentValue && Solari.IsOwned() && Solari.IsReady();
 
-        public static bool Solaric
-            =>
-                DefMenu["Solari"].Cast<CheckBox>().CurrentValue && Solari.IsOwned()
-                && Solari.IsReady();
+        public static bool FaceOfTheMountainc => DefMenu["FaceOfTheMountain"].Cast<CheckBox>().CurrentValue && FOTM.IsOwned() && FOTM.IsReady();
 
-        public static bool FaceOfTheMountainc
-            =>
-                DefMenu["FaceOfTheMountain"].Cast<CheckBox>().CurrentValue && FOTM.IsOwned()
-                && FOTM.IsReady();
-
-        public static bool Zhonyasc
-            =>
-                DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue && Zhonyas.IsOwned()
-                && Zhonyas.IsReady();
+        public static bool Zhonyasc => DefMenu["Zhonyas"].Cast<CheckBox>().CurrentValue && Zhonyas.IsOwned() && Zhonyas.IsReady();
 
         public static Menu DefMenu { get; private set; }
 
