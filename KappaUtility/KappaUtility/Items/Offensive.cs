@@ -48,7 +48,7 @@
                 return;
             }
 
-            var useHydra = OffMenu["Hydra"].Cast<CheckBox>().CurrentValue;
+            var useHydra = OffMenu["Hydra"].Cast<CheckBox>().CurrentValue && ((Hydra.IsOwned() && Hydra.IsReady()) || (Timat.IsOwned() && Timat.IsReady()) || (Titanic.IsOwned() && Titanic.IsReady()));
             var flags = Orbwalker.ActiveModesFlags;
             if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && useHydra)
             {
