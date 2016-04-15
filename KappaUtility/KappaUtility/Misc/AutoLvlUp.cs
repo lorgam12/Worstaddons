@@ -61,58 +61,58 @@
             LevelMenu.AddLabel("Q = 1 | W = 2 | E = 3 | R = 4");
             LevelMenu.AddSeparator();
 
-            level1 = LevelMenu.Add("1", new Slider("Level 1", 1, 1, 4));
+            level1 = LevelMenu.Add(Player.Instance.ChampionName + "1", new Slider("Level 1", 1, 1, 4));
             level1.OnValueChange += delegate { Getset(); };
 
-            level2 = LevelMenu.Add("2", new Slider("Level 2", 2, 1, 4));
+            level2 = LevelMenu.Add(Player.Instance.ChampionName + "2", new Slider("Level 2", 2, 1, 4));
             level2.OnValueChange += delegate { Getset(); };
 
-            level3 = LevelMenu.Add("3", new Slider("Level 3", 3, 1, 4));
+            level3 = LevelMenu.Add(Player.Instance.ChampionName + "3", new Slider("Level 3", 3, 1, 4));
             level3.OnValueChange += delegate { Getset(); };
 
-            level4 = LevelMenu.Add("4", new Slider("Level 4", 1, 1, 4));
+            level4 = LevelMenu.Add(Player.Instance.ChampionName + "4", new Slider("Level 4", 1, 1, 4));
             level4.OnValueChange += delegate { Getset(); };
 
-            level5 = LevelMenu.Add("5", new Slider("Level 5", 1, 1, 4));
+            level5 = LevelMenu.Add(Player.Instance.ChampionName + "5", new Slider("Level 5", 1, 1, 4));
             level5.OnValueChange += delegate { Getset(); };
 
-            level6 = LevelMenu.Add("6", new Slider("Level 6", 4, 1, 4));
+            level6 = LevelMenu.Add(Player.Instance.ChampionName + "6", new Slider("Level 6", 4, 1, 4));
             level5.OnValueChange += delegate { Getset(); };
 
-            level7 = LevelMenu.Add("7", new Slider("Level 7", 1, 1, 4));
+            level7 = LevelMenu.Add(Player.Instance.ChampionName + "7", new Slider("Level 7", 1, 1, 4));
             level7.OnValueChange += delegate { Getset(); };
 
-            level8 = LevelMenu.Add("8", new Slider("Level 8", 2, 1, 4));
+            level8 = LevelMenu.Add(Player.Instance.ChampionName + "8", new Slider("Level 8", 2, 1, 4));
             level8.OnValueChange += delegate { Getset(); };
 
-            level9 = LevelMenu.Add("9", new Slider("Level 9", 1, 1, 4));
+            level9 = LevelMenu.Add(Player.Instance.ChampionName + "9", new Slider("Level 9", 1, 1, 4));
             level9.OnValueChange += delegate { Getset(); };
 
-            level10 = LevelMenu.Add("10", new Slider("Level 10", 2, 1, 4));
+            level10 = LevelMenu.Add(Player.Instance.ChampionName + "10", new Slider("Level 10", 2, 1, 4));
             level10.OnValueChange += delegate { Getset(); };
 
-            level11 = LevelMenu.Add("11", new Slider("Level 11", 4, 1, 4));
+            level11 = LevelMenu.Add(Player.Instance.ChampionName + "11", new Slider("Level 11", 4, 1, 4));
             level11.OnValueChange += delegate { Getset(); };
 
-            level12 = LevelMenu.Add("12", new Slider("Level 12", 2, 1, 4));
+            level12 = LevelMenu.Add(Player.Instance.ChampionName + "12", new Slider("Level 12", 2, 1, 4));
             level12.OnValueChange += delegate { Getset(); };
 
-            level13 = LevelMenu.Add("13", new Slider("Level 13", 3, 1, 4));
+            level13 = LevelMenu.Add(Player.Instance.ChampionName + "13", new Slider("Level 13", 3, 1, 4));
             level13.OnValueChange += delegate { Getset(); };
 
-            level14 = LevelMenu.Add("14", new Slider("Level 14", 2, 1, 4));
+            level14 = LevelMenu.Add(Player.Instance.ChampionName + "14", new Slider("Level 14", 2, 1, 4));
             level14.OnValueChange += delegate { Getset(); };
 
-            level15 = LevelMenu.Add("15", new Slider("Level 15", 3, 1, 4));
+            level15 = LevelMenu.Add(Player.Instance.ChampionName + "15", new Slider("Level 15", 3, 1, 4));
             level15.OnValueChange += delegate { Getset(); };
 
-            level16 = LevelMenu.Add("16", new Slider("Level 16", 4, 1, 4));
+            level16 = LevelMenu.Add(Player.Instance.ChampionName + "16", new Slider("Level 16", 4, 1, 4));
             level16.OnValueChange += delegate { Getset(); };
 
-            level17 = LevelMenu.Add("17", new Slider("Level 17", 3, 1, 4));
+            level17 = LevelMenu.Add(Player.Instance.ChampionName + "17", new Slider("Level 17", 3, 1, 4));
             level17.OnValueChange += delegate { Getset(); };
 
-            level18 = LevelMenu.Add("18", new Slider("Level 18", 3, 1, 4));
+            level18 = LevelMenu.Add(Player.Instance.ChampionName + "18", new Slider("Level 18", 3, 1, 4));
             level18.OnValueChange += delegate { Getset(); };
 
             LevelMenu.AddSeparator();
