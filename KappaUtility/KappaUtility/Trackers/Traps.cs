@@ -12,11 +12,11 @@
 
     using Color = System.Drawing.Color;
 
-    internal class Traps
+    internal class Traps : Tracker
     {
         internal static void Draw()
         {
-            if (!Tracker.TrackMenu["Tracktraps"].Cast<CheckBox>().CurrentValue)
+            if (!TrackMenu["Tracktraps"].Cast<CheckBox>().CurrentValue)
             {
                 return;
             }

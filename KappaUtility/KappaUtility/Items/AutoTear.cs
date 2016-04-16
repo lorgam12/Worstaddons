@@ -7,10 +7,10 @@
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
 
-    using KappaUtility.Summoners;
-
     internal class AutoTear
     {
+        protected static bool loaded = false;
+
         public static readonly Item Tear = new Item(ItemId.Tear_of_the_Goddess);
 
         public static readonly Item Tearcs = new Item(ItemId.Tear_of_the_Goddess_Crystal_Scar);
@@ -50,10 +50,16 @@
             TearMenu.Add(Player.Instance.ChampionName + "W", new CheckBox("Use W", false));
             TearMenu.Add(Player.Instance.ChampionName + "E", new CheckBox("Use E", false));
             TearMenu.Add(Player.Instance.ChampionName + "R", new CheckBox("Use R", false));
+            loaded = true;
         }
 
         internal static void OnUpdate()
         {
+            if (!loaded)
+            {
+                return;
+            }
+
             if (TearMenu[Player.Instance.ChampionName + "enable"].Cast<KeyBind>().CurrentValue)
             {
                 var items = ((Tearcs.IsOwned() || Tear.IsOwned()) && TearMenu[Player.Instance.ChampionName + "tear"].Cast<CheckBox>().CurrentValue)

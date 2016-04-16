@@ -48,6 +48,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\DamageHandler.cs" />
     <Compile Include="Common\Helpers.cs" />
     <Compile Include="Items\Defensive.cs" />
     <Compile Include="Items\Offensive.cs" />

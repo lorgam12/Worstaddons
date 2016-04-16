@@ -7,6 +7,10 @@
     using EloBuddy.SDK.Events;
     using EloBuddy.SDK.Menu;
 
+    using Common;
+
+    using EloBuddy.SDK.Menu.Values;
+
     using Items;
 
     using Misc;
@@ -17,6 +21,10 @@
 
     internal class Load
     {
+        protected static bool loadedreveal = false;
+
+        protected static bool loadedtrack = false;
+
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoad;
@@ -27,25 +35,71 @@
         private static void OnLoad(EventArgs args)
         {
             UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
-            AutoLvlUp.OnLoad();
-            AutoQSS.OnLoad();
-            AutoTear.OnLoad();
-            AutoReveal.OnLoad();
-            GanksDetector.OnLoad();
-            Tracker.OnLoad();
-            Surrender.OnLoad();
-            SkinHax.OnLoad();
-            Spells.OnLoad();
-            Flash.FOnLoad();
-            Potions.OnLoad();
-            Offensive.OnLoad();
-            Defensive.OnLoad();
+            UtliMenu.AddGroupLabel("Global Settings [Must F5 To Take Effect]");
+            UtliMenu.Add("AutoLvlUp", new CheckBox("Enable AutoLvlUp"));
+            UtliMenu.Add("AutoQSS", new CheckBox("Enable AutoQSS"));
+            UtliMenu.Add("AutoTear", new CheckBox("Enable AutoTear"));
+            UtliMenu.Add("AutoReveal", new CheckBox("Enable AutoReveal"));
+            UtliMenu.Add("GanksDetector", new CheckBox("Enable GanksDetector"));
+            UtliMenu.Add("Tracker", new CheckBox("Enable Tracker"));
+            UtliMenu.Add("SkinHax", new CheckBox("Enable SkinHax"));
+            UtliMenu.Add("Spells", new CheckBox("Enable SummonerSpells"));
+            UtliMenu.Add("Potions", new CheckBox("Enable Potions"));
+            UtliMenu.Add("Offensive", new CheckBox("Enable Offensive Items"));
+            UtliMenu.Add("Defensive", new CheckBox("Enable Defensive Items"));
+
+            if (UtliMenu["AutoLvlUp"].Cast<CheckBox>().CurrentValue)
+            {
+                AutoLvlUp.OnLoad();
+            }
+            if (UtliMenu["AutoQSS"].Cast<CheckBox>().CurrentValue)
+            {
+                AutoQSS.OnLoad();
+            }
+            if (UtliMenu["AutoTear"].Cast<CheckBox>().CurrentValue)
+            {
+                AutoTear.OnLoad();
+            }
+            if (UtliMenu["AutoReveal"].Cast<CheckBox>().CurrentValue)
+            {
+                AutoReveal.OnLoad();
+                loadedreveal = true;
+            }
+            if (UtliMenu["GanksDetector"].Cast<CheckBox>().CurrentValue)
+            {
+                GanksDetector.OnLoad();
+            }
+            if (UtliMenu["Tracker"].Cast<CheckBox>().CurrentValue)
+            {
+                Tracker.OnLoad();
+                Surrender.OnLoad();
+            }
+            if (UtliMenu["SkinHax"].Cast<CheckBox>().CurrentValue)
+            {
+                SkinHax.OnLoad();
+            }
+            if (UtliMenu["Spells"].Cast<CheckBox>().CurrentValue)
+            {
+                Spells.OnLoad();
+                Flash.FOnLoad();
+            }
+            if (UtliMenu["Potions"].Cast<CheckBox>().CurrentValue)
+            {
+                Potions.OnLoad();
+            }
+            if (UtliMenu["Offensive"].Cast<CheckBox>().CurrentValue)
+            {
+                Offensive.OnLoad();
+            }
+            if (UtliMenu["Defensive"].Cast<CheckBox>().CurrentValue)
+            {
+                Defensive.OnLoad();
+                DamageHandler.OnLoad();
+            }
 
             Game.OnTick += GameOnTick;
             Drawing.OnEndScene += OnEndScene;
             Drawing.OnDraw += DrawingOnDraw;
-            Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
-            Obj_AI_Base.OnBasicAttack += OnBasicAttack;
         }
 
         private static void DrawingOnDraw(EventArgs args)
@@ -65,10 +119,16 @@
         {
             try
             {
-                AutoReveal.Drawings();
-                Traps.Draw();
-                Tracker.HPtrack();
-                Tracker.track();
+                if (loadedreveal)
+                {
+                    AutoReveal.Drawings();
+                }
+                if (loadedtrack)
+                {
+                    Traps.Draw();
+                    Tracker.HPtrack();
+                    Tracker.track();
+                }
                 GanksDetector.OnEndScene();
             }
             catch (Exception e)
@@ -88,7 +148,11 @@
                     Defensive.Items();
                 }
 
-                AutoReveal.Reveal();
+                if (loadedreveal)
+                {
+                    AutoReveal.Reveal();
+                }
+
                 AutoLvlUp.Levelup();
                 AutoTear.OnUpdate();
                 GanksDetector.OnUpdate();
@@ -98,143 +162,6 @@
             catch (Exception e)
             {
                 Console.WriteLine(e);
-            }
-        }
-
-        public static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (!(args.Target is AIHeroClient))
-            {
-                return;
-            }
-
-            var caster = sender;
-            var target = (AIHeroClient)args.Target;
-            if ((caster is AIHeroClient || caster is Obj_AI_Turret) && caster.IsEnemy && target != null && target.IsAlly)
-            {
-                if (target.IsValidTarget(Defensive.FOTM.Range) && Defensive.FaceOfTheMountainc)
-                {
-                    if (target.HealthPercent <= Defensive.FaceOfTheMountainh)
-                    {
-                        Defensive.FOTM.Cast(target);
-                    }
-
-                    if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                    {
-                        Defensive.FOTM.Cast(target);
-                    }
-                }
-
-                if (target.IsValidTarget(Defensive.Solari.Range) && Defensive.Solaric)
-                {
-                    if (target.HealthPercent <= Defensive.Solarih)
-                    {
-                        Defensive.Solari.Cast();
-                    }
-
-                    if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                    {
-                        Defensive.Solari.Cast();
-                    }
-                }
-
-                if (target.IsMe)
-                {
-                    if (Defensive.Seraphc)
-                    {
-                        if (target.HealthPercent <= Defensive.Seraphh)
-                        {
-                            Defensive.Seraph.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                        {
-                            Defensive.Seraph.Cast();
-                        }
-                    }
-
-                    if (Defensive.Zhonyasc)
-                    {
-                        if (target.HealthPercent <= Defensive.Zhonyash)
-                        {
-                            Defensive.Zhonyas.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
-                        {
-                            Defensive.Zhonyas.Cast();
-                        }
-                    }
-                }
-            }
-        }
-
-        public static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (!(args.Target is AIHeroClient))
-            {
-                return;
-            }
-
-            var caster = sender;
-            var target = (AIHeroClient)args.Target;
-
-            if ((caster is AIHeroClient || caster is Obj_AI_Turret) && caster.IsEnemy && target != null && target.IsAlly)
-            {
-                if (target.IsValidTarget(Defensive.FOTM.Range))
-                {
-                    if (Defensive.FaceOfTheMountainc && target.HealthPercent <= Defensive.FaceOfTheMountainh)
-                    {
-                        Defensive.FOTM.Cast(target);
-                    }
-
-                    if (caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth())
-                    {
-                        Defensive.FOTM.Cast(target);
-                    }
-                }
-
-                if (target.IsValidTarget(Defensive.Solari.Range) && Defensive.Solaric)
-                {
-                    if (target.HealthPercent <= Defensive.Solarih)
-                    {
-                        Defensive.Solari.Cast();
-                    }
-
-                    if (caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth())
-                    {
-                        Defensive.Solari.Cast();
-                    }
-                }
-
-                if (target.IsMe)
-                {
-                    if (Defensive.Seraphc)
-                    {
-                        if (target.HealthPercent <= Defensive.Seraphh)
-                        {
-                            Defensive.Seraph.Cast();
-                        }
-
-                        if (caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth())
-                        {
-                            Defensive.Seraph.Cast();
-                        }
-                    }
-
-                    if (Defensive.Zhonyasc)
-                    {
-                        if (target.HealthPercent <= Defensive.Zhonyash)
-                        {
-                            Defensive.Zhonyas.Cast();
-                        }
-
-                        if (caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth())
-                        {
-                            Defensive.Zhonyas.Cast();
-                        }
-                    }
-                }
             }
         }
     }

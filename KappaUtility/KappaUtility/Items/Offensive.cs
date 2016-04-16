@@ -25,6 +25,8 @@
 
         public static Menu OffMenu { get; private set; }
 
+        protected static bool loaded = false;
+
         internal static void OnLoad()
         {
             OffMenu = Load.UtliMenu.AddSubMenu("Offense Items");
@@ -39,6 +41,7 @@
             OffMenu.Add("oL", new Slider("Use On My health", 65, 0, 100));
 
             Orbwalker.OnPostAttack += Orbwalker_OnPostAttack;
+            loaded = true;
         }
 
         private static void Orbwalker_OnPostAttack(AttackableUnit target, EventArgs args)
@@ -48,7 +51,9 @@
                 return;
             }
 
-            var useHydra = OffMenu["Hydra"].Cast<CheckBox>().CurrentValue && ((Hydra.IsOwned() && Hydra.IsReady()) || (Timat.IsOwned() && Timat.IsReady()) || (Titanic.IsOwned() && Titanic.IsReady()));
+            var useHydra = OffMenu["Hydra"].Cast<CheckBox>().CurrentValue
+                           && ((Hydra.IsOwned() && Hydra.IsReady()) || (Timat.IsOwned() && Timat.IsReady())
+                               || (Titanic.IsOwned() && Titanic.IsReady()));
             var flags = Orbwalker.ActiveModesFlags;
             if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && useHydra)
             {
@@ -71,6 +76,10 @@
 
         internal static void Items()
         {
+            if (!loaded)
+            {
+                return;
+            }
             var target = TargetSelector.GetTarget(500, DamageType.Physical);
             if (target == null || !target.IsValidTarget())
             {

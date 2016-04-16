@@ -23,6 +23,8 @@
 
         public static Menu GankMenu { get; private set; }
 
+        protected static bool loaded = false;
+
         internal static void OnLoad()
         {
             GankMenu = Load.UtliMenu.AddSubMenu("GanksDetector");
@@ -52,10 +54,16 @@
                     GankMenu.Add("EnemyGank" + hero.BaseSkinName, cb);
                 }
             }
+            loaded = true;
         }
 
         internal static void OnEndScene()
         {
+            if (!loaded)
+            {
+                return;
+            }
+
             if (!GankMenu["enable"].Cast<CheckBox>().CurrentValue)
             {
                 return;
@@ -77,6 +85,11 @@
 
         internal static void OnUpdate()
         {
+            if (!loaded)
+            {
+                return;
+            }
+
             if (Player.Instance.IsDead || !GankMenu["enable"].Cast<CheckBox>().CurrentValue)
             {
                 return;
@@ -125,6 +138,10 @@
 
         internal static void OnDraw()
         {
+            if (!loaded)
+            {
+                return;
+            }
             if (!GankMenu["enable"].Cast<CheckBox>().CurrentValue)
             {
                 return;

@@ -32,6 +32,8 @@
 
         public static Menu SummMenu { get; private set; }
 
+        protected static bool loaded = false;
+
         internal static void OnLoad()
         {
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
@@ -177,9 +179,7 @@
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerPoroThrow")) != null)
             {
                 SummMenu.AddGroupLabel("Poro Settings");
-                SummMenu.Add(
-                    Player.Instance.ChampionName + "EnablePoro",
-                    new KeyBind("Enable Poro Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
+                SummMenu.Add(Player.Instance.ChampionName + "EnablePoro", new KeyBind("Enable Poro Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
                 SummMenu.Add(
                     Player.Instance.ChampionName + "EnableactivePoro",
                     new KeyBind("Enable Poro Active", false, KeyBind.BindTypes.HoldActive));
@@ -188,16 +188,22 @@
                 foreach (var enemy in EntityManager.Heroes.Enemies)
                 {
                     var cb = new CheckBox(enemy.BaseSkinName) { CurrentValue = false };
-                        SummMenu.Add("Dontporo" + enemy.BaseSkinName, cb);
-                    
+                    SummMenu.Add("Dontporo" + enemy.BaseSkinName, cb);
                 }
 
-                porotoss = new Spell.Skillshot(Player.Instance.GetSpellSlotFromName("SummonerPoroThrow"), 2250, SkillShotType.Linear, 50, 1000, 50) { AllowedCollisionCount = 0};
+                porotoss = new Spell.Skillshot(Player.Instance.GetSpellSlotFromName("SummonerPoroThrow"), 2250, SkillShotType.Linear, 50, 1000, 50)
+                               { AllowedCollisionCount = 0 };
             }
+            loaded = true;
         }
 
         internal static void Drawings()
         {
+            if (!loaded)
+            {
+                return;
+            }
+
             if (Ignite != null)
             {
                 if (SummMenu["drawIgnite"].Cast<CheckBox>().CurrentValue
@@ -250,7 +256,10 @@
 
             var ally = ObjectManager.Get<AIHeroClient>().FirstOrDefault(a => a.IsValid && a.IsAlly && a.IsVisible);
 
-            if (target == null) return;
+            if (target == null)
+            {
+                return;
+            }
             if (Ignite != null)
             {
                 var ignitec = (SummMenu[Player.Instance.ChampionName + "EnableactiveIgnite"].Cast<KeyBind>().CurrentValue
@@ -272,7 +281,8 @@
                 if (SummMenu[Player.Instance.ChampionName + "Enableactiveporo"].Cast<KeyBind>().CurrentValue
                     || SummMenu[Player.Instance.ChampionName + "Enableporo"].Cast<KeyBind>().CurrentValue)
                 {
-                    if (porotoss.IsReady() && target.IsValidTarget(porotoss.Range) && !SummMenu["Dontporo" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    if (porotoss.IsReady() && target.IsValidTarget(porotoss.Range)
+                        && !SummMenu["Dontporo" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                     {
                         var pred = porotoss.GetPrediction(target);
                         if (pred.HitChance >= HitChance.Medium)
@@ -290,8 +300,7 @@
                 var Exhaustally = SummMenu["exhaustally"].Cast<Slider>().CurrentValue;
                 var Exhaustenemy = SummMenu["exhaustenemy"].Cast<Slider>().CurrentValue;
 
-                if (exhaustc
-                    && (target.IsValidTarget(Exhaust.Range) && !SummMenu["DontExhaust" + target.BaseSkinName].Cast<CheckBox>().CurrentValue))
+                if (exhaustc && (target.IsValidTarget(Exhaust.Range) && !SummMenu["DontExhaust" + target.BaseSkinName].Cast<CheckBox>().CurrentValue))
                 {
                     if (target.HealthPercent <= Exhaustenemy)
                     {

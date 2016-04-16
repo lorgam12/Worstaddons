@@ -15,6 +15,8 @@
 
         protected static readonly Item Quicksilver_Sash = new Item(ItemId.Quicksilver_Sash);
 
+        protected static bool loaded = false;
+
         public static Menu QssMenu { get; private set; }
 
         internal static void OnLoad()
@@ -64,11 +66,18 @@
             QssMenu.Add("human", new Slider("Humanizer Delay", 150, 0, 1500));
             QssMenu.Add("Rene", new Slider("Enemies Near to Cast", 1, 0, 5));
             QssMenu.Add("enemydetect", new Slider("Enemies Detect Range", 1000, 0, 2000));
+            loaded = true;
+
             Obj_AI_Base.OnBuffGain += OnBuffGain;
         }
 
         private static void OnBuffGain(Obj_AI_Base sender, Obj_AI_BaseBuffGainEventArgs args)
         {
+            if (!loaded)
+            {
+                return;
+            }
+
             if (QssMenu["enable"].Cast<CheckBox>().CurrentValue)
             {
                 if (sender.IsMe)

@@ -35,6 +35,8 @@
 
         public static Menu DefMenu { get; private set; }
 
+        protected static bool loaded = false;
+
         internal static void OnLoad()
         {
             DefMenu = Load.UtliMenu.AddSubMenu("Defence Items");
@@ -57,10 +59,16 @@
             DefMenu.AddGroupLabel("Zhonya Danger Spells");
             DefMenu.Add("ZhonyasD", new CheckBox("Deny Dangers Spells", false));
             Zhonya.OnLoad();
+            loaded = true;
         }
 
         internal static void Items()
         {
+            if (!loaded)
+            {
+                return;
+            }
+
             if (Randuin.IsReady() && Randuin.IsOwned(Player.Instance)
                 && Player.Instance.CountEnemiesInRange(Randuin.Range) >= DefMenu["Randuinh"].Cast<Slider>().CurrentValue
                 && DefMenu["Randuin"].Cast<CheckBox>().CurrentValue)

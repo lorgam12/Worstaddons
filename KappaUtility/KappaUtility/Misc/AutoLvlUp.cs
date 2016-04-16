@@ -51,6 +51,8 @@
 
         public static Menu LevelMenu { get; private set; }
 
+        protected static bool loaded = false;
+
         internal static void OnLoad()
         {
             LevelMenu = Load.UtliMenu.AddSubMenu("AutoLvlUP");
@@ -119,12 +121,8 @@
             LevelMenu.AddGroupLabel("Leveling Delay");
             LevelMenu.Add("delay", new Slider("LevelUP Delay {0} sec", 5, 0, 15));
 
-            loadfirstset();
-        }
-
-        internal static void loadfirstset()
-        {
             Getset();
+            loaded = true;
         }
 
         internal static void Getset()
@@ -142,6 +140,11 @@
 
         internal static void Levelup()
         {
+            if (!loaded)
+            {
+                return;
+            }
+
             if (!LevelMenu[Player.Instance.ChampionName + "enable1"].Cast<CheckBox>().CurrentValue)
             {
                 return;
