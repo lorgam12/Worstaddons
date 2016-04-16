@@ -73,6 +73,7 @@
             {
                 Tracker.OnLoad();
                 Surrender.OnLoad();
+                loadedtrack = true;
             }
             if (UtliMenu["SkinHax"].Cast<CheckBox>().CurrentValue)
             {
