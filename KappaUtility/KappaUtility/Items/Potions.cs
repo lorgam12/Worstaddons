@@ -58,8 +58,7 @@
             PotMenu.Add("RPH", new Slider("Use On health %", 50, 0, 100));
             PotMenu.Add("BP", new CheckBox("Biscuit", false));
             PotMenu.Add("BPH", new Slider("Use On health %", 40, 0, 100));
-
-            Chat.Print(Health.ItemInfo.Name);
+            
             Obj_AI_Base.OnBasicAttack += Obj_AI_Base_OnBasicAttack;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
         }
