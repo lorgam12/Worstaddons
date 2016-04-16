@@ -43,6 +43,10 @@
 
         public static Slider level18;
 
+        public static ComboBox levels;
+
+        public static ComboBox mode;
+
         public static int[] LevelSet;
 
         public static int[] level = { 0, 0, 0, 0 };
@@ -58,11 +62,134 @@
             LevelMenu = Load.UtliMenu.AddSubMenu("AutoLvlUP");
             LevelMenu.AddGroupLabel("AutoLeveler Settings");
             LevelMenu.Add(Player.Instance.ChampionName + "enable1", new CheckBox("Enable", false));
-            LevelMenu.AddSeparator();
+            LevelMenu.AddSeparator(0);
+            LevelMenu.AddGroupLabel("Leveling Delay");
+            LevelMenu.Add("delay", new Slider("LevelUP Delay {0} sec", 5, 0, 15));
+            loaded = true;
+            LevelMenu.AddSeparator(0);
             LevelMenu.AddGroupLabel("Level Sets");
-            LevelMenu.AddLabel("Q = 1 | W = 2 | E = 3 | R = 4");
-            LevelMenu.AddSeparator();
+            mode = LevelMenu.Add("switch", new ComboBox("SelectMode", 0, "Premade", "Custom"));
+            mode.OnValueChange += delegate
+                {
+                    switch (mode.Cast<ComboBox>().CurrentValue)
+                    {
+                        case 0:
+                            {
+                                premade();
+                                premadeset();
+                            }
+                            break;
+                        case 1:
+                            {
+                                custom();
+                                Getset();
+                            }
+                            break;
+                    }
+                };
 
+            LevelMenu.AddGroupLabel("Leveling Mode");
+            LevelMenu.AddLabel("Q = 1 | W = 2 | E = 3 | R = 4");
+
+            LoadPremadeMenu();
+            LoadCustomMenu();
+
+            switch (mode.Cast<ComboBox>().CurrentValue)
+            {
+                case 0:
+                    {
+                        premade();
+                        premadeset();
+                    }
+                    break;
+                case 1:
+                    {
+                        custom();
+                        Getset();
+                    }
+                    break;
+            }
+            Obj_AI_Base.OnLevelUp += Obj_AI_Base_OnLevelUp;
+        }
+
+        private static void Obj_AI_Base_OnLevelUp(Obj_AI_Base sender, Obj_AI_BaseLevelUpEventArgs args)
+        {
+            if (!sender.IsMe)
+            {
+                return;
+            }
+
+            switch (mode.Cast<ComboBox>().CurrentValue)
+            {
+                case 0:
+                    {
+                        premadeset();
+                    }
+                    break;
+                case 1:
+                    {
+                        Getset();
+                    }
+                    break;
+            }
+        }
+
+        internal static void premade()
+        {
+            levels.IsVisible = true;
+            level1.IsVisible = false;
+            level2.IsVisible = false;
+            level3.IsVisible = false;
+            level4.IsVisible = false;
+            level5.IsVisible = false;
+            level6.IsVisible = false;
+            level7.IsVisible = false;
+            level8.IsVisible = false;
+            level9.IsVisible = false;
+            level10.IsVisible = false;
+            level11.IsVisible = false;
+            level12.IsVisible = false;
+            level13.IsVisible = false;
+            level14.IsVisible = false;
+            level15.IsVisible = false;
+            level16.IsVisible = false;
+            level17.IsVisible = false;
+            level18.IsVisible = false;
+        }
+
+        internal static void custom()
+        {
+            levels.IsVisible = false;
+            level1.IsVisible = true;
+            level2.IsVisible = true;
+            level3.IsVisible = true;
+            level4.IsVisible = true;
+            level5.IsVisible = true;
+            level6.IsVisible = true;
+            level7.IsVisible = true;
+            level8.IsVisible = true;
+            level9.IsVisible = true;
+            level10.IsVisible = true;
+            level11.IsVisible = true;
+            level12.IsVisible = true;
+            level13.IsVisible = true;
+            level14.IsVisible = true;
+            level15.IsVisible = true;
+            level16.IsVisible = true;
+            level17.IsVisible = true;
+            level18.IsVisible = true;
+        }
+
+        internal static void LoadPremadeMenu()
+        {
+            levels = LevelMenu.Add(
+                Player.Instance.ChampionName + "sets",
+                new ComboBox("Level Sets", 0, "R > Q > W > E", "R > Q > E > W", "R > W > Q > E", "R > W > E > Q", "R > E > Q > W", "R > E > W > Q"));
+            levels.OnValueChange += delegate { premadeset(); };
+        }
+
+        internal static void LoadCustomMenu()
+        {
             level1 = LevelMenu.Add(Player.Instance.ChampionName + "1", new Slider("Level 1", 1, 1, 4));
             level1.OnValueChange += delegate { Getset(); };
 
@@ -116,13 +243,6 @@
 
             level18 = LevelMenu.Add(Player.Instance.ChampionName + "18", new Slider("Level 18", 3, 1, 4));
             level18.OnValueChange += delegate { Getset(); };
-
-            LevelMenu.AddSeparator();
-            LevelMenu.AddGroupLabel("Leveling Delay");
-            LevelMenu.Add("delay", new Slider("LevelUP Delay {0} sec", 5, 0, 15));
-
-            Getset();
-            loaded = true;
         }
 
         internal static void Getset()
@@ -136,6 +256,48 @@
                                level13.Cast<Slider>().CurrentValue, level14.Cast<Slider>().CurrentValue, level15.Cast<Slider>().CurrentValue,
                                level16.Cast<Slider>().CurrentValue, level17.Cast<Slider>().CurrentValue, level18.Cast<Slider>().CurrentValue
                            };
+        }
+
+        internal static void premadeset()
+        {
+            switch (levels.Cast<ComboBox>().CurrentValue)
+            {
+                case 0:
+                    {
+                        LevelSet = new[] { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 3, 2, 3, 4, 3, 3 };
+                    }
+                    break;
+
+                case 1:
+                    {
+                        LevelSet = new[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 2, 3, 2, 4, 2, 2 };
+                    }
+                    break;
+
+                case 2:
+                    {
+                        LevelSet = new[] { 2, 1, 3, 2, 2, 4, 2, 1, 2, 1, 4, 1, 3, 1, 3, 4, 3, 3 };
+                    }
+                    break;
+
+                case 3:
+                    {
+                        LevelSet = new[] { 2, 3, 1, 2, 2, 4, 2, 3, 2, 3, 4, 3, 1, 3, 1, 4, 1, 1 };
+                    }
+                    break;
+
+                case 4:
+                    {
+                        LevelSet = new[] { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 2, 1, 2, 4, 2, 2 };
+                    }
+                    break;
+
+                case 5:
+                    {
+                        LevelSet = new[] { 3, 2, 1, 3, 3, 4, 3, 2, 3, 2, 4, 2, 1, 2, 1, 4, 1, 1 };
+                    }
+                    break;
+            }
         }
 
         internal static void Levelup()
