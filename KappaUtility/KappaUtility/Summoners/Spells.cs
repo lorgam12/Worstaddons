@@ -1,5 +1,6 @@
 ﻿namespace KappaUtility.Summoners
 {
+    using System;
     using System.Linq;
 
     using EloBuddy;
@@ -9,6 +10,9 @@
     using EloBuddy.SDK.Rendering;
 
     using Common;
+
+    using EloBuddy.SDK.Enumerations;
+    using EloBuddy.SDK.Spells;
 
     using SharpDX;
 
@@ -23,6 +27,8 @@
         public static Spell.Targeted Smite;
 
         public static Spell.Targeted Exhaust;
+
+        public static Spell.Skillshot porotoss;
 
         public static Menu SummMenu { get; private set; }
 
@@ -167,6 +173,27 @@
                     Smite = new Spell.Targeted(SpellSlot.Summoner2, 555);
                 }
             }
+
+            if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerPoroThrow")) != null)
+            {
+                SummMenu.AddGroupLabel("Poro Settings");
+                SummMenu.Add(
+                    Player.Instance.ChampionName + "EnablePoro",
+                    new KeyBind("Enable Poro Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
+                SummMenu.Add(
+                    Player.Instance.ChampionName + "EnableactivePoro",
+                    new KeyBind("Enable Poro Active", false, KeyBind.BindTypes.HoldActive));
+                SummMenu.Add("drawporo", new CheckBox("Draw PoroToss range", false));
+                SummMenu.AddGroupLabel("Don't Use PoroToss On:");
+                foreach (var enemy in EntityManager.Heroes.Enemies)
+                {
+                    var cb = new CheckBox(enemy.BaseSkinName) { CurrentValue = false };
+                        SummMenu.Add("Dontporo" + enemy.BaseSkinName, cb);
+                    
+                }
+
+                porotoss = new Spell.Skillshot(Player.Instance.GetSpellSlotFromName("SummonerPoroThrow"), 2250, SkillShotType.Linear, 50, 1000, 50) { AllowedCollisionCount = 0};
+            }
         }
 
         internal static void Drawings()
@@ -208,28 +235,50 @@
                     Circle.Draw(Exhaust.IsReady() ? Color.LightBlue : Color.Red, Exhaust.Range, Player.Instance.Position);
                 }
             }
+            if (porotoss != null)
+            {
+                if (SummMenu["drawporo"].Cast<CheckBox>().CurrentValue)
+                {
+                    Circle.Draw(porotoss.IsReady() ? Color.LightBlue : Color.Red, porotoss.Range, Player.Instance.Position);
+                }
+            }
         }
 
         public static void Cast()
         {
-            var target =
-                ObjectManager.Get<AIHeroClient>()
-                    .FirstOrDefault(enemy => enemy.IsValid && enemy.IsEnemy && enemy.IsVisible && !enemy.IsDead && enemy.IsKillable());
+            var target = TargetSelector.GetTarget(2150, DamageType.True);
 
             var ally = ObjectManager.Get<AIHeroClient>().FirstOrDefault(a => a.IsValid && a.IsAlly && a.IsVisible);
 
+            if (target == null) return;
             if (Ignite != null)
             {
                 var ignitec = (SummMenu[Player.Instance.ChampionName + "EnableactiveIgnite"].Cast<KeyBind>().CurrentValue
                                || SummMenu[Player.Instance.ChampionName + "EnableIgnite"].Cast<KeyBind>().CurrentValue) && Ignite.IsReady();
 
-                if (ignitec && target != null
+                if (ignitec
                     && Player.Instance.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
                     >= target.TotalShieldHealth() + (target.HPRegenRate * 3))
                 {
                     if (target.IsValidTarget(Ignite.Range) && !SummMenu["DontIgnite" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                     {
                         Ignite.Cast(target);
+                    }
+                }
+            }
+
+            if (porotoss != null && Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerPoroThrow")) != null)
+            {
+                if (SummMenu[Player.Instance.ChampionName + "Enableactiveporo"].Cast<KeyBind>().CurrentValue
+                    || SummMenu[Player.Instance.ChampionName + "Enableporo"].Cast<KeyBind>().CurrentValue)
+                {
+                    if (porotoss.IsReady() && target.IsValidTarget(porotoss.Range) && !SummMenu["Dontporo" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    {
+                        var pred = porotoss.GetPrediction(target);
+                        if (pred.HitChance >= HitChance.Medium)
+                        {
+                            porotoss.Cast(pred.CastPosition);
+                        }
                     }
                 }
             }
@@ -241,7 +290,7 @@
                 var Exhaustally = SummMenu["exhaustally"].Cast<Slider>().CurrentValue;
                 var Exhaustenemy = SummMenu["exhaustenemy"].Cast<Slider>().CurrentValue;
 
-                if (exhaustc && target != null
+                if (exhaustc
                     && (target.IsValidTarget(Exhaust.Range) && !SummMenu["DontExhaust" + target.BaseSkinName].Cast<CheckBox>().CurrentValue))
                 {
                     if (target.HealthPercent <= Exhaustenemy)

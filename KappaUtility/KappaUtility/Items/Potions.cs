@@ -29,15 +29,15 @@
 
         public static int Biscuith => PotMenu["BPH"].Cast<Slider>().CurrentValue;
 
-        public static bool Corruptingc => PotMenu["CP"].Cast<CheckBox>().CurrentValue && Corrupting.IsOwned() && Corrupting.IsReady();
+        public static bool Corruptingc => PotMenu["CP"].Cast<CheckBox>().CurrentValue && Corrupting.IsOwned() && Corrupting.IsReady() && !Player.Instance.HasBuff(Corrupting.ItemInfo.Name);
 
-        public static bool Healthc => PotMenu["HP"].Cast<CheckBox>().CurrentValue && Health.IsOwned() && Health.IsReady();
+        public static bool Healthc => PotMenu["HP"].Cast<CheckBox>().CurrentValue && Health.IsOwned() && Health.IsReady() && !Player.Instance.HasBuff(Health.ItemInfo.Name);
 
-        public static bool Huntersc => PotMenu["HPS"].Cast<CheckBox>().CurrentValue && Hunters.IsOwned() && Hunters.IsReady();
+        public static bool Huntersc => PotMenu["HPS"].Cast<CheckBox>().CurrentValue && Hunters.IsOwned() && Hunters.IsReady() && !Player.Instance.HasBuff(Hunters.ItemInfo.Name);
 
-        public static bool Refillablec => PotMenu["RP"].Cast<CheckBox>().CurrentValue && Refillable.IsOwned() && Refillable.IsReady();
+        public static bool Refillablec => PotMenu["RP"].Cast<CheckBox>().CurrentValue && Refillable.IsOwned() && Refillable.IsReady() && !Player.Instance.HasBuff(Refillable.ItemInfo.Name);
 
-        public static bool Biscuitc => PotMenu["BP"].Cast<CheckBox>().CurrentValue && Biscuit.IsOwned() && Biscuit.IsReady();
+        public static bool Biscuitc => PotMenu["BP"].Cast<CheckBox>().CurrentValue && Biscuit.IsOwned() && Biscuit.IsReady() && !Player.Instance.HasBuff(Biscuit.ItemInfo.Name);
 
         internal static void OnLoad()
         {
@@ -59,6 +59,7 @@
             PotMenu.Add("BP", new CheckBox("Biscuit", false));
             PotMenu.Add("BPH", new Slider("Use On health %", 40, 0, 100));
 
+            Chat.Print(Health.ItemInfo.Name);
             Obj_AI_Base.OnBasicAttack += Obj_AI_Base_OnBasicAttack;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
         }
