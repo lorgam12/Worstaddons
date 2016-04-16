@@ -64,11 +64,11 @@
             LevelMenu.Add(Player.Instance.ChampionName + "enable1", new CheckBox("Enable", false));
             LevelMenu.AddSeparator(0);
             LevelMenu.AddGroupLabel("Leveling Delay");
-            LevelMenu.Add("delay", new Slider("LevelUP Delay {0} sec", 5, 0, 15));
+            LevelMenu.Add(Player.Instance.ChampionName + "delay", new Slider("LevelUP Delay {0} sec", 5, 0, 15));
             loaded = true;
             LevelMenu.AddSeparator(0);
             LevelMenu.AddGroupLabel("Level Sets");
-            mode = LevelMenu.Add("switch", new ComboBox("SelectMode", 0, "Premade", "Custom"));
+            mode = LevelMenu.Add(Player.Instance.ChampionName + "switch", new ComboBox("SelectMode", 0, "Premade", "Custom"));
             mode.OnValueChange += delegate
                 {
                     switch (mode.Cast<ComboBox>().CurrentValue)
@@ -349,7 +349,7 @@
 
         internal static void levelup(SpellSlot slot)
         {
-            Core.DelayAction(() => { ObjectManager.Player.Spellbook.LevelSpell(slot); }, LevelMenu["delay"].Cast<Slider>().CurrentValue * 1000);
+            Core.DelayAction(() => { ObjectManager.Player.Spellbook.LevelSpell(slot); }, LevelMenu[Player.Instance.ChampionName + "delay"].Cast<Slider>().CurrentValue * 1000);
         }
     }
 }
