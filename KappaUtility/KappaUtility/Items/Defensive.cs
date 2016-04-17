@@ -58,6 +58,7 @@
             DefMenu.AddSeparator();
             DefMenu.AddGroupLabel("Zhonya Danger Spells");
             DefMenu.Add("ZhonyasD", new CheckBox("Deny Dangers Spells", false));
+            Common.DamageHandler.OnLoad();
             Zhonya.OnLoad();
             loaded = true;
         }

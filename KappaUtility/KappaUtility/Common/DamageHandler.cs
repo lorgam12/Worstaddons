@@ -26,12 +26,8 @@
             {
                 if (target.IsValidTarget(Defensive.FOTM.Range) && Defensive.FaceOfTheMountainc)
                 {
-                    if (target.HealthPercent <= Defensive.FaceOfTheMountainh)
-                    {
-                        Defensive.FOTM.Cast(target);
-                    }
-
-                    if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                    if (target.HealthPercent <= Defensive.FaceOfTheMountainh || caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth()
+                        || args.SData.SpellDamageRatio >= target.HealthPercent)
                     {
                         Defensive.FOTM.Cast(target);
                     }
@@ -39,12 +35,8 @@
 
                 if (target.IsValidTarget(Defensive.Solari.Range) && Defensive.Solaric)
                 {
-                    if (target.HealthPercent <= Defensive.Solarih)
-                    {
-                        Defensive.Solari.Cast();
-                    }
-
-                    if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                    if (target.HealthPercent <= Defensive.Solarih || caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth()
+                        || args.SData.SpellDamageRatio >= target.HealthPercent)
                     {
                         Defensive.Solari.Cast();
                     }
@@ -54,12 +46,8 @@
                 {
                     if (Defensive.Seraphc)
                     {
-                        if (target.HealthPercent <= Defensive.Seraphh)
-                        {
-                            Defensive.Seraph.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                        if (target.HealthPercent <= Defensive.Seraphh || caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth()
+                            || args.SData.SpellDamageRatio >= target.HealthPercent)
                         {
                             Defensive.Seraph.Cast();
                         }
@@ -67,12 +55,8 @@
 
                     if (Defensive.Zhonyasc)
                     {
-                        if (target.HealthPercent <= Defensive.Zhonyash)
-                        {
-                            Defensive.Zhonyas.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                        if (target.HealthPercent <= Defensive.Zhonyash || caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth()
+                            || args.SData.SpellDamageRatio >= target.HealthPercent)
                         {
                             Defensive.Zhonyas.Cast();
                         }
@@ -95,25 +79,18 @@
             {
                 if (target.IsValidTarget(Defensive.FOTM.Range))
                 {
-                    if (Defensive.FaceOfTheMountainc && target.HealthPercent <= Defensive.FaceOfTheMountainh)
-                    {
-                        Defensive.FOTM.Cast(target);
-                    }
-
-                    if (caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth())
+                    if ((Defensive.FaceOfTheMountainc) && target.HealthPercent <= Defensive.FaceOfTheMountainh
+                        || caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth()
+                        || args.SData.SpellDamageRatio >= target.HealthPercent)
                     {
                         Defensive.FOTM.Cast(target);
                     }
                 }
 
-                if (target.IsValidTarget(Defensive.Solari.Range) && Defensive.Solaric)
+                if (Defensive.Solaric && target.IsValidTarget(Defensive.Solari.Range))
                 {
-                    if (target.HealthPercent <= Defensive.Solarih)
-                    {
-                        Defensive.Solari.Cast();
-                    }
-
-                    if (caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth())
+                    if (target.HealthPercent <= Defensive.Solarih || caster.BaseAttackDamage >= target.TotalShieldHealth()
+                        || caster.BaseAbilityDamage >= target.TotalShieldHealth() || args.SData.SpellDamageRatio >= target.HealthPercent)
                     {
                         Defensive.Solari.Cast();
                     }
@@ -123,12 +100,8 @@
                 {
                     if (Defensive.Seraphc)
                     {
-                        if (target.HealthPercent <= Defensive.Seraphh)
-                        {
-                            Defensive.Seraph.Cast();
-                        }
-
-                        if (caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth())
+                        if (target.HealthPercent <= Defensive.Seraphh || caster.BaseAttackDamage >= target.TotalShieldHealth()
+                            || caster.BaseAbilityDamage >= target.TotalShieldHealth() || args.SData.SpellDamageRatio >= target.HealthPercent)
                         {
                             Defensive.Seraph.Cast();
                         }
@@ -136,12 +109,13 @@
 
                     if (Defensive.Zhonyasc)
                     {
-                        if (target.HealthPercent <= Defensive.Zhonyash)
+                        if (target.HealthPercent <= Defensive.Zhonyash || caster.BaseAttackDamage >= target.TotalShieldHealth()
+                            || caster.BaseAbilityDamage >= target.TotalShieldHealth())
                         {
                             Defensive.Zhonyas.Cast();
                         }
 
-                        if (caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth())
+                        if (args.SData.SpellDamageRatio >= target.HealthPercent)
                         {
                             Defensive.Zhonyas.Cast();
                         }

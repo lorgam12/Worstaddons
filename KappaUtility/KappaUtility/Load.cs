@@ -47,7 +47,6 @@
             UtliMenu.Add("Potions", new CheckBox("Enable Potions"));
             UtliMenu.Add("Offensive", new CheckBox("Enable Offensive Items"));
             UtliMenu.Add("Defensive", new CheckBox("Enable Defensive Items"));
-
             if (UtliMenu["AutoLvlUp"].Cast<CheckBox>().CurrentValue)
             {
                 AutoLvlUp.OnLoad();
@@ -95,7 +94,6 @@
             if (UtliMenu["Defensive"].Cast<CheckBox>().CurrentValue)
             {
                 Defensive.OnLoad();
-                DamageHandler.OnLoad();
             }
 
             Game.OnTick += GameOnTick;

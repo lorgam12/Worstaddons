@@ -349,7 +349,9 @@
 
         internal static void levelup(SpellSlot slot)
         {
-            Core.DelayAction(() => { ObjectManager.Player.Spellbook.LevelSpell(slot); }, LevelMenu[Player.Instance.ChampionName + "delay"].Cast<Slider>().CurrentValue * 1000);
+            Core.DelayAction(
+                () => { ObjectManager.Player.Spellbook.LevelSpell(slot); },
+                LevelMenu[Player.Instance.ChampionName + "delay"].Cast<Slider>().CurrentValue * 1000);
         }
     }
 }
