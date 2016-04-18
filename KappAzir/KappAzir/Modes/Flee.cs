@@ -4,7 +4,6 @@
 
     using EloBuddy;
     using EloBuddy.SDK;
-    
     using static Menus;
     using static SpellsManager;
     using Mario_s_Lib;

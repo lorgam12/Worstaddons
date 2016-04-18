@@ -6,14 +6,8 @@
     using EloBuddy.SDK;
 
     using Mario_s_Lib;
-    using
-    
-
-    static
-Menus;
-    using
-    static
-SpellsManager;
+    using static Menus;
+    using static SpellsManager;
 
     /// <summary>
     /// This mode will run when the key of the orbwalker is pressed
@@ -41,12 +35,9 @@ SpellsManager;
                 }
 
                 var location =
-                    Prediction.Position.PredictCircularMissileAoe(
-                        minions.Cast<Obj_AI_Base>().ToArray(),
-                        Q.Range,
-                        Q.Width,
-                        Q.CastDelay,
-                        Q.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
+                    Prediction.Position.PredictCircularMissileAoe(minions.Cast<Obj_AI_Base>().ToArray(), Q.Range, Q.Width, Q.CastDelay, Q.Speed)
+                        .OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length)
+                        .FirstOrDefault();
 
                 if (location != null && location.CollisionObjects.Length >= 2)
                 {

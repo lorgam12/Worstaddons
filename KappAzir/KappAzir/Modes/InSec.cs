@@ -17,23 +17,27 @@
 
         public static void QCast(Vector3 pos)
         {
-            Core.DelayAction(() => {
-                                       if (Q.Cast(Azir.Position.Extend(pos, Q.Range).To3D()))
-                                       {
-
-                    if (tower != null)
+            Core.DelayAction(
+                () =>
                     {
-                        R.Cast(tower.ServerPosition);
-                    }
-                    else if (ally != null)
-                    {
-                        R.Cast(ally.ServerPosition);
-                    }
-                    else
-                    {
-                        RCast(insecLoc.To3D());
-                    }
-                }; }, 150);
+                        if (Q.Cast(Azir.Position.Extend(pos, Q.Range).To3D()))
+                        {
+                            if (tower != null)
+                            {
+                                R.Cast(tower.ServerPosition);
+                            }
+                            else if (ally != null)
+                            {
+                                R.Cast(ally.ServerPosition);
+                            }
+                            else
+                            {
+                                RCast(insecLoc.To3D());
+                            }
+                        }
+                        ;
+                    },
+                150);
         }
 
         public static void RCast(Vector3 pos)
@@ -52,9 +56,14 @@
                     {
                         if (R.IsReady())
                         {
-                            if(Orbwalker.AzirSoldiers.Count > 0)
-                            insecLoc = Vector2.Zero;
-                            var s = Orbwalker.AzirSoldiers.Where(it => it.Distance(Target) <= (R.Width / 2) - 20).OrderByDescending(it => it.Distance(Target)).First();
+                            if (Orbwalker.AzirSoldiers.Count > 0)
+                            {
+                                insecLoc = Vector2.Zero;
+                            }
+                            var s =
+                                Orbwalker.AzirSoldiers.Where(it => it.Distance(Target) <= (R.Width / 2) - 20)
+                                    .OrderByDescending(it => it.Distance(Target))
+                                    .First();
                             insecLoc = (Vector2)Azir.ServerPosition;
                             if (Azir.Distance(Target) > 200 && s != null)
                             {
@@ -137,7 +146,9 @@
                             {
                                 if (E.Cast(Azir.Position.Extend(insecPos, E.Range).To3D()))
                                 {
-                                    Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(insecPos, Q.Range).To3D()); }, FleeMenu.GetSliderValue("delay"));
+                                    Core.DelayAction(
+                                        () => { Q.Cast(Azir.Position.Extend(insecPos, Q.Range).To3D()); },
+                                        FleeMenu.GetSliderValue("delay"));
                                 }
                             }
                         }

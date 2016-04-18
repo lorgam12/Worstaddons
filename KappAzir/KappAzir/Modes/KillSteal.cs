@@ -15,10 +15,14 @@
     {
         public static void Execute()
         {
-            if (kstarget(Q.Range) == null) return;
-            if (W.IsReady() && KillStealMenu.GetCheckBoxValue("wUse") )
+            if (kstarget(Q.Range) == null)
             {
-                if (Q.IsReady() && Q.Handle.SData.Mana + W.Handle.SData.Mana < Azir.Mana && Azir.GetSpellDamage(kstarget(Q.Range), SpellSlot.Q) >= kstarget(Q.Range).TotalShieldHealth())
+                return;
+            }
+            if (W.IsReady() && KillStealMenu.GetCheckBoxValue("wUse"))
+            {
+                if (Q.IsReady() && Q.Handle.SData.Mana + W.Handle.SData.Mana < Azir.Mana
+                    && Azir.GetSpellDamage(kstarget(Q.Range), SpellSlot.Q) >= kstarget(Q.Range).TotalShieldHealth())
                 {
                     var p = Azir.Distance(kstarget(Q.Range), true) > W.RangeSquared
                                 ? Azir.Position.To2D().Extend(kstarget(Q.Range).Position.To2D(), W.Range)

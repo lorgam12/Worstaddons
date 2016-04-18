@@ -95,7 +95,7 @@
             InsecMenu.CreateCheckBox(" - Push Enemy To Ally Tower", "Tower");
             InsecMenu.AddGroupLabel("Small Guide");
             InsecMenu.AddLabel("Select a Target then hold the insec key");
-            
+
             SpellsMenu.AddGroupLabel("Spells Handler");
             SpellsMenu.CreateCheckBox(" - R Anti GapCloser", "rUseGap");
             SpellsMenu.CreateCheckBox(" - R Interrupter", "rUseInt");
@@ -183,7 +183,7 @@
             KillStealMenu.CreateCheckBox(" - Use W", "wUse");
             KillStealMenu.CreateCheckBox(" - Use E", "eUse");
             KillStealMenu.CreateCheckBox(" - Use R", "rUse");
-            
+
             MiscMenu.AddGroupLabel("Skin Changer");
 
             var skinList = Mario_s_Lib.DataBases.Skins.SkinsDB.FirstOrDefault(list => list.Champ == Player.Instance.Hero);

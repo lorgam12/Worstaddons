@@ -1,7 +1,7 @@
 ﻿namespace KappAzir.Modes
 {
     using System.Linq;
-    
+
     using EloBuddy.SDK;
 
     /// <summary>

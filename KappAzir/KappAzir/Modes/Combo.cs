@@ -18,6 +18,7 @@
     internal class Combo : ModeManager
     {
         public static Vector2 pos = Vector2.Zero;
+
         /// <summary>
         /// Put in here what you want to do when the mode is running
         /// </summary>
@@ -58,7 +59,8 @@
                 }
             }
 
-            var azirtower = ObjectManager.Get<GameObject>().FirstOrDefault(o => o != null && o.Name.ToLower().Contains("towerclicker") && Azir.Distance(o) < 500);
+            var azirtower =
+                ObjectManager.Get<GameObject>().FirstOrDefault(o => o != null && o.Name.ToLower().Contains("towerclicker") && Azir.Distance(o) < 500);
             if (azirtower != null && Azir.PassiveCooldownEndTime <= 0 && azirtower.CountEnemiesInRange(800) >= ComboMenu.GetSliderValue("TowerPls"))
             {
                 Player.UseObject(azirtower);
@@ -116,7 +118,8 @@
                 }
             }
 
-            if ((R.IsReady() && ComboMenu.GetCheckBoxValue("rUse") || (ComboMenu.GetKeyBindValue("Rcast"))) && target.IsValidTarget(R.Range) && R.GetPrediction(target).HitChance >= hitchance)
+            if ((R.IsReady() && ComboMenu.GetCheckBoxValue("rUse") || (ComboMenu.GetKeyBindValue("Rcast"))) && target.IsValidTarget(R.Range)
+                && R.GetPrediction(target).HitChance >= hitchance)
             {
                 if (target.Damage() - target.GetDamage(SpellSlot.R) >= target.TotalShieldHealth() && ComboMenu.GetCheckBoxValue("rOverKill"))
                 {
@@ -125,7 +128,9 @@
                 }
 
                 var RTargets = ComboMenu.GetSliderValue("Raoe");
-                if ((Azir.HealthPercent <= 20 && ComboMenu.GetCheckBoxValue("rUseSave")) || (ManaCheck(Azir) < Azir.Mana && target.Damage() >= target.TotalShieldHealth() && ComboMenu.GetCheckBoxValue("rUsekill")) || (Azir.CountEnemiesInRange(R.Range - 15) >= RTargets))
+                if ((Azir.HealthPercent <= 20 && ComboMenu.GetCheckBoxValue("rUseSave"))
+                    || (ManaCheck(Azir) < Azir.Mana && target.Damage() >= target.TotalShieldHealth() && ComboMenu.GetCheckBoxValue("rUsekill"))
+                    || (Azir.CountEnemiesInRange(R.Range - 15) >= RTargets))
                 {
                     if (tower != null && ComboMenu.GetCheckBoxValue("rUseTower"))
                     {
