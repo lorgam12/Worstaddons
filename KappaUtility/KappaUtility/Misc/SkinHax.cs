@@ -17,6 +17,7 @@
             setskin.OnValueChange += delegate { Hax(); };
 
             SkinMenu.AddLabel("Can be buggy When your Champion Model Changes in Game.");
+            Hax();
         }
 
         public static void Hax()
