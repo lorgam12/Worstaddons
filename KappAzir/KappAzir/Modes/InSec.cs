@@ -15,6 +15,8 @@
     {
         internal static Vector2 insecLoc;
 
+        internal static Vector3 soldposition;
+
         public static void QCast(Vector3 pos)
         {
             Core.DelayAction(
@@ -106,7 +108,7 @@
             var Target = TargetSelector.SelectedTarget;
             if (Target != null)
             {
-                if (Target.IsValidTarget(R.Range) && R.IsReady())
+                if (Target.IsValidTarget(R.Width) && R.IsReady())
                 {
                     if (tower != null && InsecMenu.GetCheckBoxValue("Tower"))
                     {
@@ -134,8 +136,12 @@
                             insecLoc = Vector2.Zero;
                             var direction = (TargetSelector.SelectedTarget.ServerPosition - ObjectManager.Player.ServerPosition).To2D().Normalized();
                             var insecPos = TargetSelector.SelectedTarget.ServerPosition.To2D() + (direction * 200f);
-
+                            if (Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(insecPos)).FirstOrDefault() != null)
+                            {
+                                soldposition = Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(insecPos)).FirstOrDefault().ServerPosition;
+                            }
                             insecLoc = (Vector2)Azir.ServerPosition;
+                            var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * 1000) - ((Game.Ping + FleeMenu.GetSliderValue("delay")));
                             var allready = Q.IsReady() && E.IsReady() && W.IsReady();
                             if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) < 1 && allready && ManaCheck(Azir) < Azir.Mana)
                             {
@@ -148,7 +154,7 @@
                                 {
                                     Core.DelayAction(
                                         () => { Q.Cast(Azir.Position.Extend(insecPos, Q.Range).To3D()); },
-                                        FleeMenu.GetSliderValue("delay"));
+                                        (int)time);
                                 }
                             }
                         }

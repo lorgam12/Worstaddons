@@ -28,7 +28,7 @@
             try
             {
                 //Put the name of the champion here
-                if (Player.Instance.ChampionName != "Azir")
+                if (Player.Instance.Hero != Champion.Azir)
                 {
                     return;
                 }

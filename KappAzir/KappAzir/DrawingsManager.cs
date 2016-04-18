@@ -30,10 +30,6 @@
         {
             var readyDraw = DrawingsMenu.GetCheckBoxValue("readyDraw");
 
-            var rect = new Geometry.Polygon.Rectangle(Player.Instance.Front(350), Player.Instance.Back(300), R.Width);
-            var Target = TargetSelector.GetTarget(R.Range, DamageType.Magical);
-            var tower = EntityManager.Turrets.Allies.FirstOrDefault(it => it.IsValidTarget(1000));
-            ;
             if (DrawingsMenu.GetCheckBoxValue("qDraw") && readyDraw ? Q.IsReady() : DrawingsMenu.GetCheckBoxValue("qDraw"))
             {
                 Circle.Draw(QColorSlide.GetSharpColor(), Q.Range, 1f, Player.Instance);

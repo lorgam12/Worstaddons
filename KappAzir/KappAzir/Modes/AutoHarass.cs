@@ -61,7 +61,7 @@
                     return;
                 }
 
-                Q.RangeCheckSource = Player.Instance.ServerPosition;
+                Q.RangeCheckSource = Azir.ServerPosition;
                 Q.SourcePosition = Orbwalker.AzirSoldiers.FirstOrDefault(s => s.IsAlly)?.ServerPosition;
 
                 var pred = Q.GetPrediction(target);

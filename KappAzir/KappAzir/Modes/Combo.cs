@@ -100,7 +100,7 @@
                     return;
                 }
 
-                if (target.HealthPercent - Player.Instance.HealthPercent > ComboMenu.GetSliderValue("eHealth"))
+                if (target.HealthPercent - Azir.HealthPercent > ComboMenu.GetSliderValue("eHealth"))
                 {
                     return;
                 }

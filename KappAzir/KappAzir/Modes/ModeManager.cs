@@ -34,7 +34,7 @@
         {
             if (Orbwalker.AzirSoldiers.Any(x => x.IsInRange(target, Orbwalker.AzirSoldierAutoAttackRange - 5) && x.IsAlly))
             {
-                if (Player.Instance.Distance(target.Position) < 850)
+                if (Azir.Distance(target.Position) < 850)
                 {
                     Core.DelayAction((() => Player.IssueOrder(GameObjectOrder.AttackUnit, target)), 250);
                 }
@@ -45,24 +45,24 @@
         {
             var mana = (float)0;
 
-            if (Player.Instance.Spellbook.GetSpell(SpellSlot.Q).IsReady)
+            if (Azir.Spellbook.GetSpell(SpellSlot.Q).IsReady)
             {
                 // Q mana
                 mana += SpellsManager.Q.Handle.SData.Mana;
             }
 
-            if (Player.Instance.Spellbook.GetSpell(SpellSlot.W).IsReady && Orbwalker.AzirSoldiers.Count == 0)
+            if (Azir.Spellbook.GetSpell(SpellSlot.W).IsReady && Orbwalker.AzirSoldiers.Count == 0)
             {
                 // W mana
                 mana += SpellsManager.W.Handle.SData.Mana;
             }
 
-            if (Player.Instance.Spellbook.GetSpell(SpellSlot.E).IsReady)
+            if (Azir.Spellbook.GetSpell(SpellSlot.E).IsReady)
             {
                 // E mana
                 mana += SpellsManager.E.Handle.SData.Mana;
             }
-            if (Player.Instance.Spellbook.GetSpell(SpellSlot.R).IsReady)
+            if (Azir.Spellbook.GetSpell(SpellSlot.R).IsReady)
             {
                 // E mana
                 mana += SpellsManager.R.Handle.SData.Mana;
