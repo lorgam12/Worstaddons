@@ -215,11 +215,6 @@
             {
                 InSec.Normal();
             }
-
-            if (InsecMenu.GetKeyBindValue("insected"))
-            {
-                InSec.New();
-            }
             KillSteal.Execute();
         }
     }

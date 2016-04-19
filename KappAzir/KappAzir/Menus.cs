@@ -91,7 +91,6 @@
             DrawingsMenu = FirstMenu.AddSubMenu("• Drawings", DrawingsMenuID);
 
             InsecMenu.Add("insect", new KeyBind("Normal InSec", false, KeyBind.BindTypes.HoldActive, 'S'));
-            InsecMenu.Add("insected", new KeyBind("New InSec", false, KeyBind.BindTypes.HoldActive, 'Z'));
             InsecMenu.CreateCheckBox(" - Push Enemy To Allis", "Ally");
             InsecMenu.CreateCheckBox(" - Push Enemy To Ally Tower", "Tower");
             InsecMenu.AddGroupLabel("Small Guide");
@@ -105,11 +104,7 @@
             SpellsMenu.CreateComboBox("HitChance", "chance", new List<string> { "High", "Medium", "Low" });
 
             FleeMenu.AddGroupLabel("Spells");
-            FleeMenu.CreateSlider("EQ Speed = {0}", "delay", 100, 0, 350);
-            FleeMenu.AddSeparator(0);
-            FleeMenu.AddLabel("This is used for Speed of Casting between E > Q");
-            FleeMenu.AddLabel("Used In Insec / Flee Mode");
-            FleeMenu.AddLabel("Note: it uses Arrive time - (speed set above + Game Ping)");
+            FleeMenu.CreateSlider("EQ Delay = {0}", "delay", 100, 0, 350);
 
             ComboMenu.AddGroupLabel("Spells");
             ComboMenu.CreateCheckBox(" - Use Q", "qUse");

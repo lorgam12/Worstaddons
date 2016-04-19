@@ -27,13 +27,11 @@
 
         public static Spell.Skillshot E { get; set; }
 
-        public static Spell.Skillshot E2 { get; set; }
+        public static Spell.Active E2 { get; set; }
 
         public static Spell.Targeted R { get; set; }
 
-        public static Spell.Skillshot F { get; set; }
-
-        public static AIHeroClient player { get; set; }
+        public static AIHeroClient Player { get; set; }
 
         public static Menu ComboMenu { get; private set; }
 
@@ -44,8 +42,6 @@
         public static Menu LaneMenu { get; private set; }
 
         public static Menu MiscMenu { get; private set; }
-
-        public static Menu FlashMenu { get; private set; }
 
         public static Menu FleeMenu { get; private set; }
 
@@ -123,22 +119,6 @@
             LaneMenu.Add("jW", new CheckBox("Use W"));
             LaneMenu.Add("jE", new CheckBox("Use E", false));
 
-            if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerFlash")) != null)
-            {
-                FlashMenu = menuIni.AddSubMenu("Flashy Combo");
-                FlashMenu.AddGroupLabel("Flash Combo Settings");
-                FlashMenu.Add("flash", new KeyBind("Enable", false, KeyBind.BindTypes.HoldActive));
-                FlashMenu.Add("flashhit", new Slider("Flashy Combo Hit >=", 3, 1, 5));
-                FlashMenu.Add("mode", new ComboBox("Flashy combo mode", 0, "Smart", "E > R", "Flash > R"));
-                FlashMenu.AddGroupLabel("Smart Mode Explain");
-                FlashMenu.AddLabel("Smart mode will do the follwing");
-                FlashMenu.AddLabel("1- Will try to Flash > R To hit the Selected number of enemies");
-                FlashMenu.AddLabel("2- If cant do step 1 Will try to E > R To hit the Selected number of enemies");
-                FlashMenu.AddLabel(
-                    "3- If cant do step 1 or 2 Will try to E > Flash > R To hit the Selected number of enemies");
-                F = new Spell.Skillshot(ObjectManager.Player.GetSpellSlotFromName("SummonerFlash"), 1000, SkillShotType.Circular, 250, int.MaxValue, 450);
-            }
-
             MiscMenu = menuIni.AddSubMenu("Misc");
             MiscMenu.AddGroupLabel("Misc Settings");
             MiscMenu.Add("gapcloserW", new CheckBox("Anti-GapCloser W"));
@@ -165,10 +145,9 @@
             Q2 = new Spell.Skillshot(SpellSlot.Q, 825, SkillShotType.Linear, 250, 2200, 90);
             Qtest = new Spell.Skillshot(SpellSlot.Q, 715, SkillShotType.Linear, 250, 2200, 75)
                         { AllowedCollisionCount = int.MaxValue };
-            W = new Spell.Active(SpellSlot.W, 400);
+            W = new Spell.Active(SpellSlot.W, 425);
             E = new Spell.Skillshot(SpellSlot.E, 1000, SkillShotType.Linear, 250, 850, 125);
-            E2 = new Spell.Skillshot(SpellSlot.E, 2000, SkillShotType.Linear, 250, 850, 125);
-            R = new Spell.Targeted(SpellSlot.R, 500);
+            R = new Spell.Targeted(SpellSlot.R, 400);
 
             Game.OnUpdate += OnUpdate;
             GameObject.OnCreate += OnCreate;
@@ -205,11 +184,11 @@
 
                 if (sender.IsEnemy || sender is Obj_AI_Turret)
                 {
-                    if (useRS && player.HealthPercent <= shp && !player.HasBuff("kindredrnodeathbuff")
-                        && !player.HasBuff("JudicatorIntervention") && !player.HasBuff("ChronoShift")
-                        && !player.HasBuff("UndyingRage"))
+                    if (useRS && Player.HealthPercent <= shp && !Player.HasBuff("kindredrnodeathbuff")
+                        && !Player.HasBuff("JudicatorIntervention") && !Player.HasBuff("ChronoShift")
+                        && !Player.HasBuff("UndyingRage"))
                     {
-                        R.Cast(player);
+                        R.Cast(Player);
                     }
                 }
             }
@@ -241,11 +220,11 @@
 
                 if (sender.IsEnemy || sender is Obj_AI_Turret)
                 {
-                    if (useRS && player.HealthPercent <= shp && !player.HasBuff("kindredrnodeathbuff")
-                        && !player.HasBuff("JudicatorIntervention") && !player.HasBuff("ChronoShift")
-                        && !player.HasBuff("UndyingRage"))
+                    if (useRS && Player.HealthPercent <= shp && !Player.HasBuff("kindredrnodeathbuff")
+                        && !Player.HasBuff("JudicatorIntervention") && !Player.HasBuff("ChronoShift")
+                        && !Player.HasBuff("UndyingRage"))
                     {
-                        R.Cast(player);
+                        R.Cast(Player);
                     }
                 }
             }
@@ -288,7 +267,7 @@
 
         private static void OnUpdate(EventArgs args)
         {
-            player = ObjectManager.Player;
+            Player = ObjectManager.Player;
 
             var flags = Orbwalker.ActiveModesFlags;
             if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
@@ -303,7 +282,7 @@
 
             if (flags.HasFlag(Orbwalker.ActiveModes.LaneClear) && menuIni.Get<CheckBox>("LaneClear").CurrentValue)
             {
-                if (player.ManaPercent > LaneMenu["Mana"].Cast<Slider>().CurrentValue)
+                if (Player.ManaPercent > LaneMenu["Mana"].Cast<Slider>().CurrentValue)
                 {
                     Clear();
                 }
@@ -311,7 +290,7 @@
 
             if (flags.HasFlag(Orbwalker.ActiveModes.JungleClear) && menuIni.Get<CheckBox>("JungleClear").CurrentValue)
             {
-                if (player.ManaPercent > LaneMenu["Mana"].Cast<Slider>().CurrentValue)
+                if (Player.ManaPercent > LaneMenu["Mana"].Cast<Slider>().CurrentValue)
                 {
                     jClear();
                 }
@@ -322,24 +301,15 @@
                 Flee();
             }
 
-            if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerFlash")) != null)
-            {
-                if (FlashMenu["flash"].Cast<KeyBind>().CurrentValue)
-                {
-                    Flash();
-                    Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-                }
-            }
-
             if (W.IsReady())
             {
-                if (MiscMenu.Get<CheckBox>("WTower").CurrentValue && player.CountEnemiesInRange(W.Range) >= 1
-                    && player.IsUnderHisturret() && player.IsUnderTurret() && !player.IsUnderEnemyturret())
+                if (MiscMenu.Get<CheckBox>("WTower").CurrentValue && Player.CountEnemiesInRange(W.Range) >= 1
+                    && Player.IsUnderHisturret() && Player.IsUnderTurret() && !Player.IsUnderEnemyturret())
                 {
                     W.Cast();
                 }
 
-                if (player.CountEnemiesInRange(W.Range) >= MiscMenu.Get<Slider>("AutoW").CurrentValue)
+                if (Player.CountEnemiesInRange(W.Range) >= MiscMenu.Get<Slider>("AutoW").CurrentValue)
                 {
                     W.Cast();
                 }
@@ -372,127 +342,9 @@
             }
         }
 
-        private static void Flash()
-        {
-            if (R.IsReady())
-            {
-                var hit = FlashMenu["flashhit"].Cast<Slider>().CurrentValue;
-
-                var enemies = EntityManager.Heroes.Enemies.Where(n => n.IsValidTarget(E2.Range));
-                var aoePrediction =
-                    Prediction.Position.PredictCircularMissileAoe(
-                        enemies.ToArray(),
-                        E2.Range,
-                        500,
-                        R.CastDelay,
-                        R.Handle.SData.MissileSpeed)
-                        .OrderByDescending(r => r.GetCollisionObjects<AIHeroClient>().Length)
-                        .FirstOrDefault();
-                var target = TargetSelector.GetTarget(R.Range, DamageType.Magical);
-
-                if (aoePrediction.CollisionObjects.Length < hit || target == null)
-                {
-                    return;
-                }
-
-                if (FlashMenu["mode"].Cast<ComboBox>().CurrentValue == 0)
-                {
-                    if (player.CountEnemiesInRange(R.Range) >= hit && target.CountEnemiesInRange(R.Range) <= hit)
-                    {
-                        R.Cast(player);
-                    }
-
-                    if (player.CountEnemiesInRange(R.Range) <= hit && target.CountEnemiesInRange(R.Range) >= hit)
-                    {
-                        R.Cast(target);
-                    }
-
-                    if (!aoePrediction.CastPosition.IsInRange(player, R.Range) && aoePrediction.CastPosition.IsInRange(player, E2.Range - 50))
-                    {
-                        if (LissEMissile == null && E2.IsReady() && player.Mana >= (R.Handle.SData.Mana + E2.Handle.SData.Mana))
-                        {
-                            E2.Cast(aoePrediction.CastPosition);
-                        }
-                    }
-
-                    if (!aoePrediction.CastPosition.IsInRange(player, R.Range) && !aoePrediction.CastPosition.IsInRange(player, E.Range + R.Range - 50)
-                        && aoePrediction.CastPosition.IsInRange(player, E2.Range - 50) && F.IsReady())
-                    {
-                        if (LissEMissile == null && E.IsReady() && player.Mana >= (R.Handle.SData.Mana + E2.Handle.SData.Mana))
-                        {
-                            E2.Cast(aoePrediction.CastPosition);
-                        }
-                    }
-
-                    if (F.IsReady())
-                    {
-                        if (LissEMissile != null && LissEMissile.Position.IsInRange(aoePrediction.CastPosition, F.Range - 100))
-                        {
-                            E2.Cast(Game.CursorPos);
-                        }
-                    }
-
-                    if (LissEMissile != null && LissEMissile.Position.IsInRange(aoePrediction.CastPosition, R.Range - 250))
-                    {
-                        E2.Cast(Game.CursorPos);
-                    }
-
-                    if (!aoePrediction.CastPosition.IsInRange(player, R.Range) && !E2.IsReady()
-                        && !aoePrediction.CastPosition.IsInRange(player, F.Range))
-                    {
-                        F.Cast(aoePrediction.CastPosition);
-                    }
-                }
-
-                if (FlashMenu["mode"].Cast<ComboBox>().CurrentValue == 1)
-                {
-                    if (player.CountEnemiesInRange(R.Range) >= hit)
-                    {
-                        R.Cast(player);
-                    }
-
-                    if (player.CountEnemiesInRange(R.Range) <= hit && target.CountEnemiesInRange(R.Range - 50) >= hit)
-                    {
-                        R.Cast(target);
-                    }
-
-                    if (!aoePrediction.CastPosition.IsInRange(player.Position, R.Range) && aoePrediction.CastPosition.IsInRange(player.Position, E.Range - 50))
-                    {
-                        if (LissEMissile == null && E.IsReady() && player.Mana >= (R.Handle.SData.Mana + E2.Handle.SData.Mana))
-                        {
-                            E.Cast(aoePrediction.CastPosition);
-                        }
-                    }
-
-                    if (LissEMissile != null && LissEMissile.Position.IsInRange(aoePrediction.CastPosition, R.Range - 200))
-                    {
-                        E.Cast(Game.CursorPos);
-                    }
-                }
-
-                if (FlashMenu["mode"].Cast<ComboBox>().CurrentValue == 2)
-                {
-                    if (player.CountEnemiesInRange(R.Range) >= hit)
-                    {
-                        R.Cast(player);
-                    }
-
-                    if (player.CountEnemiesInRange(R.Range) <= hit && target.CountEnemiesInRange(R.Range - 50) >= hit)
-                    {
-                        R.Cast(target);
-                    }
-
-                    if (!player.IsInRange(aoePrediction.CastPosition, R.Range) && player.IsInRange(aoePrediction.CastPosition, F.Range - 100))
-                    {
-                        F.Cast(aoePrediction.CastPosition);
-                    }
-                }
-            }
-        }
-
         private static void Flee()
         {
-            player = ObjectManager.Player;
+            Player = ObjectManager.Player;
             var useQ = FleeMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady();
             var useW = FleeMenu["W"].Cast<CheckBox>().CurrentValue && W.IsReady();
             var useE = FleeMenu["E"].Cast<CheckBox>().CurrentValue && E.IsReady();
@@ -520,7 +372,7 @@
 
         private static void Combo()
         {
-            player = ObjectManager.Player;
+            Player = ObjectManager.Player;
             var useQ = ComboMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady();
             var useW = ComboMenu["W"].Cast<CheckBox>().CurrentValue && W.IsReady();
             var useE = ComboMenu["E"].Cast<CheckBox>().CurrentValue && E.IsReady();
@@ -550,7 +402,7 @@
 
         private static void Harass()
         {
-            player = ObjectManager.Player;
+            Player = ObjectManager.Player;
             var useQ = HarassMenu["Q"].Cast<CheckBox>().CurrentValue;
             var useW = HarassMenu["W"].Cast<CheckBox>().CurrentValue;
             var useE = HarassMenu["E"].Cast<CheckBox>().CurrentValue;
@@ -563,7 +415,7 @@
                     EntityManager.Heroes.Enemies.FirstOrDefault(
                         h =>
                         h.IsValidTarget()
-                        && (Vector3.Distance(h.ServerPosition, player.ServerPosition) < E.Range * 0.94) && !h.IsZombie);
+                        && (Vector3.Distance(h.ServerPosition, Player.ServerPosition) < E.Range * 0.94) && !h.IsZombie);
             }
 
             if (Target != null && !Target.IsInvulnerable)
@@ -587,7 +439,7 @@
 
         private static void Clear()
         {
-            player = ObjectManager.Player;
+            Player = ObjectManager.Player;
             var useQ = LaneMenu["Q"].Cast<CheckBox>().CurrentValue;
             var useW = LaneMenu["W"].Cast<CheckBox>().CurrentValue;
             var useE = LaneMenu["E"].Cast<CheckBox>().CurrentValue;
@@ -633,7 +485,7 @@
 
         private static void jClear()
         {
-            player = ObjectManager.Player;
+            Player = ObjectManager.Player;
             var useQ = LaneMenu["jQ"].Cast<CheckBox>().CurrentValue;
             var useW = LaneMenu["jW"].Cast<CheckBox>().CurrentValue;
             var useE = LaneMenu["jE"].Cast<CheckBox>().CurrentValue;
@@ -700,8 +552,8 @@
             foreach (var minion in collisions)
             {
                 var poly = new Geometry.Polygon.Rectangle(
-                    (Vector2)player.ServerPosition,
-                    player.ServerPosition.Extend(minion.ServerPosition, Q2.Range),
+                    (Vector2)Player.ServerPosition,
+                    Player.ServerPosition.Extend(minion.ServerPosition, Q2.Range),
                     Q2.Width);
 
                 if (poly.IsInside(pred.UnitPosition))
@@ -719,7 +571,7 @@
             }
 
             var target = TargetSelector.GetTarget(W.Range, DamageType.Magical);
-            if (target != null && Vector3.Distance(target.ServerPosition, player.ServerPosition) <= W.Range - 5)
+            if (target != null && Vector3.Distance(target.ServerPosition, Player.ServerPosition) <= W.Range - 5)
             {
                 W.Cast();
             }
@@ -728,7 +580,7 @@
                 EntityManager.Heroes.Enemies.Any(
                     h =>
                     h.IsValidTarget() && h != null
-                    && (Vector3.Distance(h.ServerPosition, player.ServerPosition) < W.Range) && !h.IsZombie))
+                    && (Vector3.Distance(h.ServerPosition, Player.ServerPosition) < W.Range) && !h.IsZombie))
             {
                 W.Cast();
             }
@@ -748,14 +600,14 @@
             }
 
             var target = TargetSelector.GetTarget(E.Range + 100, DamageType.Magical);
-            if (LissEMissile == null && !player.HasBuff("LissandraE") && target != null && useE)
+            if (LissEMissile == null && !Player.HasBuff("LissandraE") && target != null && useE)
             {
                 var pred = E.GetPrediction(target);
                 E.Cast(pred.CastPosition);
             }
 
             if (useES && LissEMissile != null && LissEMissile.Position.CountEnemiesInRange(W.Range - 50) <= ESE
-                && player.HealthPercent <= EHP)
+                && Player.HealthPercent <= EHP)
             {
                 E.Cast(Game.CursorPos);
             }
@@ -795,16 +647,16 @@
 
             if (useRS)
             {
-                if (aoeR && player.CountEnemiesInRange(R.Range) >= hitR
-                    && !UltMenu["DontUltally" + player.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                if (aoeR && Player.CountEnemiesInRange(R.Range) >= hitR
+                    && !UltMenu["DontUltally" + Player.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
-                    R.Cast(player);
+                    R.Cast(Player);
                 }
             }
 
             if (target != null && useRF)
             {
-                if (target.TotalShieldHealth() < player.GetSpellDamage(target, SpellSlot.R)
+                if (target.TotalShieldHealth() < Player.GetSpellDamage(target, SpellSlot.R)
                     && !UltMenu["DontUltenemy" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
                     if (target.IsValidTarget(R.Range))
@@ -812,10 +664,10 @@
                         R.Cast(target);
                     }
 
-                    if (target.IsInRange(player, R.Range)
-                        && !UltMenu["DontUltally" + player.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    if (target.IsInRange(Player, R.Range)
+                        && !UltMenu["DontUltally" + Player.BaseSkinName].Cast<CheckBox>().CurrentValue)
                     {
-                        R.Cast(player);
+                        R.Cast(Player);
                     }
                 }
             }
@@ -895,16 +747,15 @@
                     Circle.Draw(Color.DarkBlue, W.Range, LissEMissile.EndPosition);
                 }
 
-                /*
-                if (player != null)
+                if (Player != null)
                 {
-                    var hpPosp = player.HPBarPosition;
-                    Circle.Draw(Color.DarkBlue, R.Range, player.Position);
+                    var hpPosp = Player.HPBarPosition;
+                    Circle.Draw(Color.DarkBlue, R.Range, Player.Position);
                     Drawing.DrawText(
                         hpPosp.X + 135f,
                         hpPosp.Y,
                         System.Drawing.Color.White,
-                        "Enemies in Range " + player.CountEnemiesInRange(R.Range),
+                        "Enemies in Range " + Player.CountEnemiesInRange(R.Range),
                         10);
                 }
 
@@ -917,28 +768,6 @@
                         hpPos.Y,
                         System.Drawing.Color.White,
                         "Enemies in Range " + target.CountEnemiesInRange(R.Range).ToString(),
-                        10);
-                }
-                */
-                var enemies = EntityManager.Heroes.Enemies.Where(n => n.IsValidTarget(E2.Range));
-                var aoePrediction =
-                    Prediction.Position.PredictCircularMissileAoe(
-                        enemies.ToArray(),
-                        R.Range,
-                        500,
-                        R.CastDelay,
-                        R.Handle.SData.MissileSpeed)
-                        .OrderByDescending(r => r.GetCollisionObjects<AIHeroClient>().Length)
-                        .FirstOrDefault();
-
-                if (aoePrediction != null)
-                {
-                    Circle.Draw(Color.White, R.Range, aoePrediction.CastPosition);
-                    Drawing.DrawText(
-                        aoePrediction.CastPosition.X + 135f,
-                        aoePrediction.CastPosition.Y,
-                        System.Drawing.Color.White,
-                        "Enemies in Range " + aoePrediction.CastPosition.CountEnemiesInRange(R.Range),
                         10);
                 }
             }

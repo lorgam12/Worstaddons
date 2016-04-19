@@ -13,62 +13,78 @@
 
     internal class InSec : ModeManager
     {
-        public static float LastQTime;
-
-        public static AIHeroClient target;
-        internal static Vector3 insecLoc;
+        internal static Vector2 insecLoc;
 
         internal static Vector3 soldposition;
 
+        public static void QCast(Vector3 pos)
+        {
+            Core.DelayAction(
+                () =>
+                    {
+                        if (Q.Cast(Azir.Position.Extend(pos, Q.Range).To3D()))
+                        {
+                            if (tower != null)
+                            {
+                                R.Cast(tower.ServerPosition);
+                            }
+                            else if (ally != null)
+                            {
+                                R.Cast(ally.ServerPosition);
+                            }
+                            else
+                            {
+                                RCast(insecLoc.To3D());
+                            }
+                        }
+                        ;
+                    },
+                150);
+        }
+
+        public static void RCast(Vector3 pos)
+        {
+            R.Cast(pos);
+        }
+
         public static void New()
         {
-            target = TargetSelector.SelectedTarget;
-            if (target != null)
+            var Target = TargetSelector.SelectedTarget;
+            if (Target != null)
             {
-                if (target.IsValidTarget(825))
+                if (Target.IsValidTarget(825))
                 {
                     if (Q.IsReady())
                     {
                         if (R.IsReady())
                         {
-                            insecLoc = Vector3.Zero;
-                            var allreadys = Q.IsReady() && E.IsReady() && W.IsReady();
-                            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) < 1 && allreadys && ManaCheck(Azir) < Azir.Mana)
+                            if (Orbwalker.AzirSoldiers.Count > 0)
                             {
-                                W.Cast(target.ServerPosition);
+                                insecLoc = Vector2.Zero;
                             }
-
-                            insecLoc = tower.ServerPosition;
-                            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) > 0)
+                            var s =
+                                Orbwalker.AzirSoldiers.Where(it => it.Distance(Target) <= (R.Width / 2) - 20)
+                                    .OrderByDescending(it => it.Distance(Target))
+                                    .First();
+                            insecLoc = (Vector2)Azir.ServerPosition;
+                            if (Azir.Distance(Target) > 200 && s != null)
                             {
-                                if (Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(target)).FirstOrDefault() != null)
+                                if (E.Cast(s.Position))
                                 {
-                                    soldposition = Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(target)).FirstOrDefault().ServerPosition;
-                                }
-                                if (E.Cast(Azir.Position.Extend(target, E.Range).To3D())
-                                    && soldposition.IsInRange(target.ServerPosition, R.Range) && !Ehit(target))
-                                {
-                                    var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * 995)
-                                               - (Game.Ping + FleeMenu.GetSliderValue("delay"));
-                                    Core.DelayAction(
-                                        () =>
-                                            {
-                                                if (Q.Cast(Azir.Position.Extend(Game.CursorPos, Q.Range).To3D()))
-                                                {
-                                                    LastQTime = Game.Time;
-                                                }
-                                            },
-                                        (int)time);
+                                    if (tower != null && InsecMenu.GetCheckBoxValue("Tower"))
+                                    {
+                                        QCast(tower.ServerPosition);
+                                    }
+                                    else if (ally != null && InsecMenu.GetCheckBoxValue("Ally"))
+                                    {
+                                        QCast(ally.ServerPosition);
+                                    }
+                                    else
+                                    {
+                                        QCast(insecLoc.To3D());
+                                    }
                                 }
                             }
-                            else
-                            {
-                                Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-                            }
-                        }
-                        else
-                        {
-                            Player.IssueOrder(GameObjectOrder.MoveTo, target.Position);
                         }
                     }
                     else
@@ -89,10 +105,10 @@
 
         public static void Normal()
         {
-            target = TargetSelector.SelectedTarget;
-            if (target != null)
+            var Target = TargetSelector.SelectedTarget;
+            if (Target != null)
             {
-                if (target.IsValidTarget(R.Width) && R.IsReady())
+                if (Target.IsValidTarget(R.Width) && R.IsReady())
                 {
                     if (tower != null && InsecMenu.GetCheckBoxValue("Tower"))
                     {
@@ -111,22 +127,36 @@
                 {
                     Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                 }
-                if (target.IsValidTarget(900))
+                if (Target.IsValidTarget(825))
                 {
                     if (Q.IsReady())
                     {
                         if (R.IsReady())
                         {
-                            insecLoc = Vector3.Zero;
+                            insecLoc = Vector2.Zero;
                             var direction = (TargetSelector.SelectedTarget.ServerPosition - ObjectManager.Player.ServerPosition).To2D().Normalized();
                             var insecPos = TargetSelector.SelectedTarget.ServerPosition.To2D() + (direction * 200f);
                             if (Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(insecPos)).FirstOrDefault() != null)
                             {
                                 soldposition = Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(insecPos)).FirstOrDefault().ServerPosition;
                             }
-                            insecLoc = Azir.ServerPosition;
+                            insecLoc = (Vector2)Azir.ServerPosition;
+                            var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * 1000) - ((Game.Ping + FleeMenu.GetSliderValue("delay")));
+                            var allready = Q.IsReady() && E.IsReady() && W.IsReady();
+                            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) < 1 && allready && ManaCheck(Azir) < Azir.Mana)
+                            {
+                                W.Cast(Azir.Position.Extend(insecPos, W.Range).To3D());
+                            }
 
-                            Jumper.jump(insecPos);
+                            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) > 0)
+                            {
+                                if (E.Cast(Azir.Position.Extend(insecPos, E.Range).To3D()))
+                                {
+                                    Core.DelayAction(
+                                        () => { Q.Cast(Azir.Position.Extend(insecPos, Q.Range).To3D()); },
+                                        (int)time);
+                                }
+                            }
                         }
                         else
                         {
