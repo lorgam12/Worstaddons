@@ -67,6 +67,7 @@
     <Compile Include="Modes\Flee.cs" />
     <Compile Include="Modes\Harass.cs" />
     <Compile Include="Modes\InSec.cs" />
+    <Compile Include="Modes\Jumper.cs" />
     <Compile Include="Modes\JungleClear.cs" />
     <Compile Include="Modes\KillSteal.cs" />
     <Compile Include="Modes\LaneClear.cs" />

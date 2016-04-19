@@ -2,7 +2,10 @@
 {
     using System.Linq;
 
+    using EloBuddy;
     using EloBuddy.SDK;
+
+    using Mario_s_Lib;
 
     /// <summary>
     /// This mode will always run
@@ -14,6 +17,11 @@
         /// </summary>
         public static void Execute()
         {
+            if (SpellsManager.R.IsReady() && Game.Time - InSec.LastQTime > 0.1f && Game.Time - InSec.LastQTime < 1)
+            {
+                SpellsManager.R.Cast(Azir.Position.Extend(Game.CursorPos, SpellsManager.R.Range).To3D());
+            }
+
             if (SpellsManager.R.Level == 1)
             {
                 SpellsManager.R.Width = 220;
