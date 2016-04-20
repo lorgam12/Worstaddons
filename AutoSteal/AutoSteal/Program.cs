@@ -125,7 +125,10 @@
             if (JungleStealMenu[champion + "EnableJST"].Cast<KeyBind>().CurrentValue
                 || JungleStealMenu[champion + "EnableJSA"].Cast<KeyBind>().CurrentValue)
             {
-                Modes.JungleSteal.Js();
+                if (Game.Type == GameType.Ascension || Game.Type == GameType.Normal)
+                {
+                    Modes.JungleSteal.Js();
+                }
             }
         }
     }

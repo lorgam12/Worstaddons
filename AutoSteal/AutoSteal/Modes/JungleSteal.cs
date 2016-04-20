@@ -23,9 +23,9 @@
             foreach (Obj_AI_Minion mob in
                 ObjectManager.Get<Obj_AI_Minion>()
                     .Where(
-                        jmob =>
+                        jmob => jmob != null &&
                         !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsMonster && jmob.IsValid
-                        && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie && jmob.IsKillable()
+                        && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie
                         && ((JungleStealMenu[champion + "drake"].Cast<CheckBox>().CurrentValue
                              && jmob.BaseSkinName == "SRU_Dragon")
                             || (JungleStealMenu[champion + "baron"].Cast<CheckBox>().CurrentValue
@@ -48,6 +48,7 @@
                                 && jmob.BaseSkinName == "AscXerath"))))
             {
                 Mobxdd = mob;
+
                 if (JungleStealMenu[champion + "AAJ"].Cast<CheckBox>().CurrentValue)
                 {
                     if (player.CanAttack && player.GetAutoAttackDamage(mob) > mob.Health
@@ -64,9 +65,8 @@
                     {
                         return;
                     }
-
-                    var traveltime = mob.Distance(player) / (Spells.Q.Handle.SData.MissileSpeed + Spells.Q.CastDelay)
-                                     + Game.Ping / 2f / 1000;
+                    
+                    var traveltime = mob.Distance(player) / (Spells.Q.Handle.SData.MissileSpeed + Spells.Q.CastDelay) * (1000 - Game.Ping);
 
                     if (KillSteal.Playerdamage + player.GetSpellDamage(mob, SpellSlot.Q)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.Q.IsInRange(mob)
@@ -123,8 +123,7 @@
                         return;
                     }
 
-                    var traveltime = mob.Distance(player) / (Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay)
-                                     + Game.Ping / 2f / 1000;
+                    var traveltime = mob.Distance(player) / (Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay) * (1000 - Game.Ping);
 
                     if (KillSteal.Playerdamage + player.GetSpellDamage(mob, SpellSlot.W)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.W.IsInRange(mob)
@@ -180,8 +179,7 @@
                         return;
                     }
 
-                    var traveltime = mob.Distance(player) / (Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay)
-                                     + Game.Ping / 2f / 1000;
+                    var traveltime = mob.Distance(player) / (Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay) * (1000 - Game.Ping);
 
                     if (KillSteal.Playerdamage + player.GetSpellDamage(mob, SpellSlot.E)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.E.IsInRange(mob)
@@ -237,8 +235,7 @@
                         return;
                     }
 
-                    var traveltime = mob.Distance(player) / (Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay)
-                                     + Game.Ping / 2f / 1000;
+                    var traveltime = mob.Distance(player) / (Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay) * (1000 - Game.Ping);
 
                     if (KillSteal.Playerdamage + player.GetSpellDamage(mob, SpellSlot.R)
                         > Prediction.Health.GetPrediction(mob, (int)traveltime) && Spells.R.IsInRange(mob)

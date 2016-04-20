@@ -48,8 +48,7 @@
                     {
                         return;
                     }
-                    var qtraveltime = target.Distance(player) / Spells.Q.Handle.SData.MissileSpeed
-                                      + (Spells.Q.CastDelay) + Game.Ping / 2f / 1000;
+                    var qtraveltime = target.Distance(player) / (Spells.Q.Handle.SData.MissileSpeed + Spells.Q.CastDelay) * (1000 - Game.Ping);
                     if (Playerdamage + player.GetSpellDamage(target, SpellSlot.Q)
                         >= Prediction.Health.GetPrediction(target, (int)qtraveltime) && Spells.Q.IsInRange(target)
                         && Spells.Q.IsReady())
@@ -97,8 +96,7 @@
                     {
                         return;
                     }
-                    var wtraveltime = target.Distance(player) / Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay
-                                      + Game.Ping / 2f / 1000;
+                    var wtraveltime = target.Distance(player) / (Spells.W.Handle.SData.MissileSpeed + Spells.W.CastDelay) * (1000 - Game.Ping);
                     if (Playerdamage + player.GetSpellDamage(target, SpellSlot.W)
                         >= Prediction.Health.GetPrediction(target, (int)(wtraveltime)) && Spells.W.IsInRange(target)
                         && Spells.W.IsReady())
@@ -152,8 +150,7 @@
                     {
                         return;
                     }
-                    var etraveltime = target.Distance(player) / Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay
-                                      + Game.Ping / 2f / 1000;
+                    var etraveltime = target.Distance(player) / (Spells.E.Handle.SData.MissileSpeed + Spells.E.CastDelay) * (1000 - Game.Ping);
                     if (Playerdamage + player.GetSpellDamage(target, SpellSlot.E)
                         >= Prediction.Health.GetPrediction(target, (int)(etraveltime)) && Spells.E.IsInRange(target)
                         && Spells.E.IsReady())
@@ -207,8 +204,7 @@
                     {
                         return;
                     }
-                    var rtraveltime = target.Distance(player) / Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay
-                                      + Game.Ping / 2f / 1000;
+                    var rtraveltime = target.Distance(player) / (Spells.R.Handle.SData.MissileSpeed + Spells.R.CastDelay) * (1000 - Game.Ping);
                     if (Playerdamage + player.GetSpellDamage(target, SpellSlot.R)
                         >= Prediction.Health.GetPrediction(target, (int)(rtraveltime)) && Spells.R.IsInRange(target)
                         && Spells.R.IsReady())
