@@ -23,8 +23,8 @@
         {
             Playerdamage = (int)(player.BaseAbilityDamage + player.BaseAttackDamage);
             var champion = player.ChampionName;
-            foreach (AIHeroClient target in
-                ObjectManager.Get<AIHeroClient>()
+            foreach (var target in
+                EntityManager.Heroes.Enemies
                     .Where(
                         hero =>
                         hero != null && hero.IsHPBarRendered && !hero.HasBuffOfType(BuffType.Invulnerability)

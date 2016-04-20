@@ -20,8 +20,8 @@
         public static void Js()
         {
             var champion = player.ChampionName;
-            foreach (Obj_AI_Minion mob in
-                ObjectManager.Get<Obj_AI_Minion>()
+            foreach (var mob in
+                EntityManager.MinionsAndMonsters.GetJungleMonsters()
                     .Where(
                         jmob => jmob != null &&
                         !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsMonster && jmob.IsValid
