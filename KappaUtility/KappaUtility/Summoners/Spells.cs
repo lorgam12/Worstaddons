@@ -252,9 +252,29 @@
 
         public static void Cast()
         {
-            var target = TargetSelector.GetTarget(2150, DamageType.True);
+            var target = TargetSelector.GetTarget(600, DamageType.True);
 
             var ally = ObjectManager.Get<AIHeroClient>().FirstOrDefault(a => a.IsValid && a.IsAlly && a.IsVisible);
+
+            if (porotoss != null && Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerPoroThrow")) != null)
+            {
+                if (SummMenu[Player.Instance.ChampionName + "Enableactiveporo"].Cast<KeyBind>().CurrentValue
+                    || SummMenu[Player.Instance.ChampionName + "Enableporo"].Cast<KeyBind>().CurrentValue)
+                {
+                    foreach (
+                        var pred in
+                            EntityManager.Heroes.Enemies.Where(e => e.IsValidTarget(porotoss.Range))
+                                .Where(
+                                    enemy =>
+                                    porotoss.IsReady() && enemy.IsValidTarget(porotoss.Range) && enemy != null
+                                    && !SummMenu["Dontporo" + enemy.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                                .Select(enemy => porotoss.GetPrediction(enemy))
+                                .Where(pred => pred.HitChance > HitChance.High))
+                    {
+                        porotoss.Cast(pred.CastPosition);
+                    }
+                }
+            }
 
             if (target == null)
             {
@@ -272,23 +292,6 @@
                     if (target.IsValidTarget(Ignite.Range) && !SummMenu["DontIgnite" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                     {
                         Ignite.Cast(target);
-                    }
-                }
-            }
-
-            if (porotoss != null && Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerPoroThrow")) != null)
-            {
-                if (SummMenu[Player.Instance.ChampionName + "Enableactiveporo"].Cast<KeyBind>().CurrentValue
-                    || SummMenu[Player.Instance.ChampionName + "Enableporo"].Cast<KeyBind>().CurrentValue)
-                {
-                    if (porotoss.IsReady() && target.IsValidTarget(porotoss.Range)
-                        && !SummMenu["Dontporo" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                    {
-                        var pred = porotoss.GetPrediction(target);
-                        if (pred.HitChance >= HitChance.Medium)
-                        {
-                            porotoss.Cast(pred.CastPosition);
-                        }
                     }
                 }
             }

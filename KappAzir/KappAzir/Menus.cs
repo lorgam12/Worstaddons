@@ -90,12 +90,18 @@
             MiscMenu = FirstMenu.AddSubMenu("• Misc", MiscMenuID);
             DrawingsMenu = FirstMenu.AddSubMenu("• Drawings", DrawingsMenuID);
 
-            InsecMenu.Add("insect", new KeyBind("Normal InSec", false, KeyBind.BindTypes.HoldActive, 'S'));
-            InsecMenu.Add("insected", new KeyBind("New InSec", false, KeyBind.BindTypes.HoldActive, 'Z'));
-            InsecMenu.CreateCheckBox(" - Push Enemy To Allis", "Ally");
-            InsecMenu.CreateCheckBox(" - Push Enemy To Ally Tower", "Tower");
             InsecMenu.AddGroupLabel("Small Guide");
             InsecMenu.AddLabel("Select a Target then hold the insec key");
+            InsecMenu.Add("insect", new KeyBind("Normal InSec", false, KeyBind.BindTypes.HoldActive, 'S'));
+            InsecMenu.Add("insected", new KeyBind("New InSec", false, KeyBind.BindTypes.HoldActive, 'Z'));
+            InsecMenu.AddGroupLabel("Normal Insec Settings");
+            InsecMenu.CreateCheckBox(" - Push Enemy To Allis", "Ally");
+            InsecMenu.CreateCheckBox(" - Push Enemy To Ally Tower", "Tower");
+            InsecMenu.AddSeparator(0);
+            InsecMenu.AddGroupLabel("New Insec Settings");
+            InsecMenu.CreateComboBox("Q Position", "qpos", new List<string> { "To Mouse", "To Old Position", "To Tower", "To Ally" });
+            InsecMenu.CreateComboBox("R Position", "rpos", new List<string> { "To Mouse", "To Old Position", "To Tower", "To Ally" });
+            InsecMenu.CreateSlider("Lower Q Distance by [{0}]", "dis", 0, 0, 500);
 
             SpellsMenu.AddGroupLabel("Spells Handler");
             SpellsMenu.CreateCheckBox(" - R Anti GapCloser", "rUseGap");
@@ -105,12 +111,13 @@
             SpellsMenu.CreateComboBox("HitChance", "chance", new List<string> { "High", "Medium", "Low" });
 
             FleeMenu.AddGroupLabel("Spells");
-            FleeMenu.CreateSlider("EQ Speed = {0}", "delay", 100, 0, 350);
+            FleeMenu.CreateSlider("EQ Speed = {0}", "delay", 150, 0, 500);
+            FleeMenu.CreateComboBox("Mode", "jmode", new List<string> { "Smart", "Use Only Existing Soldier", "Always Create New Soldier"});
             FleeMenu.AddSeparator(0);
             FleeMenu.AddLabel("This is used for Speed of Casting between E > Q");
             FleeMenu.AddLabel("Used In Insec / Flee Mode");
             FleeMenu.AddLabel("Note: it uses Arrive time - (speed set above + Game Ping)");
-
+            
             ComboMenu.AddGroupLabel("Spells");
             ComboMenu.CreateCheckBox(" - Use Q", "qUse");
             ComboMenu.CreateCheckBox(" - Use W", "wUse");

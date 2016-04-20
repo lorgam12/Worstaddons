@@ -19,7 +19,7 @@
         {
             if (SpellsManager.R.IsReady() && Game.Time - InSec.LastQTime > 0.1f && Game.Time - InSec.LastQTime < 1)
             {
-                SpellsManager.R.Cast(Azir.Position.Extend(Game.CursorPos, SpellsManager.R.Range).To3D());
+                SpellsManager.R.Cast(Azir.Position.Extend(InSec.rpos, SpellsManager.R.Range).To3D());
             }
 
             if (SpellsManager.R.Level == 1)

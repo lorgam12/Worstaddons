@@ -19,6 +19,7 @@
         /// </summary>
         public static void Execute()
         {
+            
             var minion = EntityManager.MinionsAndMonsters.GetLaneMinions().FirstOrDefault(m => m.IsValidTarget(W.Range) && m != null);
             var minions = EntityManager.MinionsAndMonsters.EnemyMinions;
             if (minion == null || minions == null || !minions.Any())

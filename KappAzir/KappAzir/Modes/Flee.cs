@@ -7,7 +7,7 @@
     {
         public static void Execute()
         {
-            Jumper.jump(Game.CursorPos.To2D());
+            Jumper.jump(Game.CursorPos, Game.CursorPos);
         }
     }
 }

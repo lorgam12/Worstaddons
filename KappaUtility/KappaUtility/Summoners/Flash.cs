@@ -31,11 +31,9 @@
             {
                 var wall = SummMenu["wall"].Cast<CheckBox>().CurrentValue
                            && (NavMesh.GetCollisionFlags(args.EndPosition) == CollisionFlags.Wall
-                               || NavMesh.GetCollisionFlags(args.EndPosition) == CollisionFlags.Building
-                               || NavMesh.GetCollisionFlags(Player.Instance.Position.Extend(Game.CursorPos, 450)) == CollisionFlags.Wall
-                               || NavMesh.GetCollisionFlags(Player.Instance.Position.Extend(Game.CursorPos, 450)) == CollisionFlags.Building);
+                               || NavMesh.GetCollisionFlags(args.EndPosition) == CollisionFlags.Building);
 
-                if (wall && SummMenu["wall"].Cast<CheckBox>().CurrentValue)
+                if (wall && SummMenu["wall"].Cast<CheckBox>().CurrentValue || args.EndPosition.Distance(Player.Instance) < 450 && SummMenu["extend"].Cast<CheckBox>().CurrentValue)
                 {
                     args.Process = false;
                 }
@@ -44,7 +42,7 @@
                 {
                     if (wall && SummMenu["wall"].Cast<CheckBox>().CurrentValue)
                     {
-                        return;
+                        args.Process = false;
                     }
 
                     F.Cast(Player.Instance.Position.Extend(Game.CursorPos, 450).To3D());
