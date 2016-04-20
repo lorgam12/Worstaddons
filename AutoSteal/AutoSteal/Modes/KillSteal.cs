@@ -28,7 +28,7 @@
                     .Where(
                         hero =>
                         hero != null && hero.IsHPBarRendered && !hero.HasBuffOfType(BuffType.Invulnerability)
-                        && hero.IsValid && hero.IsVisible && hero.IsEnemy && !hero.IsDead && !hero.IsZombie
+                        && hero.IsValidTarget() && hero.IsVisible && hero.IsEnemy && !hero.IsDead && !hero.IsZombie
                         && KillStealMenu[champion + "Steal" + hero.BaseSkinName].Cast<CheckBox>().CurrentValue && hero.IsKillable()))
             {
                 Targetxdd = target;

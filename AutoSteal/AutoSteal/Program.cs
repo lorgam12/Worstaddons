@@ -92,11 +92,13 @@
             JungleStealMenu.Add(champion + "crab", new CheckBox("Steal Crab "));
             JungleStealMenu.Add(champion + "murkwolf", new CheckBox("Steal Murkwolf "));
 
-            if (Game.Type == GameType.Ascension)
+            Special = MenuIni.AddSubMenu("Ascension Stealer ", "Ascension Stealer");
+            Special.AddGroupLabel("Ascension Stealer Settings");
+            var asc = Special.Add(champion + "Ascension", new CheckBox("Steal Ascension Mob"));
+            if (Game.Type != GameType.Ascension)
             {
-                Special = MenuIni.AddSubMenu("Ascension Stealer ", "Ascension Stealer");
-                Special.AddGroupLabel("Ascension Stealer Settings");
-                Special.Add(champion + "Ascension", new CheckBox("Steal Ascension Mob"));
+                Special.AddLabel("This Game Mode Isn't Ascension");
+                asc.IsVisible = false;
             }
 
             SpellManager.Initialize();

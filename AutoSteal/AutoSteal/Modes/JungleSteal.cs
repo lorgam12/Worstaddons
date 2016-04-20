@@ -24,7 +24,7 @@
                 EntityManager.MinionsAndMonsters.GetJungleMonsters()
                     .Where(
                         jmob => jmob != null &&
-                        !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsMonster && jmob.IsValid
+                        !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsMonster && jmob.IsValidTarget()
                         && jmob.IsVisible && !jmob.IsDead && !jmob.IsZombie
                         && ((JungleStealMenu[champion + "drake"].Cast<CheckBox>().CurrentValue
                              && jmob.BaseSkinName == "SRU_Dragon")
