@@ -27,7 +27,7 @@ namespace KappAzir.Modes
                 soldposition = sold.ServerPosition;
                 if (E.Cast(Azir.Position.Extend(sold, E.Range).To3D()))
                 {
-                    var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * 1000) - FleeMenu.GetSliderValue("delay");
+                    var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * 900) - FleeMenu.GetSliderValue("delay");
                     Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, (int)time);
                 }
             }

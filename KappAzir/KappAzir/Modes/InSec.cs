@@ -99,7 +99,7 @@
                                 {
                                         if (E.Cast(Azir.Position.Extend(target, E.Range).To3D()))
                                         {
-                                            var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * 950) - FleeMenu.GetSliderValue("delay");
+                                            var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * 900) - FleeMenu.GetSliderValue("delay");
                                             Core.DelayAction(() => {
                                                 if (Q.Cast(Azir.Position.Extend(qpos, Q.Range - FleeMenu.GetSliderValue("dis")).To3D()))
                                                 {
