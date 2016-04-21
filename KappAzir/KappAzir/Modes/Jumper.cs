@@ -31,7 +31,7 @@ namespace KappAzir.Modes
                     Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, (int)time);
                 }
             }
-            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) < 1 && allready && ManaCheck(Azir) < Azir.Mana)
+            else if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) < 1 && allready && ManaCheck(Azir) < Azir.Mana)
             {
                 if (W.Cast(Azir.Position.Extend(pos, W.Range).To3D()))
                 {
@@ -40,6 +40,19 @@ namespace KappAzir.Modes
                             Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, FleeMenu.GetSliderValue("delay"));
                         }
                 }
+            }else if (W.IsReady() && Orbwalker.AzirSoldiers.Count(s => s.IsAlly) < 1)
+            {
+                if (W.Cast(Azir.Position.Extend(pos, W.Range).To3D()))
+                    Core.DelayAction(() => E.Cast(Azir.Position.Extend(Game.CursorPos, E.Range).To3D()), 250);
+            }
+
+            else if (Orbwalker.ValidAzirSoldiers.Any(it => it.Distance(Game.CursorPos) <= 150) && Q.IsReady())
+                E.Cast(Azir.Position.Extend(Game.CursorPos, E.Range).To3D());
+
+            else if (Orbwalker.ValidAzirSoldiers.Any() && Q.IsReady() && E.IsReady())
+            {
+                if (Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()))
+                    Core.DelayAction(() => E.Cast(Azir.Position.Extend(Game.CursorPos, E.Range).To3D()), 100);
             }
 
             /*
