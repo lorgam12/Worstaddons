@@ -32,7 +32,7 @@ namespace KappAzir.Modes
                         var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - FleeMenu.GetSliderValue("delay"))) - Game.Ping;
                         Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, (int)time);
                     }
-                }, 150);
+                }, 100);
                 return;
             }
             if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) < 1 && allready && ManaCheck(Azir) < Azir.Mana)
@@ -45,7 +45,7 @@ namespace KappAzir.Modes
                         {
                             Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, FleeMenu.GetSliderValue("delay"));
                         }
-                    }, 150);
+                    }, 100);
                 }
             }
 
