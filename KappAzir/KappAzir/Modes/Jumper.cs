@@ -21,70 +21,49 @@ namespace KappAzir.Modes
         {
             var allready = Q.IsReady() && E.IsReady() && W.IsReady();
 
-            switch (FleeMenu.GetComboBoxValue("jmode"))
+            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) > 0 && allready && ManaCheck(Azir) < Azir.Mana)
             {
-                case 0:
+                sold = Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(pos)).FirstOrDefault(s => s != null);
+                soldposition = sold.ServerPosition;
+                Core.DelayAction(() =>
+                {
+                    if (E.Cast(Azir.Position.Extend(sold, E.Range).To3D()))
                     {
-                        if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) < 1 && allready && ManaCheck(Azir) < Azir.Mana)
-                        {
-                            W.Cast(Azir.Position.Extend(pos, W.Range).To3D());
-                        }
-
-                        if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) > 0)
-                        {
-                            if (Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(pos)).FirstOrDefault() != null)
-                            {
-                                sold = Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(pos)).FirstOrDefault();
-                                soldposition = sold.ServerPosition;
-                            }
-                            if (E.Cast(Azir.Position.Extend(sold, E.Range).To3D()))
-                            {
-                                var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - FleeMenu.GetSliderValue("delay"))) - Game.Ping;
-                                Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, (int)time);
-                            }
-                        }
+                        var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - FleeMenu.GetSliderValue("delay"))) - Game.Ping;
+                        Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, (int)time);
                     }
-                    break;
-
-                case 1:
-                    {
-                        if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) > 0)
-                        {
-                            if (Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(pos)).FirstOrDefault() != null)
-                            {
-                                sold = Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(pos)).FirstOrDefault();
-                                soldposition = sold.ServerPosition;
-                            }
-                            if (E.Cast(Azir.Position.Extend(sold, E.Range).To3D()))
-                            {
-                                var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - FleeMenu.GetSliderValue("delay"))) - Game.Ping;
-                                Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, (int)time);
-                            }
-                        }
-                    }
-                    break;
-
-                case 2:
-                    {
-                        if (allready && ManaCheck(Azir) < Azir.Mana)
-                        {
-                            if (W.Cast(Azir.Position.Extend(pos, W.Range).To3D()))
-                            {
-                                if (Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(pos)).FirstOrDefault() != null)
-                                {
-                                    sold = Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(pos)).FirstOrDefault();
-                                    soldposition = sold.ServerPosition;
-                                }
-                                if (E.Cast(Azir.Position.Extend(sold, E.Range).To3D()))
-                                {
-                                    var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - FleeMenu.GetSliderValue("delay"))) - Game.Ping;
-                                    Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, (int)time);
-                                }
-                            }
-                        }
-                    }
-                    break;
+                }, 150);
+                return;
             }
+            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) < 1 && allready && ManaCheck(Azir) < Azir.Mana)
+            {
+                if (W.Cast(Azir.Position.Extend(pos, W.Range).To3D()))
+                {
+                    Core.DelayAction(() =>
+                    {
+                        if (E.Cast(Azir.Position.Extend(Game.CursorPos, E.Range).To3D()))
+                        {
+                            Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, FleeMenu.GetSliderValue("delay"));
+                        }
+                    }, 150);
+                }
+            }
+
+            /*
+            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) > 0)
+            {
+                if (Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(pos)).FirstOrDefault() != null)
+                {
+                    sold = Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(pos)).FirstOrDefault();
+                    soldposition = sold.ServerPosition;
+                }
+                if (E.Cast(Azir.Position.Extend(sold, E.Range).To3D()))
+                {
+                    var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - FleeMenu.GetSliderValue("delay"))) - Game.Ping;
+                    Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, (int)time);
+                }
+            }
+            */
         }
     }
 }

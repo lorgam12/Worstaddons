@@ -52,13 +52,10 @@
 
         internal static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsMe)
-            {
-                if (args.Slot == SpellSlot.Q)
+                if (args.Slot == SpellSlot.Q && sender.IsMe)
                 {
                     Orbwalker.ResetAutoAttack();
                 }
-            }
         }
 
         /// <summary>

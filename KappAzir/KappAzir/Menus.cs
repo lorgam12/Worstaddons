@@ -85,16 +85,15 @@
             MiscMenu = FirstMenu.AddSubMenu("• Misc", MiscMenuID);
             DrawingsMenu = FirstMenu.AddSubMenu("• Drawings", DrawingsMenuID);
 
-            FleeMenu.AddGroupLabel("Jumper");
+            FleeMenu.AddGroupLabel("Jumper - Flee Mode");
             FleeMenu.Add("flee", new KeyBind("Jumper Key", false, KeyBind.BindTypes.HoldActive, 'A'));
-            FleeMenu.CreateSlider("EQ Speed = {0}", "delay", 350, 150, 750);
-            FleeMenu.CreateComboBox("Mode", "jmode", new List<string> { "Smart", "Use Only Existing Soldier", "Always Create New Soldier" });
+            FleeMenu.CreateSlider("EQ Speed = {0}", "delay", 250, 100, 400);
             FleeMenu.AddSeparator(0);
             FleeMenu.AddLabel("This is used for Speed of Casting between E > Q");
             FleeMenu.AddLabel("Used In Insec / Flee Mode");
             FleeMenu.AddLabel("Note: it uses Arrive time - (speed set above + Game Ping)");
             FleeMenu.AddSeparator(0);
-            FleeMenu.AddGroupLabel("Insec");
+            FleeMenu.AddGroupLabel("Insec Mode");
             FleeMenu.AddLabel("Select a Target then hold the insec key");
             FleeMenu.Add("insect", new KeyBind("Normal InSec", false, KeyBind.BindTypes.HoldActive, 'S'));
             FleeMenu.Add("insected", new KeyBind("New InSec", false, KeyBind.BindTypes.HoldActive, 'Z'));
