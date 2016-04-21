@@ -192,11 +192,6 @@
                 JungleClear.Execute();
             }
 
-            if (orbMode.HasFlag(Orbwalker.ActiveModes.Flee) && playerMana > JungleClearMenu.GetSliderValue("manaSlider"))
-            {
-                Flee.Execute();
-            }
-
             if (AutoHarassMenu.GetKeyBindValue("autoHarassKey"))
             {
                 if (Orbwalker.AzirSoldiers.Count >= 1 && AutoHarassMenu.GetCheckBoxValue("attack"))
@@ -213,14 +208,19 @@
                     AutoHarass.Execute();
                 }
             }
-            if (InsecMenu.GetKeyBindValue("insect"))
+            if (FleeMenu.GetKeyBindValue("insect"))
             {
                 InSec.Normal();
             }
 
-            if (InsecMenu.GetKeyBindValue("insected"))
+            if (FleeMenu.GetKeyBindValue("insected"))
             {
                 InSec.New();
+            }
+
+            if (FleeMenu.GetKeyBindValue("flee"))
+            {
+                Flee.Execute();
             }
             KillSteal.Execute();
         }

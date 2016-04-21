@@ -36,7 +36,7 @@
                     {
                         if (R.IsReady())
                         {
-                            switch (InsecMenu.GetComboBoxValue("qpos"))
+                            switch (FleeMenu.GetComboBoxValue("qpos"))
                             {
                                 case 0:
                                     {
@@ -63,7 +63,7 @@
                                     break;
                             }
 
-                            switch (InsecMenu.GetComboBoxValue("rpos"))
+                            switch (FleeMenu.GetComboBoxValue("rpos"))
                             {
                                 case 0:
                                     {
@@ -106,11 +106,11 @@
                                 if (E.Cast(Azir.Position.Extend(target, E.Range).To3D())
                                     && soldposition.IsInRange(target.ServerPosition, R.Width) && !Ehit(target))
                                 {
-                                    var time = (Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - (Game.Ping + FleeMenu.GetSliderValue("delay")));
+                                    var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - FleeMenu.GetSliderValue("delay"))) - Game.Ping;
                                     Core.DelayAction(
                                         () =>
                                             {
-                                                if (Q.Cast(Azir.Position.Extend(qpos, Q.Range - InsecMenu.GetSliderValue("dis")).To3D()))
+                                                if (Q.Cast(Azir.Position.Extend(qpos, Q.Range - FleeMenu.GetSliderValue("dis")).To3D()))
                                                 {
                                                     LastQTime = Game.Time;
                                                 }
@@ -155,11 +155,11 @@
             {
                 if (target.IsValidTarget(R.Width) && R.IsReady())
                 {
-                    if (tower != null && InsecMenu.GetCheckBoxValue("Tower"))
+                    if (tower != null && FleeMenu.GetCheckBoxValue("Tower"))
                     {
                         R.Cast(Azir.Position.Extend(tower.ServerPosition, R.Range).To3D());
                     }
-                    else if (ally != null && InsecMenu.GetCheckBoxValue("Ally"))
+                    else if (ally != null && FleeMenu.GetCheckBoxValue("Ally"))
                     {
                         R.Cast(Azir.Position.Extend(ally.ServerPosition, R.Range).To3D());
                     }

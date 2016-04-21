@@ -39,7 +39,7 @@ namespace KappAzir.Modes
                             }
                             if (E.Cast(Azir.Position.Extend(sold, E.Range).To3D()))
                             {
-                                var time = (Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - (Game.Ping + FleeMenu.GetSliderValue("delay")));
+                                var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - FleeMenu.GetSliderValue("delay"))) - Game.Ping;
                                 Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, (int)time);
                             }
                         }
@@ -57,7 +57,7 @@ namespace KappAzir.Modes
                             }
                             if (E.Cast(Azir.Position.Extend(sold, E.Range).To3D()))
                             {
-                                var time = (Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - (Game.Ping + FleeMenu.GetSliderValue("delay")));
+                                var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - FleeMenu.GetSliderValue("delay"))) - Game.Ping;
                                 Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, (int)time);
                             }
                         }
@@ -77,7 +77,7 @@ namespace KappAzir.Modes
                                 }
                                 if (E.Cast(Azir.Position.Extend(sold, E.Range).To3D()))
                                 {
-                                    var time = (Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - (Game.Ping + FleeMenu.GetSliderValue("delay")));
+                                    var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * (1000 - FleeMenu.GetSliderValue("delay"))) - Game.Ping;
                                     Core.DelayAction(() => { Q.Cast(Azir.Position.Extend(qpos, Q.Range).To3D()); }, (int)time);
                                 }
                             }
