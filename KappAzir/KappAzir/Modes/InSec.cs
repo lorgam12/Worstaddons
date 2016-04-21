@@ -92,16 +92,14 @@
 
                             var allready = Q.IsReady() && E.IsReady() && W.IsReady();
 
-                            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) > 0 && allready && ManaCheck(Azir) < Azir.Mana && target.Distance(Azir) > 300)
+                            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) > 0 && allready && ManaCheck(Azir) < Azir.Mana && target.Distance(Azir) > 420)
                             {
                                 soldposition = Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(target)).FirstOrDefault(s => s != null).ServerPosition;
                                 if (soldposition.IsInRange(target.ServerPosition, R.Width) && !Ehit(target))
                                 {
-                                    Core.DelayAction(() =>
-                                    {
                                         if (E.Cast(Azir.Position.Extend(target, E.Range).To3D()))
                                         {
-                                            var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * 1000) - FleeMenu.GetSliderValue("delay");
+                                            var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * 950) - FleeMenu.GetSliderValue("delay");
                                             Core.DelayAction(() => {
                                                 if (Q.Cast(Azir.Position.Extend(qpos, Q.Range - FleeMenu.GetSliderValue("dis")).To3D()))
                                                 {
@@ -109,7 +107,10 @@
                                                 }
                                             }, (int)time);
                                         }
-                                    }, 100);
+                                }
+                                else
+                                {
+                                    Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                                 }
                             }
                             else
@@ -170,7 +171,7 @@
                         {
                             insecLoc = Vector3.Zero;
                             var direction = (TargetSelector.SelectedTarget.ServerPosition - ObjectManager.Player.ServerPosition).To2D().Normalized();
-                            var insecPos = TargetSelector.SelectedTarget.ServerPosition.To2D() + (direction * 200f);
+                            var insecPos = TargetSelector.SelectedTarget.ServerPosition.To2D() + (direction * 175f);
                             if (Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(insecPos)).FirstOrDefault() != null)
                             {
                                 soldposition = Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(insecPos)).FirstOrDefault().ServerPosition;

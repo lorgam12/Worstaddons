@@ -26,7 +26,7 @@
         internal static bool Ehit(AIHeroClient target)
         {
             return
-                Orbwalker.AzirSoldiers.Select(soldier => new Geometry.Polygon.Rectangle(Azir.Position, soldier.Position, target.BoundingRadius))
+                Orbwalker.AzirSoldiers.Select(soldier => new Geometry.Polygon.Rectangle(Azir.Position, soldier.Position, target.BoundingRadius + 35))
                     .Any(rectangle => rectangle.IsInside(target));
         }
 

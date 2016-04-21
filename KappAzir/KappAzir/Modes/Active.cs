@@ -17,7 +17,7 @@
         /// </summary>
         public static void Execute()
         {
-            if (SpellsManager.R.IsReady() && Game.Time - InSec.LastQTime > 0.1f && Game.Time - InSec.LastQTime < 1)
+            if (SpellsManager.R.IsReady() && Game.Time - InSec.LastQTime > 0.1f && Game.Time - InSec.LastQTime < 1 && InSec.target.IsValidTarget(SpellsManager.R.Range))
             {
                 SpellsManager.R.Cast(Azir.Position.Extend(InSec.rpos, SpellsManager.R.Range).To3D());
             }
