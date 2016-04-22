@@ -105,7 +105,7 @@
                                                 {
                                                     LastQTime = Game.Time;
                                                 }
-                                            }, (int)time);
+                                            }, FleeMenu.GetSliderValue("delay") + Game.Ping);
                                         }
                                 }
                                 else
