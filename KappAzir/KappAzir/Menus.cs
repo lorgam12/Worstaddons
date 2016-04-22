@@ -87,7 +87,7 @@
 
             FleeMenu.AddGroupLabel("Jumper - Flee Mode");
             FleeMenu.Add("flee", new KeyBind("Jumper Key", false, KeyBind.BindTypes.HoldActive, 'A'));
-            FleeMenu.CreateSlider("EQ Speed = {0}", "delay", Game.Ping + 100, Game.Ping, 500);
+            FleeMenu.CreateSlider("EQ Speed = {0}", "delay", Game.Ping + 100, Game.Ping, Game.Ping + 400);
             FleeMenu.AddSeparator(0);
             FleeMenu.AddLabel("This is used for Speed of Casting between E > Q");
             FleeMenu.AddLabel("Used In Insec / Flee Mode");
