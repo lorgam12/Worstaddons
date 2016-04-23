@@ -5,6 +5,7 @@
     using Genesis.Library;
 
     using EloBuddy;
+    using EloBuddy.SDK;
     using EloBuddy.SDK.Events;
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
@@ -117,6 +118,8 @@
 
         private static void OnUpdate(EventArgs args)
         {
+
+            if (Player.Instance.IsRecalling()) return;
             var champion = ObjectManager.Player.ChampionName;
             if (KillStealMenu[champion + "EnableKST"].Cast<KeyBind>().CurrentValue
                 || KillStealMenu[champion + "EnableKSA"].Cast<KeyBind>().CurrentValue)

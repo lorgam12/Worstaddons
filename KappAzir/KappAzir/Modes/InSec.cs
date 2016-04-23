@@ -178,7 +178,7 @@
                             }
                             insecLoc = Azir.ServerPosition;
 
-                            Jumper.jump(insecPos.To3D(), insecPos.To3D());
+                            Jumper.jump(insecPos.To3D());
                         }
                         else
                         {

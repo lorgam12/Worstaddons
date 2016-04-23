@@ -104,6 +104,7 @@
 
         private static void Game_OnTick(EventArgs args)
         {
+            if (Player.IsRecalling()) return;
             if (Lc[Player.ChampionName + "Enable"].Cast<KeyBind>().CurrentValue
                 || Lc[Player.ChampionName + "Enableactive"].Cast<KeyBind>().CurrentValue)
             {
