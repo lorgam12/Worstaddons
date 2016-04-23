@@ -92,20 +92,24 @@
 
                             var allready = Q.IsReady() && E.IsReady() && W.IsReady();
 
-                            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) > 0 && allready && ManaCheck(Azir) < Azir.Mana && target.Distance(Azir) > 420)
+                            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) > 0 && allready && ManaCheck(Azir) < Azir.Mana
+                                && target.Distance(Azir) > 420)
                             {
                                 soldposition = Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(target)).FirstOrDefault(s => s != null).ServerPosition;
                                 if (soldposition.IsInRange(target.ServerPosition, R.Width) && !Ehit(target))
                                 {
-                                        if (E.Cast())
-                                        {
-                                            Core.DelayAction(() => {
-                                                if (Q.Cast(Azir.Position.Extend(qpos, Q.Range - FleeMenu.GetSliderValue("dis")).To3D()))
+                                    if (E.Cast())
+                                    {
+                                        Core.DelayAction(
+                                            () =>
                                                 {
-                                                    LastQTime = Game.Time;
-                                                }
-                                            }, FleeMenu.GetSliderValue("delay") + Game.Ping);
-                                        }
+                                                    if (Q.Cast(Azir.Position.Extend(qpos, Q.Range - FleeMenu.GetSliderValue("dis")).To3D()))
+                                                    {
+                                                        LastQTime = Game.Time;
+                                                    }
+                                                },
+                                            FleeMenu.GetSliderValue("delay") + Game.Ping);
+                                    }
                                 }
                                 else
                                 {

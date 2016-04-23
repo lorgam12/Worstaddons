@@ -49,8 +49,7 @@
                     W.Cast(W.GetPrediction(target).CastPosition);
                 }
 
-                if (target.IsValidTarget(Q.Range - 100) && Q.IsReady() && Azir.Mana > ManaCheck(Azir)
-                    && !target.IsValidTarget(W.Range))
+                if (target.IsValidTarget(Q.Range - 100) && Q.IsReady() && Azir.Mana > ManaCheck(Azir) && !target.IsValidTarget(W.Range))
                 {
                     var p = Azir.Distance(target, true) > W.RangeSquared
                                 ? Azir.Position.To2D().Extend(target.Position.To2D(), W.Range)

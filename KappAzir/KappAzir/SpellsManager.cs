@@ -23,7 +23,7 @@
 
         public static Spell.Skillshot W;
 
-        public static Spell.Active E;
+        public static Spell.Skillshot E;
 
         public static Spell.Skillshot R;
 
@@ -36,7 +36,7 @@
         {
             Q = new Spell.Skillshot(SpellSlot.Q, 1000, SkillShotType.Linear, 250, 1000, 65) { AllowedCollisionCount = int.MaxValue };
             W = new Spell.Skillshot(SpellSlot.W, 525, SkillShotType.Circular);
-            E = new Spell.Active(SpellSlot.E);
+            E = new Spell.Skillshot(SpellSlot.E, 1200, SkillShotType.Linear, 250, 1200, 80) { AllowedCollisionCount = int.MaxValue };
             R = new Spell.Skillshot(SpellSlot.R, 350, SkillShotType.Linear, 500, 1000, 220) { AllowedCollisionCount = int.MaxValue };
 
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerFlash")) != null)
@@ -52,10 +52,10 @@
 
         internal static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-                if (args.Slot == SpellSlot.Q && sender.IsMe)
-                {
-                    Orbwalker.ResetAutoAttack();
-                }
+            if (args.Slot == SpellSlot.Q && sender.IsMe)
+            {
+                Orbwalker.ResetAutoAttack();
+            }
         }
 
         /// <summary>

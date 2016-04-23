@@ -1,5 +1,6 @@
 ﻿namespace KappAzir.Modes
 {
+    using System;
     using System.Linq;
 
     using EloBuddy;
@@ -11,76 +12,58 @@
     using static Menus;
     using static SpellsManager;
 
-    class Jumper : ModeManager
+    internal class Jumper : ModeManager
     {
         public static void jump(Vector3 qpos, Vector3 pos)
         {
-            if(W.IsReady() && E.IsReady() && Q.IsReady() && Orbwalker.AzirSoldiers.Count(s => s.Distance(Azir) <= FleeMenu.GetSliderValue("range")) < 1 && Azir.Mana > ManaCheck(Azir))
+            var range = FleeMenu.GetSliderValue("range");
+            var delay = FleeMenu.GetSliderValue("delay");
+            var allready = Q.IsReady() && E.IsReady() && ManaCheck(Azir) < Azir.Mana;
+            if (Orbwalker.AzirSoldiers.Count(s => s.Distance(Azir) < range) < 1 && allready)
             {
                 if (W.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
                 {
-                    Core.DelayAction(
-                        () =>
-                            {
-                                if (E.Cast())
+                    Console.WriteLine("W1 Casted");
+                                if (E.IsReady())
                                 {
-                                    Core.DelayAction(
-                                        () =>
-                                            { Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D()); }, FleeMenu.GetSliderValue("delay"));
-                                }
-                            }, 150);
-                }
-            }else if (Orbwalker.AzirSoldiers.Count(s => s.Distance(Azir) <= FleeMenu.GetSliderValue("range")) > 0 && Q.IsReady())
-            {
-                Core.DelayAction(
-                    () =>
-                    {
-                        if (E.Cast())
-                        {
-                            Core.DelayAction(
-                                    () =>
-                                    { Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D()); }, FleeMenu.GetSliderValue("delay"));
-                        }
-                    }, 150);
-            }else if (Orbwalker.AzirSoldiers.Count(s => s.Distance(Azir) <= FleeMenu.GetSliderValue("range")) > 0 && E.IsReady())
-            {
-                Core.DelayAction(
-                    () =>
-                        {
-                            if (Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D()))
-                            {
-                                Core.DelayAction(
-                                    () =>
+                                    if (E.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
+                                    {
+                                        Console.WriteLine("E1 Casted");
+                                        if (Q.IsReady())
                                         {
-                                            E.Cast();
-                                        },
-                                    FleeMenu.GetSliderValue("delay"));
-                            }
-                        },
-                    150);
-            }else if (E.Cast() && Q.IsReady())
-            {
-                Core.DelayAction(
-                        () =>
-                        { Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D()); }, FleeMenu.GetSliderValue("delay"));
-
-            }else if (Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D()) && E.IsReady())
-            {
-                Core.DelayAction(
-                        () =>
-                        { E.Cast(); }, FleeMenu.GetSliderValue("delay"));
-            }
-            else if (Orbwalker.AzirSoldiers.Any(s => s != null))
-            {
-                if (E.Cast() && Q.IsReady())
-                {
-                    Core.DelayAction(
-                        () =>
-                            {
-                                Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D());
-                            },
-                        FleeMenu.GetSliderValue("delay"));
+                                            Core.DelayAction(
+                                                () =>
+                                                {
+                                                    Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D());
+                                                    Console.WriteLine("Q1 Casted");
+                                                }, delay);
+                                        }
+                                    }
+                                }
                 }
+                return;
+            }
+            if (Orbwalker.AzirSoldiers.Count(s => s.Distance(Azir) < range) > 0 && allready)
+            {
+                if (E.IsReady())
+                {
+                                if (E.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
+                                {
+                                    Console.WriteLine("E2 Casted");
+                                    if (Q.IsReady())
+                                    {
+                                        Core.DelayAction(
+                                            () =>
+                                                {
+                                                    Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D());
+                                                    Console.WriteLine("Q2 Casted");
+                                                },
+                                            delay);
+                                    }
+                                }
+                }
+
+                return;
             }
         }
     }

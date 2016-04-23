@@ -125,7 +125,7 @@
             Gapcloser.OnGapcloser += Gapcloser_OnGapcloser;
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
         }
-        
+
         private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs e)
         {
             if (!sender.IsEnemy || sender == null || e == null || !SpellsMenu.GetCheckBoxValue("rUseInt"))
@@ -140,7 +140,8 @@
 
         private static void Gapcloser_OnGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
-            if (!sender.IsEnemy || sender == null || e == null || !SpellsMenu.GetCheckBoxValue("rUseGap") || sender.Spellbook.CastEndTime > SpellsManager.R.CastDelay)
+            if (!sender.IsEnemy || sender == null || e == null || !SpellsMenu.GetCheckBoxValue("rUseGap")
+                || sender.Spellbook.CastEndTime > SpellsManager.R.CastDelay)
             {
                 return;
             }
