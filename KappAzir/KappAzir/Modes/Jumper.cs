@@ -23,23 +23,16 @@
             {
                 if (W.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
                 {
-                    Console.WriteLine("W1 Casted");
-                                if (E.IsReady())
-                                {
-                                    if (E.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
-                                    {
-                                        Console.WriteLine("E1 Casted");
-                                        if (Q.IsReady())
-                                        {
-                                            Core.DelayAction(
-                                                () =>
-                                                {
-                                                    Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D());
-                                                    Console.WriteLine("Q1 Casted");
-                                                }, delay);
-                                        }
-                                    }
-                                }
+                    if (E.IsReady())
+                    {
+                        if (E.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
+                        {
+                            if (Q.IsReady())
+                            {
+                                Core.DelayAction(() => { Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D()); }, delay);
+                            }
+                        }
+                    }
                 }
                 return;
             }
@@ -47,20 +40,13 @@
             {
                 if (E.IsReady())
                 {
-                                if (E.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
-                                {
-                                    Console.WriteLine("E2 Casted");
-                                    if (Q.IsReady())
-                                    {
-                                        Core.DelayAction(
-                                            () =>
-                                                {
-                                                    Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D());
-                                                    Console.WriteLine("Q2 Casted");
-                                                },
-                                            delay);
-                                    }
-                                }
+                    if (E.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
+                    {
+                        if (Q.IsReady())
+                        {
+                            Core.DelayAction(() => { Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D()); }, delay);
+                        }
+                    }
                 }
 
                 return;
