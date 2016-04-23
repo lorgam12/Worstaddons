@@ -22,7 +22,7 @@
                     Core.DelayAction(
                         () =>
                             {
-                                if (E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()))
+                                if (E.Cast())
                                 {
                                     Core.DelayAction(
                                         () =>
@@ -35,7 +35,7 @@
                 Core.DelayAction(
                     () =>
                     {
-                        if (E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()))
+                        if (E.Cast())
                         {
                             Core.DelayAction(
                                     () =>
@@ -52,13 +52,13 @@
                                 Core.DelayAction(
                                     () =>
                                         {
-                                            E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D());
+                                            E.Cast();
                                         },
                                     FleeMenu.GetSliderValue("delay"));
                             }
                         },
                     150);
-            }else if (E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()) && Q.IsReady())
+            }else if (E.Cast() && Q.IsReady())
             {
                 Core.DelayAction(
                         () =>
@@ -68,7 +68,19 @@
             {
                 Core.DelayAction(
                         () =>
-                        { E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()); }, FleeMenu.GetSliderValue("delay"));
+                        { E.Cast(); }, FleeMenu.GetSliderValue("delay"));
+            }
+            else if (Orbwalker.AzirSoldiers.Any(s => s != null))
+            {
+                if (E.Cast() && Q.IsReady())
+                {
+                    Core.DelayAction(
+                        () =>
+                            {
+                                Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D());
+                            },
+                        FleeMenu.GetSliderValue("delay"));
+                }
             }
         }
     }

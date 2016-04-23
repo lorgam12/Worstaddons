@@ -97,9 +97,8 @@
                                 soldposition = Orbwalker.AzirSoldiers.OrderBy(s => s.Distance(target)).FirstOrDefault(s => s != null).ServerPosition;
                                 if (soldposition.IsInRange(target.ServerPosition, R.Width) && !Ehit(target))
                                 {
-                                        if (E.Cast(Azir.Position.Extend(target, E.Range).To3D()))
+                                        if (E.Cast())
                                         {
-                                            var time = ((Azir.ServerPosition.Distance(soldposition) / E.Speed) * 900) - FleeMenu.GetSliderValue("delay");
                                             Core.DelayAction(() => {
                                                 if (Q.Cast(Azir.Position.Extend(qpos, Q.Range - FleeMenu.GetSliderValue("dis")).To3D()))
                                                 {
