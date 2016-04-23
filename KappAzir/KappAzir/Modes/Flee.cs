@@ -7,7 +7,7 @@
     {
         public static void Execute()
         {
-            Jumper.jump(Game.CursorPos);
+            Jumper.jump(Game.CursorPos, Game.CursorPos);
         }
     }
 }
