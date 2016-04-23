@@ -31,7 +31,7 @@
                                             () =>
                                                 { Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D()); }, FleeMenu.GetSliderValue("delay"));
                                     }
-                                }, 100);
+                                }, 150);
                     }
                 }
                 else if (Orbwalker.AzirSoldiers.Count(s => s.Distance(Azir) <= FleeMenu.GetSliderValue("range") && s != null && s.IsAlly) > 0)
@@ -46,10 +46,10 @@
                                             {
                                                 Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D());
                                             },
-                                        150);
+                                        100);
                                 }
                             },
-                        100);
+                        150);
                 }
                 else if (Orbwalker.AzirSoldiers.Count(s => s.Distance(Azir) <= FleeMenu.GetSliderValue("range") && s != null && s.IsAlly) < 1)
                 {
@@ -58,7 +58,7 @@
                         Core.DelayAction(
                         () =>
                         { E.Cast(Azir.ServerPosition.Extend(Game.CursorPos, E.Range).To3D()); },
-                        100);
+                        150);
                     }
                 }else if(E.Cast(Azir.ServerPosition.Extend(Game.CursorPos, E.Range).To3D()))
                 {
@@ -68,6 +68,15 @@
                             Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D());
                         },
                         150);
+                }
+                else if (Orbwalker.AzirSoldiers.Count(s => s.Distance(Azir) <= FleeMenu.GetSliderValue("range") && s != null && s.IsAlly) > 1 && !E.IsReady())
+                {
+                    Core.DelayAction(
+                        () =>
+                        {
+                            Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D());
+                        },
+                        100);
                 }
             }
         }
