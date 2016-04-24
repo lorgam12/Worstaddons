@@ -37,6 +37,7 @@
                 Menus.CreateMenu();
                 ModeManager.InitializeModes();
                 DrawingsManager.InitializeDrawings();
+                Jumper.OnLoad();
             }
             catch (Exception e)
             {

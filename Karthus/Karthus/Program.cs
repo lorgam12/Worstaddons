@@ -20,8 +20,6 @@ namespace Karthus
 
     internal class Program
     {
-        public static Check Check;
-
         private static Vector2 PingLocation;
 
         private static int LastPingT = 0;
@@ -85,8 +83,6 @@ namespace Karthus
             {
                 return;
             }
-
-            Check = new Check();
 
             Q = new Spell.Skillshot(SpellSlot.Q, 875, SkillShotType.Circular, 1000, int.MaxValue, 160);
             Q2 = new Spell.Skillshot(SpellSlot.Q, 875, SkillShotType.Circular, 650, int.MaxValue, 100);
@@ -193,8 +189,7 @@ namespace Karthus
         private static void Gapcloser_OnGap(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
             if (!menuIni.Get<CheckBox>("Misc").CurrentValue || !MiscMenu.Get<CheckBox>("gapcloser").CurrentValue
-                || ObjectManager.Player.ManaPercent < MiscMenu.Get<Slider>("gapclosermana").CurrentValue
-                || Sender == null)
+                || ObjectManager.Player.ManaPercent < MiscMenu.Get<Slider>("gapclosermana").CurrentValue || Sender == null)
             {
                 return;
             }
@@ -211,12 +206,12 @@ namespace Karthus
 
         private static void Ping(Vector2 position)
         {
-            if (Helper.TickCount - LastPingT < 30 * 1000)
+            if (Environment.TickCount - LastPingT < 30 * 1000)
             {
                 return;
             }
 
-            LastPingT = Helper.TickCount;
+            LastPingT = Environment.TickCount;
             PingLocation = position;
             SimplePing();
             Core.DelayAction(SimplePing, 150);
@@ -289,10 +284,9 @@ namespace Karthus
             var flags = Orbwalker.ActiveModesFlags;
             if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && menuIni.Get<CheckBox>("Combo").CurrentValue)
             {
-                Orbwalker.DisableAttacking = ComboMenu.Get<CheckBox>("CUse_AA").CurrentValue
-                                             && player.Mana > Q.Handle.SData.Mana * 3;
-                if (MiscMenu.Get<CheckBox>("SaveR").CurrentValue
-                    && player.Mana - (SaveR() / 3) - 30 > R.Handle.SData.Mana && player.Level >= 6 && R.IsLearned)
+                Orbwalker.DisableAttacking = ComboMenu.Get<CheckBox>("CUse_AA").CurrentValue && player.Mana > Q.Handle.SData.Mana * 3;
+                if (MiscMenu.Get<CheckBox>("SaveR").CurrentValue && player.Mana - (SaveR() / 3) - 30 > R.Handle.SData.Mana && player.Level >= 6
+                    && R.IsLearned)
                 {
                     Combo();
                 }
@@ -306,8 +300,8 @@ namespace Karthus
             if (flags.HasFlag(Orbwalker.ActiveModes.LaneClear) && menuIni.Get<CheckBox>("LaneClear").CurrentValue)
             {
                 Orbwalker.DisableAttacking = false;
-                if (MiscMenu.Get<CheckBox>("SaveR").CurrentValue && player.Mana - (SaveR() / 3) > R.Handle.SData.Mana
-                    && player.Level >= 6 && R.IsLearned)
+                if (MiscMenu.Get<CheckBox>("SaveR").CurrentValue && player.Mana - (SaveR() / 3) > R.Handle.SData.Mana && player.Level >= 6
+                    && R.IsLearned)
                 {
                     LaneClear();
                 }
@@ -335,8 +329,7 @@ namespace Karthus
 
             if (flags.HasFlag(Orbwalker.ActiveModes.Harass) && menuIni.Get<CheckBox>("Harass").CurrentValue)
             {
-                Orbwalker.DisableAttacking = HarassMenu.Get<CheckBox>("HUse_AA").CurrentValue
-                                             && Player.Instance.Mana < Q.Handle.SData.Mana * 3;
+                Orbwalker.DisableAttacking = HarassMenu.Get<CheckBox>("HUse_AA").CurrentValue && Player.Instance.Mana < Q.Handle.SData.Mana * 3;
 
                 if (MiscMenu.Get<CheckBox>("SaveR").CurrentValue && player.Level >= 6 && R.IsLearned
                     && player.Mana - (SaveR() / 2) > R.Handle.SData.Mana)
@@ -353,8 +346,7 @@ namespace Karthus
             if (flags.HasFlag(Orbwalker.ActiveModes.LastHit) && menuIni.Get<CheckBox>("LastHit").CurrentValue)
             {
                 if (LaneMenu.Get<CheckBox>("LAA").CurrentValue
-                    && (Q.IsReady()
-                        || ObjectManager.Player.ManaPercent >= LaneMenu.Get<Slider>("LHQPercent").CurrentValue))
+                    && (Q.IsReady() || ObjectManager.Player.ManaPercent >= LaneMenu.Get<Slider>("LHQPercent").CurrentValue))
                 {
                     Orbwalker.DisableAttacking = true;
                 }
@@ -425,9 +417,8 @@ namespace Karthus
 
         private static void DrawKillable()
         {
-            var time = Helper.TickCount;
-            var enemiesrange =
-                ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("Rranged").CurrentValue);
+            var time = Environment.TickCount;
+            var enemiesrange = ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("Rranged").CurrentValue);
             var enemieinsrange = UltMenu.Get<Slider>("RnearEn").CurrentValue;
             if (UltMenu.Get<CheckBox>("RnearE").CurrentValue && enemiesrange >= enemieinsrange)
             {
@@ -442,41 +433,34 @@ namespace Karthus
             {
                 var killable = string.Empty;
 
-                foreach (var target in
-                    Check.TI.Where(
-                        x =>
-                        x.Player.IsValid && !x.Player.IsDead && x.Player.IsEnemy
-                        && player.GetSpellDamage(x.Player, SpellSlot.R)
-                        > Check.GetTargetHealth(x, (int)(R.CastDelay * 1000f))))
+                foreach (
+                    var target in
+                        EntityManager.Heroes.Enemies.Where(
+                            x =>
+                            !x.IsDead && x.IsEnemy
+                            && player.GetSpellDamage(x, SpellSlot.R) > Prediction.Health.GetPrediction(x, (int)(R.CastDelay * 1000f)))
+                            .Where(target => target.IsVisible))
                 {
-                    if (target.Player.IsVisible
-                        || (!target.Player.IsVisible && time - Helper.GetPlayerInfo(target.Player).LastSeen < 3000))
+                    killable += target.ChampionName + ", ";
+                    if (MiscMenu.Get<CheckBox>("ping").CurrentValue)
                     {
-                        killable += target.Player.ChampionName + ", ";
-                        if (MiscMenu.Get<CheckBox>("ping").CurrentValue)
-                        {
-                            Ping(target.Player.Position.To2D());
-                        }
-                        if (DrawMenu.Get<CheckBox>("Rtarget").CurrentValue)
-                        {
-                            Circle.Draw(Color.DarkRed, 650, target.Player.Position);
-                            Drawing.DrawText(
-                                Drawing.WorldToScreen(target.Player.Position) - new Vector2(0.44f, 0.8f),
-                                System.Drawing.Color.Red,
-                                "Killable by ult",
-                                2);
-                        }
+                        Ping(target.Position.To2D());
+                    }
+                    if (DrawMenu.Get<CheckBox>("Rtarget").CurrentValue)
+                    {
+                        Circle.Draw(Color.DarkRed, 650, target.Position);
+                        Drawing.DrawText(
+                            Drawing.WorldToScreen(target.Position) - new Vector2(0.44f, 0.8f),
+                            System.Drawing.Color.Red,
+                            "Killable by ult",
+                            2);
+                    }
 
-                        if (killable != string.Empty)
+                    if (killable != string.Empty)
+                    {
+                        if (MiscMenu.Get<CheckBox>("NotifyUlt").CurrentValue)
                         {
-                            if (MiscMenu.Get<CheckBox>("NotifyUlt").CurrentValue)
-                            {
-                                Drawing.DrawText(
-                                    Drawing.Width * 0.44f,
-                                    Drawing.Height * 0.7f,
-                                    System.Drawing.Color.Red,
-                                    "Killable by ult: " + killable);
-                            }
+                            Drawing.DrawText(Drawing.Width * 0.44f, Drawing.Height * 0.7f, System.Drawing.Color.Red, "Killable by ult: " + killable);
                         }
                     }
                 }
@@ -487,10 +471,8 @@ namespace Karthus
         {
             {
                 float i = 0;
-                foreach (
-                    var hero in
-                        EntityManager.Heroes.Enemies.Where(
-                            hero => hero != null && hero.IsEnemy && !hero.IsMe && !hero.IsDead))
+                foreach (var hero in
+                    EntityManager.Heroes.Enemies.Where(hero => hero != null && hero.IsEnemy && !hero.IsMe && !hero.IsDead))
                 {
                     var champion = hero.ChampionName;
                     if (champion.Length > 12)
@@ -522,8 +504,7 @@ namespace Karthus
                         color,
                         (" ( " + (int)hero.TotalShieldHealth()) + " / " + (int)hero.MaxHealth + " | " + percent + "% ) ");
 
-                    if (hero.IsVisible
-                        || (!hero.IsVisible && Helper.TickCount - Helper.GetPlayerInfo(hero).LastSeen < 3000))
+                    if (hero.IsVisible)
                     {
                         if (player.GetSpellDamage(hero, SpellSlot.R) > hero.TotalShieldHealth())
                         {
@@ -548,11 +529,7 @@ namespace Karthus
                 return;
             }
 
-            var minions =
-                EntityManager.MinionsAndMonsters.GetLaneMinions(
-                    EntityManager.UnitTeam.Enemy,
-                    Player.Instance.Position,
-                    E.Range).ToArray();
+            var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position, E.Range).ToArray();
 
             if (!tc && (eTarget != null || (!nowE && minions.Count() != 0)))
             {
@@ -569,8 +546,7 @@ namespace Karthus
                 if (qTarget != null)
                 {
                     var predQ = Q2.GetPrediction(qTarget);
-                    if (HarassMenu.Get<CheckBox>("HUse_Q").CurrentValue
-                        && (Q.IsReady() && qTarget.IsValidTarget(Q.Range)))
+                    if (HarassMenu.Get<CheckBox>("HUse_Q").CurrentValue && (Q.IsReady() && qTarget.IsValidTarget(Q.Range)))
                     {
                         if (!cz && predQ.HitChance >= HitChance.High)
                         {
@@ -583,8 +559,8 @@ namespace Karthus
                     }
                 }
 
-                if (HarassMenu.Get<CheckBox>("HUse_E").CurrentValue
-                    && HarassMenu.Get<CheckBox>("E_LastHit").CurrentValue && E.IsReady() && !player.IsZombie)
+                if (HarassMenu.Get<CheckBox>("HUse_E").CurrentValue && HarassMenu.Get<CheckBox>("E_LastHit").CurrentValue && E.IsReady()
+                    && !player.IsZombie)
                 {
                     if (!E.IsReady() || player.IsZombie)
                     {
@@ -594,15 +570,9 @@ namespace Karthus
                     nowE = false;
                     var minions =
                         new List<Obj_AI_Base>(
-                            EntityManager.MinionsAndMonsters.GetLaneMinions(
-                                EntityManager.UnitTeam.Enemy,
-                                Player.Instance.Position,
-                                E.Range).ToArray());
+                            EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Instance.Position, E.Range).ToArray());
                     minions.RemoveAll(x => x.Health <= 5);
-                    minions.RemoveAll(
-                        x =>
-                        player.Distance(x.ServerPosition) > E.Range
-                        || x.Health > player.GetSpellDamage(eTarget, SpellSlot.E));
+                    minions.RemoveAll(x => player.Distance(x.ServerPosition) > E.Range || x.Health > player.GetSpellDamage(eTarget, SpellSlot.E));
                     var jgm = minions.Any(x => x.Team == GameObjectTeam.Neutral);
 
                     if ((player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && (minions.Count >= 1 || jgm))
@@ -824,10 +794,8 @@ namespace Karthus
                     GetBestCircularFarmLocation(
                         EntityManager.MinionsAndMonsters.EnemyMinions.Where(
                             x =>
-                            x.Distance(Player.Instance) <= Q.Range && x.Health > 5 && (x.CountEnemiesInRange(155) == 0)
-                            && !x.IsDead && x.IsValid
-                            && Prediction.Health.GetPrediction(x, (int)(Q.CastDelay * 1000))
-                            < (2 * player.GetSpellDamage(x, SpellSlot.Q)))
+                            x.Distance(Player.Instance) <= Q.Range && x.Health > 5 && (x.CountEnemiesInRange(155) == 0) && !x.IsDead && x.IsValid
+                            && Prediction.Health.GetPrediction(x, (int)(Q.CastDelay * 1000)) < (2 * player.GetSpellDamage(x, SpellSlot.Q)))
                             .Select(xm => xm.ServerPosition.To2D())
                             .ToList(),
                         Q.Width + 5,
@@ -852,8 +820,7 @@ namespace Karthus
                         EntityManager.MinionsAndMonsters.EnemyMinions.Where(
                             x =>
                             x.Distance(Player.Instance) <= Q.Range && x.Health > 5 && !x.IsDead && x.IsValid
-                            && (Prediction.Health.GetPrediction(x, (int)(Q.CastDelay * 1000))
-                                < player.GetSpellDamage(x, SpellSlot.Q)))
+                            && (Prediction.Health.GetPrediction(x, (int)(Q.CastDelay * 1000)) < player.GetSpellDamage(x, SpellSlot.Q)))
                             .Select(xm => xm.ServerPosition.To2D())
                             .ToList(),
                         Q.Width,
@@ -869,26 +836,17 @@ namespace Karthus
         private static void Ult()
         {
             // Kappa ult logic.
-            var time = Helper.TickCount;
-            var enemiesrange =
-                ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("Rranged").CurrentValue);
+            var time = Environment.TickCount;
+            var enemiesrange = ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("Rranged").CurrentValue);
             var enemieinsrange = UltMenu.Get<Slider>("RnearEn").CurrentValue;
             foreach (
                 var rtarget in
-                    from target in
-                        Check.TI.Where(
-                            x =>
-                            x.Player != null && x.Player.IsValid && !x.Player.IsDead && x.Player.IsEnemy
-                            && (!x.Player.HasBuff("kindrednodeathbuff") || !x.Player.HasBuff("Undying Rage")
-                                || !x.Player.HasBuff("JudicatorIntervention")) && !x.Player.IsZombie
-                            && player.GetSpellDamage(x.Player, SpellSlot.R)
-                            > Check.GetTargetHealth(x, (int)(R.CastDelay * 1000f))
-                            && x.Player.CountAlliesInRange(750) < 1)
-                    where
-                        target.Player != null
-                        && (target.Player.IsVisible
-                            || (!target.Player.IsVisible && time - Helper.GetPlayerInfo(target.Player).LastSeen < 3000))
-                    select TargetSelector.GetTarget(R.Range, DamageType.Magical))
+                    EntityManager.Heroes.Enemies.Where(
+                        x =>
+                        x != null && x.IsValid && !x.IsDead && x.IsEnemy
+                        && (!x.HasBuff("kindrednodeathbuff") || !x.HasBuff("Undying Rage") || !x.HasBuff("JudicatorIntervention")) && !x.IsZombie
+                        && player.GetSpellDamage(x, SpellSlot.R) > Prediction.Health.GetPrediction(x, (int)(R.CastDelay * 1000f))
+                        && x.CountAlliesInRange(750) < 1))
             {
                 if (UltMenu.Get<CheckBox>("RnearE").CurrentValue && enemieinsrange <= enemiesrange)
                 {
@@ -922,12 +880,7 @@ namespace Karthus
 
         // Find the points nearest the upper left, upper right,
         // lower left, and lower right corners.
-        private static void GetMinMaxCorners(
-            List<Vector2> points,
-            ref Vector2 ul,
-            ref Vector2 ur,
-            ref Vector2 ll,
-            ref Vector2 lr)
+        private static void GetMinMaxCorners(List<Vector2> points, ref Vector2 ul, ref Vector2 ur, ref Vector2 ll, ref Vector2 lr)
         {
             // Start with the first point as the solution.
             ul = points[0];
@@ -1007,10 +960,8 @@ namespace Karthus
 
             // Cull the points.
             var results =
-                points.Where(
-                    pt =>
-                    pt.X <= cullingBox.Left || pt.X >= cullingBox.Right || pt.Y <= cullingBox.Top
-                    || pt.Y >= cullingBox.Bottom).ToList();
+                points.Where(pt => pt.X <= cullingBox.Left || pt.X >= cullingBox.Right || pt.Y <= cullingBox.Top || pt.Y >= cullingBox.Bottom)
+                    .ToList();
 
             GNonCulledPoints = new Vector2[results.Count]; // For debugging.
             results.CopyTo(GNonCulledPoints); // For debugging.
@@ -1027,8 +978,7 @@ namespace Karthus
             // Find the remaining point with the smallest Y value.
             // if (there's a tie, take the one with the smaller X value.
             Vector2[] bestPt = { points[0] };
-            foreach (
-                var pt in points.Where(pt => (pt.Y < bestPt[0].Y) || ((pt.Y == bestPt[0].Y) && (pt.X < bestPt[0].X))))
+            foreach (var pt in points.Where(pt => (pt.Y < bestPt[0].Y) || ((pt.Y == bestPt[0].Y) && (pt.X < bestPt[0].X))))
             {
                 bestPt[0] = pt;
             }
@@ -1197,13 +1147,7 @@ namespace Karthus
         }
 
         // Return true if the indicated circle encloses all of the points.
-        private static bool CircleEnclosesPoints(
-            Vector2 center,
-            float radius2,
-            List<Vector2> points,
-            int skip1,
-            int skip2,
-            int skip3)
+        private static bool CircleEnclosesPoints(Vector2 center, float radius2, List<Vector2> points, int skip1, int skip2, int skip3)
         {
             return (from point in points.Where((t, i) => (i != skip1) && (i != skip2) && (i != skip3))
                     let dx = center.X - point.X
@@ -1259,11 +1203,7 @@ namespace Karthus
             return new MecCircle(center, radius);
         }
 
-        public static FarmLocation GetBestCircularFarmLocation(
-            List<Vector2> minionPositions,
-            float width,
-            float range,
-            int useMecMax = 9)
+        public static FarmLocation GetBestCircularFarmLocation(List<Vector2> minionPositions, float width, float range, int useMecMax = 9)
         {
             var result = new Vector2();
             var minionCount = 0;

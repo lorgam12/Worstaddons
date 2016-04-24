@@ -29,7 +29,7 @@
                     {
                         case "Cupcake Trap":
                             Drawing.DrawText(Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30), Color.White, "Caitlyn Trap", 2);
-                            Circle.Draw(SharpDX.Color.Purple, trap.BoundingRadius + 10, trap.Position);
+                            Circle.Draw(SharpDX.Color.White, trap.BoundingRadius + 10, trap.Position);
                             break;
 
                         case "Noxious Trap":
@@ -37,7 +37,7 @@
                             {
                                 var endTime = Math.Max(0, -Game.Time + 120);
                                 Drawing.DrawText(Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30), Color.White, "Nidalee Trap", 2);
-                                Circle.Draw(SharpDX.Color.Green, trap.BoundingRadius + 25, trap.Position);
+                                Circle.Draw(SharpDX.Color.White, trap.BoundingRadius + 25, trap.Position);
                             }
 
                             if (trap.BaseSkinName == "TeemoMushroom")
@@ -51,8 +51,38 @@
                                         "Teemo Mushroom Expire: " + Convert.ToString(endTime, CultureInfo.InstalledUICulture),
                                         2);
                                 }
+                                else if (trap.GetBuff("BantamTrap") == null)
+                                {
+                                    Drawing.DrawText(
+                                        Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
+                                        Color.White,
+                                        "Teemo Mushroom",
+                                        2);
+                                }
 
-                                Circle.Draw(SharpDX.Color.Green, trap.BoundingRadius * 3, trap.Position);
+                                Circle.Draw(SharpDX.Color.White, trap.BoundingRadius * 3, trap.Position);
+                            }
+                            if (trap.BaseSkinName == "JhinTrap")
+                            {
+                                if (trap.GetBuff("JhinETrap") != null)
+                                {
+                                    var endTime = Math.Max(0, trap.GetBuff("JhinETrap").EndTime - Game.Time);
+                                    Drawing.DrawText(
+                                        Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
+                                        Color.White,
+                                        "Jhin Trap Expire: " + Convert.ToString(endTime, CultureInfo.InstalledUICulture),
+                                        2);
+                                }
+                                else if (trap.GetBuff("JhinETrap") == null)
+                                {
+                                    Drawing.DrawText(
+                                        Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
+                                        Color.White,
+                                        "Jhin Trap",
+                                        2);
+                                }
+
+                                Circle.Draw(SharpDX.Color.White, trap.BoundingRadius * 3, trap.Position);
                             }
                             break;
 
@@ -66,8 +96,16 @@
                                     "Shaco Box Expire: " + Convert.ToString(endTime, CultureInfo.InvariantCulture),
                                     2);
                             }
+                            else if (trap.GetBuff("JackInTheBox") == null)
+                            {
+                                Drawing.DrawText(
+                                    Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30),
+                                    Color.White,
+                                    "Shaco Box",
+                                    2);
+                            }
 
-                            Circle.Draw(SharpDX.Color.Green, trap.BoundingRadius * 15, trap.Position);
+                            Circle.Draw(SharpDX.Color.White, trap.BoundingRadius * 15, trap.Position);
                             break;
                     }
                 }
