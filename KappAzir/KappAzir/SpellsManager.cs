@@ -21,6 +21,8 @@
         //Remenber of putting the correct type of the spell here
         public static Spell.Skillshot Q;
 
+        public static Spell.Skillshot Q2;
+
         public static Spell.Skillshot W;
 
         public static Spell.Skillshot E;
@@ -35,6 +37,7 @@
         public static void InitializeSpells()
         {
             Q = new Spell.Skillshot(SpellSlot.Q, 1000, SkillShotType.Linear, 250, 1000, 65) { AllowedCollisionCount = int.MaxValue };
+            Q2 = new Spell.Skillshot(SpellSlot.Q, 870, SkillShotType.Linear, 250, 1000, 65) { AllowedCollisionCount = int.MaxValue };
             W = new Spell.Skillshot(SpellSlot.W, 525, SkillShotType.Circular);
             E = new Spell.Skillshot(SpellSlot.E, 1200, SkillShotType.Linear, 250, 1200, 80) { AllowedCollisionCount = int.MaxValue };
             R = new Spell.Skillshot(SpellSlot.R, 350, SkillShotType.Linear, 500, 1000, 220) { AllowedCollisionCount = int.MaxValue };

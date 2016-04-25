@@ -88,7 +88,7 @@
             FleeMenu.AddGroupLabel("Jumper - Flee Mode");
             FleeMenu.Add("flee", new KeyBind("Jumper Key", false, KeyBind.BindTypes.HoldActive, 'A'));
             FleeMenu.CreateSlider("Use Soldiers in {0} Range", "range", 1000, 150, 1500);
-            FleeMenu.CreateSlider("EQ Delay = {0}", "delay", 100, 50, 350);
+            FleeMenu.CreateSlider("EQ Delay = {0}", "delay", 250, 150, 500);
             FleeMenu.AddSeparator(0);
             FleeMenu.AddLabel("This is used for the Delay of Casting between E > Q");
             FleeMenu.AddLabel("Used In Insec / Flee Mode");

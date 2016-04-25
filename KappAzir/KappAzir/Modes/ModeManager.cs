@@ -198,7 +198,7 @@
                 if (Orbwalker.AzirSoldiers.Count >= 1 && AutoHarassMenu.GetCheckBoxValue("attack"))
                 {
                     var target = TargetSelector.GetTarget(1250, DamageType.Magical);
-                    if (target == null)
+                    if (target != null)
                     {
                         return;
                     }

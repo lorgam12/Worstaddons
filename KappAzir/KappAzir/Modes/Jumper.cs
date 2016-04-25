@@ -15,6 +15,7 @@
     internal class Jumper : ModeManager
     {
         public static int delay = delay = FleeMenu.GetSliderValue("delay");
+
         public static int range = delay = FleeMenu.GetSliderValue("range");
 
         public static Vector3 castpos;
@@ -22,38 +23,28 @@
         public static void jump(Vector3 qpos, Vector3 pos)
         {
             castpos = qpos;
-            var allready = Q.IsReady() && E.IsReady() && ManaCheck(Azir) < Azir.Mana;
-            if (Orbwalker.AzirSoldiers.Count(s => s.Distance(Azir) < range) < 1 && allready)
+            if (Orbwalker.AzirSoldiers.Count(s => s.Distance(Azir) < range) < 1)
             {
-                if (W.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
+                if (E.IsReady() && Q2.IsReady())
                 {
-                    if (E.IsReady())
+                    if (W.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
                     {
-                        if (E.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
+                        if (E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()))
                         {
-                            if (Q.IsReady())
-                            {
-                                Core.DelayAction(() => { Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D()); }, delay);
-                            }
+                            Core.DelayAction(() => Q2.Cast(Azir.ServerPosition.Extend(qpos, Q2.Range).To3D()), delay);
                         }
                     }
                 }
-                return;
             }
-            if (Orbwalker.AzirSoldiers.Count(s => s.Distance(Azir) < range) > 0 && allready)
+            else
             {
-                if (E.IsReady())
+                if (E.IsReady() && Q2.IsReady())
                 {
-                    if (E.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
+                    if (E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()))
                     {
-                        if (Q.IsReady())
-                        {
-                            Core.DelayAction(() => { Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D()); }, delay);
-                        }
+                        Core.DelayAction(() => Q2.Cast(Azir.ServerPosition.Extend(qpos, Q2.Range).To3D()), delay);
                     }
                 }
-
-                return;
             }
         }
 
@@ -66,19 +57,13 @@
         {
             if (sender.IsMe && (FleeMenu.GetKeyBindValue("flee") || FleeMenu.GetKeyBindValue("insect") || FleeMenu.GetKeyBindValue("insected")))
             {
-                if (args.Slot == SpellSlot.E)
+                if (args.SData.Name == "AzirE" && Q2.IsReady())
                 {
-                    if (Q.IsReady())
-                    {
-                        Core.DelayAction(() => { Q.Cast(Azir.ServerPosition.Extend(castpos, Q.Range).To3D()); }, delay);
-                    }
+                    Q2.Cast(Azir.ServerPosition.Extend(castpos, Q2.Range).To3D());
                 }
-                if (args.Slot == SpellSlot.Q)
+                if (args.SData.Name == "AzirQ" && E.IsReady())
                 {
-                    if (E.IsReady())
-                    {
-                        Core.DelayAction(() => { E.Cast(Azir.ServerPosition.Extend(castpos, W.Range).To3D()); }, delay);
-                    }
+                    E.Cast(Azir.ServerPosition.Extend(castpos, E.Range).To3D());
                 }
             }
         }

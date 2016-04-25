@@ -871,7 +871,7 @@ namespace Karthus
             {
                 if (!cz && qTarget.TotalShieldHealth() < player.GetSpellDamage(qTarget, SpellSlot.Q))
                 {
-                    Q.Cast(qTarget.ServerPosition);
+                    Q.Cast(Q.GetPrediction(qTarget).CastPosition);
                 }
             }
         }
