@@ -261,15 +261,14 @@
                 if (SummMenu[Player.Instance.ChampionName + "Enableactiveporo"].Cast<KeyBind>().CurrentValue
                     || SummMenu[Player.Instance.ChampionName + "Enableporo"].Cast<KeyBind>().CurrentValue)
                 {
-                    foreach (
-                        var pred in
-                            EntityManager.Heroes.Enemies.Where(e => e.IsValidTarget(porotoss.Range))
-                                .Where(
-                                    enemy =>
-                                    porotoss.IsReady() && enemy.IsValidTarget(porotoss.Range) && enemy != null
-                                    && !SummMenu["Dontporo" + enemy.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                                .Select(enemy => porotoss.GetPrediction(enemy))
-                                .Where(pred => pred.HitChance > HitChance.High))
+                    foreach (var pred in
+                        EntityManager.Heroes.Enemies.Where(e => e.IsValidTarget(porotoss.Range))
+                            .Where(
+                                enemy =>
+                                porotoss.IsReady() && enemy.IsValidTarget(porotoss.Range) && enemy != null
+                                && !SummMenu["Dontporo" + enemy.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                            .Select(enemy => porotoss.GetPrediction(enemy))
+                            .Where(pred => pred.HitChance > HitChance.High))
                     {
                         porotoss.Cast(pred.CastPosition);
                     }

@@ -5,6 +5,8 @@
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
 
+    using Common;
+
     internal class Potions
     {
         public static Menu PotMenu { get; private set; }
@@ -28,6 +30,16 @@
         public static int Refillableh => PotMenu["RPH"].Cast<Slider>().CurrentValue;
 
         public static int Biscuith => PotMenu["BPH"].Cast<Slider>().CurrentValue;
+
+        public static int Corruptingn => PotMenu["CPN"].Cast<Slider>().CurrentValue;
+
+        public static int Healthn => PotMenu["HPN"].Cast<Slider>().CurrentValue;
+
+        public static int Huntersn => PotMenu["HPSN"].Cast<Slider>().CurrentValue;
+
+        public static int Refillablen => PotMenu["RPN"].Cast<Slider>().CurrentValue;
+
+        public static int Biscuitn => PotMenu["BPN"].Cast<Slider>().CurrentValue;
 
         public static bool Corruptingc
             =>
@@ -62,15 +74,20 @@
             PotMenu.Add("tower", new CheckBox("Use On Turrets"));
             PotMenu.AddGroupLabel("Potions Settings");
             PotMenu.Add("CP", new CheckBox("Corrupting Potion", false));
-            PotMenu.Add("CPH", new Slider("Use On Health %", 65, 0, 100));
+            PotMenu.Add("CPH", new Slider("Use On Health [{0}%]", 65));
+            PotMenu.Add("CPN", new Slider("Use If incoming Damange more than [{0}%]", 35));
             PotMenu.Add("HP", new CheckBox("Health Potion", false));
-            PotMenu.Add("HPH", new Slider("Use On health %", 45, 0, 100));
+            PotMenu.Add("HPH", new Slider("Use On health [{0}%]", 45));
+            PotMenu.Add("HPN", new Slider("Use If incoming Damange more than [{0}%]", 35));
             PotMenu.Add("HPS", new CheckBox("Hunters Potion", false));
-            PotMenu.Add("HPSH", new Slider("Use On health %", 75, 0, 100));
+            PotMenu.Add("HPSH", new Slider("Use On health [{0}%]", 75));
+            PotMenu.Add("HPSN", new Slider("Use If incoming Damange more than [{0}%]", 35));
             PotMenu.Add("RP", new CheckBox("Refillable Potion", false));
-            PotMenu.Add("RPH", new Slider("Use On health %", 50, 0, 100));
+            PotMenu.Add("RPH", new Slider("Use On health [{0}%]", 50));
+            PotMenu.Add("RPN", new Slider("Use If incoming Damange more than [{0}%]", 35));
             PotMenu.Add("BP", new CheckBox("Biscuit", false));
-            PotMenu.Add("BPH", new Slider("Use On health %", 40, 0, 100));
+            PotMenu.Add("BPH", new Slider("Use On health [{0}%]", 40));
+            PotMenu.Add("BPN", new Slider("Use If incoming Damange more than [{0}%]", 35));
 
             Obj_AI_Base.OnBasicAttack += Obj_AI_Base_OnBasicAttack;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
@@ -90,16 +107,12 @@
                  || (caster is Obj_AI_Minion && caster.IsMonster && PotMenu["jmob"].Cast<CheckBox>().CurrentValue)
                  || (caster is Obj_AI_Turret && PotMenu["tower"].Cast<CheckBox>().CurrentValue)) && caster.IsEnemy && target != null && target.IsMe)
             {
-                if (!Player.Instance.IsRecalling())
+                if (!Player.Instance.IsRecalling() && Player.Instance.IsKillable())
                 {
                     if (Refillablec)
                     {
-                        if (target.HealthPercent <= Refillableh)
-                        {
-                            Refillable.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                        if (target.HealthPercent <= Refillableh || caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth()
+                            || args.SData.SpellDamageRatio >= Refillablen || args.SData.PhysicalDamageRatio >= Refillablen)
                         {
                             Refillable.Cast();
                         }
@@ -107,12 +120,8 @@
 
                     if (Healthc)
                     {
-                        if (target.HealthPercent <= Healthh)
-                        {
-                            Health.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                        if (target.HealthPercent <= Healthh || caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth()
+                            || args.SData.SpellDamageRatio >= Healthn || args.SData.PhysicalDamageRatio >= Healthn)
                         {
                             Health.Cast();
                         }
@@ -120,12 +129,8 @@
 
                     if (Huntersc)
                     {
-                        if (target.HealthPercent <= Huntersh)
-                        {
-                            Hunters.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                        if (target.HealthPercent <= Huntersh || caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth()
+                            || args.SData.SpellDamageRatio >= Huntersn || args.SData.PhysicalDamageRatio >= Huntersn)
                         {
                             Hunters.Cast();
                         }
@@ -133,12 +138,8 @@
 
                     if (Biscuitc)
                     {
-                        if (target.HealthPercent <= Biscuith)
-                        {
-                            Biscuit.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                        if (target.HealthPercent <= Biscuith || caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth()
+                            || args.SData.SpellDamageRatio >= Biscuitn || args.SData.PhysicalDamageRatio >= Biscuitn)
                         {
                             Biscuit.Cast();
                         }
@@ -146,12 +147,8 @@
 
                     if (Corruptingc)
                     {
-                        if (target.HealthPercent <= Corruptingh)
-                        {
-                            Corrupting.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                        if (target.HealthPercent <= Corruptingh || caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth()
+                            || args.SData.SpellDamageRatio >= Corruptingn || args.SData.PhysicalDamageRatio >= Corruptingn)
                         {
                             Corrupting.Cast();
                         }
@@ -174,16 +171,12 @@
                  || (caster is Obj_AI_Minion && caster.IsMonster && PotMenu["jmob"].Cast<CheckBox>().CurrentValue)
                  || (caster is Obj_AI_Turret && PotMenu["tower"].Cast<CheckBox>().CurrentValue)) && caster.IsEnemy && target != null && target.IsMe)
             {
-                if (!Player.Instance.IsRecalling())
+                if (!Player.Instance.IsRecalling() && Player.Instance.IsKillable())
                 {
                     if (Refillablec)
                     {
-                        if (target.HealthPercent <= Refillableh)
-                        {
-                            Refillable.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth() || target.HealthPercent <= Refillableh
+                            || args.SData.SpellDamageRatio >= Refillablen || args.SData.PhysicalDamageRatio >= Refillablen)
                         {
                             Refillable.Cast();
                         }
@@ -191,12 +184,8 @@
 
                     if (Healthc)
                     {
-                        if (target.HealthPercent <= Healthh)
-                        {
-                            Health.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                        if (target.HealthPercent <= Healthh || caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth()
+                            || args.SData.SpellDamageRatio >= Healthn || args.SData.PhysicalDamageRatio >= Healthn)
                         {
                             Health.Cast();
                         }
@@ -204,12 +193,8 @@
 
                     if (Huntersc)
                     {
-                        if (target.HealthPercent <= Huntersh)
-                        {
-                            Hunters.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                        if (target.HealthPercent <= Huntersh || caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth()
+                            || args.SData.SpellDamageRatio >= Huntersn || args.SData.PhysicalDamageRatio >= Huntersn)
                         {
                             Hunters.Cast();
                         }
@@ -217,12 +202,8 @@
 
                     if (Biscuitc)
                     {
-                        if (target.HealthPercent <= Biscuith)
-                        {
-                            Biscuit.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                        if (target.HealthPercent <= Biscuith || caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth()
+                            || args.SData.SpellDamageRatio >= Biscuitn || args.SData.PhysicalDamageRatio >= Biscuitn)
                         {
                             Biscuit.Cast();
                         }
@@ -230,12 +211,8 @@
 
                     if (Corruptingc)
                     {
-                        if (target.HealthPercent <= Corruptingh)
-                        {
-                            Corrupting.Cast();
-                        }
-
-                        if (caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth())
+                        if (target.HealthPercent <= Corruptingh || caster.GetAutoAttackDamage(target) >= target.TotalShieldHealth()
+                            || args.SData.SpellDamageRatio >= Corruptingn || args.SData.PhysicalDamageRatio >= Corruptingn)
                         {
                             Corrupting.Cast();
                         }

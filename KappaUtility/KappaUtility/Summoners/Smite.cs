@@ -22,7 +22,7 @@
                 var smiteks = SummMenu["smiteks"].Cast<CheckBox>().CurrentValue && Smite.IsReady();
 
                 foreach (var mob in
-                    ObjectManager.Get<Obj_AI_Minion>()
+                    EntityManager.MinionsAndMonsters.GetJungleMonsters()
                         .Where(
                             jmob =>
                             !jmob.HasBuffOfType(BuffType.Invulnerability) && jmob.IsHPBarRendered && jmob.IsMonster && jmob.IsVisible && !jmob.IsDead
@@ -43,7 +43,7 @@
                 }
 
                 foreach (var target in
-                    ObjectManager.Get<AIHeroClient>()
+                    EntityManager.Heroes.Enemies
                         .Where(
                             hero =>
                             hero != null && hero.IsHPBarRendered && !hero.HasBuffOfType(BuffType.Invulnerability) && hero.IsValid && hero.IsVisible
@@ -57,7 +57,7 @@
                     }
 
                     if (smiteks && target.IsKillable()
-                        && Player.Instance.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Smite) > target.TotalShieldHealth())
+                        && Player.Instance.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Smite) >= target.TotalShieldHealth())
                     {
                         Smite.Cast(target);
                     }

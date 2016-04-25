@@ -25,6 +25,14 @@
 
         public static int Zhonyash => DefMenu["Zhonyash"].Cast<Slider>().CurrentValue;
 
+        public static int Seraphn => DefMenu["Seraphn"].Cast<Slider>().CurrentValue;
+
+        public static int Solarin => DefMenu["Solarin"].Cast<Slider>().CurrentValue;
+
+        public static int FaceOfTheMountainn => DefMenu["FaceOfTheMountainn"].Cast<Slider>().CurrentValue;
+
+        public static int Zhonyasn => DefMenu["Zhonyasn"].Cast<Slider>().CurrentValue;
+
         public static bool Seraphc => DefMenu["Seraph"].Cast<CheckBox>().CurrentValue && Seraph.IsOwned() && Seraph.IsReady();
 
         public static bool Solaric => DefMenu["Solari"].Cast<CheckBox>().CurrentValue && Solari.IsOwned() && Solari.IsReady();
@@ -42,16 +50,20 @@
             DefMenu = Load.UtliMenu.AddSubMenu("Defence Items");
             DefMenu.AddGroupLabel("Defence Settings");
             DefMenu.Add("Zhonyas", new CheckBox("Use Zhonyas", false));
-            DefMenu.Add("Zhonyash", new Slider("Use Zhonyas health", 25, 0, 100));
+            DefMenu.Add("Zhonyash", new Slider("Use Zhonyas health [{0}%]", 35));
+            DefMenu.Add("Zhonyasn", new Slider("Use Zhonyas if incoming Damage more than [{0}%]", 50));
             DefMenu.AddSeparator();
             DefMenu.Add("Seraph", new CheckBox("Use Seraph", false));
-            DefMenu.Add("Seraphh", new Slider("Use Seraph health", 45, 0, 100));
+            DefMenu.Add("Seraphh", new Slider("Use Seraph health [{0}%]", 45));
+            DefMenu.Add("Seraphn", new Slider("Use Seraph if incoming Damage more than [{0}%]", 45));
             DefMenu.AddSeparator();
             DefMenu.Add("FaceOfTheMountain", new CheckBox("Use Face Of The Mountain", false));
-            DefMenu.Add("FaceOfTheMountainh", new Slider("Use Face Of The Mountain health", 50, 0, 100));
+            DefMenu.Add("FaceOfTheMountainh", new Slider("Use FOTM health [{0}%]", 50));
+            DefMenu.Add("FaceOfTheMountainn", new Slider("Use FOTM if incoming Damage more than [{0}%]", 50));
             DefMenu.AddSeparator();
             DefMenu.Add("Solari", new CheckBox("Use Solari", false));
-            DefMenu.Add("Solarih", new Slider("Use Solari health", 30, 0, 100));
+            DefMenu.Add("Solarih", new Slider("Use Solari health [{0}%]", 30));
+            DefMenu.Add("Solarin", new Slider("Use Solari if incoming Damage more than [{0}%]", 35));
             DefMenu.AddSeparator();
             DefMenu.Add("Randuin", new CheckBox("Use Randuin", false));
             DefMenu.Add("Randuinh", new Slider("Use Randuin On X Enemies", 2, 1, 5));

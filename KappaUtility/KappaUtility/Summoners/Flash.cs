@@ -33,7 +33,8 @@
                            && (NavMesh.GetCollisionFlags(args.EndPosition) == CollisionFlags.Wall
                                || NavMesh.GetCollisionFlags(args.EndPosition) == CollisionFlags.Building);
 
-                if (wall && SummMenu["wall"].Cast<CheckBox>().CurrentValue || args.EndPosition.Distance(Player.Instance) < 450 && SummMenu["extend"].Cast<CheckBox>().CurrentValue)
+                if (wall && SummMenu["wall"].Cast<CheckBox>().CurrentValue
+                    || args.EndPosition.Distance(Player.Instance) < 450 && SummMenu["extend"].Cast<CheckBox>().CurrentValue)
                 {
                     args.Process = false;
                 }
