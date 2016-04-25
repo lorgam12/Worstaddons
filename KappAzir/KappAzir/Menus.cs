@@ -171,6 +171,7 @@
             LaneClearMenu.CreateCheckBox(" - Use W", "wUse");
             LaneClearMenu.AddGroupLabel("Settings");
             LaneClearMenu.CreateCheckBox(" - Save 1 W Stack", "wSave");
+            LaneClearMenu.CreateCheckBox(" - Use W On Enemy Turret", "wTurret");
             LaneClearMenu.CreateSlider("Mana must be more than [{0}%] to use LaneClear spells", "manaSlider", 75);
 
             LasthitMenu.AddGroupLabel("Spells");

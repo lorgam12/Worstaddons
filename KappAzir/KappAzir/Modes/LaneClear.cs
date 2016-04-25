@@ -21,6 +21,8 @@
         {
             var minion = EntityManager.MinionsAndMonsters.GetLaneMinions().FirstOrDefault(m => m.IsValidTarget(W.Range) && m != null);
             var minions = EntityManager.MinionsAndMonsters.EnemyMinions;
+            var turret = EntityManager.Turrets.Enemies.FirstOrDefault(t => t.IsValidTarget(W.Range));
+
             if (minion == null || minions == null || !minions.Any())
             {
                 return;
@@ -63,6 +65,13 @@
                 if (location != null && location.CollisionObjects.Length >= 2)
                 {
                     W.Cast(location.CastPosition);
+                }
+                if (LaneClearMenu.GetCheckBoxValue("wTurret"))
+                {
+                    if (turret != null)
+                    {
+                        W.Cast(turret);
+                    }
                 }
             }
         }

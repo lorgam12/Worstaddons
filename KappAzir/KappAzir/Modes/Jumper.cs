@@ -29,10 +29,15 @@
                 {
                     if (W.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
                     {
-                        if (E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()))
-                        {
-                            Core.DelayAction(() => Q2.Cast(Azir.ServerPosition.Extend(qpos, Q2.Range).To3D()), delay);
-                        }
+                        Core.DelayAction(
+                            () =>
+                                {
+                                    if (E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()))
+                                    {
+                                        Core.DelayAction(() => Q2.Cast(Azir.ServerPosition.Extend(qpos, Q2.Range).To3D()), delay);
+                                    }
+                                },
+                            150);
                     }
                 }
             }
@@ -40,10 +45,25 @@
             {
                 if (E.IsReady() && Q2.IsReady())
                 {
-                    if (E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()))
-                    {
-                        Core.DelayAction(() => Q2.Cast(Azir.ServerPosition.Extend(qpos, Q2.Range).To3D()), delay);
-                    }
+                    Core.DelayAction(
+                        () =>
+                            {
+                                if (E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()))
+                                {
+                                    Core.DelayAction(() => Q2.Cast(Azir.ServerPosition.Extend(qpos, Q2.Range).To3D()), delay);
+                                }
+                            },
+                        150);
+
+                    Core.DelayAction(
+                        () =>
+                            {
+                                if (Q2.Cast(Azir.ServerPosition.Extend(qpos, Q2.Range).To3D()))
+                                {
+                                    Core.DelayAction(() => E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()), delay);
+                                }
+                            },
+                        250);
                 }
             }
         }

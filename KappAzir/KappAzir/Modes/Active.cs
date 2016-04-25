@@ -5,8 +5,6 @@
     using EloBuddy;
     using EloBuddy.SDK;
 
-    using Mario_s_Lib;
-
     /// <summary>
     /// This mode will always run
     /// </summary>
@@ -23,35 +21,10 @@
                 SpellsManager.R.Cast(Azir.Position.Extend(InSec.rpos, SpellsManager.R.Range).To3D());
             }
 
-            if (SpellsManager.R.Level == 1)
-            {
-                SpellsManager.R.Width = 220;
-            }
+            SpellsManager.R.Width = 107 * SpellsManager.R.Level < 200 ? 220 : (107 * SpellsManager.R.Level) + 5;
 
-            if (SpellsManager.R.Level == 2)
-            {
-                SpellsManager.R.Width = 270;
-            }
-
-            if (SpellsManager.R.Level == 3)
-            {
-                SpellsManager.R.Width = 320;
-            }
-
-            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) <= 1)
-            {
-                SpellsManager.Q.Width = 65;
-            }
-
-            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) == 2)
-            {
-                SpellsManager.Q.Width = 140;
-            }
-
-            if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) == 3)
-            {
-                SpellsManager.Q.Width = 215;
-            }
+            int count = Orbwalker.AzirSoldiers.Count(s => s.IsAlly);
+            SpellsManager.Q.Width = count != 0 ? 65 * count : 65;
         }
     }
 }

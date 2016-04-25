@@ -134,26 +134,24 @@
             }
             if (sender.IsValidTarget(SpellsManager.R.Range) && e.DangerLevel >= Intdanger)
             {
-                SpellsManager.R.Cast(sender.Position);
+                SpellsManager.R.Cast(sender.ServerPosition);
             }
         }
 
         private static void Gapcloser_OnGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
-            if (!sender.IsEnemy || sender == null || e == null || !SpellsMenu.GetCheckBoxValue("rUseGap")
-                || sender.Spellbook.CastEndTime > SpellsManager.R.CastDelay)
+            if (!sender.IsEnemy || sender == null || e == null || !SpellsMenu.GetCheckBoxValue("rUseGap"))
             {
                 return;
             }
-
             if (sender.IsValidTarget(SpellsManager.R.Range))
             {
-                SpellsManager.R.Cast(sender.Position);
+                Core.DelayAction(() => SpellsManager.R.Cast(sender.ServerPosition), (int)(sender.Spellbook.CastEndTime - Game.Time));
             }
 
             if (Azir.IsInRange(e.End, SpellsManager.R.Range) && e.End.IsInRange(Azir.ServerPosition, SpellsManager.R.Range))
             {
-                SpellsManager.R.Cast(e.End);
+                Core.DelayAction(() => SpellsManager.R.Cast(Azir.ServerPosition.Extend(sender.ServerPosition, SpellsManager.R.Range).To3D()), (int)(sender.Spellbook.CastEndTime - Game.Time));
             }
         }
 

@@ -35,7 +35,7 @@
             {
                 if (Orbwalker.AzirSoldiers.Any(s => s.IsAlly))
                 {
-                    Q.TryToCast(kstarget(Q.Range).Position, KillStealMenu);
+                    Q.TryToCast(Q.GetPrediction(kstarget(Q.Range)).CastPosition, KillStealMenu);
                 }
             }
 

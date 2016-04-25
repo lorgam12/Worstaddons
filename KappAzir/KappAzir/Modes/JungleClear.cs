@@ -27,9 +27,9 @@
             Q.SourcePosition = Orbwalker.AzirSoldiers.FirstOrDefault(s => s.IsAlly)?.ServerPosition;
             if (Orbwalker.AzirSoldiers.Count(s => s.IsAlly) >= 1)
             {
-                Q.TryToCast(Q.GetJungleMinion(), JungleClearMenu);
+                Q.TryToCast(Q.GetJungleMinion().Position, JungleClearMenu);
             }
-            W.TryToCast(Q.GetJungleMinion().Position, JungleClearMenu);
+            W.TryToCast(W.GetJungleMinion().Position, JungleClearMenu);
         }
     }
 }
