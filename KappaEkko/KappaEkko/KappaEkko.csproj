@@ -77,6 +77,7 @@
     <Compile Include="Loading\Menu.cs" />
     <Compile Include="Logics\Qlogic.cs" />
     <Compile Include="Logics\Rlogic.cs" />
+    <Compile Include="main.cs" />
     <Compile Include="Modes\Clear.cs" />
     <Compile Include="Modes\Combo.cs" />
     <Compile Include="Modes\Harass.cs" />

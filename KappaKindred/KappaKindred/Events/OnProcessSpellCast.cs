@@ -42,8 +42,7 @@
                     Spells.R.Cast();
                 }
 
-                if (caster.BaseAttackDamage >= target.TotalShieldHealth()
-                    || caster.BaseAbilityDamage >= target.TotalShieldHealth())
+                if (caster.BaseAttackDamage >= target.TotalShieldHealth() || caster.BaseAbilityDamage >= target.TotalShieldHealth())
                 {
                     Spells.R.Cast();
                 }

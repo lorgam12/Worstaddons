@@ -11,7 +11,11 @@
 
     using Color = System.Drawing.Color;
     using Line = EloBuddy.SDK.Rendering.Line;
-    using static Menus;
+    using
+    
+
+    static
+Menus;
     using Mario_s_Lib;
 
     /// <summary>

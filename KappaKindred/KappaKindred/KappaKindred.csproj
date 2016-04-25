@@ -35,13 +35,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EloBuddy">
-      <HintPath>..\..\..\..\..\Desktop\New folder\EloBuddy\System\EloBuddy.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Desktop\New folder\EloBuddy\System\EloBuddy.dll</HintPath>
     </Reference>
     <Reference Include="EloBuddy.SDK">
-      <HintPath>..\..\..\..\..\Desktop\New folder\EloBuddy\System\EloBuddy.SDK.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Desktop\New folder\EloBuddy\System\EloBuddy.SDK.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>..\..\..\..\..\Desktop\New folder\EloBuddy\System\SharpDX.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Desktop\New folder\EloBuddy\System\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -59,6 +59,7 @@
     <Compile Include="Events\OnUpdate.cs" />
     <Compile Include="Load\Menu.cs" />
     <Compile Include="Load\Spells.cs" />
+    <Compile Include="main.cs" />
     <Compile Include="Modes\Clear.cs" />
     <Compile Include="Modes\Combo.cs" />
     <Compile Include="Modes\Flee.cs" />

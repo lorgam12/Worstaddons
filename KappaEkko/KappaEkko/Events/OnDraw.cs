@@ -55,8 +55,8 @@
                         10);
                 }
 
-                if (Menu.ComboMenu.Get<CheckBox>("W").CurrentValue
-                    && !Menu.ComboMenu.Get<CheckBox>("Wpred").CurrentValue && Wtarget != null && Spells.W.IsReady())
+                if (Menu.ComboMenu.Get<CheckBox>("W").CurrentValue && !Menu.ComboMenu.Get<CheckBox>("Wpred").CurrentValue && Wtarget != null
+                    && Spells.W.IsReady())
                 {
                     Circle.Draw(Color.Purple, Spells.W.Radius, Wtarget.Position);
                     Drawing.DrawText(

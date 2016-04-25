@@ -14,10 +14,7 @@
             var useQ = Menu.JungleMenu["Q"].Cast<CheckBox>().CurrentValue && Spells.Q.IsReady();
             var useE = Menu.JungleMenu["E"].Cast<CheckBox>().CurrentValue && Spells.E.IsReady();
 
-            var jmobs =
-                ObjectManager.Get<Obj_AI_Minion>()
-                    .OrderBy(m => m.CampNumber)
-                    .Where(m => m.IsMonster && m.IsEnemy && !m.IsDead);
+            var jmobs = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.CampNumber).Where(m => m.IsMonster && m.IsEnemy && !m.IsDead);
             var objAiMinions = jmobs as IList<Obj_AI_Minion> ?? jmobs.ToList();
             foreach (var jmob in objAiMinions)
             {

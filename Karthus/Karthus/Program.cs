@@ -72,12 +72,7 @@ namespace Karthus
 
         private static bool nowE = false;
 
-        private static void Main(string[] args)
-        {
-            Loading.OnLoadingComplete += Game_OnGameLoad;
-        }
-
-        private static void Game_OnGameLoad(EventArgs args)
+        public static void Execute()
         {
             if (player.ChampionName != "Karthus")
             {
@@ -433,13 +428,12 @@ namespace Karthus
             {
                 var killable = string.Empty;
 
-                foreach (
-                    var target in
-                        EntityManager.Heroes.Enemies.Where(
-                            x =>
-                            !x.IsDead && x.IsEnemy
-                            && player.GetSpellDamage(x, SpellSlot.R) > Prediction.Health.GetPrediction(x, (int)(R.CastDelay * 1000f)))
-                            .Where(target => target.IsVisible))
+                foreach (var target in
+                    EntityManager.Heroes.Enemies.Where(
+                        x =>
+                        !x.IsDead && x.IsEnemy
+                        && player.GetSpellDamage(x, SpellSlot.R) > Prediction.Health.GetPrediction(x, (int)(R.CastDelay * 1000f)))
+                        .Where(target => target.IsVisible))
                 {
                     killable += target.ChampionName + ", ";
                     if (MiscMenu.Get<CheckBox>("ping").CurrentValue)
@@ -839,14 +833,13 @@ namespace Karthus
             var time = Environment.TickCount;
             var enemiesrange = ObjectManager.Player.Position.CountEnemiesInRange(UltMenu.Get<Slider>("Rranged").CurrentValue);
             var enemieinsrange = UltMenu.Get<Slider>("RnearEn").CurrentValue;
-            foreach (
-                var rtarget in
-                    EntityManager.Heroes.Enemies.Where(
-                        x =>
-                        x != null && x.IsValid && !x.IsDead && x.IsEnemy
-                        && (!x.HasBuff("kindrednodeathbuff") || !x.HasBuff("Undying Rage") || !x.HasBuff("JudicatorIntervention")) && !x.IsZombie
-                        && player.GetSpellDamage(x, SpellSlot.R) > Prediction.Health.GetPrediction(x, (int)(R.CastDelay * 1000f))
-                        && x.CountAlliesInRange(750) < 1))
+            foreach (var rtarget in
+                EntityManager.Heroes.Enemies.Where(
+                    x =>
+                    x != null && x.IsValid && !x.IsDead && x.IsEnemy
+                    && (!x.HasBuff("kindrednodeathbuff") || !x.HasBuff("Undying Rage") || !x.HasBuff("JudicatorIntervention")) && !x.IsZombie
+                    && player.GetSpellDamage(x, SpellSlot.R) > Prediction.Health.GetPrediction(x, (int)(R.CastDelay * 1000f))
+                    && x.CountAlliesInRange(750) < 1))
             {
                 if (UltMenu.Get<CheckBox>("RnearE").CurrentValue && enemieinsrange <= enemiesrange)
                 {

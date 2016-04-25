@@ -32,10 +32,7 @@
                 {
                     if (useQ)
                     {
-                        var fl = EntityManager.MinionsAndMonsters.GetLineFarmLocation(
-                            objAiMinions,
-                            Spells.Q.Width,
-                            (int)Spells.Q.Range);
+                        var fl = EntityManager.MinionsAndMonsters.GetLineFarmLocation(objAiMinions, Spells.Q.Width, (int)Spells.Q.Range);
                         if (fl.HitNumber >= 1)
                         {
                             Spells.Q.Cast(fl.CastPosition);
@@ -44,8 +41,7 @@
 
                     if (useE
                         && minion.TotalShieldHealth()
-                        <= ObjectManager.Player.GetSpellDamage(minion, SpellSlot.E)
-                        + ObjectManager.Player.GetAutoAttackDamage(minion)
+                        <= ObjectManager.Player.GetSpellDamage(minion, SpellSlot.E) + ObjectManager.Player.GetAutoAttackDamage(minion)
                         && !minion.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
                     {
                         if (Spells.E.Cast(minion.Position))

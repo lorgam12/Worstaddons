@@ -7,8 +7,8 @@
     <ProjectGuid>{70AF6D65-56CE-4A77-9023-BAC3C4064D49}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Olaf</RootNamespace>
-    <AssemblyName>Olaf</AssemblyName>
+    <RootNamespace>Malzahar</RootNamespace>
+    <AssemblyName>Malzahar</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PreBuildEvent />
@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="main.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

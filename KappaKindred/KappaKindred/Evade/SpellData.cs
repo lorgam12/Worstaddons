@@ -60,14 +60,7 @@ namespace KappaKindred.Evade
         {
         }
 
-        public SpellData(
-            string charName,
-            string spellName,
-            string name,
-            int range,
-            int radius,
-            int dangerlevel,
-            SpellType spellType)
+        public SpellData(string charName, string spellName, string name, int range, int radius, int dangerlevel, SpellType spellType)
         {
             this.charName = charName;
             this.spellName = spellName;

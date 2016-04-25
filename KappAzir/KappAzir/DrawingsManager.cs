@@ -10,8 +10,14 @@
     using Mario_s_Lib;
 
     using SharpDX;
-    using static SpellsManager;
-    using static Menus;
+    using
+    
+
+    static
+SpellsManager;
+    using
+    static
+Menus;
 
     internal class DrawingsManager
     {

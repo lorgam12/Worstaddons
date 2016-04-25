@@ -20,14 +20,12 @@
         {
             var target = TargetSelector.GetTarget(W.Range, DamageType.Physical);
 
-            if (target != null && !target.IsZombie && !target.IsInvulnerable
-                && !target.HasBuffOfType(BuffType.PhysicalImmunity))
+            if (target != null && !target.IsZombie && !target.IsInvulnerable && !target.HasBuffOfType(BuffType.PhysicalImmunity))
             {
                 var Distance = player.Distance(target);
 
                 if (doubleJump && target.IsValidTarget(Q.Range)
-                    && (GetQDamage(target) >= target.Health
-                        || player.GetSpellDamage(target, SpellSlot.W) >= target.Health))
+                    && (GetQDamage(target) >= target.Health || player.GetSpellDamage(target, SpellSlot.W) >= target.Health))
                 {
                     return;
                 }
@@ -65,8 +63,7 @@
                 }
 
                 if (!menu.Combo["useR"].Cast<CheckBox>().CurrentValue
-                    || (menu.Combo["R"].Cast<CheckBox>().CurrentValue || !R.IsReady() || Q.IsReady() || W.IsReady()
-                        || E.IsReady()))
+                    || (menu.Combo["R"].Cast<CheckBox>().CurrentValue || !R.IsReady() || Q.IsReady() || W.IsReady() || E.IsReady()))
                 {
                     return;
                 }
@@ -75,16 +72,14 @@
                 {
                     if ((Q.IsReady() || W.IsReady() || E.IsReady()) && player.ManaPercent >= 15)
                     {
-                        if (Distance <= E.Range + Q.Range - 25 + (player.MoveSpeed * 0.7) && Distance > Q.Range
-                            && E.IsReady())
+                        if (Distance <= E.Range + Q.Range - 25 + (player.MoveSpeed * 0.7) && Distance > Q.Range && E.IsReady())
                         {
                             R.Cast();
                         }
                     }
                 }
 
-                if (menu.Combo["Rmode"].Cast<ComboBox>().CurrentValue == 1 && R.IsReady()
-                    && target.IsValidTarget(Q.Range + 25))
+                if (menu.Combo["Rmode"].Cast<ComboBox>().CurrentValue == 1 && R.IsReady() && target.IsValidTarget(Q.Range + 25))
                 {
                     R.Cast();
                 }

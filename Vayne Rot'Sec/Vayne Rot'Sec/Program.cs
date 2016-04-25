@@ -21,12 +21,7 @@ namespace Vayne_Rot_Sec
 
         public static SpellDataInst E;
 
-        private static void Main(string[] args)
-        {
-            Loading.OnLoadingComplete += Loading_OnLoadingComplete;
-        }
-
-        private static void Loading_OnLoadingComplete(EventArgs args)
+        public static void Execute()
         {
             if (Player.Instance.ChampionName != "Vayne")
             {
@@ -81,17 +76,12 @@ namespace Vayne_Rot_Sec
             {
                 return;
             }
-            if (RotSec["Kappa"].Cast<KeyBind>().CurrentValue && E.IsReady && ZZrot.IsReady()
-                && Target.IsValidTarget(ZZrot.Range))
+            if (RotSec["Kappa"].Cast<KeyBind>().CurrentValue && E.IsReady && ZZrot.IsReady() && Target.IsValidTarget(ZZrot.Range))
             {
                 if (Player.CastSpell(SpellSlot.E, Target))
                 {
                     Core.DelayAction(
-                        () =>
-                            {
-                                ZZrot.Cast(
-                                    Target.Position.To2D().Extend(Player.Instance.ServerPosition.To2D(), -100).To3D());
-                            },
+                        () => { ZZrot.Cast(Target.Position.To2D().Extend(Player.Instance.ServerPosition.To2D(), -100).To3D()); },
                         RotSec["delay"].Cast<Slider>().CurrentValue);
                 }
             }

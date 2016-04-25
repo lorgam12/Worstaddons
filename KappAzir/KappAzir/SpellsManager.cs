@@ -5,7 +5,11 @@
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Enumerations;
-    using static Menus;
+    using
+    
+
+    static
+Menus;
     using Mario_s_Lib;
 
     public static class SpellsManager

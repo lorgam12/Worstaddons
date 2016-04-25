@@ -72,12 +72,7 @@ namespace Olaf
 
         private static Menu menuIni;
 
-        private static void Main(string[] args)
-        {
-            Loading.OnLoadingComplete += OnLoad;
-        }
-
-        private static void OnLoad(EventArgs args)
+        public static void Execute()
         {
             if (player.ChampionName != ChampName)
             {
@@ -141,8 +136,7 @@ namespace Olaf
             UltMenu.Add("human", new Slider("Humanizer Delay", 150, 0, 1500));
             UltMenu.Add("Rene", new Slider("Enemies Near to Cast R", 1, 0, 5));
             UltMenu.Add("enemydetect", new Slider("Enemies Detect Range", 1000, 0, 2000));
-            UltMenu.AddLabel(
-                "Ult logic: It will Cast if you have one of the selected debuffs, HP under selected and Nearby enemies.");
+            UltMenu.AddLabel("Ult logic: It will Cast if you have one of the selected debuffs, HP under selected and Nearby enemies.");
 
             ComboMenu = menuIni.AddSubMenu("Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -202,8 +196,7 @@ namespace Olaf
         private static void Gapcloser_OnGap(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
             if (!menuIni.Get<CheckBox>("Misc").CurrentValue || !MiscMenu.Get<CheckBox>("gapcloser").CurrentValue
-                || ObjectManager.Player.ManaPercent < MiscMenu.Get<Slider>("gapclosermana").CurrentValue
-                || Sender == null)
+                || ObjectManager.Player.ManaPercent < MiscMenu.Get<Slider>("gapclosermana").CurrentValue || Sender == null)
             {
                 return;
             }
@@ -223,33 +216,23 @@ namespace Olaf
                              || (UltMenu["tunt"].Cast<CheckBox>().CurrentValue && player.IsTaunted)
                              || (UltMenu["stun"].Cast<CheckBox>().CurrentValue && player.IsStunned)
                              || (UltMenu["fear"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Fear))
-                             || (UltMenu["silence"].Cast<CheckBox>().CurrentValue
-                                 && player.HasBuffOfType(BuffType.Silence))
+                             || (UltMenu["silence"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Silence))
                              || (UltMenu["snare"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Snare))
-                             || (UltMenu["supperss"].Cast<CheckBox>().CurrentValue
-                                 && player.HasBuffOfType(BuffType.Suppression))
+                             || (UltMenu["supperss"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Suppression))
                              || (UltMenu["sleep"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Sleep))
-                             || (UltMenu["poly"].Cast<CheckBox>().CurrentValue
-                                 && player.HasBuffOfType(BuffType.Polymorph))
-                             || (UltMenu["frenzy"].Cast<CheckBox>().CurrentValue
-                                 && player.HasBuffOfType(BuffType.Frenzy))
-                             || (UltMenu["disarm"].Cast<CheckBox>().CurrentValue
-                                 && player.HasBuffOfType(BuffType.Disarm))
-                             || (UltMenu["nearsight"].Cast<CheckBox>().CurrentValue
-                                 && player.HasBuffOfType(BuffType.NearSight))
-                             || (UltMenu["knockback"].Cast<CheckBox>().CurrentValue
-                                 && player.HasBuffOfType(BuffType.Knockback))
-                             || (UltMenu["knockup"].Cast<CheckBox>().CurrentValue
-                                 && player.HasBuffOfType(BuffType.Knockup))
+                             || (UltMenu["poly"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Polymorph))
+                             || (UltMenu["frenzy"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Frenzy))
+                             || (UltMenu["disarm"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Disarm))
+                             || (UltMenu["nearsight"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.NearSight))
+                             || (UltMenu["knockback"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Knockback))
+                             || (UltMenu["knockup"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Knockup))
                              || (UltMenu["slow"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Slow))
-                             || (UltMenu["poison"].Cast<CheckBox>().CurrentValue
-                                 && player.HasBuffOfType(BuffType.Poison))
+                             || (UltMenu["poison"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Poison))
                              || (UltMenu["blind"].Cast<CheckBox>().CurrentValue && player.HasBuffOfType(BuffType.Blind));
                 var enemys = UltMenu["Rene"].Cast<Slider>().CurrentValue;
                 var hp = UltMenu["hp"].Cast<Slider>().CurrentValue;
                 var enemysrange = UltMenu["enemydetect"].Cast<Slider>().CurrentValue;
-                if (debuff && ObjectManager.Player.HealthPercent <= hp
-                    && enemys >= ObjectManager.Player.Position.CountEnemiesInRange(enemysrange))
+                if (debuff && ObjectManager.Player.HealthPercent <= hp && enemys >= ObjectManager.Player.Position.CountEnemiesInRange(enemysrange))
                 {
                     Core.DelayAction(() => R.Cast(), UltMenu["human"].Cast<Slider>().CurrentValue);
                 }
@@ -304,9 +287,7 @@ namespace Olaf
                 var target =
                     ObjectManager.Get<AIHeroClient>()
                         .FirstOrDefault(
-                            enemy =>
-                            enemy.IsEnemy && enemy.IsValidTarget(Q.Range)
-                            && enemy.Health < player.GetSpellDamage(enemy, SpellSlot.Q));
+                            enemy => enemy.IsEnemy && enemy.IsValidTarget(Q.Range) && enemy.Health < player.GetSpellDamage(enemy, SpellSlot.Q));
                 if (target.IsValidTarget(Q.Range))
                 {
                     if (target != null)
@@ -322,9 +303,7 @@ namespace Olaf
                 var target =
                     ObjectManager.Get<AIHeroClient>()
                         .FirstOrDefault(
-                            enemy =>
-                            enemy.IsEnemy && enemy.IsValidTarget(E.Range)
-                            && enemy.Health < player.GetSpellDamage(enemy, SpellSlot.E));
+                            enemy => enemy.IsEnemy && enemy.IsValidTarget(E.Range) && enemy.Health < player.GetSpellDamage(enemy, SpellSlot.E));
                 if (target.IsValidTarget(E.Range) && target != null)
                 {
                     E.Cast(target);
@@ -341,23 +320,20 @@ namespace Olaf
             }
 
             if (Botrk.IsReady() && Botrk.IsOwned(player) && Botrk.IsInRange(target)
-                && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue
-                && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
+                && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
             {
                 Botrk.Cast(target);
             }
 
             if (Botrk.IsReady() && Botrk.IsOwned(player) && Botrk.IsInRange(target)
-                && target.HealthPercent <= ItemsMenu["oL"].Cast<Slider>().CurrentValue
-                && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
+                && target.HealthPercent <= ItemsMenu["oL"].Cast<Slider>().CurrentValue && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
 
             {
                 Botrk.Cast(target);
             }
 
             if (Cutlass.IsReady() && Cutlass.IsOwned(player) && Cutlass.IsInRange(target)
-                && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue
-                && ItemsMenu["UseBilge"].Cast<CheckBox>().CurrentValue)
+                && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue && ItemsMenu["UseBilge"].Cast<CheckBox>().CurrentValue)
             {
                 Cutlass.Cast(target);
             }
@@ -430,10 +406,7 @@ namespace Olaf
 
             if (E.IsReady() && LaneMenu["fE"].Cast<CheckBox>().CurrentValue && player.HealthPercent >= femana)
             {
-                var etarget =
-                    ObjectManager.Get<Obj_AI_Base>()
-                        .OrderBy(m => m.Health)
-                        .Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+                var etarget = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
                 foreach (var minion in etarget)
                 {
                     if (minion.Health <= player.GetSpellDamage(minion, SpellSlot.E) && minion != null)
@@ -448,15 +421,13 @@ namespace Olaf
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
             var harassmana = HarassMenu["harassmana"].Cast<Slider>().CurrentValue;
-            if (!Q.IsReady() || !menuIni["Harass"].Cast<CheckBox>().CurrentValue
-                || !HarassMenu["hQA"].Cast<CheckBox>().CurrentValue || player.IsRecalling() || target == null
-                || !target.IsValidTarget())
+            if (!Q.IsReady() || !menuIni["Harass"].Cast<CheckBox>().CurrentValue || !HarassMenu["hQA"].Cast<CheckBox>().CurrentValue
+                || player.IsRecalling() || target == null || !target.IsValidTarget())
             {
                 return;
             }
 
-            if (Q.IsReady() && HarassMenu["hQA"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(Q.Range)
-                && player.ManaPercent >= harassmana)
+            if (Q.IsReady() && HarassMenu["hQA"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(Q.Range) && player.ManaPercent >= harassmana)
             {
                 var Qpredict = Q.GetPrediction(target);
                 var hithere = Qpredict.CastPosition.Extend(ObjectManager.Player.Position, -100);
@@ -480,8 +451,7 @@ namespace Olaf
                 return;
             }
 
-            if (HarassMenu["hQ"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(Q.Range)
-                && player.ManaPercent >= harassmana)
+            if (HarassMenu["hQ"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(Q.Range) && player.ManaPercent >= harassmana)
             {
                 var Qpredict = Q.GetPrediction(target);
                 var hithere = Qpredict.CastPosition.Extend(ObjectManager.Player.Position, -100);
@@ -495,8 +465,7 @@ namespace Olaf
                 }
             }
 
-            if (HarassMenu["hQ2"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(Q.Range)
-                && player.ManaPercent >= harassmana)
+            if (HarassMenu["hQ2"].Cast<CheckBox>().CurrentValue && target.IsValidTarget(Q.Range) && player.ManaPercent >= harassmana)
             {
                 if (target.IsValidTarget() && Q.IsReady() && player.Distance(target.ServerPosition) <= Q2.Range)
                 {
@@ -514,8 +483,7 @@ namespace Olaf
                 E.Cast(target);
             }
 
-            if (W.IsReady() && target.IsValidTarget(175) && player.ManaPercent >= harassmana
-                && HarassMenu["hW"].Cast<CheckBox>().CurrentValue)
+            if (W.IsReady() && target.IsValidTarget(175) && player.ManaPercent >= harassmana && HarassMenu["hW"].Cast<CheckBox>().CurrentValue)
             {
                 W.Cast();
             }
@@ -529,16 +497,12 @@ namespace Olaf
             var Elane = LaneMenu["jungleE"].Cast<CheckBox>().CurrentValue && E.IsReady();
             var Wlane = LaneMenu["jungleW"].Cast<CheckBox>().CurrentValue && W.IsReady();
 
-            var jmobs =
-                ObjectManager.Get<Obj_AI_Minion>()
-                    .OrderBy(m => m.CampNumber)
-                    .Where(m => m.IsMonster && m.IsEnemy && !m.IsDead);
+            var jmobs = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.CampNumber).Where(m => m.IsMonster && m.IsEnemy && !m.IsDead);
             foreach (var jmob in jmobs)
             {
                 if (junglemana <= Player.Instance.ManaPercent)
                 {
-                    if (Qlane && !jmob.IsValidTarget(player.AttackRange) && jmob.IsValidTarget(Q.Range)
-                        && jmobs.Count() > 1)
+                    if (Qlane && !jmob.IsValidTarget(player.AttackRange) && jmob.IsValidTarget(Q.Range) && jmobs.Count() > 1)
                     {
                         Q.Cast(jmob);
                     }
@@ -549,8 +513,7 @@ namespace Olaf
                     }
                 }
 
-                if (Elane && E.IsReady() && Player.Instance.HealthPercent > jemana
-                    && jmob.Health <= player.GetSpellDamage(jmob, SpellSlot.E)
+                if (Elane && E.IsReady() && Player.Instance.HealthPercent > jemana && jmob.Health <= player.GetSpellDamage(jmob, SpellSlot.E)
                     && !jmob.IsValidTarget(player.AttackRange))
                 {
                     E.Cast(jmob);
@@ -566,10 +529,7 @@ namespace Olaf
             var Elane = LaneMenu["laneE"].Cast<CheckBox>().CurrentValue && E.IsReady();
             var Wlane = LaneMenu["laneW"].Cast<CheckBox>().CurrentValue && W.IsReady();
 
-            var minions =
-                ObjectManager.Get<Obj_AI_Minion>()
-                    .OrderBy(m => m.Health)
-                    .Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+            var minions = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
 
             foreach (var minion in minions)
             {
@@ -587,8 +547,7 @@ namespace Olaf
                     }
                 }
 
-                if (Elane && E.IsReady() && Player.Instance.HealthPercent > femana
-                    && minion.Health <= player.GetSpellDamage(minion, SpellSlot.E)
+                if (Elane && E.IsReady() && Player.Instance.HealthPercent > femana && minion.Health <= player.GetSpellDamage(minion, SpellSlot.E)
                     && !minion.IsValidTarget(player.AttackRange))
                 {
                     E.Cast(minion);
@@ -636,10 +595,7 @@ namespace Olaf
             }
             if (DrawMenu["Rdraw"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(
-                    Color.DarkOrange,
-                    UltMenu["enemydetect"].Cast<Slider>().CurrentValue,
-                    Player.Instance.Position);
+                Circle.Draw(Color.DarkOrange, UltMenu["enemydetect"].Cast<Slider>().CurrentValue, Player.Instance.Position);
             }
 
             if (DrawMenu["AxeDraw"].Cast<CheckBox>().CurrentValue && olafAxe.Object != null)

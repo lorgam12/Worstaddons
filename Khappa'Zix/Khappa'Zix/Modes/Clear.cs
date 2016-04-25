@@ -61,20 +61,19 @@
                 return;
             }
 
-            if (Q.IsReady() && player.GetSpellDamage(minion, SpellSlot.Q) > minion.Health
-                && menu.Clear["Qh"].Cast<CheckBox>().CurrentValue && minion.IsValidTarget(Q.Range))
+            if (Q.IsReady() && player.GetSpellDamage(minion, SpellSlot.Q) > minion.Health && menu.Clear["Qh"].Cast<CheckBox>().CurrentValue
+                && minion.IsValidTarget(Q.Range))
             {
                 Q.Cast(minion);
             }
 
-            if (W.IsReady() && player.GetSpellDamage(minion, SpellSlot.W) > minion.Health
-                && menu.Clear["Wh"].Cast<CheckBox>().CurrentValue)
+            if (W.IsReady() && player.GetSpellDamage(minion, SpellSlot.W) > minion.Health && menu.Clear["Wh"].Cast<CheckBox>().CurrentValue)
             {
                 W.Cast(W.GetPrediction(minion).CastPosition);
             }
 
-            if (E.IsReady() && player.GetSpellDamage(minion, SpellSlot.E) > minion.Health
-                && menu.Clear["Eh"].Cast<CheckBox>().CurrentValue && minion.IsValidTarget(E.Range))
+            if (E.IsReady() && player.GetSpellDamage(minion, SpellSlot.E) > minion.Health && menu.Clear["Eh"].Cast<CheckBox>().CurrentValue
+                && minion.IsValidTarget(E.Range))
             {
                 E.Cast(E.GetPrediction(minion).CastPosition);
             }

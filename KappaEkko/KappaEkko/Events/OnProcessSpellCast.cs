@@ -8,8 +8,7 @@
     {
         public static void OnSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!sender.IsEnemy || sender.IsMe || sender is Obj_AI_Minion || !args.Target.IsMe || sender == null
-                || args == null)
+            if (!sender.IsEnemy || sender.IsMe || sender is Obj_AI_Minion || !args.Target.IsMe || sender == null || args == null)
             {
                 return;
             }

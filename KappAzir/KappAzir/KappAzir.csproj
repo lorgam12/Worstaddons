@@ -33,24 +33,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EloBuddy, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7339047cb10f6e86, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\New folder\EloBuddy\System\EloBuddy.dll</HintPath>
+    <Reference Include="EloBuddy">
+      <HintPath>..\..\..\..\..\..\Desktop\New folder\EloBuddy\System\EloBuddy.dll</HintPath>
     </Reference>
-    <Reference Include="EloBuddy.SDK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6b574a82b1ea937e, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\New folder\EloBuddy\System\EloBuddy.SDK.dll</HintPath>
+    <Reference Include="EloBuddy.SDK">
+      <HintPath>..\..\..\..\..\..\Desktop\New folder\EloBuddy\System\EloBuddy.SDK.dll</HintPath>
     </Reference>
-    <Reference Include="Mario`s Lib, Version=0.0.0.8, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\AppData\Roaming\EloBuddy\Addons\Libraries\Mario`s Lib.dll</HintPath>
+    <Reference Include="Mario`s Lib">
+      <HintPath>..\..\..\..\..\..\AppData\Roaming\EloBuddy\Addons\Libraries\Mario`s Lib.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>..\..\New folder\EloBuddy\System\SharpDX.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Desktop\New folder\EloBuddy\System\SharpDX.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.Direct3D9, Version=2.6.3.0, Culture=neutral, PublicKeyToken=2306ab36a61019a8, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\New folder\EloBuddy\System\SharpDX.Direct3D9.dll</HintPath>
+    <Reference Include="SharpDX.Direct3D9">
+      <HintPath>..\..\..\..\..\..\Desktop\New folder\EloBuddy\System\SharpDX.Direct3D9.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -60,6 +56,7 @@
     <Compile Include="DamageIndicator.cs" />
     <Compile Include="DrawingsManager.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="main.cs" />
     <Compile Include="Menus.cs" />
     <Compile Include="Modes\Active.cs" />
     <Compile Include="Modes\AutoHarass.cs" />

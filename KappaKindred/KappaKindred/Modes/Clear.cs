@@ -61,9 +61,7 @@
                         Spells.Q.Range - 25,
                         Spells.Q.Radius - 25,
                         Spells.Q.CastDelay,
-                        Spells.Q.Speed)
-                        .OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length)
-                        .FirstOrDefault();
+                        Spells.Q.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
                 if (location != null && location.CollisionObjects.Length >= 2)
                 {
                     Spells.Q.Cast(Game.CursorPos);

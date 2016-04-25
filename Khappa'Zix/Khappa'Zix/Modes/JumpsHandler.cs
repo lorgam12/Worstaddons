@@ -28,9 +28,8 @@
             if (sender is Obj_AI_Turret && args.Target.IsMe)
             {
                 bases = ObjectManager.Get<Obj_Shop>().FirstOrDefault(o => o.IsAlly && o != null);
-                if (player.HealthPercent <= menu.Jump["saveh"].Cast<Slider>().CurrentValue
-                    && menu.Jump["save"].Cast<CheckBox>().CurrentValue && E.IsReady() && player.IsUnderEnemyturret()
-                    && !player.IsDead)
+                if (player.HealthPercent <= menu.Jump["saveh"].Cast<Slider>().CurrentValue && menu.Jump["save"].Cast<CheckBox>().CurrentValue
+                    && E.IsReady() && player.IsUnderEnemyturret() && !player.IsDead)
                 {
                     var pos = player.ServerPosition.Extend(bases.Position, E.Range).To3D();
 
@@ -46,12 +45,9 @@
         {
             var target =
                 EntityManager.Heroes.Enemies.OrderByDescending(
-                    x =>
-                    x.IsValidTarget(E.Range) && !x.IsValidTarget(Q.Range)
-                    && x.Health <= GetQDamage(x) + player.GetAutoAttackDamage(x)).FirstOrDefault(x => x != null);
-            var ally =
-                EntityManager.Heroes.Allies.OrderByDescending(x => x.Health)
-                    .FirstOrDefault(x => x.IsValidTarget(E.Range) && x != null);
+                    x => x.IsValidTarget(E.Range) && !x.IsValidTarget(Q.Range) && x.Health <= GetQDamage(x) + player.GetAutoAttackDamage(x))
+                    .FirstOrDefault(x => x != null);
+            var ally = EntityManager.Heroes.Allies.OrderByDescending(x => x.Health).FirstOrDefault(x => x.IsValidTarget(E.Range) && x != null);
             var finalPosition = player.Position.Extend(bases.Position, E.Range);
             var collFlags = NavMesh.GetCollisionFlags(finalPosition);
 
@@ -144,9 +140,7 @@
 
             var targets = EntityManager.Heroes.Enemies.Where(x => x.IsValidTarget() && !x.IsInvulnerable && !x.IsZombie);
             var checkQKillable =
-                targets.FirstOrDefault(
-                    x =>
-                    Vector3.Distance(player.ServerPosition, x.ServerPosition) < Q.Range - 25 && GetQDamage(x) > x.Health);
+                targets.FirstOrDefault(x => Vector3.Distance(player.ServerPosition, x.ServerPosition) < Q.Range - 25 && GetQDamage(x) > x.Health);
 
             if (checkQKillable != null && checkQKillable.IsValidTarget(Q.Range))
             {
@@ -195,8 +189,7 @@
 
         internal static void Orbwalker_OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
         {
-            if (!EvolvedE || !Combo.doubleJump || !E.IsReady() || !(args.Target is AIHeroClient)
-                || !(target is AIHeroClient))
+            if (!EvolvedE || !Combo.doubleJump || !E.IsReady() || !(args.Target is AIHeroClient) || !(target is AIHeroClient))
             {
                 return;
             }

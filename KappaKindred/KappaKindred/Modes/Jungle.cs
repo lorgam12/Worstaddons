@@ -16,10 +16,7 @@
 
             if (useW)
             {
-                var minions = EntityManager.MinionsAndMonsters.GetJungleMonsters(
-                    Player.Instance.Position,
-                    Spells.W.Range + 50,
-                    false);
+                var minions = EntityManager.MinionsAndMonsters.GetJungleMonsters(Player.Instance.Position, Spells.W.Range + 50, false);
 
                 if (minions.Any())
                 {
@@ -29,10 +26,7 @@
 
             if (useE)
             {
-                var jmobs =
-                    ObjectManager.Get<Obj_AI_Minion>()
-                        .OrderBy(m => m.CampNumber)
-                        .Where(m => m.IsMonster && m.IsEnemy && !m.IsDead);
+                var jmobs = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.CampNumber).Where(m => m.IsMonster && m.IsEnemy && !m.IsDead);
                 foreach (var jmob in jmobs)
                 {
                     if (jmob.IsValidTarget(Spells.E.Range))
@@ -52,10 +46,7 @@
 
             if (useQ)
             {
-                var minions1 = EntityManager.MinionsAndMonsters.GetJungleMonsters(
-                    Player.Instance.Position,
-                    Spells.Q.Range,
-                    false);
+                var minions1 = EntityManager.MinionsAndMonsters.GetJungleMonsters(Player.Instance.Position, Spells.Q.Range, false);
 
                 var location =
                     Prediction.Position.PredictCircularMissileAoe(
@@ -63,9 +54,7 @@
                         Spells.Q.Range - 25,
                         Spells.Q.Radius - 25,
                         Spells.Q.CastDelay,
-                        Spells.Q.Speed)
-                        .OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length)
-                        .FirstOrDefault();
+                        Spells.Q.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
 
                 if (location != null)
                 {

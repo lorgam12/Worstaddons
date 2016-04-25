@@ -15,8 +15,7 @@
             var useQ = Menu.ComboMenu["Q"].Cast<CheckBox>().CurrentValue && Spells.Q.IsReady();
             var qmode = Menu.ComboMenu["Qmode"].Cast<ComboBox>().CurrentValue;
 
-            if (qtarget == null || hero == null || hero.Type != GameObjectType.AIHeroClient
-                || qtarget.HasBuff("kindredrnodeathbuff"))
+            if (qtarget == null || hero == null || hero.Type != GameObjectType.AIHeroClient || qtarget.HasBuff("kindredrnodeathbuff"))
             {
                 return;
             }

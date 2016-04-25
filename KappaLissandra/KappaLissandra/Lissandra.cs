@@ -49,12 +49,7 @@
 
         private static Menu menuIni;
 
-        private static void Main(string[] args)
-        {
-            Loading.OnLoadingComplete += OnLoad;
-        }
-
-        private static void OnLoad(EventArgs args)
+        public static void Execute()
         {
             if (ObjectManager.Player.BaseSkinName != "Lissandra")
             {
@@ -143,8 +138,7 @@
 
             Q = new Spell.Skillshot(SpellSlot.Q, 715, SkillShotType.Linear, 250, 2200, 75);
             Q2 = new Spell.Skillshot(SpellSlot.Q, 825, SkillShotType.Linear, 250, 2200, 90);
-            Qtest = new Spell.Skillshot(SpellSlot.Q, 715, SkillShotType.Linear, 250, 2200, 75)
-                        { AllowedCollisionCount = int.MaxValue };
+            Qtest = new Spell.Skillshot(SpellSlot.Q, 715, SkillShotType.Linear, 250, 2200, 75) { AllowedCollisionCount = int.MaxValue };
             W = new Spell.Active(SpellSlot.W, 425);
             E = new Spell.Skillshot(SpellSlot.E, 1000, SkillShotType.Linear, 250, 850, 125);
             R = new Spell.Targeted(SpellSlot.R, 400);
@@ -184,9 +178,8 @@
 
                 if (sender.IsEnemy || sender is Obj_AI_Turret)
                 {
-                    if (useRS && Player.HealthPercent <= shp && !Player.HasBuff("kindredrnodeathbuff")
-                        && !Player.HasBuff("JudicatorIntervention") && !Player.HasBuff("ChronoShift")
-                        && !Player.HasBuff("UndyingRage"))
+                    if (useRS && Player.HealthPercent <= shp && !Player.HasBuff("kindredrnodeathbuff") && !Player.HasBuff("JudicatorIntervention")
+                        && !Player.HasBuff("ChronoShift") && !Player.HasBuff("UndyingRage"))
                     {
                         R.Cast(Player);
                     }
@@ -220,9 +213,8 @@
 
                 if (sender.IsEnemy || sender is Obj_AI_Turret)
                 {
-                    if (useRS && Player.HealthPercent <= shp && !Player.HasBuff("kindredrnodeathbuff")
-                        && !Player.HasBuff("JudicatorIntervention") && !Player.HasBuff("ChronoShift")
-                        && !Player.HasBuff("UndyingRage"))
+                    if (useRS && Player.HealthPercent <= shp && !Player.HasBuff("kindredrnodeathbuff") && !Player.HasBuff("JudicatorIntervention")
+                        && !Player.HasBuff("ChronoShift") && !Player.HasBuff("UndyingRage"))
                     {
                         R.Cast(Player);
                     }
@@ -252,8 +244,7 @@
 
         private static void OnInterruptableSpell(Obj_AI_Base Sender, Interrupter.InterruptableSpellEventArgs args)
         {
-            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || Sender == null || Sender.IsAlly || Sender.IsMe
-                || !Sender.IsEnemy)
+            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || Sender == null || Sender.IsAlly || Sender.IsMe || !Sender.IsEnemy)
             {
                 return;
             }
@@ -303,8 +294,8 @@
 
             if (W.IsReady())
             {
-                if (MiscMenu.Get<CheckBox>("WTower").CurrentValue && Player.CountEnemiesInRange(W.Range) >= 1
-                    && Player.IsUnderHisturret() && Player.IsUnderTurret() && !Player.IsUnderEnemyturret())
+                if (MiscMenu.Get<CheckBox>("WTower").CurrentValue && Player.CountEnemiesInRange(W.Range) >= 1 && Player.IsUnderHisturret()
+                    && Player.IsUnderTurret() && !Player.IsUnderEnemyturret())
                 {
                     W.Cast();
                 }
@@ -335,8 +326,7 @@
             {
                 return;
             }
-            if (miss.SpellCaster is AIHeroClient && miss.SpellCaster.IsValid && miss.SpellCaster.IsMe
-                && miss.SData.Name == "LissandraEMissile")
+            if (miss.SpellCaster is AIHeroClient && miss.SpellCaster.IsValid && miss.SpellCaster.IsMe && miss.SData.Name == "LissandraEMissile")
             {
                 LissEMissile = null;
             }
@@ -413,9 +403,7 @@
             {
                 Target =
                     EntityManager.Heroes.Enemies.FirstOrDefault(
-                        h =>
-                        h.IsValidTarget()
-                        && (Vector3.Distance(h.ServerPosition, Player.ServerPosition) < E.Range * 0.94) && !h.IsZombie);
+                        h => h.IsValidTarget() && (Vector3.Distance(h.ServerPosition, Player.ServerPosition) < E.Range * 0.94) && !h.IsZombie);
             }
 
             if (Target != null && !Target.IsInvulnerable)
@@ -490,10 +478,7 @@
             var useW = LaneMenu["jW"].Cast<CheckBox>().CurrentValue;
             var useE = LaneMenu["jE"].Cast<CheckBox>().CurrentValue;
 
-            var jmobs =
-                ObjectManager.Get<Obj_AI_Minion>()
-                    .OrderBy(m => m.CampNumber)
-                    .Where(m => m.IsMonster && m.IsEnemy && !m.IsDead);
+            var jmobs = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.CampNumber).Where(m => m.IsMonster && m.IsEnemy && !m.IsDead);
             foreach (var jmob in jmobs)
             {
                 if (useQ && jmob.IsValidTarget(Q.Range) && jmobs.Any())
@@ -506,8 +491,7 @@
                     W.Cast();
                 }
 
-                if (useE && E.IsReady() && jmob.IsValidTarget(E.Range) && LissEMissile == null
-                    && E.Handle.ToggleState == 1)
+                if (useE && E.IsReady() && jmob.IsValidTarget(E.Range) && LissEMissile == null && E.Handle.ToggleState == 1)
                 {
                     E.Cast(jmob.Position);
                 }
@@ -541,8 +525,7 @@
             }
 
             var pred = Q2.GetPrediction(target2);
-            var collisions =
-                EntityManager.MinionsAndMonsters.EnemyMinions.Where(it => it.IsValidTarget(Q.Range)).ToList();
+            var collisions = EntityManager.MinionsAndMonsters.EnemyMinions.Where(it => it.IsValidTarget(Q.Range)).ToList();
 
             if (!collisions.Any())
             {
@@ -578,9 +561,7 @@
 
             if (
                 EntityManager.Heroes.Enemies.Any(
-                    h =>
-                    h.IsValidTarget() && h != null
-                    && (Vector3.Distance(h.ServerPosition, Player.ServerPosition) < W.Range) && !h.IsZombie))
+                    h => h.IsValidTarget() && h != null && (Vector3.Distance(h.ServerPosition, Player.ServerPosition) < W.Range) && !h.IsZombie))
             {
                 W.Cast();
             }
@@ -606,8 +587,7 @@
                 E.Cast(pred.CastPosition);
             }
 
-            if (useES && LissEMissile != null && LissEMissile.Position.CountEnemiesInRange(W.Range - 50) <= ESE
-                && Player.HealthPercent <= EHP)
+            if (useES && LissEMissile != null && LissEMissile.Position.CountEnemiesInRange(W.Range - 50) <= ESE && Player.HealthPercent <= EHP)
             {
                 E.Cast(Game.CursorPos);
             }
@@ -633,8 +613,8 @@
             var target =
                 EntityManager.Heroes.Enemies.FirstOrDefault(
                     e =>
-                    !e.IsZombie && !e.IsInvulnerable && !e.IsDead && !e.HasBuff("kindredrnodeathbuff")
-                    && !e.HasBuff("JudicatorIntervention") && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage"));
+                    !e.IsZombie && !e.IsInvulnerable && !e.IsDead && !e.HasBuff("kindredrnodeathbuff") && !e.HasBuff("JudicatorIntervention")
+                    && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage"));
 
             if (target != null && useRE)
             {
@@ -647,8 +627,7 @@
 
             if (useRS)
             {
-                if (aoeR && Player.CountEnemiesInRange(R.Range) >= hitR
-                    && !UltMenu["DontUltally" + Player.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                if (aoeR && Player.CountEnemiesInRange(R.Range) >= hitR && !UltMenu["DontUltally" + Player.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
                     R.Cast(Player);
                 }
@@ -664,8 +643,7 @@
                         R.Cast(target);
                     }
 
-                    if (target.IsInRange(Player, R.Range)
-                        && !UltMenu["DontUltally" + Player.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    if (target.IsInRange(Player, R.Range) && !UltMenu["DontUltally" + Player.BaseSkinName].Cast<CheckBox>().CurrentValue)
                     {
                         R.Cast(Player);
                     }
@@ -737,9 +715,8 @@
                 var target =
                     EntityManager.Heroes.Enemies.FirstOrDefault(
                         e =>
-                        !e.IsZombie && !e.IsDead && !e.HasBuff("kindredrnodeathbuff")
-                        && !e.HasBuff("JudicatorIntervention") && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage")
-                        && e.IsHPBarRendered && e.IsEnemy);
+                        !e.IsZombie && !e.IsDead && !e.HasBuff("kindredrnodeathbuff") && !e.HasBuff("JudicatorIntervention")
+                        && !e.HasBuff("ChronoShift") && !e.HasBuff("UndyingRage") && e.IsHPBarRendered && e.IsEnemy);
 
                 if (LissEMissile != null)
                 {

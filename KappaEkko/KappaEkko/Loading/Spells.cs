@@ -22,9 +22,7 @@
 
         public static void Load()
         {
-            EkkoREmitter =
-                ObjectManager.Get<Obj_GeneralParticleEmitter>()
-                    .FirstOrDefault(x => x.Name.Equals("Ekko_Base_R_TrailEnd.troy"));
+            EkkoREmitter = ObjectManager.Get<Obj_GeneralParticleEmitter>().FirstOrDefault(x => x.Name.Equals("Ekko_Base_R_TrailEnd.troy"));
             Q = new Spell.Skillshot(SpellSlot.Q, 750, SkillShotType.Linear, 250, 2200, 60);
             W = new Spell.Skillshot(SpellSlot.W, 1600, SkillShotType.Circular, 1500, 500, 650);
             E = new Spell.Skillshot(SpellSlot.E, 450, SkillShotType.Linear, 250, int.MaxValue, 1);

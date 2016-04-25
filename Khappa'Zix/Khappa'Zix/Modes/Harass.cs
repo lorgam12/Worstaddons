@@ -16,9 +16,7 @@
         {
             var target =
                 EntityManager.Heroes.Enemies.FirstOrDefault(
-                    x =>
-                    x.IsValidTarget(W.Range) && !x.IsZombie && !x.IsInvulnerable
-                    && !x.HasBuffOfType(BuffType.PhysicalImmunity));
+                    x => x.IsValidTarget(W.Range) && !x.IsZombie && !x.IsInvulnerable && !x.HasBuffOfType(BuffType.PhysicalImmunity));
 
             if (target == null)
             {

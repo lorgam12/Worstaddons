@@ -14,9 +14,8 @@
                     .FirstOrDefault(
                         enemy =>
                         enemy != null && enemy.IsEnemy && enemy.IsValidTarget(Spells.Q.Range) && !enemy.IsDead
-                        && !enemy.HasBuff("kindredrnodeathbuff") && !enemy.HasBuff("JudicatorIntervention")
-                        && !enemy.HasBuff("ChronoShift") && !enemy.HasBuff("UndyingRage")
-                        && enemy.GetBuffCount("EkkoStacks") > 1);
+                        && !enemy.HasBuff("kindredrnodeathbuff") && !enemy.HasBuff("JudicatorIntervention") && !enemy.HasBuff("ChronoShift")
+                        && !enemy.HasBuff("UndyingRage") && enemy.GetBuffCount("EkkoStacks") > 1);
 
             if (target != null)
             {

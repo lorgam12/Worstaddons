@@ -55,12 +55,7 @@
 
         public static SpellSlot IgniteSlot;
 
-        private static void Main(string[] args)
-        {
-            Loading.OnLoadingComplete += GameOnOnStart;
-        }
-
-        private static void GameOnOnStart(EventArgs args)
+        public static void Execute()
         {
             Player = ObjectManager.Player;
             if (Player.ChampionName != ChampionName)
@@ -188,8 +183,7 @@
                 {
                     if (Saver.Get<CheckBox>("AutoES").CurrentValue)
                     {
-                        if (target.IsValidTarget(E.Range) && !target.IsDead
-                            && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                        if (target.IsValidTarget(E.Range) && !target.IsDead && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
                             var c = target.CountEnemiesInRange(750);
                             if (target.HealthPercent <= 25 && (c >= 1 || target.IsUnderEnemyturret()))
@@ -207,8 +201,7 @@
 
                     if (Saver.Get<CheckBox>("AutoR").CurrentValue)
                     {
-                        if (target.IsValidTarget(R.Range) && target != null
-                            && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                        if (target.IsValidTarget(R.Range) && target != null && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
                             var c = target.CountEnemiesInRange(300);
                             if (c >= 1 + 1 + 1 || target.HealthPercent <= 20 && c >= 1)
@@ -248,8 +241,7 @@
                 {
                     if (Saver.Get<CheckBox>("AutoES").CurrentValue)
                     {
-                        if (target.IsValidTarget(E.Range) && !target.IsDead
-                            && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                        if (target.IsValidTarget(E.Range) && !target.IsDead && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
                             var c = target.CountEnemiesInRange(600);
                             if (target.HealthPercent <= 25 && (c >= 1 || target.IsUnderEnemyturret()))
@@ -267,8 +259,7 @@
 
                     if (Saver.Get<CheckBox>("AutoR").CurrentValue)
                     {
-                        if (target.IsValidTarget(R.Range) && target != null
-                            && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                        if (target.IsValidTarget(R.Range) && target != null && !Saver["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
                             var c = target.CountEnemiesInRange(300);
                             if (c >= 1 + 1 + 1 || target.HealthPercent <= 20 && c >= 1)
@@ -324,8 +315,7 @@
                 {
                     foreach (var ally in EntityManager.Heroes.Allies)
                     {
-                        if (ally.IsValidTarget(R.Range)
-                            && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue && Sender.IsEnemy)
+                        if (ally.IsValidTarget(R.Range) && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue && Sender.IsEnemy)
                         {
                             if (ally.Distance(Sender, true) < 300 * 300 && ally.HealthPercent <= 25)
                             {
@@ -342,9 +332,7 @@
             }
         }
 
-        private static void Interrupter2_OnInterruptableTarget(
-            Obj_AI_Base sender,
-            Interrupter.InterruptableSpellEventArgs args)
+        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs args)
         {
             if (!menuIni.Get<CheckBox>("Saver").CurrentValue)
             {
@@ -371,8 +359,7 @@
                 {
                     foreach (var ally in EntityManager.Heroes.AllHeroes)
                     {
-                        if (ally.IsValidTarget(R.Range)
-                            && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                        if (ally.IsValidTarget(R.Range) && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         {
                             if (ally.Distance(sender, true) < 300 * 300 && ally.HealthPercent < 25)
                             {
@@ -443,8 +430,7 @@
             {
                 foreach (var ally in EntityManager.Heroes.Allies)
                 {
-                    if (ally.IsValidTarget(R.Range) && ally != null
-                        && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    if (ally.IsValidTarget(R.Range) && ally != null && !Saver["DontUlt" + ally.BaseSkinName].Cast<CheckBox>().CurrentValue)
                     {
                         var c = ally.CountEnemiesInRange(300);
                         if (c >= 1 + 1 + 1 || ally.HealthPercent <= 20 && c >= 1)
@@ -477,12 +463,8 @@
 
             Obj_AI_Base luluTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
 
-            var pixTargetEffectiveHealth = pixTarget != null
-                                               ? pixTarget.Health * (1 + pixTarget.SpellBlock / 100f)
-                                               : float.MaxValue;
-            var luluTargetEffectiveHealth = luluTarget != null
-                                                ? luluTarget.Health * (1 + luluTarget.SpellBlock / 100f)
-                                                : float.MaxValue;
+            var pixTargetEffectiveHealth = pixTarget != null ? pixTarget.Health * (1 + pixTarget.SpellBlock / 100f) : float.MaxValue;
+            var luluTargetEffectiveHealth = luluTarget != null ? luluTarget.Health * (1 + luluTarget.SpellBlock / 100f) : float.MaxValue;
 
             var target = pixTargetEffectiveHealth * 1.2f > luluTargetEffectiveHealth ? luluTarget : pixTarget;
             var flag = false;
@@ -490,13 +472,9 @@
             if (target != null)
             {
                 var distanceToTargetFromPlayer = Player.Distance(target, true);
-                var distanceToTargetFromPix = PixManager.Pix != null
-                                                  ? PixManager.Pix.Distance(target, true)
-                                                  : float.MaxValue;
+                var distanceToTargetFromPix = PixManager.Pix != null ? PixManager.Pix.Distance(target, true) : float.MaxValue;
 
-                var source = PixManager.Pix == null
-                                 ? Player
-                                 : (distanceToTargetFromPix < distanceToTargetFromPlayer ? PixManager.Pix : Player);
+                var source = PixManager.Pix == null ? Player : (distanceToTargetFromPix < distanceToTargetFromPlayer ? PixManager.Pix : Player);
                 Q.SourcePosition = source.ServerPosition;
                 Q.RangeCheckSource = source.ServerPosition;
                 if (!useE || !E.IsReady() || source.ServerPosition.Distance(target.ServerPosition) < Q.Range - 100)
@@ -524,8 +502,7 @@
                             ObjectManager.Get<Obj_AI_Base>()
                                 .Where(
                                     t =>
-                                    t.IsValidTarget(E.Range) && t != null && !t.IsMe
-                                    && t.Distance(eqTarget, true) < Q.RangeSquared
+                                    t.IsValidTarget(E.Range) && t != null && !t.IsMe && t.Distance(eqTarget, true) < Q.RangeSquared
                                     && Player.GetSpellDamage(eqTarget, SpellSlot.E) < eqTarget.TotalShieldHealth())
                                 .FirstOrDefault(t => t.Distance(eqTarget) < 1750);
                         if (eTarget != null)
@@ -665,10 +642,7 @@
             if (useE)
             {
                 foreach (var minion in
-                    allMinions.Where(
-                        m =>
-                        m.BaseSkinName.EndsWith("MinionSiege")
-                        && Player.GetSpellDamage(m, SpellSlot.E) > m.TotalShieldHealth()))
+                    allMinions.Where(m => m.BaseSkinName.EndsWith("MinionSiege") && Player.GetSpellDamage(m, SpellSlot.E) > m.TotalShieldHealth()))
                 {
                     E.Cast(minion);
                 }
@@ -680,10 +654,7 @@
             var useQ = LaneMenu["QJ"].Cast<CheckBox>().CurrentValue;
             var useE = LaneMenu["EJ"].Cast<CheckBox>().CurrentValue;
 
-            var mobs =
-                ObjectManager.Get<Obj_AI_Minion>()
-                    .OrderBy(m => m.Health)
-                    .Where(m => m != null && m.IsMonster && !m.IsDead);
+            var mobs = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.Health).Where(m => m != null && m.IsMonster && !m.IsDead);
             foreach (var mob in mobs)
             {
                 if (useQ && Q.IsReady())
@@ -701,9 +672,7 @@
         {
             foreach (var enemy in
                 EntityManager.Heroes.Enemies.Where(
-                    e =>
-                    e != null && e.IsValidTarget(E.Range) && e.IsEnemy
-                    && Player.GetSpellDamage(e, SpellSlot.E) > e.TotalShieldHealth()))
+                    e => e != null && e.IsValidTarget(E.Range) && e.IsEnemy && Player.GetSpellDamage(e, SpellSlot.E) > e.TotalShieldHealth()))
             {
                 E.Cast(enemy);
             }

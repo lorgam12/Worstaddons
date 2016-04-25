@@ -25,14 +25,9 @@
 
         protected static bool loadedtrack = false;
 
-        private static void Main(string[] args)
-        {
-            Loading.OnLoadingComplete += OnLoad;
-        }
-
         public static Menu UtliMenu;
 
-        private static void OnLoad(EventArgs args)
+        public static void Execute()
         {
             UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
             UtliMenu.AddGroupLabel("Global Settings [Must F5 To Take Effect]");

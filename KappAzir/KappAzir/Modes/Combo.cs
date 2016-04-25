@@ -8,8 +8,14 @@
     using Mario_s_Lib;
 
     using SharpDX;
-    using static Menus;
-    using static SpellsManager;
+    using
+    
+
+    static
+Menus;
+    using
+    static
+SpellsManager;
     using KappAzir;
 
     /// <summary>

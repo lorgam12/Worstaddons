@@ -54,15 +54,10 @@
 
         #region Constructors and Destructors
 
-        private static void Main(string[] args)
-        {
-            Loading.OnLoadingComplete += OnLoad;
-        }
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="Malzahar" /> class.
         /// </summary>
-        private static void OnLoad(EventArgs args)
+        public static void Execute()
         {
             if (ObjectManager.Player.ChampionName != "Malzahar")
             {
@@ -190,8 +185,7 @@
             }
 
             if (Sender != null && R.IsReady() && Sender.IsEnemy && Sender.IsValidTarget(R.Range)
-                && !UltMenu["DontUlt" + Sender.BaseSkinName].Cast<CheckBox>().CurrentValue
-                && UltMenu.Get<CheckBox>("gapcloserR").CurrentValue)
+                && !UltMenu["DontUlt" + Sender.BaseSkinName].Cast<CheckBox>().CurrentValue && UltMenu.Get<CheckBox>("gapcloserR").CurrentValue)
             {
                 R.Cast(Sender);
                 return;
@@ -202,16 +196,13 @@
         {
             var castingR = Player.Instance.Spellbook.IsChanneling && !Player.Instance.IsRecalling();
             if (sender.IsMe && castingR
-                && (args.Order == GameObjectOrder.MoveTo || args.Order == GameObjectOrder.AttackUnit
-                    || args.Order == GameObjectOrder.AutoAttack))
+                && (args.Order == GameObjectOrder.MoveTo || args.Order == GameObjectOrder.AttackUnit || args.Order == GameObjectOrder.AutoAttack))
             {
                 args.Process = false;
             }
         }
 
-        private static void InterrupterOnOnPossibleToInterrupt(
-            Obj_AI_Base unit,
-            Interrupter.InterruptableSpellEventArgs args)
+        private static void InterrupterOnOnPossibleToInterrupt(Obj_AI_Base unit, Interrupter.InterruptableSpellEventArgs args)
         {
             var castingR = Player.Instance.Spellbook.IsChanneling && !Player.Instance.IsRecalling();
             if (castingR)
@@ -220,8 +211,8 @@
             }
 
             var predq = Q.GetPrediction(unit);
-            if (unit != null && Q.IsReady() && unit.IsEnemy && unit.IsValidTarget(Q.Range)
-                && MiscMenu.Get<CheckBox>("interruptQ").CurrentValue && menuIni["Misc"].Cast<CheckBox>().CurrentValue)
+            if (unit != null && Q.IsReady() && unit.IsEnemy && unit.IsValidTarget(Q.Range) && MiscMenu.Get<CheckBox>("interruptQ").CurrentValue
+                && menuIni["Misc"].Cast<CheckBox>().CurrentValue)
             {
                 Q.Cast(predq.CastPosition);
                 return;
@@ -234,8 +225,7 @@
                     return;
                 }
 
-                if (unit.IsEnemy && unit.IsValidTarget(R.Range)
-                    && !UltMenu["DontUlt" + unit.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                if (unit.IsEnemy && unit.IsValidTarget(R.Range) && !UltMenu["DontUlt" + unit.BaseSkinName].Cast<CheckBox>().CurrentValue)
                 {
                     R.Cast(unit);
                 }
@@ -246,9 +236,8 @@
         {
             var Target = TargetSelector.GetTarget(R.Range, DamageType.Physical);
 
-            if (Target != null && R.IsReady() && Target.IsUnderTurret() && !Target.IsUnderHisturret()
-                && !ObjectManager.Player.IsUnderEnemyturret() && R.IsReady()
-                && !UltMenu["DontUlt" + Target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+            if (Target != null && R.IsReady() && Target.IsUnderTurret() && !Target.IsUnderHisturret() && !ObjectManager.Player.IsUnderEnemyturret()
+                && R.IsReady() && !UltMenu["DontUlt" + Target.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 R.Cast(Target);
             }
@@ -263,13 +252,11 @@
 
             var target =
                 ObjectManager.Get<AIHeroClient>()
-                    .FirstOrDefault(
-                        enemy => enemy.IsValid && enemy.IsEnemy && enemy.IsVisible && !enemy.IsDead && enemy != null);
+                    .FirstOrDefault(enemy => enemy.IsValid && enemy.IsEnemy && enemy.IsVisible && !enemy.IsDead && enemy != null);
 
             if (KillStealMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
-                if (target.IsValidTarget(Q.Range)
-                    && ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q) > target.TotalShieldHealth())
+                if (target.IsValidTarget(Q.Range) && ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q) > target.TotalShieldHealth())
                 {
                     if (target != null)
                     {
@@ -280,8 +267,7 @@
 
             if (KillStealMenu["W"].Cast<CheckBox>().CurrentValue && W.IsReady())
             {
-                if (target.IsValidTarget(W.Range)
-                    && ObjectManager.Player.GetSpellDamage(target, SpellSlot.W) > target.TotalShieldHealth())
+                if (target.IsValidTarget(W.Range) && ObjectManager.Player.GetSpellDamage(target, SpellSlot.W) > target.TotalShieldHealth())
                 {
                     if (target != null)
                     {
@@ -292,8 +278,7 @@
 
             if (KillStealMenu["E"].Cast<CheckBox>().CurrentValue && E.IsReady())
             {
-                if (target.IsValidTarget(E.Range)
-                    && ObjectManager.Player.GetSpellDamage(target, SpellSlot.E) > target.TotalShieldHealth())
+                if (target.IsValidTarget(E.Range) && ObjectManager.Player.GetSpellDamage(target, SpellSlot.E) > target.TotalShieldHealth())
                 {
                     if (target != null)
                     {
@@ -307,17 +292,15 @@
         {
             var target =
                 ObjectManager.Get<AIHeroClient>()
-                    .FirstOrDefault(
-                        enemy => enemy != null && enemy.IsValid && !enemy.IsDead && enemy.IsEnemy && !enemy.IsMe);
+                    .FirstOrDefault(enemy => enemy != null && enemy.IsValid && !enemy.IsDead && enemy.IsEnemy && !enemy.IsMe);
 
             if (ObjectManager.Player.Spellbook.IsChanneling || target == null)
             {
                 return;
             }
 
-            var debuff = target.IsCharmed || target.IsRooted || target.IsTaunted || target.IsStunned
-                         || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Snare)
-                         || target.HasBuffOfType(BuffType.Suppression) || target.HasBuffOfType(BuffType.Sleep)
+            var debuff = target.IsCharmed || target.IsRooted || target.IsTaunted || target.IsStunned || target.HasBuffOfType(BuffType.Fear)
+                         || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Suppression) || target.HasBuffOfType(BuffType.Sleep)
                          || target.HasBuffOfType(BuffType.Polymorph) || target.HasBuffOfType(BuffType.Knockback)
                          || target.HasBuffOfType(BuffType.Knockup);
 
@@ -597,9 +580,8 @@
                 return;
             }
 
-            if (target != null
-                && ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > target.TotalShieldHealth() + 50
-                && R.IsReady() && !UltMenu["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
+            if (target != null && ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) > target.TotalShieldHealth() + 50 && R.IsReady()
+                && !UltMenu["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
                 R.Cast(target);
             }

@@ -43,12 +43,10 @@
                 }
 
                 foreach (var target in
-                    EntityManager.Heroes.Enemies
-                        .Where(
-                            hero =>
-                            hero != null && hero.IsHPBarRendered && !hero.HasBuffOfType(BuffType.Invulnerability) && hero.IsValid && hero.IsVisible
-                            && hero.IsEnemy && !hero.IsDead && !hero.IsZombie
-                            && !SummMenu["DontSmite" + hero.BaseSkinName].Cast<CheckBox>().CurrentValue)
+                    EntityManager.Heroes.Enemies.Where(
+                        hero =>
+                        hero != null && hero.IsHPBarRendered && !hero.HasBuffOfType(BuffType.Invulnerability) && hero.IsValid && hero.IsVisible
+                        && hero.IsEnemy && !hero.IsDead && !hero.IsZombie && !SummMenu["DontSmite" + hero.BaseSkinName].Cast<CheckBox>().CurrentValue)
                         .Where(target => target.IsValidTarget(Smite.Range)))
                 {
                     if (smitecombo)

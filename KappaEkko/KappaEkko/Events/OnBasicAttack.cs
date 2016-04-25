@@ -18,8 +18,7 @@
             var Health = ObjectManager.Player.HealthPercent;
             var caster = sender;
             var target = (AIHeroClient)args.Target;
-            if (caster.IsValid && target.IsMe && Rsave && Spells.R.IsReady()
-                && ObjectManager.Player.CountEnemiesInRange(1000) >= 1)
+            if (caster.IsValid && target.IsMe && Rsave && Spells.R.IsReady() && ObjectManager.Player.CountEnemiesInRange(1000) >= 1)
             {
                 if (Rsaveh >= Health)
                 {

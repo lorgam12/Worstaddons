@@ -57,12 +57,7 @@
 
         private static AIHeroClient comboTarget;
 
-        private static void Main(string[] args)
-        {
-            Loading.OnLoadingComplete += Game_OnGameLoad;
-        }
-
-        private static void Game_OnGameLoad(EventArgs args)
+        public static void Execute()
         {
             if (Player.BaseSkinName != "Brand")
             {
@@ -138,8 +133,7 @@
 
         private static void OnEnemyGapcloser(AIHeroClient Sender, Gapcloser.GapcloserEventArgs args)
         {
-            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || !MiscMenu.Get<CheckBox>("gapcloser").CurrentValue
-                || Sender == null)
+            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || !MiscMenu.Get<CheckBox>("gapcloser").CurrentValue || Sender == null)
             {
                 return;
             }
@@ -159,14 +153,12 @@
 
         private static void OnInterruptableTarget(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs arg)
         {
-            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || !MiscMenu.Get<CheckBox>("interrupt").CurrentValue
-                || sender == null)
+            if (!menuIni.Get<CheckBox>("Misc").CurrentValue || !MiscMenu.Get<CheckBox>("interrupt").CurrentValue || sender == null)
             {
                 return;
             }
             var pred = _Q.GetPrediction(sender);
-            if (sender.HasBuff("brandablaze") && _Q.IsReady() && pred.HitChance >= HitChance.High && !sender.IsAlly
-                && !sender.IsMe)
+            if (sender.HasBuff("brandablaze") && _Q.IsReady() && pred.HitChance >= HitChance.High && !sender.IsAlly && !sender.IsMe)
             {
                 _Q.Cast(pred.CastPosition);
             }
@@ -181,23 +173,19 @@
 
         private static void OnDraw(EventArgs args)
         {
-            if (menuIni.Get<CheckBox>("Drawings").CurrentValue && DrawMenu.Get<CheckBox>("drawQ").CurrentValue
-                && _Q.IsReady())
+            if (menuIni.Get<CheckBox>("Drawings").CurrentValue && DrawMenu.Get<CheckBox>("drawQ").CurrentValue && _Q.IsReady())
             {
                 Drawing.DrawCircle(Player.Position, _Q.Range, Color.OrangeRed);
             }
-            if (menuIni.Get<CheckBox>("Drawings").CurrentValue && DrawMenu.Get<CheckBox>("drawW").CurrentValue
-                && _W.IsReady())
+            if (menuIni.Get<CheckBox>("Drawings").CurrentValue && DrawMenu.Get<CheckBox>("drawW").CurrentValue && _W.IsReady())
             {
                 Drawing.DrawCircle(Player.Position, _W.Range, Color.OrangeRed);
             }
-            if (menuIni.Get<CheckBox>("Drawings").CurrentValue && DrawMenu.Get<CheckBox>("drawE").CurrentValue
-                && _E.IsReady())
+            if (menuIni.Get<CheckBox>("Drawings").CurrentValue && DrawMenu.Get<CheckBox>("drawE").CurrentValue && _E.IsReady())
             {
                 Drawing.DrawCircle(Player.Position, _E.Range, Color.OrangeRed);
             }
-            if (menuIni.Get<CheckBox>("Drawings").CurrentValue && DrawMenu.Get<CheckBox>("drawR").CurrentValue
-                && _R.IsReady())
+            if (menuIni.Get<CheckBox>("Drawings").CurrentValue && DrawMenu.Get<CheckBox>("drawR").CurrentValue && _R.IsReady())
             {
                 Drawing.DrawCircle(Player.Position, _R.Range, Color.OrangeRed);
             }
@@ -243,8 +231,7 @@
 
         private static void LaneClear()
         {
-            if (menuIni.Get<CheckBox>("Farm").CurrentValue
-                && Player.ManaPercent >= LaneMenu.Get<Slider>("mana").CurrentValue)
+            if (menuIni.Get<CheckBox>("Farm").CurrentValue && Player.ManaPercent >= LaneMenu.Get<Slider>("mana").CurrentValue)
             {
                 if (LaneMenu.Get<CheckBox>("useW").CurrentValue && _W.IsReady())
                 {
@@ -256,8 +243,7 @@
 
                     var location =
                         GetBestCircularFarmLocation(
-                            EntityManager.MinionsAndMonsters.EnemyMinions.Where(
-                                x => x.Distance(Player.Position) <= _W.Range)
+                            EntityManager.MinionsAndMonsters.EnemyMinions.Where(x => x.Distance(Player.Position) <= _W.Range)
                                 .Select(xm => xm.ServerPosition.To2D())
                                 .ToList(),
                             _W.Width,
@@ -270,11 +256,8 @@
                 if (LaneMenu.Get<CheckBox>("useE").CurrentValue && _E.IsReady())
                 {
                     var minions =
-                        EntityManager.MinionsAndMonsters.GetLaneMinions(
-                            EntityManager.UnitTeam.Enemy,
-                            Player.Position,
-                            _E.Range + 20,
-                            false).Where(m => m.HasBuff("brandablaze"));
+                        EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Position, _E.Range + 20, false)
+                            .Where(m => m.HasBuff("brandablaze"));
                     foreach (var minion in minions)
                     {
                         _E.Cast(minion);
@@ -282,11 +265,7 @@
                 }
                 if (LaneMenu.Get<CheckBox>("useQ").CurrentValue && _Q.IsReady())
                 {
-                    var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(
-                        EntityManager.UnitTeam.Enemy,
-                        Player.Position,
-                        _Q.Range + 20,
-                        false);
+                    var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, Player.Position, _Q.Range + 20, false);
                     foreach (var minion in minions)
                     {
                         _Q.Cast(minion.ServerPosition);
@@ -301,18 +280,17 @@
             {
                 return;
             }
-            if (menuIni.Get<CheckBox>("Harass").CurrentValue && HarassMenu.Get<CheckBox>("useE").CurrentValue
-                && _E.IsReady() && CheckMana())
+            if (menuIni.Get<CheckBox>("Harass").CurrentValue && HarassMenu.Get<CheckBox>("useE").CurrentValue && _E.IsReady() && CheckMana())
             {
                 CastE(target);
             }
-            if (menuIni.Get<CheckBox>("Harass").CurrentValue && HarassMenu.Get<CheckBox>("useQ").CurrentValue
-                && _Q.IsReady() && CheckMana() && CheckMana())
+            if (menuIni.Get<CheckBox>("Harass").CurrentValue && HarassMenu.Get<CheckBox>("useQ").CurrentValue && _Q.IsReady() && CheckMana()
+                && CheckMana())
             {
                 CastQ(target);
             }
-            if (menuIni.Get<CheckBox>("Harass").CurrentValue && HarassMenu.Get<CheckBox>("useW").CurrentValue
-                && _W.IsReady() && CheckMana() && CheckMana())
+            if (menuIni.Get<CheckBox>("Harass").CurrentValue && HarassMenu.Get<CheckBox>("useW").CurrentValue && _W.IsReady() && CheckMana()
+                && CheckMana())
             {
                 CastW(target);
             }
@@ -329,23 +307,19 @@
             {
                 return;
             }
-            if (menuIni.Get<CheckBox>("Combo").CurrentValue && ComboMenu.Get<CheckBox>("useE").CurrentValue
-                && _E.IsReady())
+            if (menuIni.Get<CheckBox>("Combo").CurrentValue && ComboMenu.Get<CheckBox>("useE").CurrentValue && _E.IsReady())
             {
                 CastE(target);
             }
-            if (menuIni.Get<CheckBox>("Combo").CurrentValue && ComboMenu.Get<CheckBox>("useQ").CurrentValue
-                && _Q.IsReady())
+            if (menuIni.Get<CheckBox>("Combo").CurrentValue && ComboMenu.Get<CheckBox>("useQ").CurrentValue && _Q.IsReady())
             {
                 CastQ(target);
             }
-            if (menuIni.Get<CheckBox>("Combo").CurrentValue && ComboMenu.Get<CheckBox>("useW").CurrentValue
-                && _W.IsReady())
+            if (menuIni.Get<CheckBox>("Combo").CurrentValue && ComboMenu.Get<CheckBox>("useW").CurrentValue && _W.IsReady())
             {
                 CastW(target);
             }
-            if (menuIni.Get<CheckBox>("Combo").CurrentValue && ComboMenu.Get<CheckBox>("useR").CurrentValue
-                && _R.IsReady())
+            if (menuIni.Get<CheckBox>("Combo").CurrentValue && ComboMenu.Get<CheckBox>("useR").CurrentValue && _R.IsReady())
             {
                 CastR(target);
             }
@@ -359,27 +333,23 @@
                 {
                     return;
                 }
-                if (KillStealMenu.Get<CheckBox>("ksQ").CurrentValue
-                    && Player.GetSpellDamage(enemy, SpellSlot.Q) > enemy.Health && _Q.IsReady()
+                if (KillStealMenu.Get<CheckBox>("ksQ").CurrentValue && Player.GetSpellDamage(enemy, SpellSlot.Q) > enemy.Health && _Q.IsReady()
                     && enemy.IsValidTarget(_Q.Range))
                 {
                     _Q.Cast(enemy);
                 }
-                else if (KillStealMenu.Get<CheckBox>("ksW").CurrentValue
-                         && Player.GetSpellDamage(enemy, SpellSlot.W) > enemy.Health && _W.IsReady()
+                else if (KillStealMenu.Get<CheckBox>("ksW").CurrentValue && Player.GetSpellDamage(enemy, SpellSlot.W) > enemy.Health && _W.IsReady()
                          && enemy.IsValidTarget(_W.Range))
                 {
                     _W.Cast(enemy);
                 }
-                else if (KillStealMenu.Get<CheckBox>("ksE").CurrentValue
-                         && Player.GetSpellDamage(enemy, SpellSlot.E) > enemy.Health && _E.IsReady()
-                         && enemy.IsValidTarget(_E.Range))
+                else if (KillStealMenu.Get<CheckBox>("ksE").CurrentValue && Player.GetSpellDamage(enemy, SpellSlot.E) > enemy.Health
+                         && _E.IsReady() && enemy.IsValidTarget(_E.Range))
                 {
                     _E.Cast(enemy);
                 }
-                else if (KillStealMenu.Get<CheckBox>("ksR").CurrentValue
-                         && Player.GetSpellDamage(enemy, SpellSlot.R) > enemy.Health && _R.IsReady()
-                         && enemy.IsValidTarget(_R.Range))
+                else if (KillStealMenu.Get<CheckBox>("ksR").CurrentValue && Player.GetSpellDamage(enemy, SpellSlot.R) > enemy.Health
+                         && _R.IsReady() && enemy.IsValidTarget(_R.Range))
                 {
                     _R.Cast(enemy);
                 }
@@ -393,8 +363,8 @@
                 return;
             }
             var predq = _Q.GetPrediction(target);
-            if (target.HasBuff("brandablaze") && menuIni.Get<CheckBox>("Combo").CurrentValue
-                && ComboMenu.Get<CheckBox>("blaze").CurrentValue && predq.HitChance >= HitChance.High)
+            if (target.HasBuff("brandablaze") && menuIni.Get<CheckBox>("Combo").CurrentValue && ComboMenu.Get<CheckBox>("blaze").CurrentValue
+                && predq.HitChance >= HitChance.High)
             {
                 if (_Q.IsReady() && target.IsValidTarget(_Q.Range))
                 {
@@ -431,12 +401,9 @@
             if (enemies.Count() > 1)
             {
                 var aoePrediction =
-                    Prediction.Position.PredictCircularMissileAoe(
-                        enemies.Cast<Obj_AI_Base>().ToArray(),
-                        _W.Range,
-                        _W.Radius,
-                        _W.CastDelay,
-                        _W.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
+                    Prediction.Position.PredictCircularMissileAoe(enemies.Cast<Obj_AI_Base>().ToArray(), _W.Range, _W.Radius, _W.CastDelay, _W.Speed)
+                        .OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length)
+                        .FirstOrDefault();
 
                 if (aoePrediction != null)
                 {
@@ -486,18 +453,10 @@
                     _R.Cast(target);
                 }
 
-                if ((_Q.IsReady()
-                     && (Player.GetSpellDamage(target, SpellSlot.Q) + Player.GetSpellDamage(target, SpellSlot.R)
-                         >= target.Health))
-                    || (_W.IsReady()
-                        && (Player.GetSpellDamage(target, SpellSlot.W) + Player.GetSpellDamage(target, SpellSlot.R)
-                            >= target.Health))
-                    || (_E.IsReady()
-                        && (Player.GetSpellDamage(target, SpellSlot.E) + Player.GetSpellDamage(target, SpellSlot.R)
-                            >= target.Health))
-                    || (_Q.IsReady()
-                        && (Player.GetSpellDamage(target, SpellSlot.Q) + Player.GetSpellDamage(target, SpellSlot.R)
-                            >= target.Health)))
+                if ((_Q.IsReady() && (Player.GetSpellDamage(target, SpellSlot.Q) + Player.GetSpellDamage(target, SpellSlot.R) >= target.Health))
+                    || (_W.IsReady() && (Player.GetSpellDamage(target, SpellSlot.W) + Player.GetSpellDamage(target, SpellSlot.R) >= target.Health))
+                    || (_E.IsReady() && (Player.GetSpellDamage(target, SpellSlot.E) + Player.GetSpellDamage(target, SpellSlot.R) >= target.Health))
+                    || (_Q.IsReady() && (Player.GetSpellDamage(target, SpellSlot.Q) + Player.GetSpellDamage(target, SpellSlot.R) >= target.Health)))
                 {
                     _R.Cast(target);
                 }
@@ -569,12 +528,7 @@
 
         // Find the points nearest the upper left, upper right,
         // lower left, and lower right corners.
-        private static void GetMinMaxCorners(
-            List<Vector2> points,
-            ref Vector2 ul,
-            ref Vector2 ur,
-            ref Vector2 ll,
-            ref Vector2 lr)
+        private static void GetMinMaxCorners(List<Vector2> points, ref Vector2 ul, ref Vector2 ur, ref Vector2 ll, ref Vector2 lr)
         {
             // Start with the first point as the solution.
             ul = points[0];
@@ -654,10 +608,8 @@
 
             // Cull the points.
             var results =
-                points.Where(
-                    pt =>
-                    pt.X <= cullingBox.Left || pt.X >= cullingBox.Right || pt.Y <= cullingBox.Top
-                    || pt.Y >= cullingBox.Bottom).ToList();
+                points.Where(pt => pt.X <= cullingBox.Left || pt.X >= cullingBox.Right || pt.Y <= cullingBox.Top || pt.Y >= cullingBox.Bottom)
+                    .ToList();
 
             GNonCulledPoints = new Vector2[results.Count]; // For debugging.
             results.CopyTo(GNonCulledPoints); // For debugging.
@@ -674,8 +626,7 @@
             // Find the remaining point with the smallest Y value.
             // if (there's a tie, take the one with the smaller X value.
             Vector2[] bestPt = { points[0] };
-            foreach (
-                var pt in points.Where(pt => (pt.Y < bestPt[0].Y) || ((pt.Y == bestPt[0].Y) && (pt.X < bestPt[0].X))))
+            foreach (var pt in points.Where(pt => (pt.Y < bestPt[0].Y) || ((pt.Y == bestPt[0].Y) && (pt.X < bestPt[0].X))))
             {
                 bestPt[0] = pt;
             }
@@ -844,13 +795,7 @@
         }
 
         // Return true if the indicated circle encloses all of the points.
-        private static bool CircleEnclosesPoints(
-            Vector2 center,
-            float radius2,
-            List<Vector2> points,
-            int skip1,
-            int skip2,
-            int skip3)
+        private static bool CircleEnclosesPoints(Vector2 center, float radius2, List<Vector2> points, int skip1, int skip2, int skip3)
         {
             return (from point in points.Where((t, i) => (i != skip1) && (i != skip2) && (i != skip3))
                     let dx = center.X - point.X
@@ -906,11 +851,7 @@
             return new MecCircle(center, radius);
         }
 
-        public static FarmLocation GetBestCircularFarmLocation(
-            List<Vector2> minionPositions,
-            float width,
-            float range,
-            int useMecMax = 9)
+        public static FarmLocation GetBestCircularFarmLocation(List<Vector2> minionPositions, float width, float range, int useMecMax = 9)
         {
             var result = new Vector2();
             var minionCount = 0;

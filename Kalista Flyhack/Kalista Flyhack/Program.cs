@@ -4,7 +4,6 @@
 
     using EloBuddy;
     using EloBuddy.SDK;
-    using EloBuddy.SDK.Events;
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
 
@@ -14,12 +13,7 @@
 
         public static int LastAATick;
 
-        private static void Main(string[] args)
-        {
-            Loading.OnLoadingComplete += Loading_OnLoadingComplete;
-        }
-
-        private static void Loading_OnLoadingComplete(EventArgs args)
+        public static void Execute()
         {
             if (Player.Instance.ChampionName != "Kalista")
             {
@@ -44,13 +38,10 @@
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
-                    var target = TargetSelector.GetTarget(
-                        ObjectManager.Player.GetAutoAttackRange(),
-                        DamageType.Physical);
+                    var target = TargetSelector.GetTarget(ObjectManager.Player.GetAutoAttackRange(), DamageType.Physical);
                     if (target.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
                     {
-                        if (Game.Time * (1000 - flymenu["Flyspeed"].Cast<Slider>().CurrentValue) - Game.Ping
-                            >= LastAATick + 1)
+                        if (Game.Time * (1000 - flymenu["Flyspeed"].Cast<Slider>().CurrentValue) - Game.Ping >= LastAATick + 1)
                         {
                             Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                         }

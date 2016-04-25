@@ -58,12 +58,7 @@
 
         public static readonly AIHeroClient player = ObjectManager.Player;
 
-        private static void Main(string[] args)
-        {
-            Loading.OnLoadingComplete += OnLoad;
-        }
-
-        private static void OnLoad(EventArgs args)
+        public static void Execute()
         {
             if (player.ChampionName != ChampName)
             {
@@ -151,12 +146,9 @@
             Gapcloser.OnGapcloser += AntiGapcloser_OnEnemyGapcloser;
         }
 
-        private static void Interrupter2_OnInterruptableTarget(
-            Obj_AI_Base sender,
-            Interrupter.InterruptableSpellEventArgs args)
+        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs args)
         {
-            if (sender != null && R.IsReady() && sender.IsEnemy && sender.IsValidTarget(R.Range)
-                && UltMenu.Get<CheckBox>("interrupt").CurrentValue)
+            if (sender != null && R.IsReady() && sender.IsEnemy && sender.IsValidTarget(R.Range) && UltMenu.Get<CheckBox>("interrupt").CurrentValue)
             {
                 R.Cast();
             }
@@ -169,8 +161,7 @@
                 return;
             }
 
-            if (menuIni["Misc"].Cast<CheckBox>().CurrentValue
-                && player.ManaPercent > MiscMenu.Get<Slider>("gapclosermana").CurrentValue)
+            if (menuIni["Misc"].Cast<CheckBox>().CurrentValue && player.ManaPercent > MiscMenu.Get<Slider>("gapclosermana").CurrentValue)
             {
                 if (Sender != null && W.IsReady() && Sender.IsEnemy && Sender.IsValidTarget(Q.Range)
                     && MiscMenu.Get<CheckBox>("gapcloser").CurrentValue)
@@ -185,8 +176,7 @@
             if (menuIni["Drawings"].Cast<CheckBox>().CurrentValue && DrawMenu["DrawD"].Cast<CheckBox>().CurrentValue)
             {
                 foreach (var enemy in
-                    ObjectManager.Get<AIHeroClient>()
-                        .Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsVisible && ene.IsValid))
+                    ObjectManager.Get<AIHeroClient>().Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsVisible && ene.IsValid))
                 {
                     Hpi.unit = enemy;
                     Hpi.drawDmg(CalcDamage(enemy), System.Drawing.Color.Goldenrod);
@@ -298,10 +288,7 @@
         {
             foreach (AIHeroClient target in
                 ObjectManager.Get<AIHeroClient>()
-                    .Where(
-                        hero =>
-                        hero.IsValidTarget(Q.Range) && !hero.HasBuffOfType(BuffType.Invulnerability) && hero.IsEnemy
-                        && hero != null))
+                    .Where(hero => hero.IsValidTarget(Q.Range) && !hero.HasBuffOfType(BuffType.Invulnerability) && hero.IsEnemy && hero != null))
             {
                 if (target == null || IsCastingR())
                 {
@@ -309,16 +296,14 @@
                 }
 
                 var qDmg = player.GetSpellDamage(target, SpellSlot.Q);
-                if (KillStealMenu["ksQ"].Cast<CheckBox>().CurrentValue && Q.IsReady() && target.IsValidTarget(Q.Range)
-                    && target.Health <= qDmg)
+                if (KillStealMenu["ksQ"].Cast<CheckBox>().CurrentValue && Q.IsReady() && target.IsValidTarget(Q.Range) && target.Health <= qDmg)
                 {
                     Q.Cast();
                     Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                 }
 
                 var eDmg = player.GetSpellDamage(target, SpellSlot.E);
-                if (KillStealMenu["ksE"].Cast<CheckBox>().CurrentValue && E.IsReady() && target.IsValidTarget(E.Range)
-                    && target.Health <= eDmg)
+                if (KillStealMenu["ksE"].Cast<CheckBox>().CurrentValue && E.IsReady() && target.IsValidTarget(E.Range) && target.Health <= eDmg)
                 {
                     E.Cast(target);
                 }
@@ -338,23 +323,20 @@
             }
 
             if (Botrk.IsReady() && Botrk.IsOwned(player) && Botrk.IsInRange(target)
-                && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue
-                && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
+                && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
             {
                 Botrk.Cast(target);
             }
 
             if (Botrk.IsReady() && Botrk.IsOwned(player) && Botrk.IsInRange(target)
-                && target.HealthPercent <= ItemsMenu["oL"].Cast<Slider>().CurrentValue
-                && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
+                && target.HealthPercent <= ItemsMenu["oL"].Cast<Slider>().CurrentValue && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
 
             {
                 Botrk.Cast(target);
             }
 
             if (Cutlass.IsReady() && Cutlass.IsOwned(player) && Cutlass.IsInRange(target)
-                && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue
-                && ItemsMenu["UseBilge"].Cast<CheckBox>().CurrentValue)
+                && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue && ItemsMenu["UseBilge"].Cast<CheckBox>().CurrentValue)
             {
                 Cutlass.Cast(target);
             }
@@ -442,14 +424,12 @@
                 return;
             }
 
-            if (E.IsReady() && HarassMenu.Get<CheckBox>("hE").CurrentValue && target.IsValidTarget(E.Range)
-                && player.ManaPercent >= harassmana)
+            if (E.IsReady() && HarassMenu.Get<CheckBox>("hE").CurrentValue && target.IsValidTarget(E.Range) && player.ManaPercent >= harassmana)
             {
                 E.Cast(target);
             }
 
-            if (Q.IsReady() && HarassMenu.Get<CheckBox>("hQ").CurrentValue && target.IsValidTarget(Q.Range)
-                && player.ManaPercent >= harassmana)
+            if (Q.IsReady() && HarassMenu.Get<CheckBox>("hQ").CurrentValue && target.IsValidTarget(Q.Range) && player.ManaPercent >= harassmana)
             {
                 Q.Cast();
             }
@@ -465,10 +445,7 @@
             var Qlane = LaneMenu["laneQ"].Cast<CheckBox>().CurrentValue && Q.IsReady();
             var Elane = LaneMenu["laneE"].Cast<CheckBox>().CurrentValue && E.IsReady();
 
-            var minions =
-                ObjectManager.Get<Obj_AI_Minion>()
-                    .OrderBy(m => m.Health)
-                    .Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+            var minions = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
 
             if (lanemana <= Player.Instance.ManaPercent)
             {

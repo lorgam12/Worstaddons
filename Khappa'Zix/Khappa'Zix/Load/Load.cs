@@ -27,12 +27,7 @@
 
         internal static bool EvolvedQ, EvolvedW, EvolvedE, EvolvedR;
 
-        private static void Main(string[] args)
-        {
-            Loading.OnLoadingComplete += Loading_OnLoadingComplete;
-        }
-
-        private static void Loading_OnLoadingComplete(EventArgs args)
+        public static void Execute()
         {
             if (player.ChampionName != "Khazix")
             {
@@ -70,19 +65,14 @@
                      .Any(
                          x =>
                          x.NetworkId != target.NetworkId && x.Team == target.Team && x.Distance(target) <= 500
-                         && (x.Type == GameObjectType.AIHeroClient || x.Type == GameObjectType.obj_AI_Minion
-                             || x.Type == GameObjectType.obj_AI_Turret));
+                         && (x.Type == GameObjectType.AIHeroClient || x.Type == GameObjectType.obj_AI_Minion || x.Type == GameObjectType.obj_AI_Turret));
         }
 
         internal static double GetQDamage(Obj_AI_Base target)
         {
             if (Q.Range < 326)
             {
-                return 0.984
-                       * player.GetSpellDamage(
-                           target,
-                           SpellSlot.Q,
-                           (DamageLibrary.SpellStages)(IsIsolated(target) ? 1 : 0));
+                return 0.984 * player.GetSpellDamage(target, SpellSlot.Q, (DamageLibrary.SpellStages)(IsIsolated(target) ? 1 : 0));
             }
 
             if (Q.Range > 325)
@@ -130,26 +120,22 @@
                 Combo.Start();
             }
 
-            if (flags.HasFlag(Orbwalker.ActiveModes.Harass)
-                && menu.Mana["harass"].Cast<Slider>().CurrentValue < player.ManaPercent)
+            if (flags.HasFlag(Orbwalker.ActiveModes.Harass) && menu.Mana["harass"].Cast<Slider>().CurrentValue < player.ManaPercent)
             {
                 Harass.Start();
             }
 
-            if (flags.HasFlag(Orbwalker.ActiveModes.LaneClear)
-                && menu.Mana["lane"].Cast<Slider>().CurrentValue < player.ManaPercent)
+            if (flags.HasFlag(Orbwalker.ActiveModes.LaneClear) && menu.Mana["lane"].Cast<Slider>().CurrentValue < player.ManaPercent)
             {
                 Clear.LaneClear();
             }
 
-            if (flags.HasFlag(Orbwalker.ActiveModes.LastHit)
-                && menu.Mana["last"].Cast<Slider>().CurrentValue < player.ManaPercent)
+            if (flags.HasFlag(Orbwalker.ActiveModes.LastHit) && menu.Mana["last"].Cast<Slider>().CurrentValue < player.ManaPercent)
             {
                 Clear.LastHit();
             }
 
-            if (flags.HasFlag(Orbwalker.ActiveModes.JungleClear)
-                && menu.Mana["jungle"].Cast<Slider>().CurrentValue < player.ManaPercent)
+            if (flags.HasFlag(Orbwalker.ActiveModes.JungleClear) && menu.Mana["jungle"].Cast<Slider>().CurrentValue < player.ManaPercent)
             {
                 Clear.JungleClear();
             }

@@ -10,7 +10,11 @@
     using EloBuddy.SDK.Events;
 
     using Mario_s_Lib;
-    using static Menus;
+    using
+    
+
+    static
+Menus;
 
     internal class ModeManager
     {
@@ -151,7 +155,9 @@
 
             if (Azir.IsInRange(e.End, SpellsManager.R.Range) && e.End.IsInRange(Azir.ServerPosition, SpellsManager.R.Range))
             {
-                Core.DelayAction(() => SpellsManager.R.Cast(Azir.ServerPosition.Extend(sender.ServerPosition, SpellsManager.R.Range).To3D()), (int)(sender.Spellbook.CastEndTime - Game.Time));
+                Core.DelayAction(
+                    () => SpellsManager.R.Cast(Azir.ServerPosition.Extend(sender.ServerPosition, SpellsManager.R.Range).To3D()),
+                    (int)(sender.Spellbook.CastEndTime - Game.Time));
             }
         }
 

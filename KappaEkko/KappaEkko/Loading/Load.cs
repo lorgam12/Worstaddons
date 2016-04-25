@@ -11,7 +11,7 @@
     {
         public static AIHeroClient Player = ObjectManager.Player;
 
-        private static void Loading_OnLoadingComplete(EventArgs args)
+        public static void Execute()
         {
             Player = ObjectManager.Player;
 
@@ -30,11 +30,6 @@
             GameObject.OnDelete += OnDelete.Delete;
             Obj_AI_Base.OnBasicAttack += OnBasicAttack.OnAttack;
             AttackableUnit.OnDamage += OnDamage.Damage;
-        }
-
-        private static void Main(string[] args)
-        {
-            Loading.OnLoadingComplete += Loading_OnLoadingComplete;
         }
     }
 }

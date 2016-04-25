@@ -58,8 +58,7 @@
                 var Etarget =
                     ObjectManager.Get<AIHeroClient>()
                         .Where(enemy => !enemy.IsDead && enemy.IsValidTarget(Player.Instance.GetAutoAttackRange()))
-                        .FirstOrDefault(
-                            enemy => enemy.Buffs.Any(buff => buff.Name == "KindredERefresher" && buff.Count > 0));
+                        .FirstOrDefault(enemy => enemy.Buffs.Any(buff => buff.Name == "KindredERefresher" && buff.Count > 0));
                 if (Etarget != null)
                 {
                     TargetSelector.GetPriority(Etarget);

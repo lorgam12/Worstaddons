@@ -16,9 +16,7 @@
         {
             var target =
                 EntityManager.Heroes.Enemies.FirstOrDefault(
-                    x =>
-                    x.IsValidTarget(W.Range) && !x.IsZombie && !x.IsInvulnerable
-                    && !x.HasBuffOfType(BuffType.PhysicalImmunity));
+                    x => x.IsValidTarget(W.Range) && !x.IsZombie && !x.IsInvulnerable && !x.HasBuffOfType(BuffType.PhysicalImmunity));
 
             if (target == null)
             {
@@ -54,8 +52,7 @@
             }
 
             if (GetQDamage(target) + player.GetSpellDamage(target, SpellSlot.E) - 25 >= target.TotalShieldHealth()
-                && menu.KillSteal["Q"].Cast<CheckBox>().CurrentValue
-                && menu.KillSteal["E"].Cast<CheckBox>().CurrentValue)
+                && menu.KillSteal["Q"].Cast<CheckBox>().CurrentValue && menu.KillSteal["E"].Cast<CheckBox>().CurrentValue)
             {
                 if (Q.IsReady() && E.IsReady())
                 {

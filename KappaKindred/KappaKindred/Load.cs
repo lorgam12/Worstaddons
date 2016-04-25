@@ -10,12 +10,7 @@
 
     internal class Load
     {
-        private static void Main(string[] args)
-        {
-            Loading.OnLoadingComplete += Loading_OnLoadingComplete;
-        }
-
-        private static void Loading_OnLoadingComplete(EventArgs args)
+        public static void Execute()
         {
             if (Player.Instance.ChampionName != "Kindred")
             {
