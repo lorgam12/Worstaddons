@@ -10,11 +10,7 @@
     using EloBuddy.SDK.Events;
 
     using Mario_s_Lib;
-    using
-    
-
-    static
-Menus;
+    using static Menus;
 
     internal class ModeManager
     {
@@ -202,7 +198,7 @@ Menus;
                 if (Orbwalker.AzirSoldiers.Count >= 1 && AutoHarassMenu.GetCheckBoxValue("attack"))
                 {
                     var target = TargetSelector.GetTarget(1250, DamageType.Magical);
-                    if (target != null)
+                    if (target == null)
                     {
                         return;
                     }
