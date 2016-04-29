@@ -9,14 +9,8 @@
     using Mario_s_Lib;
 
     using SharpDX;
-    using
-    
-
-    static
-Menus;
-    using
-    static
-SpellsManager;
+    using static Menus;
+    using static SpellsManager;
 
     /// <summary>
     /// This mode will run when the key of the orbwalker is pressed
@@ -77,7 +71,7 @@ SpellsManager;
                 }
                 if (target.GetDamage(SpellSlot.Q) >= target.TotalShieldHealth())
                 {
-                    Q.Cast(Azir.Position.To2D().Extend(target.Position.To2D(), Q.Range).To3D());
+                    Q.Cast(target.ServerPosition);
                 }
             }
 

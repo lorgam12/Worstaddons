@@ -6,14 +6,8 @@
     using EloBuddy.SDK;
 
     using Mario_s_Lib;
-    using
-    
-
-    static
-Menus;
-    using
-    static
-SpellsManager;
+    using static Menus;
+    using static SpellsManager;
 
     /// <summary>
     /// This mode will run when the key of the orbwalker is pressed

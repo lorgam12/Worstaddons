@@ -1,6 +1,5 @@
 ﻿namespace KappAzir.Modes
 {
-    using System;
     using System.Linq;
 
     using EloBuddy;
@@ -9,20 +8,16 @@
     using Mario_s_Lib;
 
     using SharpDX;
-    using
-    
-
-    static
-Menus;
-    using
-    static
-SpellsManager;
+    using static Menus;
+    using static SpellsManager;
 
     internal class Jumper : ModeManager
     {
         public static int delay = delay = FleeMenu.GetSliderValue("delay");
 
         public static int range = delay = FleeMenu.GetSliderValue("range");
+
+        private static float et = 0;
 
         public static Vector3 castpos;
 
@@ -31,7 +26,7 @@ SpellsManager;
             castpos = qpos;
             if (Orbwalker.AzirSoldiers.Count(s => s.Distance(Azir) < range) < 1)
             {
-                if (E.IsReady() && Q2.IsReady())
+                if (E.IsReady() && Q.IsReady())
                 {
                     if (W.Cast(Azir.ServerPosition.Extend(pos, W.Range).To3D()))
                     {
@@ -40,7 +35,11 @@ SpellsManager;
                                 {
                                     if (E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()))
                                     {
-                                        Core.DelayAction(() => Q2.Cast(Azir.ServerPosition.Extend(qpos, Q2.Range).To3D()), delay);
+                                        et = Game.Time;
+                                        if (Game.Time - et < 1 && Game.Time - et > 0.2f)
+                                        {
+                                            Core.DelayAction(() => Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D()), delay);
+                                        }
                                     }
                                 },
                             150);
@@ -49,14 +48,17 @@ SpellsManager;
             }
             else
             {
-                if (E.IsReady() && Q2.IsReady())
+                if (E.IsReady() && Q.IsReady())
                 {
                     Core.DelayAction(
                         () =>
                             {
                                 if (E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()))
                                 {
-                                    Core.DelayAction(() => Q2.Cast(Azir.ServerPosition.Extend(qpos, Q2.Range).To3D()), delay);
+                                    if (Game.Time - et < 1 && Game.Time - et > 0.2f)
+                                    {
+                                        Core.DelayAction(() => Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D()), delay);
+                                    }
                                 }
                             },
                         150);
@@ -64,7 +66,7 @@ SpellsManager;
                     Core.DelayAction(
                         () =>
                             {
-                                if (Q2.Cast(Azir.ServerPosition.Extend(qpos, Q2.Range).To3D()))
+                                if (Q.Cast(Azir.ServerPosition.Extend(qpos, Q.Range).To3D()))
                                 {
                                     Core.DelayAction(() => E.Cast(Azir.ServerPosition.Extend(pos, E.Range).To3D()), delay);
                                 }
@@ -83,13 +85,13 @@ SpellsManager;
         {
             if (sender.IsMe && (FleeMenu.GetKeyBindValue("flee") || FleeMenu.GetKeyBindValue("insect") || FleeMenu.GetKeyBindValue("insected")))
             {
-                if (args.SData.Name == "AzirE" && Q2.IsReady())
+                if (args.SData.Name == "AzirE" && Q.IsReady())
                 {
-                    Q2.Cast(Azir.ServerPosition.Extend(castpos, Q2.Range).To3D());
+                    Core.DelayAction(() => Q.Cast(Azir.ServerPosition.Extend(castpos, Q.Range).To3D()), delay);
                 }
                 if (args.SData.Name == "AzirQ" && E.IsReady())
                 {
-                    E.Cast(Azir.ServerPosition.Extend(castpos, E.Range).To3D());
+                    Core.DelayAction(() => E.Cast(Azir.ServerPosition.Extend(castpos, E.Range).To3D()), delay);
                 }
             }
         }

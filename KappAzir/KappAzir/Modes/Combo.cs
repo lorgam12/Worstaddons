@@ -8,14 +8,8 @@
     using Mario_s_Lib;
 
     using SharpDX;
-    using
-    
-
-    static
-Menus;
-    using
-    static
-SpellsManager;
+    using static Menus;
+    using static SpellsManager;
     using KappAzir;
 
     /// <summary>
@@ -23,8 +17,6 @@ SpellsManager;
     /// </summary>
     internal class Combo : ModeManager
     {
-        public static Vector2 pos = Vector2.Zero;
-
         /// <summary>
         /// Put in here what you want to do when the mode is running
         /// </summary>
@@ -84,14 +76,9 @@ SpellsManager;
                 {
                     Q.Cast(target.Position);
                 }
-
-                if (target.GetDamage(SpellSlot.Q) + target.GetDamage(SpellSlot.W) >= target.TotalShieldHealth())
-                {
-                    Q.Cast(Azir.Position.To2D().Extend(target.Position.To2D(), Q.Range).To3D());
-                }
-
+                
                 var pred = Q.GetPrediction(target);
-                if (pred.HitChance >= hitchance)
+                if (pred.HitChance >= hitchance || target.GetDamage(SpellSlot.Q) + target.GetDamage(SpellSlot.W) >= target.TotalShieldHealth())
                 {
                     Q.Cast(pred.CastPosition);
                 }
@@ -128,7 +115,6 @@ SpellsManager;
             {
                 if (target.Damage() - target.GetDamage(SpellSlot.R) >= target.TotalShieldHealth() && ComboMenu.GetCheckBoxValue("rOverKill"))
                 {
-                    pos = Vector2.Zero;
                     return;
                 }
 

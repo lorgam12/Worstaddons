@@ -6,14 +6,8 @@
     using EloBuddy.SDK;
 
     using Mario_s_Lib;
-    using
-    
-
-    static
-Menus;
-    using
-    static
-SpellsManager;
+    using static Menus;
+    using static SpellsManager;
 
     /// <summary>
     /// This mode will run when the key of the orbwalker is pressed
@@ -26,6 +20,7 @@ SpellsManager;
         public static void Execute()
         {
             var minion = EntityManager.MinionsAndMonsters.GetLaneMinions().FirstOrDefault(m => m.IsValidTarget(W.Range) && m != null);
+            var maxminion = EntityManager.MinionsAndMonsters.GetLaneMinions().OrderByDescending(m => m.MaxHealth).FirstOrDefault(m => m != null && m.IsValidTarget(W.Range));
             var minions = EntityManager.MinionsAndMonsters.EnemyMinions;
             var turret = EntityManager.Turrets.Enemies.FirstOrDefault(t => t.IsValidTarget(W.Range));
 
@@ -45,7 +40,7 @@ SpellsManager;
                 var location =
                     Prediction.Position.PredictCircularMissileAoe(minions.Cast<Obj_AI_Base>().ToArray(), Q.Range, Q.Width, Q.CastDelay, Q.Speed)
                         .OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length)
-                        .FirstOrDefault();
+                        .FirstOrDefault(r => r.GetCollisionObjects<Obj_AI_Minion>().Contains(maxminion));
 
                 if (location != null && location.CollisionObjects.Length >= 2)
                 {
@@ -66,7 +61,7 @@ SpellsManager;
                         W.Range,
                         (int)Orbwalker.AzirSoldierAutoAttackRange,
                         W.CastDelay,
-                        W.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
+                        W.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault(r => r.GetCollisionObjects<Obj_AI_Minion>().Contains(maxminion));
 
                 if (location != null && location.CollisionObjects.Length >= 2)
                 {
