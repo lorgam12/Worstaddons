@@ -46,6 +46,10 @@
 
         private static void Orbwalker_OnPostAttack(AttackableUnit target, EventArgs args)
         {
+            if (!loaded)
+            {
+                return;
+            }
             if (!target.IsEnemy || !(target is AIHeroClient))
             {
                 return;
@@ -57,19 +61,27 @@
             var flags = Orbwalker.ActiveModesFlags;
             if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && useHydra)
             {
-                if (Hydra.Cast())
+                if (Hydra.IsOwned() && Hydra.IsReady() && Hydra != null)
                 {
-                    Orbwalker.ResetAutoAttack();
+                    if (Hydra.Cast())
+                    {
+                        Orbwalker.ResetAutoAttack();
+                    }
                 }
 
-                if (Timat.Cast())
+                if (Timat.IsOwned() && Timat.IsReady() && Timat != null)
                 {
-                    Orbwalker.ResetAutoAttack();
+                    if (Timat.Cast())
+                    {
+                        Orbwalker.ResetAutoAttack();
+                    }
                 }
-
-                if (Titanic.Cast())
+                if (Titanic.IsOwned() && Titanic.IsReady() && Titanic != null)
                 {
-                    Orbwalker.ResetAutoAttack();
+                    if (Titanic.Cast())
+                    {
+                        Orbwalker.ResetAutoAttack();
+                    }
                 }
             }
         }

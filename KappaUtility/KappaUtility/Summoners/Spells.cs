@@ -30,6 +30,12 @@
 
         public static Spell.Skillshot porotoss;
 
+        public static readonly string[] Junglemobs =
+            {
+                "SRU_Dragon_Air", "SRU_Dragon_Earth", "SRU_Dragon_Fire", "SRU_Dragon_Water", "SRU_Dragon_Elder", "SRU_Baron", "SRU_Gromp", "SRU_Krug", "SRU_Razorbeak", "Sru_Crab", "SRU_Murkwolf",
+                "SRU_Blue", "SRU_Red", "AscXerath"
+            };
+
         public static Menu SummMenu { get; private set; }
 
         protected static bool loaded = false;
@@ -155,15 +161,10 @@
                 }
 
                 SummMenu.AddGroupLabel("Use Smite On Monster:");
-                SummMenu.Add("blue", new CheckBox(" Blue "));
-                SummMenu.Add("red", new CheckBox(" Red "));
-                SummMenu.Add("baron", new CheckBox(" Baron "));
-                SummMenu.Add("drake", new CheckBox(" Dragon "));
-                SummMenu.Add("gromp", new CheckBox(" Gromp "));
-                SummMenu.Add("krug", new CheckBox(" Krug "));
-                SummMenu.Add("razorbeak", new CheckBox(" Razorbeak "));
-                SummMenu.Add("crab", new CheckBox(" Crab "));
-                SummMenu.Add("murkwolf", new CheckBox(" Murkwolf "));
+                foreach (var mob in Junglemobs)
+                {
+                    SummMenu.Add(mob, new CheckBox(mob));
+                }
                 SummMenu.AddSeparator();
                 if (Player.Instance.Spellbook.GetSpell(SpellSlot.Summoner1).Name.ToLower().Contains("summonersmite"))
                 {
