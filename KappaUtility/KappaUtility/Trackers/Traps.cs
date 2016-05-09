@@ -51,10 +51,6 @@
                                         "Teemo Mushroom Expire: " + Convert.ToString(endTime, CultureInfo.InstalledUICulture),
                                         2);
                                 }
-                                else if (trap.GetBuff("BantamTrap") == null)
-                                {
-                                    Drawing.DrawText(Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30), Color.White, "Teemo Mushroom", 2);
-                                }
 
                                 Circle.Draw(SharpDX.Color.White, trap.BoundingRadius * 3, trap.Position);
                             }
@@ -68,10 +64,6 @@
                                         Color.White,
                                         "Jhin Trap Expire: " + Convert.ToString(endTime, CultureInfo.InstalledUICulture),
                                         2);
-                                }
-                                else if (trap.GetBuff("JhinETrap") == null)
-                                {
-                                    Drawing.DrawText(Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30), Color.White, "Jhin Trap", 2);
                                 }
 
                                 Circle.Draw(SharpDX.Color.White, trap.BoundingRadius * 3, trap.Position);
@@ -87,10 +79,6 @@
                                     Color.White,
                                     "Shaco Box Expire: " + Convert.ToString(endTime, CultureInfo.InvariantCulture),
                                     2);
-                            }
-                            else if (trap.GetBuff("JackInTheBox") == null)
-                            {
-                                Drawing.DrawText(Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30), Color.White, "Shaco Box", 2);
                             }
 
                             Circle.Draw(SharpDX.Color.White, trap.BoundingRadius * 15, trap.Position);
