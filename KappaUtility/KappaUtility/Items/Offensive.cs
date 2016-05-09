@@ -137,15 +137,15 @@
                         }
                         if (OffMenu["Hydra"].Cast<CheckBox>().CurrentValue)
                         {
-                            if (Hydra.IsOwned(Player.Instance) && Hydra.IsReady())
+                            if (Hydra.IsOwned(Player.Instance) && Hydra.IsReady() && Player.Instance.GetItemDamage(enemy, ItemId.Ravenous_Hydra_Melee_Only) >= enemy.Health)
                             {
                                 Hydra.Cast();
                             }
-                            if (Timat.IsOwned(Player.Instance) && Timat.IsReady())
+                            if (Timat.IsOwned(Player.Instance) && Timat.IsReady() && Player.Instance.GetItemDamage(enemy, ItemId.Tiamat_Melee_Only) >= enemy.Health)
                             {
                                 Timat.Cast();
                             }
-                            if (Titanic.IsOwned(Player.Instance) && Titanic.IsReady())
+                            if (Titanic.IsOwned(Player.Instance) && Titanic.IsReady() && Player.Instance.GetItemDamage(enemy, ItemId.Titanic_Hydra) >= enemy.Health)
                             {
                                 Titanic.Cast();
                             }
