@@ -519,43 +519,19 @@ namespace Malzahar
 
             if (Qready)
             {
-                var minions = EntityManager.MinionsAndMonsters.GetJungleMonsters().Where(m => m.IsKillable() && m.IsValidTarget(Q.Range + 50));
-
-                if (minions != null)
+                var minion = EntityManager.MinionsAndMonsters.GetJungleMonsters().OrderByDescending(e => e.MaxHealth).FirstOrDefault(m => m.IsKillable() && m.IsValidTarget(Q.Range));
+                if (minion != null)
                 {
-                    var location =
-                        Prediction.Position.PredictCircularMissileAoe(
-                            minions.Cast<Obj_AI_Base>().ToArray(),
-                            Q.Range,
-                            Q.Radius + 50,
-                            Q.CastDelay,
-                            Q.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
-
-                    if (location != null && location.CollisionObjects.Length >= 2)
-                    {
-                        Q.Cast(location.CastPosition);
-                    }
+                    Q.Cast(minion);
                 }
             }
 
             if (Wready)
             {
-                var minions = EntityManager.MinionsAndMonsters.GetJungleMonsters().Where(m => m.IsKillable() && m.IsValidTarget(W.Range));
-
-                if (minions != null)
+                var minion = EntityManager.MinionsAndMonsters.GetJungleMonsters().OrderByDescending(e => e.MaxHealth).FirstOrDefault(m => m.IsKillable() && m.IsValidTarget(W.Range));
+                if (minion != null)
                 {
-                    var location =
-                        Prediction.Position.PredictCircularMissileAoe(
-                            minions.Cast<Obj_AI_Base>().ToArray(),
-                            W.Range,
-                            W.Radius + 100,
-                            W.CastDelay,
-                            W.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
-
-                    if (location != null && location.CollisionObjects.Length >= 2)
-                    {
-                        W.Cast(location.CastPosition);
-                    }
+                    W.Cast(minion);
                 }
             }
 
