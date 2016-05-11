@@ -28,11 +28,16 @@
 
         public static Spell.Skillshot porotoss;
 
-        public static readonly string[] Junglemobs =
+        public static readonly string[] SRJunglemobs =
             {
                 "SRU_Dragon_Air", "SRU_Dragon_Earth", "SRU_Dragon_Fire", "SRU_Dragon_Water", "SRU_Dragon_Elder",
-                "SRU_Baron", "SRU_Gromp", "SRU_Krug", "SRU_RiftHerald", "Sru_Crab", "SRU_Murkwolf", "SRU_Blue",
+                "SRU_Baron", "SRU_Gromp", "SRU_Krug", "SRU_Razorbeak", "SRU_RiftHerald", "Sru_Crab", "SRU_Murkwolf", "SRU_Blue",
                 "SRU_Red", "AscXerath"
+            };
+
+        public static readonly string[] TTJunglemobs =
+            {
+                "TT_NWraith", "TT_NWolf", "TT_NGolem", "TT_Spiderboss"
             };
 
         public static Menu SummMenu { get; private set; }
@@ -146,11 +151,37 @@
                 SummMenu.Add(
                     Player.Instance.ChampionName + "EnableactiveSmite",
                     new KeyBind("Enable Smite Active", false, KeyBind.BindTypes.HoldActive));
+                SummMenu.Add("drawSmite", new CheckBox("Draw Smite range", false));
+                SummMenu.AddSeparator(1);
+                SummMenu.AddGroupLabel("Smite Jungle:");
                 SummMenu.Add("smitemob", new CheckBox("Smite Monsters", false));
+                SummMenu.Add("smitesavej", new CheckBox("Save 1 Smite Charge", false));
+
+                if (Game.MapId == GameMapId.SummonersRift)
+                {
+                    SummMenu.AddLabel("Use Smite On SR Monster:");
+                    foreach (var mob in SRJunglemobs)
+                    {
+                        SummMenu.Add(mob, new CheckBox(mob));
+                    }
+                    SummMenu.AddSeparator();
+                }
+
+                if (Game.MapId == GameMapId.TwistedTreeline)
+                {
+                    SummMenu.AddLabel("Use Smite On TT Monster:");
+                    foreach (var mob in TTJunglemobs)
+                    {
+                        SummMenu.Add(mob, new CheckBox(mob));
+                    }
+                    SummMenu.AddSeparator(1);
+                }
+
+                SummMenu.AddGroupLabel("Smite Heros:");
                 SummMenu.Add("smitecombo", new CheckBox("Smite Combo", false));
                 SummMenu.Add("smiteks", new CheckBox("Smite KillSteal", false));
-                SummMenu.Add("drawSmite", new CheckBox("Draw Smite range", false));
-                SummMenu.AddGroupLabel("Don't Use Smite On:");
+                SummMenu.Add("smitesaveh", new CheckBox("Save 1 Smite Charge", false));
+                SummMenu.AddLabel("Don't Use Smite On:");
                 foreach (var enemy in ObjectManager.Get<AIHeroClient>())
                 {
                     var cb = new CheckBox(enemy.BaseSkinName) { CurrentValue = false };
@@ -159,13 +190,6 @@
                         SummMenu.Add("DontSmite" + enemy.BaseSkinName, cb);
                     }
                 }
-
-                SummMenu.AddGroupLabel("Use Smite On Monster:");
-                foreach (var mob in Junglemobs)
-                {
-                    SummMenu.Add(mob, new CheckBox(mob));
-                }
-                SummMenu.AddSeparator();
 
                 Smite = new Spell.Targeted(smitespell.Slot, 555);
                 Orbwalker.OnPostAttack += Summoners.Smite.Orbwalker_OnPostAttack;
