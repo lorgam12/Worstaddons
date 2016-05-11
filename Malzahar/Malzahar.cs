@@ -478,14 +478,14 @@ namespace Malzahar
 
             if (Wready)
             {
-                var minions = EntityManager.MinionsAndMonsters.EnemyMinions.Where(m => m.IsKillable() && m.IsValidTarget(W.Range + 100));
+                var minions = EntityManager.MinionsAndMonsters.EnemyMinions.Where(m => m.IsKillable() && m.IsValidTarget(W.Range));
 
                 if (minions != null)
                 {
                     var location =
                         Prediction.Position.PredictCircularMissileAoe(
                             minions.Cast<Obj_AI_Base>().ToArray(),
-                            W.Range + 100,
+                            W.Range,
                             W.Radius + 100,
                             W.CastDelay,
                             W.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
@@ -540,14 +540,14 @@ namespace Malzahar
 
             if (Wready)
             {
-                var minions = EntityManager.MinionsAndMonsters.GetJungleMonsters().Where(m => m.IsKillable() && m.IsValidTarget(W.Range + 100));
+                var minions = EntityManager.MinionsAndMonsters.GetJungleMonsters().Where(m => m.IsKillable() && m.IsValidTarget(W.Range));
 
                 if (minions != null)
                 {
                     var location =
                         Prediction.Position.PredictCircularMissileAoe(
                             minions.Cast<Obj_AI_Base>().ToArray(),
-                            W.Range + 100,
+                            W.Range,
                             W.Radius + 100,
                             W.CastDelay,
                             W.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
