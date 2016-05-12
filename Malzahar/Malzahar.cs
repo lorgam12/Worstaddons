@@ -18,7 +18,7 @@ namespace Malzahar
 
     internal static class Malzahar
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += Loading_OnLoadingComplete;
         }
@@ -34,19 +34,25 @@ namespace Malzahar
         private static Menu menuIni;
 
         public static Menu Combo { get; private set; }
+
         public static Menu Harass { get; private set; }
+
         public static Menu LaneClear { get; private set; }
+
         public static Menu JungleClear { get; private set; }
+
         public static Menu KillSteal { get; private set; }
+
         public static Menu Misc { get; private set; }
+
         public static Menu DrawMenu { get; private set; }
 
         public static bool IsKillable(this Obj_AI_Base target)
         {
-            return !target.HasBuff("kindredrnodeathbuff") && !target.HasBuff("JudicatorIntervention")
-                   && !target.HasBuff("ChronoShift") && !target.HasBuff("UndyingRage") && !target.IsInvulnerable
-                   && !target.IsZombie && !target.HasBuff("bansheesveil") && !target.IsDead && !target.IsPhysicalImmune && target.Health > 0
-                   && !target.HasBuffOfType(BuffType.Invulnerability) && !target.HasBuffOfType(BuffType.PhysicalImmunity) && target.IsValidTarget();
+            return !target.HasBuff("kindredrnodeathbuff") && !target.HasBuff("JudicatorIntervention") && !target.HasBuff("ChronoShift")
+                   && !target.HasBuff("UndyingRage") && !target.IsInvulnerable && !target.IsZombie && !target.HasBuff("bansheesveil")
+                   && !target.IsDead && !target.IsPhysicalImmune && target.Health > 0 && !target.HasBuffOfType(BuffType.Invulnerability)
+                   && !target.HasBuffOfType(BuffType.PhysicalImmunity) && target.IsValidTarget();
         }
 
         public static bool IsCC(this Obj_AI_Base target)
@@ -66,14 +72,15 @@ namespace Malzahar
 
             switch (spell.Slot)
             {
-                    case SpellSlot.Q:
+                case SpellSlot.Q:
                     {
-                        dmg += new float[] {70, 110, 150, 190, 230 }[slotLevel] + 0.70f * AP;
+                        dmg += new float[] { 70, 110, 150, 190, 230 }[slotLevel] + 0.70f * AP;
                     }
                     break;
                 case SpellSlot.W:
                     {
-                        dmg += (new float[] { 30, 33, 35, 37, 40 }[slotLevel]  + 0.40f * AD) + (new float[] { 10, 15, 20, 25, 30 }[slotLevel] + 0.10f * AP);
+                        dmg += (new float[] { 30, 33, 35, 37, 40 }[slotLevel] + 0.40f * AD)
+                               + (new float[] { 10, 15, 20, 25, 30 }[slotLevel] + 0.10f * AP);
                     }
                     break;
                 case SpellSlot.E:
@@ -83,7 +90,8 @@ namespace Malzahar
                     break;
                 case SpellSlot.R:
                     {
-                        dmg += new float[] { target.MaxHealth * 0.25f, target.MaxHealth * 0.35f, target.MaxHealth * 0.45f }[slotLevel] + (0.07f * (AP / 100));
+                        dmg += new float[] { target.MaxHealth * 0.25f, target.MaxHealth * 0.35f, target.MaxHealth * 0.45f }[slotLevel]
+                               + (0.07f * (AP / 100));
                     }
                     break;
             }
@@ -102,7 +110,8 @@ namespace Malzahar
             }
             if (W.IsReady())
             {
-                dmg += (new float[] { 30, 33, 35, 37, 40 }[Player.GetSpell(SpellSlot.W).Level - 1] + 0.40f * AD) + (new float[] { 10, 15, 20, 25, 30 }[Player.GetSpell(SpellSlot.W).Level - 1] + 0.10f * AP);
+                dmg += (new float[] { 30, 33, 35, 37, 40 }[Player.GetSpell(SpellSlot.W).Level - 1] + 0.40f * AD)
+                       + (new float[] { 10, 15, 20, 25, 30 }[Player.GetSpell(SpellSlot.W).Level - 1] + 0.10f * AP);
             }
             if (E.IsReady())
             {
@@ -110,9 +119,11 @@ namespace Malzahar
             }
             if (R.IsReady())
             {
-                dmg += new float[] { target.MaxHealth * 0.25f, target.MaxHealth * 0.35f, target.MaxHealth * 0.45f }[Player.GetSpell(SpellSlot.R).Level - 1] + (0.07f * (AP / 100));
+                dmg +=
+                    new float[] { target.MaxHealth * 0.25f, target.MaxHealth * 0.35f, target.MaxHealth * 0.45f }[
+                        Player.GetSpell(SpellSlot.R).Level - 1] + (0.07f * (AP / 100));
             }
-            return Player.Instance.CalculateDamageOnUnit(target, DamageType.Mixed, dmg - 10);
+            return Player.Instance.CalculateDamageOnUnit(target, DamageType.Mixed, dmg - 25);
         }
 
         private static Color colorselector(Spell.SpellBase slot)
@@ -171,11 +182,14 @@ namespace Malzahar
             return DangerLevel.High;
         }
 
-        private static bool IsCastingR = Player.Instance.Spellbook.IsChanneling && !Player.Instance.IsRecalling();
+        private static bool IsCastingR;
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            if (Player.Instance.Hero != Champion.Malzahar) return;
+            if (Player.Instance.Hero != Champion.Malzahar)
+            {
+                return;
+            }
 
             Q = new Spell.Skillshot(SpellSlot.Q, 900, SkillShotType.Circular, 500, 500, 90);
             W = new Spell.Skillshot(SpellSlot.W, 600, SkillShotType.Circular, 500, int.MaxValue, 80);
@@ -244,9 +258,12 @@ namespace Malzahar
             Misc.Add("Rint", new CheckBox("R interrupt DangerSpells"));
             Misc.Add("RTurret", new CheckBox("R Enemy Under Ally Tower"));
             Misc.Add("blockR", new CheckBox("Block R under Enemy Turret", false));
-            Misc.Add("danger", new ComboBox("Spells DangerLevel to interrupt", 0, "High", "Medium", "Low"));
+            Misc.Add("danger", new ComboBox("Spells DangerLevel to interrupt", 2, "High", "Medium", "Low"));
 
             DrawMenu.AddGroupLabel("Drawings");
+            DrawMenu.Add("damage", new CheckBox("Draw Combo Damage"));
+            DrawMenu.AddLabel("Draws = ComboDamage / Enemy Current Health");
+            DrawMenu.AddSeparator(0);
             DrawMenu.Add("Q", new CheckBox("Draw Q Range"));
             DrawMenu.Add(Q.Name, new ComboBox("Q Color", 0, "Aqua", "BlueViolet", "Chartreuse", "Purple", "White", "Orange", "Green"));
             DrawMenu.AddSeparator(0);
@@ -271,18 +288,22 @@ namespace Malzahar
 
         private static void Gapcloser_OnGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
-            if (!sender.IsEnemy || sender == null || e == null || IsCastingR) return;
+            if (!sender.IsEnemy || sender == null || e == null || IsCastingR)
+            {
+                return;
+            }
 
-            var casted = 0;
             if (Misc["Qgap"].Cast<CheckBox>().CurrentValue && (e.End.IsInRange(Player.Instance, Q.Range) || sender.IsValidTarget(Q.Range)))
             {
                 Q.Cast(sender);
-                casted = (int)(Game.Time + Q.CastDelay);
             }
 
-            if (Misc["blockR"].Cast<CheckBox>().CurrentValue && Player.Instance.IsUnderEnemyturret()) return;
+            if (Misc["blockR"].Cast<CheckBox>().CurrentValue && Player.Instance.IsUnderEnemyturret())
+            {
+                return;
+            }
 
-            if (Misc["Rgap"].Cast<CheckBox>().CurrentValue && casted < 0.5 && (e.End.IsInRange(Player.Instance, R.Range) || sender.IsValidTarget(R.Range)))
+            if (Misc["Rgap"].Cast<CheckBox>().CurrentValue && (e.End.IsInRange(Player.Instance, R.Range) || sender.IsValidTarget(R.Range)))
             {
                 R.Cast(sender);
             }
@@ -302,20 +323,24 @@ namespace Malzahar
 
         private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs e)
         {
-            if (!sender.IsEnemy || sender == null || e == null || IsCastingR) return;
+            if (!sender.IsEnemy || sender == null || e == null || IsCastingR)
+            {
+                return;
+            }
 
             if (danger() >= e.DangerLevel)
             {
-                var casted = 0;
                 if (Misc["Qint"].Cast<CheckBox>().CurrentValue && sender.IsValidTarget(Q.Range))
                 {
                     Q.Cast(sender);
-                    casted = (int)(Game.Time + Q.CastDelay);
                 }
 
-                if (Misc["blockR"].Cast<CheckBox>().CurrentValue && Player.Instance.IsUnderEnemyturret()) return;
+                if (Misc["blockR"].Cast<CheckBox>().CurrentValue && Player.Instance.IsUnderEnemyturret())
+                {
+                    return;
+                }
 
-                if (Misc["Rint"].Cast<CheckBox>().CurrentValue && casted < 0.5 && sender.IsValidTarget(R.Range))
+                if (Misc["Rint"].Cast<CheckBox>().CurrentValue && sender.IsValidTarget(R.Range))
                 {
                     R.Cast(sender);
                 }
@@ -324,7 +349,10 @@ namespace Malzahar
 
         private static void Player_OnIssueOrder(Obj_AI_Base sender, PlayerIssueOrderEventArgs args)
         {
-            if (!sender.IsMe) return;
+            if (!sender.IsMe)
+            {
+                return;
+            }
 
             if (Misc["Rsave"].Cast<CheckBox>().CurrentValue && IsCastingR)
             {
@@ -334,7 +362,10 @@ namespace Malzahar
 
         private static void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-            if (!sender.Owner.IsMe) return;
+            if (!sender.Owner.IsMe)
+            {
+                return;
+            }
 
             if (Misc["Rsave"].Cast<CheckBox>().CurrentValue && IsCastingR)
             {
@@ -344,15 +375,34 @@ namespace Malzahar
 
         private static void Game_OnUpdate(EventArgs args)
         {
+            IsCastingR = Player.Instance.Buffs.FirstOrDefault(b => b.Name.ToLower().Contains("malzaharrsound")) != null;
             Orbwalker.DisableAttacking = IsCastingR;
             Orbwalker.DisableMovement = IsCastingR;
 
-            if (IsCastingR) return;
+            if (IsCastingR)
+            {
+                return;
+            }
 
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) ComboLogic();
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) && Player.Instance.ManaPercent >= Harass["mana"].Cast<Slider>().CurrentValue) HarassLogic();
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) && Player.Instance.ManaPercent >= LaneClear["mana"].Cast<Slider>().CurrentValue) LaneClearLogic();
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) && Player.Instance.ManaPercent >= JungleClear["mana"].Cast<Slider>().CurrentValue) JungleClearLogic();
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+            {
+                ComboLogic();
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)
+                && Player.Instance.ManaPercent >= Harass["mana"].Cast<Slider>().CurrentValue)
+            {
+                HarassLogic();
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear)
+                && Player.Instance.ManaPercent >= LaneClear["mana"].Cast<Slider>().CurrentValue)
+            {
+                LaneClearLogic();
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear)
+                && Player.Instance.ManaPercent >= JungleClear["mana"].Cast<Slider>().CurrentValue)
+            {
+                JungleClearLogic();
+            }
             Rlogic();
             KillStealLogic();
         }
@@ -361,9 +411,14 @@ namespace Malzahar
         {
             if (Misc["RTurret"].Cast<CheckBox>().CurrentValue && R.IsReady())
             {
-                if (Misc["blockR"].Cast<CheckBox>().CurrentValue && Player.Instance.IsUnderEnemyturret()) return;
+                if (Misc["blockR"].Cast<CheckBox>().CurrentValue && Player.Instance.IsUnderEnemyturret())
+                {
+                    return;
+                }
 
-                var targets = EntityManager.Heroes.Enemies.Where(e => e.IsUnderTurret() && !e.IsUnderHisturret() && !e.IsUnderEnemyturret() && e.IsValidTarget(R.Range));
+                var targets =
+                    EntityManager.Heroes.Enemies.Where(
+                        e => e.IsUnderTurret() && !e.IsUnderHisturret() && !e.IsUnderEnemyturret() && e.IsValidTarget(R.Range));
                 if (targets != null)
                 {
                     foreach (var target in targets.Where(target => target != null))
@@ -376,25 +431,35 @@ namespace Malzahar
 
         private static void ComboLogic()
         {
+            if (IsCastingR)
+            {
+                return;
+            }
+
             var target = TargetSelector.GetTarget(Q.Range + 50, DamageType.Mixed);
 
-            if (target == null || !target.IsKillable()) return;
+            if (target == null || !target.IsKillable())
+            {
+                return;
+            }
 
             var Qready = Combo["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady() && target.IsValidTarget(Q.Range);
-            var Wready = Combo["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.IsValidTarget(W.Range) && W.GetPrediction(target).HitChance >= HitChance.High;
+            var Wready = Combo["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.IsValidTarget(W.Range)
+                         && W.GetPrediction(target).HitChance >= HitChance.High;
             var Eready = Combo["E"].Cast<CheckBox>().CurrentValue && E.IsReady() && target.IsValidTarget(E.Range);
             var Rfinready = Combo["RFinisher"].Cast<CheckBox>().CurrentValue && R.IsReady() && target.IsValidTarget(R.Range);
             var Rcomready = Combo["RCombo"].Cast<CheckBox>().CurrentValue && R.IsReady() && target.IsValidTarget(R.Range);
-            var RTurret = Combo["RTurret"].Cast<CheckBox>().CurrentValue && R.IsReady() && target.IsValidTarget(R.Range) && target.IsUnderTurret() && !target.IsUnderHisturret() && !target.IsUnderEnemyturret();
-
-            if (Qready && (Q.GetPrediction(target).HitChance >= HitChance.High || target.IsCC()))
-            {
-                Q.Cast(target);
-            }
+            var RTurret = Combo["RTurret"].Cast<CheckBox>().CurrentValue && R.IsReady() && target.IsValidTarget(R.Range) && target.IsUnderTurret()
+                          && !target.IsUnderHisturret() && !target.IsUnderEnemyturret();
 
             if (Wready)
             {
                 W.Cast(target);
+            }
+
+            if (Qready && (Q.GetPrediction(target).HitChance >= HitChance.High || target.IsCC()))
+            {
+                Q.Cast(target);
             }
 
             if (Eready)
@@ -404,7 +469,10 @@ namespace Malzahar
 
             if (!Combo["DontUlt" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
             {
-                if (Misc["blockR"].Cast<CheckBox>().CurrentValue && Player.Instance.IsUnderEnemyturret()) return;
+                if (Misc["blockR"].Cast<CheckBox>().CurrentValue && Player.Instance.IsUnderEnemyturret())
+                {
+                    return;
+                }
 
                 if (Rcomready && GetDamage(target) >= Prediction.Health.GetPrediction(target, R.CastDelay * 1000))
                 {
@@ -425,22 +493,31 @@ namespace Malzahar
 
         private static void HarassLogic()
         {
+            if (IsCastingR)
+            {
+                return;
+            }
+
             var target = TargetSelector.GetTarget(Q.Range + 50, DamageType.Mixed);
 
-            if (target == null || !target.IsKillable()) return;
+            if (target == null || !target.IsKillable())
+            {
+                return;
+            }
 
             var Qready = Harass["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady() && target.IsValidTarget(Q.Range);
-            var Wready = Harass["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.IsValidTarget(W.Range) && W.GetPrediction(target).HitChance >= HitChance.High;
+            var Wready = Harass["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.IsValidTarget(W.Range)
+                         && W.GetPrediction(target).HitChance >= HitChance.High;
             var Eready = Harass["E"].Cast<CheckBox>().CurrentValue && E.IsReady() && target.IsValidTarget(E.Range);
-
-            if (Qready && (Q.GetPrediction(target).HitChance >= HitChance.High || target.IsCC()))
-            {
-                Q.Cast(target);
-            }
 
             if (Wready)
             {
                 W.Cast(target);
+            }
+
+            if (Qready && (Q.GetPrediction(target).HitChance >= HitChance.High || target.IsCC()))
+            {
+                Q.Cast(target);
             }
 
             if (Eready)
@@ -451,30 +528,14 @@ namespace Malzahar
 
         private static void LaneClearLogic()
         {
+            if (IsCastingR)
+            {
+                return;
+            }
+
             var Qready = LaneClear["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady();
             var Wready = LaneClear["W"].Cast<CheckBox>().CurrentValue && W.IsReady();
             var Eready = LaneClear["E"].Cast<CheckBox>().CurrentValue && E.IsReady();
-
-            if (Qready)
-            {
-                var minions = EntityManager.MinionsAndMonsters.EnemyMinions.Where(m => m.IsKillable() && m.IsValidTarget(Q.Range + 50));
-
-                if (minions != null)
-                {
-                    var location =
-                        Prediction.Position.PredictCircularMissileAoe(
-                            minions.Cast<Obj_AI_Base>().ToArray(),
-                            Q.Range,
-                            Q.Radius + 50,
-                            Q.CastDelay,
-                            Q.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
-
-                    if (location != null && location.CollisionObjects.Length >= 2)
-                    {
-                        Q.Cast(location.CastPosition);
-                    }
-                }
-            }
 
             if (Wready)
             {
@@ -497,6 +558,27 @@ namespace Malzahar
                 }
             }
 
+            if (Qready)
+            {
+                var minions = EntityManager.MinionsAndMonsters.EnemyMinions.Where(m => m.IsKillable() && m.IsValidTarget(Q.Range + 50));
+
+                if (minions != null)
+                {
+                    var location =
+                        Prediction.Position.PredictCircularMissileAoe(
+                            minions.Cast<Obj_AI_Base>().ToArray(),
+                            Q.Range,
+                            Q.Radius + 50,
+                            Q.CastDelay,
+                            Q.Speed).OrderByDescending(r => r.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
+
+                    if (location != null && location.CollisionObjects.Length >= 2)
+                    {
+                        Q.Cast(location.CastPosition);
+                    }
+                }
+            }
+
             if (Eready)
             {
                 var minions = EntityManager.MinionsAndMonsters.EnemyMinions.Where(m => m.IsKillable() && m.IsValidTarget(E.Range));
@@ -513,25 +595,36 @@ namespace Malzahar
 
         private static void JungleClearLogic()
         {
+            if (IsCastingR)
+            {
+                return;
+            }
+
             var Qready = JungleClear["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady();
             var Wready = JungleClear["W"].Cast<CheckBox>().CurrentValue && W.IsReady();
             var Eready = JungleClear["E"].Cast<CheckBox>().CurrentValue && E.IsReady();
 
-            if (Qready)
-            {
-                var minion = EntityManager.MinionsAndMonsters.GetJungleMonsters().OrderByDescending(e => e.MaxHealth).FirstOrDefault(m => m.IsKillable() && m.IsValidTarget(Q.Range));
-                if (minion != null)
-                {
-                    Q.Cast(minion);
-                }
-            }
-
             if (Wready)
             {
-                var minion = EntityManager.MinionsAndMonsters.GetJungleMonsters().OrderByDescending(e => e.MaxHealth).FirstOrDefault(m => m.IsKillable() && m.IsValidTarget(W.Range));
+                var minion =
+                    EntityManager.MinionsAndMonsters.GetJungleMonsters()
+                        .OrderByDescending(e => e.MaxHealth)
+                        .FirstOrDefault(m => m.IsKillable() && m.IsValidTarget(W.Range));
                 if (minion != null)
                 {
                     W.Cast(minion);
+                }
+            }
+
+            if (Qready)
+            {
+                var minion =
+                    EntityManager.MinionsAndMonsters.GetJungleMonsters()
+                        .OrderByDescending(e => e.MaxHealth)
+                        .FirstOrDefault(m => m.IsKillable() && m.IsValidTarget(Q.Range));
+                if (minion != null)
+                {
+                    Q.Cast(minion);
                 }
             }
 
@@ -551,6 +644,11 @@ namespace Malzahar
 
         private static void KillStealLogic()
         {
+            if (IsCastingR)
+            {
+                return;
+            }
+
             var Qready = KillSteal["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady();
             var Wready = KillSteal["W"].Cast<CheckBox>().CurrentValue && W.IsReady();
             var Eready = KillSteal["E"].Cast<CheckBox>().CurrentValue && E.IsReady();
@@ -561,7 +659,7 @@ namespace Malzahar
                 var ksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(Q.Range));
                 if (ksenemy != null)
                 {
-                    foreach (var enemy in ksenemy.Where(enemy => Q.GetDamage(enemy) >= enemy?.TotalShieldHealth()))
+                    foreach (var enemy in ksenemy.Where(enemy => Q.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, Q.CastDelay * 1000)))
                     {
                         Q.Cast(enemy);
                     }
@@ -573,7 +671,7 @@ namespace Malzahar
                 var ksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(W.Range));
                 if (ksenemy != null)
                 {
-                    foreach (var enemy in ksenemy.Where(enemy => W.GetDamage(enemy) >= enemy?.TotalShieldHealth()))
+                    foreach (var enemy in ksenemy.Where(enemy => W.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, W.CastDelay * 1000)))
                     {
                         W.Cast(enemy);
                     }
@@ -585,7 +683,7 @@ namespace Malzahar
                 var ksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(E.Range));
                 if (ksenemy != null)
                 {
-                    foreach (var enemy in ksenemy.Where(enemy => E.GetDamage(enemy) >= enemy?.TotalShieldHealth()))
+                    foreach (var enemy in ksenemy.Where(enemy => E.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, E.CastDelay * 1000)))
                     {
                         E.Cast(enemy);
                     }
@@ -594,12 +692,17 @@ namespace Malzahar
 
             if (Rready)
             {
-                if (Misc["blockR"].Cast<CheckBox>().CurrentValue && Player.Instance.IsUnderEnemyturret()) return;
+                if (Misc["blockR"].Cast<CheckBox>().CurrentValue && Player.Instance.IsUnderEnemyturret())
+                {
+                    return;
+                }
 
-                var ksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(R.Range) && !KillSteal["DontUlt" + e.BaseSkinName].Cast<CheckBox>().CurrentValue);
+                var ksenemy =
+                    EntityManager.Heroes.Enemies.Where(
+                        e => e.IsKillable() && e.IsValidTarget(R.Range) && !KillSteal["DontUlt" + e.BaseSkinName].Cast<CheckBox>().CurrentValue);
                 if (ksenemy != null)
                 {
-                    foreach (var enemy in ksenemy.Where(enemy => R.GetDamage(enemy) >= enemy?.TotalShieldHealth()))
+                    foreach (var enemy in ksenemy.Where(enemy => R.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, R.CastDelay * 1000)))
                     {
                         R.Cast(enemy);
                     }
@@ -627,6 +730,34 @@ namespace Malzahar
             if (DrawMenu["R"].Cast<CheckBox>().CurrentValue)
             {
                 Circle.Draw(R.IsReady() ? colorselector(R) : Color.Red, R.Range, Player.Instance.Position);
+            }
+
+            if (DrawMenu["damage"].Cast<CheckBox>().CurrentValue)
+            {
+                foreach (var enemy in EntityManager.Heroes.Enemies.Where(e => e.IsHPBarRendered))
+                {
+                    if (enemy != null)
+                    {
+                        var hpx = enemy.HPBarPosition.X;
+                        var hpy = enemy.HPBarPosition.Y;
+                        var damage = (int)GetDamage(enemy) + "/" + (int)enemy.TotalShieldHealth();
+                        var c = System.Drawing.Color.GreenYellow;
+
+                        if (GetDamage(enemy) >= enemy.TotalShieldHealth() / 2)
+                        {
+                            damage = "Harass for Kill: " + (int)GetDamage(enemy) + "/" + (int)enemy.TotalShieldHealth();
+                            c = System.Drawing.Color.Orange;
+                        }
+
+                        if (GetDamage(enemy) >= enemy.TotalShieldHealth())
+                        {
+                            damage = "Killable: " + (int)GetDamage(enemy) + "/" + (int)enemy.TotalShieldHealth();
+                            c = System.Drawing.Color.Red;
+                        }
+
+                        Drawing.DrawText(hpx + 145, hpy, c, damage, 3);
+                    }
+                }
             }
         }
     }
