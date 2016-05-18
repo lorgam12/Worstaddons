@@ -1,14 +1,13 @@
 ﻿namespace KappaUtility.Items
 {
     using System;
-    using System.Linq;
 
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
 
-    using KappaUtility.Common;
+    using Common;
 
     internal class Offensive
     {

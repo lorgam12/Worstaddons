@@ -14,8 +14,8 @@
         public static void Smiteopepi()
         {
             if (Smite != null
-                && (SummMenu[Player.Instance.ChampionName + "EnableactiveSmite"].Cast<KeyBind>().CurrentValue
-                    || SummMenu[Player.Instance.ChampionName + "EnableSmite"].Cast<KeyBind>().CurrentValue))
+                && (SummMenu["EnableactiveSmite"].Cast<KeyBind>().CurrentValue
+                    || SummMenu["EnableSmite"].Cast<KeyBind>().CurrentValue))
             {
                 var smitemob = SummMenu["smitemob"].Cast<CheckBox>().CurrentValue && Smite.IsReady();
                 var smitecombo = SummMenu["smitecombo"].Cast<CheckBox>().CurrentValue && Smite.IsReady()
