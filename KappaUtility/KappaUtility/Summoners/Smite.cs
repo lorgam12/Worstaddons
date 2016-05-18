@@ -27,7 +27,12 @@
                     {
                         return;
                     }
-                    var jmobs = EntityManager.MinionsAndMonsters.GetJungleMonsters().Where(j => (SRJunglemobs.Contains(j.BaseSkinName) || TTJunglemobs.Contains(j.BaseSkinName)) && j.IsKillable() && j.IsValidTarget(Smite.Range));
+                    var jmobs =
+                        EntityManager.MinionsAndMonsters.GetJungleMonsters()
+                            .Where(
+                                j =>
+                                (SRJunglemobs.Contains(j.BaseSkinName) || TTJunglemobs.Contains(j.BaseSkinName)) && j.IsKillable()
+                                && j.IsValidTarget(Smite.Range));
                     foreach (var jmob in jmobs)
                     {
                         if (jmob != null && SummMenu[jmob.BaseSkinName].Cast<CheckBox>().CurrentValue)

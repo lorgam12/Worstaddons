@@ -90,7 +90,7 @@
             {
                 Defensive.OnLoad();
             }
-            
+
             Game.OnTick += GameOnTick;
             Drawing.OnEndScene += OnEndScene;
             Drawing.OnDraw += DrawingOnDraw;

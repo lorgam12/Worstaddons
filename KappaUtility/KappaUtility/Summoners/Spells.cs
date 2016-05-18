@@ -1,6 +1,5 @@
 ﻿namespace KappaUtility.Summoners
 {
-    using System;
     using System.Linq;
 
     using EloBuddy;
@@ -10,7 +9,7 @@
     using EloBuddy.SDK.Rendering;
     using EloBuddy.SDK.Enumerations;
 
-    using KappaUtility.Common;
+    using Common;
 
     using SharpDX;
 
@@ -30,15 +29,12 @@
 
         public static readonly string[] SRJunglemobs =
             {
-                "SRU_Dragon_Air", "SRU_Dragon_Earth", "SRU_Dragon_Fire", "SRU_Dragon_Water", "SRU_Dragon_Elder",
-                "SRU_Baron", "SRU_Gromp", "SRU_Krug", "SRU_Razorbeak", "SRU_RiftHerald", "Sru_Crab", "SRU_Murkwolf", "SRU_Blue",
-                "SRU_Red", "AscXerath"
+                "SRU_Dragon_Air", "SRU_Dragon_Earth", "SRU_Dragon_Fire", "SRU_Dragon_Water",
+                "SRU_Dragon_Elder", "SRU_Baron", "SRU_Gromp", "SRU_Krug", "SRU_Razorbeak", "SRU_RiftHerald",
+                "Sru_Crab", "SRU_Murkwolf", "SRU_Blue", "SRU_Red", "AscXerath"
             };
 
-        public static readonly string[] TTJunglemobs =
-            {
-                "TT_NWraith", "TT_NWolf", "TT_NGolem", "TT_Spiderboss"
-            };
+        public static readonly string[] TTJunglemobs = { "TT_NWraith", "TT_NWolf", "TT_NGolem", "TT_Spiderboss" };
 
         public static Menu SummMenu { get; private set; }
 
@@ -46,22 +42,16 @@
 
         internal static void OnLoad()
         {
-            Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
-            Obj_AI_Base.OnBasicAttack += OnBasicAttack;
-
             SummMenu = Load.UtliMenu.AddSubMenu("Summoner Spells");
             SummMenu.AddGroupLabel("Summoner Spells Settings");
 
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerDot")) != null)
             {
                 SummMenu.AddGroupLabel("Ignite Settings");
-                SummMenu.Add(
-                    Player.Instance.ChampionName + "EnableIgnite",
-                    new KeyBind("Enable Ignite Toggle", false, KeyBind.BindTypes.PressToggle, 'M'));
-                SummMenu.Add(
-                    Player.Instance.ChampionName + "EnableactiveIgnite",
-                    new KeyBind("Enable Ignite Active", false, KeyBind.BindTypes.HoldActive));
+                SummMenu.Add("EnableIgnite", new KeyBind("Enable Ignite Toggle", false, KeyBind.BindTypes.PressToggle, 'M'));
+                SummMenu.Add("EnableactiveIgnite", new KeyBind("Enable Ignite Active", false, KeyBind.BindTypes.HoldActive));
                 SummMenu.Add("drawIgnite", new CheckBox("Draw Ignite range", false));
+                SummMenu.Checkbox("drawIgniteStat", "Draw Ignite Status");
                 SummMenu.AddGroupLabel("Don't Use Ignite On:");
                 foreach (var enemy in ObjectManager.Get<AIHeroClient>())
                 {
@@ -79,12 +69,9 @@
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerBarrier")) != null)
             {
                 SummMenu.AddGroupLabel("Barrier Settings");
-                SummMenu.Add(
-                    Player.Instance.ChampionName + "EnableBarrier",
-                    new KeyBind("Enable Barrier Toggle", false, KeyBind.BindTypes.PressToggle, 'M'));
-                SummMenu.Add(
-                    Player.Instance.ChampionName + "EnableactiveBarrier",
-                    new KeyBind("Enable Barrier Active", false, KeyBind.BindTypes.HoldActive));
+                SummMenu.Add("EnableBarrier", new KeyBind("Enable Barrier Toggle", false, KeyBind.BindTypes.PressToggle, 'M'));
+                SummMenu.Add("EnableactiveBarrier", new KeyBind("Enable Barrier Active", false, KeyBind.BindTypes.HoldActive));
+                SummMenu.Checkbox("drawBarrierStat", "Draw Barrier Status");
                 SummMenu.Add("barrierme", new Slider("Use On My Health %", 30, 0, 100));
                 SummMenu.AddSeparator();
                 Barrier = new Spell.Active(Player.Instance.GetSpellSlotFromName("SummonerBarrier"));
@@ -93,13 +80,10 @@
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerHeal")) != null)
             {
                 SummMenu.AddGroupLabel("Heal Settings");
-                SummMenu.Add(
-                    Player.Instance.ChampionName + "EnableHeal",
-                    new KeyBind("Enable Heal Toggle", false, KeyBind.BindTypes.PressToggle, 'M'));
-                SummMenu.Add(
-                    Player.Instance.ChampionName + "EnableactiveHeal",
-                    new KeyBind("Enable Heal Active", false, KeyBind.BindTypes.HoldActive));
+                SummMenu.Add("EnableHeal", new KeyBind("Enable Heal Toggle", false, KeyBind.BindTypes.PressToggle, 'M'));
+                SummMenu.Add("EnableactiveHeal", new KeyBind("Enable Heal Active", false, KeyBind.BindTypes.HoldActive));
                 SummMenu.Add("drawHeal", new CheckBox("Draw Heal range", false));
+                SummMenu.Checkbox("drawHealStat", "Draw Heal Status");
                 SummMenu.Add("Healally", new Slider("Use On Ally Health %", 25, 0, 100));
                 SummMenu.Add("Healme", new Slider("Use On My Health %", 30, 0, 100));
                 SummMenu.AddGroupLabel("Don't Use Heal On:");
@@ -119,13 +103,10 @@
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerExhaust")) != null)
             {
                 SummMenu.AddGroupLabel("Exhaust Settings");
-                SummMenu.Add(
-                    Player.Instance.ChampionName + "EnableExhaust",
-                    new KeyBind("Enable Exhaust Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
-                SummMenu.Add(
-                    Player.Instance.ChampionName + "EnableactiveExhaust",
-                    new KeyBind("Enable Exhaust Active", false, KeyBind.BindTypes.HoldActive));
+                SummMenu.Add("EnableExhaust", new KeyBind("Enable Exhaust Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
+                SummMenu.Add("EnableactiveExhaust", new KeyBind("Enable Exhaust Active", false, KeyBind.BindTypes.HoldActive));
                 SummMenu.Add("drawExhaust", new CheckBox("Draw Exhaust range", false));
+                SummMenu.Checkbox("drawExhaustStat", "Draw Exhaust Status");
                 SummMenu.Add("exhaustally", new Slider("Use When Ally/Self Health %", 35, 0, 100));
                 SummMenu.Add("exhaustenemy", new Slider("Use When Enemy Health %", 40, 0, 100));
                 SummMenu.AddGroupLabel("Don't Use Exhaust On:");
@@ -145,13 +126,10 @@
             if (smitespell != null)
             {
                 SummMenu.AddGroupLabel("Smite Settings");
-                SummMenu.Add(
-                    Player.Instance.ChampionName + "EnableSmite",
-                    new KeyBind("Enable Smite Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
-                SummMenu.Add(
-                    Player.Instance.ChampionName + "EnableactiveSmite",
-                    new KeyBind("Enable Smite Active", false, KeyBind.BindTypes.HoldActive));
+                SummMenu.Add("EnableSmite", new KeyBind("Enable Smite Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
+                SummMenu.Add("EnableactiveSmite", new KeyBind("Enable Smite Active", false, KeyBind.BindTypes.HoldActive));
                 SummMenu.Add("drawSmite", new CheckBox("Draw Smite range", false));
+                SummMenu.Checkbox("drawSmiteStat", "Draw Smite Status");
                 SummMenu.AddSeparator(1);
                 SummMenu.AddGroupLabel("Smite Jungle:");
                 SummMenu.Add("smitemob", new CheckBox("Smite Monsters", false));
@@ -199,11 +177,10 @@
                 || Player.Spells.FirstOrDefault(o => o.SData.Name.ToLower().Contains("summonersnowball")) != null)
             {
                 SummMenu.AddGroupLabel("Poro Settings");
-                SummMenu.Add(Player.Instance.ChampionName + "EnablePoro", new KeyBind("Enable Poro Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
-                SummMenu.Add(
-                    Player.Instance.ChampionName + "EnableactivePoro",
-                    new KeyBind("Enable Poro Active", false, KeyBind.BindTypes.HoldActive));
+                SummMenu.Add("EnablePoro", new KeyBind("Enable Poro Toggle", true, KeyBind.BindTypes.PressToggle, 'M'));
+                SummMenu.Add("EnableactivePoro", new KeyBind("Enable Poro Active", false, KeyBind.BindTypes.HoldActive));
                 SummMenu.Add("drawporo", new CheckBox("Draw PoroToss range", false));
+                SummMenu.Checkbox("drawporoStat", "Draw PorotToss Status");
                 SummMenu.AddGroupLabel("Don't Use PoroToss On:");
                 foreach (var enemy in EntityManager.Heroes.Enemies)
                 {
@@ -229,6 +206,16 @@
             loaded = true;
         }
 
+        public static System.Drawing.Color c(Spell.SpellBase spell)
+        {
+            return spell.IsReady() ? System.Drawing.Color.White : System.Drawing.Color.OrangeRed;
+        }
+
+        public static string ready(Spell.SpellBase spell)
+        {
+            return spell.IsReady() ? ": Ready" : ": CoolDown";
+        }
+
         internal static void Drawings()
         {
             if (!loaded)
@@ -236,48 +223,82 @@
                 return;
             }
 
+            var pos = Player.Instance.ServerPosition;
+            var posx = pos.WorldToScreen().X;
+            var posy = pos.WorldToScreen().Y;
             if (Ignite != null)
             {
-                if (SummMenu["drawIgnite"].Cast<CheckBox>().CurrentValue
-                    && (SummMenu[Player.Instance.ChampionName + "EnableactiveIgnite"].Cast<KeyBind>().CurrentValue
-                        || SummMenu[Player.Instance.ChampionName + "EnableIgnite"].Cast<KeyBind>().CurrentValue))
+                if (SummMenu["EnableactiveIgnite"].Cast<KeyBind>().CurrentValue || SummMenu["EnableIgnite"].Cast<KeyBind>().CurrentValue)
                 {
-                    Circle.Draw(Ignite.IsReady() ? Color.LightBlue : Color.Red, Ignite.Range, Player.Instance.Position);
+                    if (SummMenu["drawIgnite"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Circle.Draw(Ignite.IsReady() ? Color.LightBlue : Color.Red, Ignite.Range, pos);
+                    }
+                    if (SummMenu["drawIgniteStat"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Drawing.DrawText(posx, posy, c(Ignite), "Ignite" + ready(Ignite), 2);
+                    }
                 }
             }
+
             if (Heal != null)
             {
-                if (SummMenu["drawheal"].Cast<CheckBox>().CurrentValue
-                    && (SummMenu[Player.Instance.ChampionName + "EnableactiveHeal"].Cast<KeyBind>().CurrentValue
-                        || SummMenu[Player.Instance.ChampionName + "EnableHeal"].Cast<KeyBind>().CurrentValue))
+                if (SummMenu["EnableactiveHeal"].Cast<KeyBind>().CurrentValue || SummMenu["EnableHeal"].Cast<KeyBind>().CurrentValue)
                 {
-                    Circle.Draw(Heal.IsReady() ? Color.LightBlue : Color.Red, Heal.Range, Player.Instance.Position);
+                    if (SummMenu["drawheal"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Circle.Draw(Heal.IsReady() ? Color.LightBlue : Color.Red, Heal.Range, pos);
+                    }
+
+                    if (SummMenu["drawIgniteStat"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Drawing.DrawText(posx, posy, c(Heal), "Heal" + ready(Heal), 2);
+                    }
                 }
             }
+
             if (Smite != null)
             {
-                if (SummMenu["drawSmite"].Cast<CheckBox>().CurrentValue
-                    && (SummMenu[Player.Instance.ChampionName + "EnableactiveSmite"].Cast<KeyBind>().CurrentValue
-                        || SummMenu[Player.Instance.ChampionName + "EnableSmite"].Cast<KeyBind>().CurrentValue))
+                if (SummMenu["EnableactiveSmite"].Cast<KeyBind>().CurrentValue || SummMenu["EnableSmite"].Cast<KeyBind>().CurrentValue)
                 {
-                    Circle.Draw(Smite.IsReady() ? Color.LightBlue : Color.Red, Smite.Range, Player.Instance.Position);
+                    if (SummMenu["drawSmite"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Circle.Draw(Smite.IsReady() ? Color.LightBlue : Color.Red, Smite.Range, pos);
+                    }
+
+                    if (SummMenu["drawSmiteStat"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Drawing.DrawText(posx, posy, c(Smite), "Smite" + ready(Smite), 2);
+                    }
                 }
             }
 
             if (Exhaust != null)
             {
-                if (SummMenu["drawExhaust"].Cast<CheckBox>().CurrentValue
-                    && (SummMenu[Player.Instance.ChampionName + "EnableactiveExhaust"].Cast<KeyBind>().CurrentValue
-                        || SummMenu[Player.Instance.ChampionName + "EnableExhaust"].Cast<KeyBind>().CurrentValue))
+                if (SummMenu["EnableactiveExhaust"].Cast<KeyBind>().CurrentValue || SummMenu["EnableExhaust"].Cast<KeyBind>().CurrentValue)
                 {
-                    Circle.Draw(Exhaust.IsReady() ? Color.LightBlue : Color.Red, Exhaust.Range, Player.Instance.Position);
+                    if (SummMenu["drawExhaust"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Circle.Draw(Exhaust.IsReady() ? Color.LightBlue : Color.Red, Exhaust.Range, pos);
+                    }
+
+                    if (SummMenu["drawExhaustStat"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Drawing.DrawText(posx, posy, c(Exhaust), "Exhaust" + ready(Exhaust), 2);
+                    }
                 }
             }
+
             if (porotoss != null)
             {
                 if (SummMenu["drawporo"].Cast<CheckBox>().CurrentValue)
                 {
-                    Circle.Draw(porotoss.IsReady() ? Color.LightBlue : Color.Red, porotoss.Range, Player.Instance.Position);
+                    Circle.Draw(porotoss.IsReady() ? Color.LightBlue : Color.Red, porotoss.Range, pos);
+                }
+
+                if (SummMenu["drawporoStat"].Cast<CheckBox>().CurrentValue)
+                {
+                    Drawing.DrawText(posx, posy, c(porotoss), "PoroToss" + ready(porotoss), 2);
                 }
             }
         }
@@ -290,8 +311,7 @@
 
             if (porotoss != null && !porotoss.Name.ToLower().Contains("snowballfollowupcast"))
             {
-                if (SummMenu[Player.Instance.ChampionName + "Enableactiveporo"].Cast<KeyBind>().CurrentValue
-                    || SummMenu[Player.Instance.ChampionName + "Enableporo"].Cast<KeyBind>().CurrentValue)
+                if (SummMenu["Enableactiveporo"].Cast<KeyBind>().CurrentValue || SummMenu["Enableporo"].Cast<KeyBind>().CurrentValue)
                 {
                     foreach (var enemy in EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(porotoss.Range)))
                     {
@@ -311,10 +331,11 @@
             {
                 return;
             }
+
             if (Ignite != null)
             {
-                var ignitec = (SummMenu[Player.Instance.ChampionName + "EnableactiveIgnite"].Cast<KeyBind>().CurrentValue
-                               || SummMenu[Player.Instance.ChampionName + "EnableIgnite"].Cast<KeyBind>().CurrentValue) && Ignite.IsReady();
+                var ignitec = (SummMenu["EnableactiveIgnite"].Cast<KeyBind>().CurrentValue || SummMenu["EnableIgnite"].Cast<KeyBind>().CurrentValue)
+                              && Ignite.IsReady();
 
                 if (ignitec
                     && Player.Instance.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
@@ -329,8 +350,8 @@
 
             if (Exhaust != null)
             {
-                var exhaustc = (SummMenu[Player.Instance.ChampionName + "EnableactiveExhaust"].Cast<KeyBind>().CurrentValue
-                                || SummMenu[Player.Instance.ChampionName + "EnableExhaust"].Cast<KeyBind>().CurrentValue) && Exhaust.IsReady();
+                var exhaustc = (SummMenu["EnableactiveExhaust"].Cast<KeyBind>().CurrentValue || SummMenu["EnableExhaust"].Cast<KeyBind>().CurrentValue)
+                               && Exhaust.IsReady();
                 var Exhaustally = SummMenu["exhaustally"].Cast<Slider>().CurrentValue;
                 var Exhaustenemy = SummMenu["exhaustenemy"].Cast<Slider>().CurrentValue;
 
@@ -344,249 +365,6 @@
                     if (ally != null && ally.HealthPercent <= Exhaustally)
                     {
                         Exhaust.Cast(target);
-                    }
-                }
-            }
-        }
-
-        public static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (!(args.Target is AIHeroClient))
-            {
-                return;
-            }
-
-            var caster = sender;
-            var target = (AIHeroClient)args.Target;
-
-            if ((caster is AIHeroClient || caster is Obj_AI_Turret) && caster != null && target != null && caster.IsEnemy)
-            {
-                if (target.IsAlly && !target.IsMe)
-                {
-                    if (Exhaust != null)
-                    {
-                        var exhaustc = (SummMenu[Player.Instance.ChampionName + "EnableactiveExhaust"].Cast<KeyBind>().CurrentValue
-                                        || SummMenu[Player.Instance.ChampionName + "EnableExhaust"].Cast<KeyBind>().CurrentValue) && Exhaust.IsReady();
-                        var Exhaustally = SummMenu["exhaustally"].Cast<Slider>().CurrentValue;
-                        var Exhaustenemy = SummMenu["exhaustenemy"].Cast<Slider>().CurrentValue;
-
-                        if (exhaustc
-                            && (target.IsValidTarget(Exhaust.Range) && !SummMenu["DontExhaust" + caster.BaseSkinName].Cast<CheckBox>().CurrentValue))
-                        {
-                            if (target.HealthPercent <= Exhaustenemy)
-                            {
-                                Exhaust.Cast(caster);
-                            }
-
-                            if (target.HealthPercent <= Exhaustally)
-                            {
-                                Exhaust.Cast(caster);
-                            }
-                        }
-                    }
-
-                    if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                    {
-                        var healc = (SummMenu[Player.Instance.ChampionName + "EnableactiveHeal"].Cast<KeyBind>().CurrentValue
-                                     || SummMenu[Player.Instance.ChampionName + "EnableHeal"].Cast<KeyBind>().CurrentValue) && Heal.IsReady();
-                        var healally = SummMenu["Healally"].Cast<Slider>().CurrentValue;
-                        if (healc)
-                        {
-                            if (target.IsInRange(Player.Instance, Heal.Range))
-                            {
-                                if (target.HealthPercent <= healally)
-                                {
-                                    Heal.Cast();
-                                }
-
-                                if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
-                                {
-                                    Heal.Cast();
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (target.IsMe)
-                {
-                    if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                    {
-                        var healc = (SummMenu[Player.Instance.ChampionName + "EnableactiveHeal"].Cast<KeyBind>().CurrentValue
-                                     || SummMenu[Player.Instance.ChampionName + "EnableHeal"].Cast<KeyBind>().CurrentValue) && Heal.IsReady();
-                        var healme = SummMenu["Healme"].Cast<Slider>().CurrentValue;
-                        if (healc)
-                        {
-                            if (target.HealthPercent <= healme)
-                            {
-                                Heal.Cast();
-                            }
-
-                            if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
-                            {
-                                Heal.Cast();
-                            }
-                        }
-                    }
-
-                    if (Exhaust != null)
-                    {
-                        var exhaustc = (SummMenu[Player.Instance.ChampionName + "EnableactiveExhaust"].Cast<KeyBind>().CurrentValue
-                                        || SummMenu[Player.Instance.ChampionName + "EnableExhaust"].Cast<KeyBind>().CurrentValue) && Exhaust.IsReady();
-                        var Exhaustally = SummMenu["exhaustally"].Cast<Slider>().CurrentValue;
-                        var Exhaustenemy = SummMenu["exhaustenemy"].Cast<Slider>().CurrentValue;
-                        if (exhaustc && !SummMenu["DontExhaust" + caster.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                        {
-                            if (target.HealthPercent <= Exhaustenemy)
-                            {
-                                Exhaust.Cast(caster);
-                            }
-
-                            if (target.HealthPercent <= Exhaustally)
-                            {
-                                Exhaust.Cast(caster);
-                            }
-                        }
-                    }
-
-                    if (Barrier != null)
-                    {
-                        var barrierc = (SummMenu[Player.Instance.ChampionName + "EnableactiveBarrier"].Cast<KeyBind>().CurrentValue
-                                        || SummMenu[Player.Instance.ChampionName + "EnableBarrier"].Cast<KeyBind>().CurrentValue) && Barrier.IsReady();
-                        var barrierme = SummMenu["barrierme"].Cast<Slider>().CurrentValue;
-                        if (barrierc)
-                        {
-                            if (target.HealthPercent <= barrierme)
-                            {
-                                Barrier.Cast();
-                            }
-
-                            if (caster.GetAutoAttackDamage(target) > target.TotalShieldHealth())
-                            {
-                                Barrier.Cast();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        public static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (!(args.Target is AIHeroClient))
-            {
-                return;
-            }
-
-            var caster = sender;
-            var target = (AIHeroClient)args.Target;
-
-            if ((caster is AIHeroClient || caster is Obj_AI_Turret) && caster != null && target != null && caster.IsEnemy)
-            {
-                if (target.IsAlly && !target.IsMe)
-                {
-                    if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                    {
-                        var healc = (SummMenu[Player.Instance.ChampionName + "EnableactiveHeal"].Cast<KeyBind>().CurrentValue
-                                     || SummMenu[Player.Instance.ChampionName + "EnableHeal"].Cast<KeyBind>().CurrentValue) && Heal.IsReady();
-                        var healally = SummMenu["Healally"].Cast<Slider>().CurrentValue;
-                        if (healc)
-                        {
-                            if (target.IsInRange(Player.Instance, Heal.Range))
-                            {
-                                if (target.HealthPercent <= healally)
-                                {
-                                    Heal.Cast();
-                                }
-
-                                if (caster.BaseAttackDamage > target.TotalShieldHealth() || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                                {
-                                    Heal.Cast();
-                                }
-                            }
-                        }
-                    }
-
-                    if (Exhaust != null)
-                    {
-                        var exhaustc = (SummMenu[Player.Instance.ChampionName + "EnableactiveExhaust"].Cast<KeyBind>().CurrentValue
-                                        || SummMenu[Player.Instance.ChampionName + "EnableExhaust"].Cast<KeyBind>().CurrentValue) && Exhaust.IsReady();
-                        var Exhaustally = SummMenu["exhaustally"].Cast<Slider>().CurrentValue;
-                        var Exhaustenemy = SummMenu["exhaustenemy"].Cast<Slider>().CurrentValue;
-                        if (exhaustc && !SummMenu["DontExhaust" + caster.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                        {
-                            if (target.HealthPercent <= Exhaustenemy)
-                            {
-                                Exhaust.Cast(caster);
-                            }
-
-                            if (target.HealthPercent <= Exhaustally)
-                            {
-                                Exhaust.Cast(caster);
-                            }
-                        }
-                    }
-                }
-
-                if (target.IsMe)
-                {
-                    if (Heal != null && !SummMenu["DontHeal" + target.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                    {
-                        var healc = (SummMenu[Player.Instance.ChampionName + "EnableactiveHeal"].Cast<KeyBind>().CurrentValue
-                                     || SummMenu[Player.Instance.ChampionName + "EnableHeal"].Cast<KeyBind>().CurrentValue) && Heal.IsReady();
-                        var healme = SummMenu["Healme"].Cast<Slider>().CurrentValue;
-                        if (healc)
-                        {
-                            if (target.HealthPercent <= healme)
-                            {
-                                Heal.Cast();
-                            }
-
-                            if (caster.BaseAttackDamage > target.TotalShieldHealth() || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                            {
-                                Heal.Cast();
-                            }
-                        }
-
-                        if (Exhaust != null)
-                        {
-                            var exhaustc = (SummMenu[Player.Instance.ChampionName + "EnableactiveExhaust"].Cast<KeyBind>().CurrentValue
-                                            || SummMenu[Player.Instance.ChampionName + "EnableExhaust"].Cast<KeyBind>().CurrentValue)
-                                           && Exhaust.IsReady();
-                            var Exhaustally = SummMenu["exhaustally"].Cast<Slider>().CurrentValue;
-                            var Exhaustenemy = SummMenu["exhaustenemy"].Cast<Slider>().CurrentValue;
-                            if (exhaustc && !SummMenu["DontExhaust" + caster.BaseSkinName].Cast<CheckBox>().CurrentValue)
-                            {
-                                if (target.HealthPercent <= Exhaustenemy)
-                                {
-                                    Exhaust.Cast(caster);
-                                }
-
-                                if (target.HealthPercent <= Exhaustally)
-                                {
-                                    Exhaust.Cast(caster);
-                                }
-                            }
-                        }
-                    }
-
-                    if (Barrier != null)
-                    {
-                        var barrierc = (SummMenu[Player.Instance.ChampionName + "EnableactiveBarrier"].Cast<KeyBind>().CurrentValue
-                                        || SummMenu[Player.Instance.ChampionName + "EnableBarrier"].Cast<KeyBind>().CurrentValue) && Barrier.IsReady();
-                        var barrierme = SummMenu["barrierme"].Cast<Slider>().CurrentValue;
-                        if (barrierc)
-                        {
-                            if (target.HealthPercent <= barrierme)
-                            {
-                                Barrier.Cast();
-                            }
-
-                            if (caster.BaseAttackDamage > target.TotalShieldHealth() || caster.BaseAbilityDamage > target.TotalShieldHealth())
-                            {
-                                Barrier.Cast();
-                            }
-                        }
                     }
                 }
             }

@@ -5,7 +5,8 @@
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Menu;
-    using EloBuddy.SDK.Menu.Values;
+
+    using Common;
 
     internal class AutoQSS
     {
@@ -17,6 +18,8 @@
 
         public static readonly Item Dervish_Blade = new Item(ItemId.Dervish_Blade);
 
+        public static readonly Item Mikaels_Crucible = new Item(ItemId.Mikaels_Crucible);
+
         protected static bool loaded = false;
 
         public static Menu QssMenu { get; private set; }
@@ -25,49 +28,51 @@
         {
             QssMenu = Load.UtliMenu.AddSubMenu("AutoQSS");
             QssMenu.AddGroupLabel("AutoQSS Settings");
-            QssMenu.Add("enable", new CheckBox("Enable", false));
-            QssMenu.Add("Mercurial", new CheckBox("Use Mercurial Scimitar", false));
-            QssMenu.Add("Quicksilver", new CheckBox("Use Quicksilver Sash", false));
+            QssMenu.Checkbox("enable", "Enable");
+            QssMenu.Checkbox("Mercurial", "Use Mercurial Scimitar");
+            QssMenu.Checkbox("Quicksilver", "Use Quicksilver Sash");
+            QssMenu.Checkbox("Dervish_Blade", "Use Dervish Blade");
+            QssMenu.Checkbox("Mikaels_Crucible", "Use Mikaels Crucible");
             if (Player.Spells.FirstOrDefault(o => o.SData.Name.Contains("SummonerBoost")) != null)
             {
-                QssMenu.Add("Cleanse", new CheckBox("Use Cleanse Spell", false));
+                QssMenu.Checkbox("Cleanse", "Use Cleanse Spell");
                 Cleanse = new Spell.Active(Player.Instance.GetSpellSlotFromName("SummonerBoost"));
             }
 
             QssMenu.AddSeparator();
             QssMenu.AddGroupLabel("Debuffs Settings:");
-            QssMenu.Add("blind", new CheckBox("Use On Blinds?", false));
-            QssMenu.Add("charm", new CheckBox("Use On Charms?", false));
-            QssMenu.Add("disarm", new CheckBox("Use On Disarm?", false));
-            QssMenu.Add("fear", new CheckBox("Use On Fear?", false));
-            QssMenu.Add("frenzy", new CheckBox("Use On Frenzy?", false));
-            QssMenu.Add("silence", new CheckBox("Use On Silence?", false));
-            QssMenu.Add("snare", new CheckBox("Use On Snare?", false));
-            QssMenu.Add("sleep", new CheckBox("Use On Sleep?", false));
-            QssMenu.Add("stun", new CheckBox("Use On Stuns?", false));
-            QssMenu.Add("supperss", new CheckBox("Use On Supperss?", false));
-            QssMenu.Add("slow", new CheckBox("Use On Slows?", false));
-            QssMenu.Add("knockup", new CheckBox("Use On Knock Ups?", false));
-            QssMenu.Add("knockback", new CheckBox("Use On Knock Backs?", false));
-            QssMenu.Add("nearsight", new CheckBox("Use On NearSight?", false));
-            QssMenu.Add("root", new CheckBox("Use On Roots?", false));
-            QssMenu.Add("tunt", new CheckBox("Use On Taunts?", false));
-            QssMenu.Add("poly", new CheckBox("Use On Polymorph?", false));
-            QssMenu.Add("poison", new CheckBox("Use On Poisons?", false));
+            QssMenu.Checkbox("blind", "Use On Blinds?");
+            QssMenu.Checkbox("charm", "Use On Charms?");
+            QssMenu.Checkbox("disarm", "Use On Disarm?");
+            QssMenu.Checkbox("fear", "Use On Fear?");
+            QssMenu.Checkbox("frenzy", "Use On Frenzy?");
+            QssMenu.Checkbox("silence", "Use On Silence?");
+            QssMenu.Checkbox("snare", "Use On Snare?");
+            QssMenu.Checkbox("sleep", "Use On Sleep?");
+            QssMenu.Checkbox("stun", "Use On Stuns?");
+            QssMenu.Checkbox("supperss", "Use On Supperss?");
+            QssMenu.Checkbox("slow", "Use On Slows?");
+            QssMenu.Checkbox("knockup", "Use On Knock Ups?");
+            QssMenu.Checkbox("knockback", "Use On Knock Backs?");
+            QssMenu.Checkbox("nearsight", "Use On NearSight?");
+            QssMenu.Checkbox("root", "Use On Roots?");
+            QssMenu.Checkbox("tunt", "Use On Taunts?");
+            QssMenu.Checkbox("poly", "Use On Polymorph?");
+            QssMenu.Checkbox("poison", "Use On Poisons?");
 
             QssMenu.AddSeparator();
             QssMenu.AddGroupLabel("Ults Settings:");
-            QssMenu.Add("liss", new CheckBox("Use On Lissandra Ult?", false));
-            QssMenu.Add("naut", new CheckBox("Use On Nautilus Ult?", false));
-            QssMenu.Add("zed", new CheckBox("Use On Zed Ult?", false));
-            QssMenu.Add("vlad", new CheckBox("Use On Vlad Ult?", false));
-            QssMenu.Add("fizz", new CheckBox("Use On Fizz Ult?", false));
-            QssMenu.Add("fiora", new CheckBox("Use On Fiora Ult?", false));
+            QssMenu.Checkbox("liss", "Use On Lissandra Ult?");
+            QssMenu.Checkbox("naut", "Use On Nautilus Ult?");
+            QssMenu.Checkbox("zed", "Use On Zed Ult?");
+            QssMenu.Checkbox("vlad", "Use On Vlad Ult?");
+            QssMenu.Checkbox("fizz", "Use On Fizz Ult?");
+            QssMenu.Checkbox("fiora", "Use On Fiora Ult?");
             QssMenu.AddSeparator();
-            QssMenu.Add("hp", new Slider("Use Only When HP is Under %", 25, 0, 100));
-            QssMenu.Add("human", new Slider("Humanizer Delay", 150, 0, 1500));
-            QssMenu.Add("Rene", new Slider("Enemies Near to Cast", 1, 0, 5));
-            QssMenu.Add("enemydetect", new Slider("Enemies Detect Range", 1000, 0, 2000));
+            QssMenu.Slider("hp", "Use Only When HP is Under [{0}%]", 30);
+            QssMenu.Slider("human", "Humanizer Delay [{0}]", 150, 0, 1500);
+            QssMenu.Slider("Rene", "[{0}] Enemies or more Near to Cast", 1, 0, 5);
+            QssMenu.Slider("enemydetect", "Enemies Detect InRange [{0}]", 1000, 0, 2000);
             loaded = true;
 
             Obj_AI_Base.OnBuffGain += OnBuffGain;
@@ -80,55 +85,52 @@
                 return;
             }
 
-            if (QssMenu["enable"].Cast<CheckBox>().CurrentValue)
+            if (QssMenu.GetCheckbox("enable"))
             {
                 if (sender.IsMe)
                 {
-                    var debuff = (QssMenu["charm"].Cast<CheckBox>().CurrentValue
-                                  && (args.Buff.Type == BuffType.Charm || Player.Instance.HasBuffOfType(BuffType.Charm)))
-                                 || (QssMenu["tunt"].Cast<CheckBox>().CurrentValue
+                    var debuff = (QssMenu.GetCheckbox("charm") && (args.Buff.Type == BuffType.Charm || Player.Instance.HasBuffOfType(BuffType.Charm)))
+                                 || (QssMenu.GetCheckbox("tunt")
                                      && (args.Buff.Type == BuffType.Taunt || Player.Instance.HasBuffOfType(BuffType.Taunt)))
-                                 || (QssMenu["stun"].Cast<CheckBox>().CurrentValue
-                                     && (args.Buff.Type == BuffType.Stun || Player.Instance.HasBuffOfType(BuffType.Stun)))
-                                 || (QssMenu["fear"].Cast<CheckBox>().CurrentValue
-                                     && (args.Buff.Type == BuffType.Fear || Player.Instance.HasBuffOfType(BuffType.Fear)))
-                                 || (QssMenu["silence"].Cast<CheckBox>().CurrentValue
+                                 || (QssMenu.GetCheckbox("stun") && (args.Buff.Type == BuffType.Stun || Player.Instance.HasBuffOfType(BuffType.Stun)))
+                                 || (QssMenu.GetCheckbox("fear") && (args.Buff.Type == BuffType.Fear || Player.Instance.HasBuffOfType(BuffType.Fear)))
+                                 || (QssMenu.GetCheckbox("silence")
                                      && (args.Buff.Type == BuffType.Silence || Player.Instance.HasBuffOfType(BuffType.Silence)))
-                                 || (QssMenu["snare"].Cast<CheckBox>().CurrentValue
+                                 || (QssMenu.GetCheckbox("snare")
                                      && (args.Buff.Type == BuffType.Snare || Player.Instance.HasBuffOfType(BuffType.Snare)))
-                                 || (QssMenu["supperss"].Cast<CheckBox>().CurrentValue
+                                 || (QssMenu.GetCheckbox("supperss")
                                      && (args.Buff.Type == BuffType.Suppression || Player.Instance.HasBuffOfType(BuffType.Suppression)))
-                                 || (QssMenu["sleep"].Cast<CheckBox>().CurrentValue
+                                 || (QssMenu.GetCheckbox("sleep")
                                      && (args.Buff.Type == BuffType.Sleep || Player.Instance.HasBuffOfType(BuffType.Sleep)))
-                                 || (QssMenu["poly"].Cast<CheckBox>().CurrentValue
+                                 || (QssMenu.GetCheckbox("poly")
                                      && (args.Buff.Type == BuffType.Polymorph || Player.Instance.HasBuffOfType(BuffType.Polymorph)))
-                                 || (QssMenu["frenzy"].Cast<CheckBox>().CurrentValue
+                                 || (QssMenu.GetCheckbox("frenzy")
                                      && (args.Buff.Type == BuffType.Frenzy || Player.Instance.HasBuffOfType(BuffType.Frenzy)))
-                                 || (QssMenu["disarm"].Cast<CheckBox>().CurrentValue
+                                 || (QssMenu.GetCheckbox("disarm")
                                      && (args.Buff.Type == BuffType.Disarm || Player.Instance.HasBuffOfType(BuffType.Disarm)))
-                                 || (QssMenu["nearsight"].Cast<CheckBox>().CurrentValue
+                                 || (QssMenu.GetCheckbox("nearsight")
                                      && (args.Buff.Type == BuffType.NearSight || Player.Instance.HasBuffOfType(BuffType.NearSight)))
-                                 || (QssMenu["knockback"].Cast<CheckBox>().CurrentValue
+                                 || (QssMenu.GetCheckbox("knockback")
                                      && (args.Buff.Type == BuffType.Knockback || Player.Instance.HasBuffOfType(BuffType.Knockback)))
-                                 || (QssMenu["knockup"].Cast<CheckBox>().CurrentValue
+                                 || (QssMenu.GetCheckbox("knockup")
                                      && (args.Buff.Type == BuffType.Knockup || Player.Instance.HasBuffOfType(BuffType.Knockup)))
-                                 || (QssMenu["slow"].Cast<CheckBox>().CurrentValue
-                                     && (args.Buff.Type == BuffType.Slow || Player.Instance.HasBuffOfType(BuffType.Slow)))
-                                 || (QssMenu["poison"].Cast<CheckBox>().CurrentValue
+                                 || (QssMenu.GetCheckbox("slow") && (args.Buff.Type == BuffType.Slow || Player.Instance.HasBuffOfType(BuffType.Slow)))
+                                 || (QssMenu.GetCheckbox("poison")
                                      && (args.Buff.Type == BuffType.Poison || Player.Instance.HasBuffOfType(BuffType.Poison)))
-                                 || (QssMenu["blind"].Cast<CheckBox>().CurrentValue
+                                 || (QssMenu.GetCheckbox("blind")
                                      && (args.Buff.Type == BuffType.Blind || Player.Instance.HasBuffOfType(BuffType.Blind)))
-                                 || (QssMenu["zed"].Cast<CheckBox>().CurrentValue && args.Buff.Name == "zedrtargetmark")
-                                 || (QssMenu["vlad"].Cast<CheckBox>().CurrentValue && args.Buff.Name == "vladimirhemoplaguedebuff")
-                                 || (QssMenu["liss"].Cast<CheckBox>().CurrentValue && args.Buff.Name == "LissandraREnemy2")
-                                 || (QssMenu["fizz"].Cast<CheckBox>().CurrentValue && args.Buff.Name == "fizzmarinerdoombomb")
-                                 || (QssMenu["naut"].Cast<CheckBox>().CurrentValue && args.Buff.Name == "nautilusgrandlinetarget")
-                                 || (QssMenu["fiora"].Cast<CheckBox>().CurrentValue && args.Buff.Name == "fiorarmark");
-                    var enemys = QssMenu["Rene"].Cast<Slider>().CurrentValue;
-                    var hp = QssMenu["hp"].Cast<Slider>().CurrentValue;
-                    var enemysrange = QssMenu["enemydetect"].Cast<Slider>().CurrentValue;
-                    var delay = QssMenu["human"].Cast<Slider>().CurrentValue;
-                    if (debuff && Player.Instance.HealthPercent <= hp && Player.Instance.Position.CountEnemiesInRange(enemysrange) >= enemys)
+                                 || (QssMenu.GetCheckbox("zed") && args.Buff.Name == "zedrtargetmark")
+                                 || (QssMenu.GetCheckbox("vlad") && args.Buff.Name == "vladimirhemoplaguedebuff")
+                                 || (QssMenu.GetCheckbox("liss") && args.Buff.Name == "LissandraREnemy2")
+                                 || (QssMenu.GetCheckbox("fizz") && args.Buff.Name == "fizzmarinerdoombomb")
+                                 || (QssMenu.GetCheckbox("naut") && args.Buff.Name == "nautilusgrandlinetarget")
+                                 || (QssMenu.GetCheckbox("fiora") && args.Buff.Name == "fiorarmark");
+                    var enemys = QssMenu.GetSlider("Rene");
+                    var hp = QssMenu.GetSlider("hp");
+                    var enemysrange = QssMenu.GetSlider("enemydetect");
+                    var countenemies = Helpers.CountEnemies(enemysrange);
+                    var delay = QssMenu.GetSlider("human");
+                    if (debuff && Player.Instance.HealthPercent <= hp && countenemies >= enemys)
                     {
                         Core.DelayAction(QssCast, delay);
                     }
@@ -138,24 +140,24 @@
 
         public static void QssCast()
         {
-            if (Quicksilver_Sash.IsOwned() && Quicksilver_Sash.IsReady() && QssMenu["Quicksilver"].Cast<CheckBox>().CurrentValue)
+            if (Quicksilver_Sash.IsOwned() && Quicksilver_Sash.IsReady() && QssMenu.GetCheckbox("Quicksilver"))
             {
                 Quicksilver_Sash.Cast();
             }
 
-            if (Mercurial_Scimitar.IsOwned() && Mercurial_Scimitar.IsReady() && QssMenu["Mercurial"].Cast<CheckBox>().CurrentValue)
+            if (Mercurial_Scimitar.IsOwned() && Mercurial_Scimitar.IsReady() && QssMenu.GetCheckbox("Mercurial"))
             {
                 Mercurial_Scimitar.Cast();
             }
 
-            if (Dervish_Blade.IsOwned() && Dervish_Blade.IsReady() && QssMenu["Mercurial"].Cast<CheckBox>().CurrentValue)
+            if (Dervish_Blade.IsOwned() && Dervish_Blade.IsReady() && QssMenu.GetCheckbox("Dervish_Blade"))
             {
                 Dervish_Blade.Cast();
             }
 
             if (Cleanse != null)
             {
-                if (QssMenu["Cleanse"].Cast<CheckBox>().CurrentValue && Cleanse.IsReady())
+                if (QssMenu.GetCheckbox("Cleanse") && Cleanse.IsReady())
                 {
                     Cleanse.Cast();
                 }

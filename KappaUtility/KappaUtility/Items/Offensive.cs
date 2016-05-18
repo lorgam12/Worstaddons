@@ -38,19 +38,19 @@
         {
             OffMenu = Load.UtliMenu.AddSubMenu("Offense Items");
             OffMenu.AddGroupLabel("Offense Settings");
-            OffMenu.Add("Hydra", new CheckBox("Use Hydra / Timat / Titanic", false));
-            OffMenu.Add("useGhostblade", new CheckBox("Use Youmuu's Ghostblade", false));
-            OffMenu.Add("UseBOTRK", new CheckBox("Use Blade of the Ruined King", false));
-            OffMenu.Add("UseBilge", new CheckBox("Use Bilgewater Cutlass", false));
-            OffMenu.Add("UseGunblade", new CheckBox("Use Hextech Gunblade", false));
-            OffMenu.Add("UseBelt", new CheckBox("Use Hextech ProtoBelt-01", false));
-            OffMenu.Add("UseGLP", new CheckBox("Use Hextech GLP-800", false));
+            OffMenu.Checkbox("Hydra", " Hydra / Timat / Titanic");
+            OffMenu.Checkbox("useGhostblade", " Use Youmuu's Ghostblade");
+            OffMenu.Checkbox("UseBOTRK", " Use Blade of the Ruined King");
+            OffMenu.Checkbox("UseBilge", " Use Bilgewater Cutlass");
+            OffMenu.Checkbox("UseGunblade", " Use Hextech Gunblade");
+            OffMenu.Checkbox("UseBelt", " Use Hextech ProtoBelt-01");
+            OffMenu.Checkbox("UseGLP", " Use Hextech GLP-800");
             OffMenu.AddSeparator();
             OffMenu.AddGroupLabel("Settings");
-            OffMenu.Add("UseKS", new CheckBox("Use for KillSteal", false));
-            OffMenu.Add("UseCombo", new CheckBox("Use In Combo", false));
-            OffMenu.Add("eL", new Slider("Use On Enemy health", 65, 0, 100));
-            OffMenu.Add("oL", new Slider("Use On My health", 65, 0, 100));
+            OffMenu.Checkbox("UseKS", " Use for KillSteal");
+            OffMenu.Checkbox("UseCombo", " Use In Combo");
+            OffMenu.Slider("eL", "Use On Enemy health", 65);
+            OffMenu.Slider("oL", "Use On My health", 65);
 
             Orbwalker.OnPostAttack += Orbwalker_OnPostAttack;
             loaded = true;
@@ -73,6 +73,11 @@
             var flags = Orbwalker.ActiveModesFlags;
             if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && useHydra)
             {
+                if (Youmuu.IsReady() && Youmuu.IsOwned(Player.Instance) && target.IsValidTarget(500) && OffMenu.GetCheckbox("useGhostblade"))
+                {
+                    Youmuu.Cast();
+                }
+
                 if (Hydra.IsOwned() && Hydra.IsReady() && Hydra != null)
                 {
                     if (Hydra.Cast())
@@ -111,41 +116,38 @@
                 {
                     if (enemy != null && enemy.IsKillable() && enemy.IsValidTarget(600))
                     {
-                        if (OffMenu["UseGunblade"].Cast<CheckBox>().CurrentValue
-                            && Player.Instance.GetItemDamage(enemy, ItemId.Hextech_Gunblade) >= enemy.Health)
+                        if (OffMenu.GetCheckbox("UseGunblade") && Player.Instance.GetItemDamage(enemy, ItemId.Hextech_Gunblade) >= enemy.Health)
                         {
                             Gunblade.Cast(enemy);
                         }
-                        if (OffMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue
-                            && Player.Instance.GetItemDamage(enemy, ItemId.Blade_of_the_Ruined_King) >= enemy.Health)
+                        if (OffMenu.GetCheckbox("UseBOTRK") && Player.Instance.GetItemDamage(enemy, ItemId.Blade_of_the_Ruined_King) >= enemy.Health)
                         {
                             Botrk.Cast(enemy);
                         }
-                        if (OffMenu["UseBilge"].Cast<CheckBox>().CurrentValue
-                            && Player.Instance.GetItemDamage(enemy, ItemId.Bilgewater_Cutlass) >= enemy.Health)
+                        if (OffMenu.GetCheckbox("UseBilge") && Player.Instance.GetItemDamage(enemy, ItemId.Bilgewater_Cutlass) >= enemy.Health)
                         {
                             Cutlass.Cast(enemy);
                         }
-                        if (OffMenu["UseBelt"].Cast<CheckBox>().CurrentValue
-                            && Player.Instance.GetItemDamage(enemy, ItemId.Will_of_the_Ancients) >= enemy.Health)
+                        if (OffMenu.GetCheckbox("UseBelt") && Player.Instance.GetItemDamage(enemy, ItemId.Will_of_the_Ancients) >= enemy.Health)
                         {
                             ProtoBelt.Cast(enemy.ServerPosition);
                         }
-                        if (OffMenu["UseGLP"].Cast<CheckBox>().CurrentValue && Player.Instance.GetItemDamage(enemy, (ItemId)3030) >= enemy.Health)
+                        if (OffMenu.GetCheckbox("UseGLP") && Player.Instance.GetItemDamage(enemy, GLP.Id) >= enemy.Health)
                         {
                             GLP.Cast(enemy.ServerPosition);
                         }
-                        if (OffMenu["Hydra"].Cast<CheckBox>().CurrentValue)
+                        if (OffMenu.GetCheckbox("Hydra"))
                         {
-                            if (Hydra.IsOwned(Player.Instance) && Hydra.IsReady() && Player.Instance.GetItemDamage(enemy, ItemId.Ravenous_Hydra_Melee_Only) >= enemy.Health)
+                            if (Hydra.IsOwned(Player.Instance) && Hydra.IsReady() && Player.Instance.GetItemDamage(enemy, Hydra.Id) >= enemy.Health)
                             {
                                 Hydra.Cast();
                             }
-                            if (Timat.IsOwned(Player.Instance) && Timat.IsReady() && Player.Instance.GetItemDamage(enemy, ItemId.Tiamat_Melee_Only) >= enemy.Health)
+                            if (Timat.IsOwned(Player.Instance) && Timat.IsReady() && Player.Instance.GetItemDamage(enemy, Timat.Id) >= enemy.Health)
                             {
                                 Timat.Cast();
                             }
-                            if (Titanic.IsOwned(Player.Instance) && Titanic.IsReady() && Player.Instance.GetItemDamage(enemy, ItemId.Titanic_Hydra) >= enemy.Health)
+                            if (Titanic.IsOwned(Player.Instance) && Titanic.IsReady()
+                                && Player.Instance.GetItemDamage(enemy, Titanic.Id) >= enemy.Health)
                             {
                                 Titanic.Cast();
                             }
@@ -155,51 +157,38 @@
             }
 
             var target = TargetSelector.GetTarget(600, DamageType.Physical);
-            if (target == null || !target.IsValidTarget() || !OffMenu["UseCombo"].Cast<CheckBox>().CurrentValue)
+            if (target == null || !target.IsValidTarget() || !OffMenu.GetCheckbox("UseCombo"))
             {
                 return;
             }
 
-            if (target.HealthPercent <= OffMenu["eL"].Cast<Slider>().CurrentValue
-                || Player.Instance.HealthPercent <= OffMenu["oL"].Cast<Slider>().CurrentValue)
+            if (target.HealthPercent <= OffMenu.GetSlider("eL") || Player.Instance.HealthPercent <= OffMenu.GetSlider("oL"))
             {
                 if (Gunblade.IsReady() && Gunblade.IsOwned(Player.Instance) && target.IsValidTarget(Gunblade.Range)
-                    && OffMenu["UseGunblade"].Cast<CheckBox>().CurrentValue)
+                    && OffMenu.GetCheckbox("UseGunblade"))
                 {
                     Gunblade.Cast(target);
                 }
 
-                if (Botrk.IsReady() && Botrk.IsOwned(Player.Instance) && target.IsValidTarget(Botrk.Range)
-                    && (target.HealthPercent <= OffMenu["eL"].Cast<Slider>().CurrentValue
-                        || Player.Instance.HealthPercent <= OffMenu["oL"].Cast<Slider>().CurrentValue)
-                    && OffMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
+                if (Botrk.IsReady() && Botrk.IsOwned(Player.Instance) && target.IsValidTarget(Botrk.Range) && OffMenu.GetCheckbox("UseBOTRK"))
                 {
                     Botrk.Cast(target);
                 }
 
-                if (Cutlass.IsReady() && Cutlass.IsOwned(Player.Instance) && target.IsValidTarget(Cutlass.Range)
-                    && (target.HealthPercent <= OffMenu["eL"].Cast<Slider>().CurrentValue
-                        || Player.Instance.HealthPercent <= OffMenu["oL"].Cast<Slider>().CurrentValue)
-                    && OffMenu["UseBilge"].Cast<CheckBox>().CurrentValue)
+                if (Cutlass.IsReady() && Cutlass.IsOwned(Player.Instance) && target.IsValidTarget(Cutlass.Range) && OffMenu.GetCheckbox("UseBilge"))
                 {
                     Cutlass.Cast(target);
                 }
 
-                if (ProtoBelt.IsOwned(Player.Instance) && ProtoBelt.IsReady() && OffMenu["UseBelt"].Cast<CheckBox>().CurrentValue)
+                if (ProtoBelt.IsOwned(Player.Instance) && ProtoBelt.IsReady() && OffMenu.GetCheckbox("UseBelt"))
                 {
                     ProtoBelt.Cast(target.ServerPosition);
                 }
 
-                if (GLP.IsOwned(Player.Instance) && GLP.IsReady() && OffMenu["UseGLP"].Cast<CheckBox>().CurrentValue)
+                if (GLP.IsOwned(Player.Instance) && GLP.IsReady() && OffMenu.GetCheckbox("UseGLP"))
                 {
                     GLP.Cast(target.ServerPosition);
                 }
-            }
-
-            if (Youmuu.IsReady() && Youmuu.IsOwned(Player.Instance) && target.IsValidTarget(500)
-                && OffMenu["useGhostblade"].Cast<CheckBox>().CurrentValue)
-            {
-                Youmuu.Cast();
             }
         }
     }
