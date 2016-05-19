@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Malzahar
+﻿namespace Malzahar
 {
+    using System;
+    using System.Linq;
+
     using EloBuddy;
     using EloBuddy.SDK;
     using EloBuddy.SDK.Enumerations;
@@ -57,7 +54,7 @@ namespace Malzahar
 
         public static bool IsCC(this Obj_AI_Base target)
         {
-            return target.IsStunned || target.IsRooted || target.IsTaunted || target.IsCharmed || target.Spellbook.IsChanneling || !target.IsMoving
+            return target.IsStunned || target.IsRooted || target.IsTaunted || target.IsCharmed || target.Spellbook.IsChanneling
                    || target.HasBuffOfType(BuffType.Charm) || target.HasBuffOfType(BuffType.Knockback) || target.HasBuffOfType(BuffType.Knockup)
                    || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Suppression)
                    || target.HasBuffOfType(BuffType.Taunt);
@@ -95,7 +92,7 @@ namespace Malzahar
                     }
                     break;
             }
-            return Player.Instance.CalculateDamageOnUnit(target, DamageType.Mixed, dmg - 10);
+            return Player.Instance.CalculateDamageOnUnit(target, DamageType.Magical, dmg - 10);
         }
 
         public static float GetDamage(Obj_AI_Base target)
@@ -115,7 +112,7 @@ namespace Malzahar
             }
             if (E.IsReady())
             {
-                dmg += new float[] { 80, 115, 150, 185, 220 }[Player.GetSpell(SpellSlot.E).Level - 1] + 0.70f * AP;
+                dmg += new float[] { 80, 115, 150, 185, 220 }[Player.GetSpell(SpellSlot.E).Level - 1] + 0.7f * AP;
             }
             if (R.IsReady())
             {
@@ -123,7 +120,7 @@ namespace Malzahar
                     new float[] { target.MaxHealth * 0.25f, target.MaxHealth * 0.35f, target.MaxHealth * 0.45f }[
                         Player.GetSpell(SpellSlot.R).Level - 1] + (0.07f * (AP / 100));
             }
-            return Player.Instance.CalculateDamageOnUnit(target, DamageType.Mixed, dmg - 25);
+            return Player.Instance.CalculateDamageOnUnit(target, DamageType.Magical, dmg - 25);
         }
 
         private static Color colorselector(Spell.SpellBase slot)
@@ -191,8 +188,8 @@ namespace Malzahar
                 return;
             }
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 900, SkillShotType.Circular, 500, 500, 90);
-            W = new Spell.Skillshot(SpellSlot.W, 600, SkillShotType.Circular, 500, int.MaxValue, 80);
+            Q = new Spell.Skillshot(SpellSlot.Q, 900, SkillShotType.Circular, 250, 500, 90);
+            W = new Spell.Skillshot(SpellSlot.W, 600, SkillShotType.Circular, 250, int.MaxValue, 80);
             E = new Spell.Targeted(SpellSlot.E, 650);
             R = new Spell.Targeted(SpellSlot.R, 700);
 
@@ -277,6 +274,8 @@ namespace Malzahar
             DrawMenu.Add(R.Name, new ComboBox("R Color", 3, "Aqua", "BlueViolet", "Chartreuse", "Purple", "White", "Orange", "Green"));
             DrawMenu.AddSeparator(0);
 
+            Chat.Print(Player.Instance.NetworkId);
+
             Game.OnUpdate += Game_OnUpdate;
             Spellbook.OnCastSpell += Spellbook_OnCastSpell;
             Player.OnIssueOrder += Player_OnIssueOrder;
@@ -284,6 +283,21 @@ namespace Malzahar
             Gapcloser.OnGapcloser += Gapcloser_OnGapcloser;
             GameObject.OnCreate += GameObject_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
+            Orbwalker.OnUnkillableMinion += Orbwalker_OnUnkillableMinion;
+        }
+
+        private static void Orbwalker_OnUnkillableMinion(Obj_AI_Base target, Orbwalker.UnkillableMinionArgs args)
+        {
+            if (target == null) return;
+
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
+            {
+                var Eready = LaneClear["E"].Cast<CheckBox>().CurrentValue && E.IsReady();
+                if (Eready && E.GetDamage(target) >= args.RemainingHealth)
+                {
+                    E.Cast(target);
+                }
+            }
         }
 
         private static void Gapcloser_OnGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
@@ -474,12 +488,12 @@ namespace Malzahar
                     return;
                 }
 
-                if (Rcomready && GetDamage(target) >= Prediction.Health.GetPrediction(target, R.CastDelay * 1000))
+                if (Rcomready && GetDamage(target) >= Prediction.Health.GetPrediction(target, R.CastDelay))
                 {
                     R.Cast(target);
                 }
 
-                if (Rfinready && R.GetDamage(target) >= Prediction.Health.GetPrediction(target, R.CastDelay * 1000))
+                if (Rfinready && R.GetDamage(target) >= Prediction.Health.GetPrediction(target, R.CastDelay))
                 {
                     R.Cast(target);
                 }
@@ -654,12 +668,17 @@ namespace Malzahar
             var Eready = KillSteal["E"].Cast<CheckBox>().CurrentValue && E.IsReady();
             var Rready = KillSteal["R"].Cast<CheckBox>().CurrentValue && R.IsReady();
 
+            var Qksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(Q.Range));
+            var Wksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(W.Range));
+            var Eksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(E.Range));
+
             if (Qready)
             {
-                var ksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(Q.Range));
-                if (ksenemy != null)
+                if (Qksenemy != null)
                 {
-                    foreach (var enemy in ksenemy.Where(enemy => Q.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, Q.CastDelay * 1000)))
+                    foreach (
+                        var enemy in Qksenemy.Where(enemy => Q.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, Q.CastDelay))
+                        )
                     {
                         Q.Cast(enemy);
                     }
@@ -668,10 +687,11 @@ namespace Malzahar
 
             if (Wready)
             {
-                var ksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(W.Range));
-                if (ksenemy != null)
+                if (Wksenemy != null)
                 {
-                    foreach (var enemy in ksenemy.Where(enemy => W.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, W.CastDelay * 1000)))
+                    foreach (
+                        var enemy in Wksenemy.Where(enemy => W.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, W.CastDelay))
+                        )
                     {
                         W.Cast(enemy);
                     }
@@ -680,10 +700,11 @@ namespace Malzahar
 
             if (Eready)
             {
-                var ksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(E.Range));
-                if (ksenemy != null)
+                if (Eksenemy != null)
                 {
-                    foreach (var enemy in ksenemy.Where(enemy => E.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, E.CastDelay * 1000)))
+                    foreach (
+                        var enemy in Eksenemy.Where(enemy => E.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, E.CastDelay))
+                        )
                     {
                         E.Cast(enemy);
                     }
@@ -702,8 +723,16 @@ namespace Malzahar
                         e => e.IsKillable() && e.IsValidTarget(R.Range) && !KillSteal["DontUlt" + e.BaseSkinName].Cast<CheckBox>().CurrentValue);
                 if (ksenemy != null)
                 {
-                    foreach (var enemy in ksenemy.Where(enemy => R.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, R.CastDelay * 1000)))
+                    foreach (
+                        var enemy in ksenemy.Where(enemy => R.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, R.CastDelay)))
                     {
+                        if (Q.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, Q.CastDelay)
+                            || W.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, W.CastDelay)
+                            || E.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, E.CastDelay))
+                        {
+                            return;
+                        }
+
                         R.Cast(enemy);
                     }
                 }
