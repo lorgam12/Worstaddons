@@ -34,6 +34,8 @@
 
         private static void Loading_OnLoadingComplete1(EventArgs args)
         {
+            if(Player.Instance.Hero != Champion.Brand) return;
+
             MenuIni = MainMenu.AddMenu("Brand", "Brand");
             TS = MenuIni.AddSubMenu("TargetSelector");
             Auto = MenuIni.AddSubMenu("Auto");
