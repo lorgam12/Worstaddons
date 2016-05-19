@@ -70,33 +70,35 @@
                            && ((Hydra.IsOwned(Player.Instance) && Hydra.IsReady()) || (Timat.IsOwned(Player.Instance) && Timat.IsReady())
                                || (Titanic.IsOwned(Player.Instance) && Titanic.IsReady()));
             var flags = Orbwalker.ActiveModesFlags;
-            if (flags.HasFlag(Orbwalker.ActiveModes.Combo) && useHydra)
+            if (flags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 if (Youmuu.IsReady() && Youmuu.IsOwned(Player.Instance) && target.IsValidTarget(500) && OffMenu.GetCheckbox("useGhostblade"))
                 {
                     Youmuu.Cast();
                 }
-
-                if (Hydra.IsOwned() && Hydra.IsReady() && Hydra != null)
+                if (useHydra)
                 {
-                    if (Hydra.Cast())
+                    if (Hydra.IsOwned() && Hydra.IsReady() && Hydra != null)
                     {
-                        Orbwalker.ResetAutoAttack();
+                        if (Hydra.Cast())
+                        {
+                            Orbwalker.ResetAutoAttack();
+                        }
                     }
-                }
 
-                if (Timat.IsOwned() && Timat.IsReady() && Timat != null)
-                {
-                    if (Timat.Cast())
+                    if (Timat.IsOwned() && Timat.IsReady() && Timat != null)
                     {
-                        Orbwalker.ResetAutoAttack();
+                        if (Timat.Cast())
+                        {
+                            Orbwalker.ResetAutoAttack();
+                        }
                     }
-                }
-                if (Titanic.IsOwned() && Titanic.IsReady() && Titanic != null)
-                {
-                    if (Titanic.Cast())
+                    if (Titanic.IsOwned() && Titanic.IsReady() && Titanic != null)
                     {
-                        Orbwalker.ResetAutoAttack();
+                        if (Titanic.Cast())
+                        {
+                            Orbwalker.ResetAutoAttack();
+                        }
                     }
                 }
             }
