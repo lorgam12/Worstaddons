@@ -28,7 +28,8 @@
                         case 1:
                             {
                                 return
-                                    EntityManager.Heroes.Enemies.OrderBy(e => e.Health / Player.Instance.TotalMagicalDamage)
+                                    EntityManager.Heroes.Enemies.OrderBy(
+                                        e => e.TotalShieldHealth() / Player.Instance.CalculateDamageOnUnit(e, DamageType.Magical, 100))
                                         .ThenByDescending(TargetSelector.GetPriority)
                                         .FirstOrDefault(e => e.IsValidTarget(range) && e.IsKillable() && e.IsVisible);
                             }

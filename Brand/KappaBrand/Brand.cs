@@ -157,6 +157,23 @@
             Drawing.OnDraw += Drawing_OnDraw;
             Gapcloser.OnGapcloser += Gapcloser_OnGapcloser;
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
+            Orbwalker.OnUnkillableMinion += Orbwalker_OnUnkillableMinion;
+        }
+
+        private static void Orbwalker_OnUnkillableMinion(Obj_AI_Base target, Orbwalker.UnkillableMinionArgs args)
+        {
+            if (target == null || !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
+            {
+                return;
+            }
+
+            var Eready = LaneClear["E"].Cast<CheckBox>().CurrentValue && E.IsReady() && target.IsValidTarget(E.Range) && Common.Emana
+                         && E.Mana(LaneClear);
+
+            if (Eready && E.GetDamage(target) >= Prediction.Health.GetPrediction(target, E.CastDelay))
+            {
+                E.Cast(target);
+            }
         }
 
         private static void Game_OnTick(EventArgs args)
@@ -232,11 +249,11 @@
                 return;
             }
 
-            var Qready = Combo["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady() && target.IsValidTarget(Q.Range) && Q.Mana(Harass)
+            var Qready = Harass["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady() && target.IsValidTarget(Q.Range) && Q.Mana(Harass)
                          && (Q.GetPrediction(target).HitChance >= HitChance.High || target.IsCC()) && Common.Qmana;
-            var Wready = Combo["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.IsValidTarget(W.Range)
+            var Wready = Harass["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.IsValidTarget(W.Range)
                          && (W.GetPrediction(target).HitChance >= HitChance.High || target.IsCC()) && Common.Wmana && W.Mana(Harass);
-            var Eready = Combo["E"].Cast<CheckBox>().CurrentValue && E.IsReady() && target.IsValidTarget(E.Range) && Common.Emana && E.Mana(Harass);
+            var Eready = Harass["E"].Cast<CheckBox>().CurrentValue && E.IsReady() && target.IsValidTarget(E.Range) && Common.Emana && E.Mana(Harass);
 
             if (Qready)
             {
@@ -261,11 +278,12 @@
                 return;
             }
 
-            var Qready = Combo["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady() && target.IsValidTarget(Q.Range) && Q.Mana(LaneClear)
+            var Qready = LaneClear["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady() && target.IsValidTarget(Q.Range) && Q.Mana(LaneClear)
                          && (Q.GetPrediction(target).HitChance >= HitChance.High || target.IsCC()) && Common.Qmana;
-            var Wready = Combo["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.IsValidTarget(W.Range)
+            var Wready = LaneClear["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.IsValidTarget(W.Range)
                          && (W.GetPrediction(target).HitChance >= HitChance.High || target.IsCC()) && Common.Wmana && W.Mana(LaneClear);
-            var Eready = Combo["E"].Cast<CheckBox>().CurrentValue && E.IsReady() && target.IsValidTarget(E.Range) && Common.Emana && E.Mana(LaneClear);
+            var Eready = LaneClear["E"].Cast<CheckBox>().CurrentValue && E.IsReady() && target.IsValidTarget(E.Range) && Common.Emana
+                         && E.Mana(LaneClear);
 
             if (Qready)
             {
@@ -290,11 +308,12 @@
                 return;
             }
 
-            var Qready = Combo["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady() && target.IsValidTarget(Q.Range) && Q.Mana(LaneClear)
+            var Qready = JungleClear["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady() && target.IsValidTarget(Q.Range) && Q.Mana(JungleClear)
                          && (Q.GetPrediction(target).HitChance >= HitChance.High || target.IsCC()) && Common.Qmana;
-            var Wready = Combo["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.IsValidTarget(W.Range)
-                         && (W.GetPrediction(target).HitChance >= HitChance.High || target.IsCC()) && Common.Wmana && W.Mana(LaneClear);
-            var Eready = Combo["E"].Cast<CheckBox>().CurrentValue && E.IsReady() && target.IsValidTarget(E.Range) && Common.Emana && E.Mana(LaneClear);
+            var Wready = JungleClear["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && target.IsValidTarget(W.Range)
+                         && (W.GetPrediction(target).HitChance >= HitChance.High || target.IsCC()) && Common.Wmana && W.Mana(JungleClear);
+            var Eready = JungleClear["E"].Cast<CheckBox>().CurrentValue && E.IsReady() && target.IsValidTarget(E.Range) && Common.Emana
+                         && E.Mana(JungleClear);
 
             if (Qready)
             {
@@ -312,80 +331,89 @@
 
         public static void KillStealLogic()
         {
-            var targets = EntityManager.Heroes.Enemies.Where(e => e.IsValidTarget() && e.IsKillable());
+            var Qready = KillSteal["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady();
+            var Wready = KillSteal["W"].Cast<CheckBox>().CurrentValue && W.IsReady();
+            var Eready = KillSteal["E"].Cast<CheckBox>().CurrentValue && E.IsReady();
+            var Rready = KillSteal["R"].Cast<CheckBox>().CurrentValue && R.IsReady();
 
-            if (KillSteal.checkbox("Q") && Q.IsReady())
+            var Qksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(Q.Range));
+            var Wksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(W.Range));
+            var Eksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(E.Range));
+
+            if (Qready)
             {
-                var kstarget =
-                    targets.FirstOrDefault(e => e.IsValidTarget(Q.Range) && Q.GetDamage(e) >= Prediction.Health.GetPrediction(e, Q.CastDelay));
-
-                var Qready = kstarget != null && (Q.GetPrediction(kstarget).HitChance >= HitChance.High || kstarget.IsCC()) && Common.Qmana;
-                if (Qready)
+                if (Qksenemy != null)
                 {
-                    Q.Cast(kstarget);
+                    foreach (var enemy in Qksenemy.Where(enemy => Q.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, Q.CastDelay)))
+                    {
+                        if (Player.Instance.GetAutoAttackDamage(enemy, true) >= Prediction.Health.GetPrediction(enemy, (int)Orbwalker.AttackDelay))
+                        {
+                            return;
+                        }
+                        Q.Cast(enemy);
+                    }
                 }
             }
 
-            if (KillSteal.checkbox("W") && W.IsReady())
+            if (Wready)
             {
-                var kstarget =
-                    targets.FirstOrDefault(e => e.IsValidTarget(W.Range) && W.GetDamage(e) >= Prediction.Health.GetPrediction(e, W.CastDelay));
-
-                if (Q.GetDamage(kstarget) >= Prediction.Health.GetPrediction(kstarget, Q.CastDelay))
+                if (Wksenemy != null)
                 {
-                    return;
-                }
-
-                var Wready = kstarget != null && (W.GetPrediction(kstarget).HitChance >= HitChance.High || kstarget.IsCC()) && Common.Wmana;
-                if (Wready)
-                {
-                    W.Cast(kstarget);
+                    foreach (var enemy in Wksenemy.Where(enemy => W.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, W.CastDelay)))
+                    {
+                        if ((Q.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, Q.CastDelay) && Q.IsReady())
+                            || (Orbwalker.CanAutoAttack
+                                && Player.Instance.GetAutoAttackDamage(enemy, true)
+                                >= Prediction.Health.GetPrediction(enemy, (int)Orbwalker.AttackDelay)))
+                        {
+                            return;
+                        }
+                        W.Cast(enemy);
+                    }
                 }
             }
 
-            if (KillSteal.checkbox("E") && E.IsReady())
+            if (Eready)
             {
-                var kstarget =
-                    targets.FirstOrDefault(e => e.IsValidTarget(E.Range) && E.GetDamage(e) >= Prediction.Health.GetPrediction(e, E.CastDelay));
-
-                if (Q.GetDamage(kstarget) >= Prediction.Health.GetPrediction(kstarget, Q.CastDelay))
+                if (Eksenemy != null)
                 {
-                    return;
-                }
-                if (W.GetDamage(kstarget) >= Prediction.Health.GetPrediction(kstarget, W.CastDelay))
-                {
-                    return;
-                }
-
-                var Eready = kstarget != null && Common.Emana;
-                if (Eready)
-                {
-                    E.Cast(kstarget);
+                    foreach (var enemy in Eksenemy.Where(enemy => E.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, E.CastDelay)))
+                    {
+                        if ((Q.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, Q.CastDelay) && Q.IsReady())
+                            || (Orbwalker.CanAutoAttack
+                                && Player.Instance.GetAutoAttackDamage(enemy, true)
+                                >= Prediction.Health.GetPrediction(enemy, (int)Orbwalker.AttackDelay)))
+                        {
+                            return;
+                        }
+                        if (W.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, W.CastDelay) && W.IsReady())
+                        {
+                            return;
+                        }
+                        E.Cast(enemy);
+                    }
                 }
             }
 
-            if (KillSteal.checkbox("R") && R.IsReady())
+            if (Rready)
             {
-                var kstarget =
-                    targets.FirstOrDefault(e => e.IsValidTarget(R.Range) && R.GetDamage(e) >= Prediction.Health.GetPrediction(e, R.CastDelay));
+                var ksenemy = EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsValidTarget(R.Range));
+                if (ksenemy != null)
+                {
+                    foreach (var enemy in ksenemy.Where(enemy => R.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, R.CastDelay)))
+                    {
+                        if ((Q.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, Q.CastDelay) && Q.IsReady())
+                            || (W.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, W.CastDelay) && W.IsReady())
+                            || (E.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, E.CastDelay) && E.IsReady())
+                            || (Orbwalker.CanAutoAttack
+                                && Player.Instance.GetAutoAttackDamage(enemy, true)
+                                >= Prediction.Health.GetPrediction(enemy, (int)Orbwalker.AttackDelay)))
+                        {
+                            return;
+                        }
 
-                if (Q.GetDamage(kstarget) >= Prediction.Health.GetPrediction(kstarget, Q.CastDelay))
-                {
-                    return;
-                }
-                if (W.GetDamage(kstarget) >= Prediction.Health.GetPrediction(kstarget, W.CastDelay))
-                {
-                    return;
-                }
-                if (E.GetDamage(kstarget) >= Prediction.Health.GetPrediction(kstarget, E.CastDelay))
-                {
-                    return;
-                }
-
-                var Rready = kstarget != null && Common.Rmana;
-                if (Rready)
-                {
-                    R.Cast(kstarget);
+                        R.Cast(enemy);
+                    }
                 }
             }
         }
@@ -468,9 +496,12 @@
                 var minion =
                     EntityManager.MinionsAndMonsters.EnemyMinions.FirstOrDefault(
                         m => Q.GetDamage(m) >= Prediction.Health.GetPrediction(m, Q.CastDelay) && Q.GetPrediction(m).HitChance >= HitChance.High);
-
                 if (minion != null)
                 {
+                    if (Player.Instance.GetAutoAttackDamage(minion, true) >= Prediction.Health.GetPrediction(minion, (int)Orbwalker.AttackDelay))
+                    {
+                        return;
+                    }
                     Q.Cast(minion);
                 }
             }
@@ -544,7 +575,13 @@
             if (LaneClearmode)
             {
                 var minions = EntityManager.MinionsAndMonsters.EnemyMinions.Where(e => e.IsValidTarget(W.Range) && e.IsKillable());
-                var loc = EntityManager.MinionsAndMonsters.GetCircularFarmLocation(minions.ToArray(), W.Width, (int)W.Range, W.CastDelay, W.Speed);
+                var loc = EntityManager.MinionsAndMonsters.GetCircularFarmLocation(
+                    minions.ToArray(),
+                    W.Width + 75,
+                    (int)W.Range + 50,
+                    W.CastDelay,
+                    W.Speed);
+
                 var farmpos = loc.CastPosition;
 
                 if (farmpos != null && loc.HitNumber >= 2)
@@ -559,7 +596,12 @@
                     EntityManager.MinionsAndMonsters.GetJungleMonsters()
                         .OrderByDescending(m => m.MaxHealth)
                         .Where(e => e.IsValidTarget(W.Range) && e.IsKillable());
-                var loc = EntityManager.MinionsAndMonsters.GetCircularFarmLocation(minions.ToArray(), W.Width, (int)W.Range, W.CastDelay, W.Speed);
+                var loc = EntityManager.MinionsAndMonsters.GetCircularFarmLocation(
+                    minions.ToArray(),
+                    W.Width + 75,
+                    (int)W.Range + 50,
+                    W.CastDelay,
+                    W.Speed);
                 var farmpos = loc.CastPosition;
 
                 if (farmpos != null)
@@ -600,28 +642,35 @@
 
             if (LaneClearmode)
             {
-                var minions = EntityManager.MinionsAndMonsters.EnemyMinions.Where(e => e.IsValidTarget(W.Range) && e.IsKillable() && e.brandpassive());
-                var pred = Prediction.Position.PredictCircularMissileAoe(minions.Cast<Obj_AI_Base>().ToArray(), E.Range, 325, E.CastDelay, 1000);
-                var order = pred.OrderByDescending(p => p.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
-                var castpos = order?.CollisionObjects.FirstOrDefault(m => m.IsValidTarget(E.Range));
-
-                if (castpos != null && order.CollisionObjects.Length >= 2)
+                var minionpassive = EntityManager.MinionsAndMonsters.EnemyMinions.Where(m => m.brandpassive() && m.IsValidTarget(E.Range));
+                if (minionpassive != null)
                 {
-                    E.Cast(castpos);
+                    foreach (var minion in minionpassive)
+                    {
+                        var minions = EntityManager.MinionsAndMonsters.EnemyMinions.Where(e => e.IsValidTarget(E.Range) && e.IsKillable());
+                        var count = minions.Count(m => m.IsInRange(minion, 300));
+                        if (count >= 2)
+                        {
+                            E.Cast(minion);
+                        }
+                    }
                 }
             }
 
             if (JungleClearmode)
             {
-                var minions =
-                    EntityManager.MinionsAndMonsters.GetJungleMonsters().Where(e => e.IsValidTarget(W.Range) && e.IsKillable() && e.brandpassive());
-                var pred = Prediction.Position.PredictCircularMissileAoe(minions.Cast<Obj_AI_Base>().ToArray(), E.Range, 325, E.CastDelay, 1000);
-                var firstOrDefault = pred.OrderByDescending(p => p.GetCollisionObjects<Obj_AI_Minion>().Length).FirstOrDefault();
-                var castpos = firstOrDefault?.CollisionObjects.FirstOrDefault(m => m.IsValidTarget(E.Range));
-
-                if (castpos != null)
+                var minionpassive = EntityManager.MinionsAndMonsters.GetJungleMonsters().Where(m => m.brandpassive() && m.IsValidTarget(E.Range));
+                if (minionpassive != null)
                 {
-                    E.Cast(castpos);
+                    foreach (var minion in minionpassive)
+                    {
+                        var minions = EntityManager.MinionsAndMonsters.GetJungleMonsters().Where(e => e.IsValidTarget(E.Range) && e.IsKillable());
+                        var count = minions.Count(m => m.IsInRange(minion, 300));
+                        if (count >= 2)
+                        {
+                            E.Cast(minion);
+                        }
+                    }
                 }
             }
         }
@@ -638,15 +687,6 @@
 
             if (Combomode)
             {
-                if (Combo.checkbox("RFinisher"))
-                {
-                    var pred = R.GetDamage(target) >= Prediction.Health.GetPrediction(target, Q.CastDelay);
-                    var health = R.GetDamage(target) >= target.TotalShieldHealth();
-                    if (pred || health)
-                    {
-                        R.Cast(target);
-                    }
-                }
                 if (Combo.checkbox("RAoe"))
                 {
                     var AoeHit = Common.CountEnemeis(400, target) >= hits;
@@ -663,6 +703,30 @@
                         {
                             R.Cast(bestaoe);
                         }
+                    }
+                }
+
+                if (Combo.checkbox("RFinisher"))
+                {
+                    var pred = R.GetDamage(target) >= Prediction.Health.GetPrediction(target, Q.CastDelay);
+                    var health = R.GetDamage(target) >= target.TotalShieldHealth();
+
+                    if (Q.GetDamage(target) >= Prediction.Health.GetPrediction(target, Q.CastDelay))
+                    {
+                        return;
+                    }
+                    if (W.GetDamage(target) >= Prediction.Health.GetPrediction(target, W.CastDelay))
+                    {
+                        return;
+                    }
+                    if (E.GetDamage(target) >= Prediction.Health.GetPrediction(target, E.CastDelay))
+                    {
+                        return;
+                    }
+
+                    if (pred || health)
+                    {
+                        R.Cast(target);
                     }
                 }
             }
@@ -774,7 +838,7 @@
                             c = System.Drawing.Color.Orange;
                         }
 
-                        if (Damagelib.GetDamage(enemy) >= enemy.TotalShieldHealth())
+                        if (Damagelib.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, 1000))
                         {
                             damage = "Killable: " + (int)Damagelib.GetDamage(enemy) + "/" + (int)enemy.TotalShieldHealth();
                             c = System.Drawing.Color.Red;
