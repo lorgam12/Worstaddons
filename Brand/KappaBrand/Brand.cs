@@ -834,13 +834,13 @@
 
                         if (Damagelib.GetDamage(enemy) >= enemy.TotalShieldHealth() / 2)
                         {
-                            damage = "Harass for Kill: " + (int)Damagelib.GetDamage(enemy) + "/" + (int)enemy.TotalShieldHealth();
+                            damage = "Harass for Kill: " + (int)Damagelib.GetDamage(enemy) + " / " + (int)enemy.TotalShieldHealth();
                             c = System.Drawing.Color.Orange;
                         }
 
                         if (Damagelib.GetDamage(enemy) >= Prediction.Health.GetPrediction(enemy, 1000))
                         {
-                            damage = "Killable: " + (int)Damagelib.GetDamage(enemy) + "/" + (int)enemy.TotalShieldHealth();
+                            damage = "Killable: " + (int)Damagelib.GetDamage(enemy) + " / " + (int)enemy.TotalShieldHealth();
                             c = System.Drawing.Color.Red;
                         }
 
