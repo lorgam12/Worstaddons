@@ -274,8 +274,6 @@
             DrawMenu.Add(R.Name, new ComboBox("R Color", 3, "Aqua", "BlueViolet", "Chartreuse", "Purple", "White", "Orange", "Green"));
             DrawMenu.AddSeparator(0);
 
-            Chat.Print(Player.Instance.NetworkId);
-
             Game.OnUpdate += Game_OnUpdate;
             Spellbook.OnCastSpell += Spellbook_OnCastSpell;
             Player.OnIssueOrder += Player_OnIssueOrder;
