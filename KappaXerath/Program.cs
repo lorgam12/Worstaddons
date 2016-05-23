@@ -28,10 +28,6 @@ namespace KappaXerath
 
         public const Champion ChampionName = Champion.Xerath;
 
-        private AttackableUnit lastObjectAttacked = null;
-
-        private int stackCount = 0;
-
         private static int lastNotification = 0;
 
         private static bool hasbought;
@@ -47,8 +43,6 @@ namespace KappaXerath
         public static Spell.Skillshot E;
 
         public static Spell.Skillshot R;
-
-        private static int lastAltert = 0;
 
         public static Menu Menuini, RMenu, ComboMenu, HarassMenu, LaneClearMenu, JungleClearMenu, KillStealMenu, MiscMenu, DrawMenu;
 
