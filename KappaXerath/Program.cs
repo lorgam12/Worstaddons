@@ -44,7 +44,7 @@ namespace KappaXerath
 
         public static Spell.Skillshot R;
 
-        public static Menu Menuini, RMenu, ComboMenu, HarassMenu, LaneClearMenu, JungleClearMenu, KillStealMenu, MiscMenu, DrawMenu;
+        public static Menu Menuini, RMenu, ComboMenu, HarassMenu, LaneClearMenu, JungleClearMenu, KillStealMenu, MiscMenu, DrawMenu, ColorMenu;
 
         private static bool AttacksEnabled
         {
@@ -109,12 +109,10 @@ namespace KappaXerath
                 return;
             }
 
-            ShowNotification("KappaXerath - Loaded", 5000);
-
-            Q = new Spell.Chargeable(SpellSlot.Q, 750, 1450, 1650, 500, int.MaxValue, 100) { AllowedCollisionCount = int.MaxValue };
+            Q = new Spell.Chargeable(SpellSlot.Q, 750, 1450, 1500, 500, int.MaxValue, 100) { AllowedCollisionCount = int.MaxValue };
             W = new Spell.Skillshot(SpellSlot.W, 1100, SkillShotType.Circular, 250, int.MaxValue, 100) { AllowedCollisionCount = int.MaxValue };
             E = new Spell.Skillshot(SpellSlot.E, 1000, SkillShotType.Linear, 250, 1600, 70);
-            R = new Spell.Skillshot(SpellSlot.R, 3200, SkillShotType.Circular, 550, int.MaxValue, 120) { AllowedCollisionCount = int.MaxValue };
+            R = new Spell.Skillshot(SpellSlot.R, 3200, SkillShotType.Circular, 600, int.MaxValue, 125) { AllowedCollisionCount = int.MaxValue };
 
             SpellList.Add(Q);
             SpellList.Add(W);
@@ -130,11 +128,11 @@ namespace KappaXerath
             KillStealMenu = Menuini.AddSubMenu("KillSteal Settings");
             MiscMenu = Menuini.AddSubMenu("Misc Settings");
             DrawMenu = Menuini.AddSubMenu("Drawings Settings");
+            ColorMenu = Menuini.AddSubMenu("Color Picker");
 
+            RMenu.AddGroupLabel("R Settings");
             RMenu.Add("R", new CheckBox("Use R"));
             RMenu.Add(R.Slot + "hit", new ComboBox("R HitChance", 0, "High", "Medium", "Low"));
-            RMenu.AddSeparator(1);
-            RMenu.AddGroupLabel("R Settings");
             RMenu.Add("scrybR", new CheckBox("Use Scrybing Orb while Ulting"));
             RMenu.Add("Rmode", new ComboBox("R Mode", 0, "Auto", "Custom Delays", "On Tap"));
             RMenu.Add("Rtap", new KeyBind("R Tap Key", false, KeyBind.BindTypes.HoldActive, 'S'));
@@ -200,7 +198,7 @@ namespace KappaXerath
             MiscMenu.Add("int", new CheckBox("E Interrupter"));
             MiscMenu.Add("danger", new ComboBox("Interrupter Danger Level", 1, "High", "Medium", "Low"));
             MiscMenu.Add("flee", new KeyBind("Escape with E", false, KeyBind.BindTypes.HoldActive, 'A'));
-            MiscMenu.Add("Notifications", new CheckBox("Use Notifications"));
+            var notifi = MiscMenu.Add("Notifications", new CheckBox("Use Notifications"));
             MiscMenu.Add("autoECC", new CheckBox("Auto E On CC enemy"));
             MiscMenu.Add("scrybebuy", new CheckBox("Auto Scrybing Orb Buy"));
             MiscMenu.Add("scrybebuylevel", new Slider("Buy Orb at level [{0}]", 9, 1, 18));
@@ -216,9 +214,20 @@ namespace KappaXerath
             foreach (var spell in SpellList)
             {
                 DrawMenu.Add(spell.Slot.ToString(), new CheckBox(spell.Slot + " Range"));
+                DrawMenu.Add(spell.Slot + "Color", new ColorPicker(spell.Slot + " Color", Color.Chartreuse));
             }
 
             DrawMenu.Add("Rmini", new CheckBox("Draw R Range (MiniMap)"));
+
+            foreach (var spell in SpellList)
+            {
+                ColorMenu.Add(spell.Slot + "Color", new ColorPicker(spell.Slot + " Color", Color.Chartreuse));
+            }
+
+            if (notifi.CurrentValue)
+            {
+                ShowNotification("KappaXerath - Loaded", 5000);
+            }
 
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -268,8 +277,7 @@ namespace KappaXerath
         private static void Gapcloser_OnGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
             if (sender == null || !sender.IsEnemy || e == null || !E.IsReady() || !MiscMenu[e.SpellName].Cast<CheckBox>().CurrentValue
-                || e.End == Vector3.Zero
-                || !MiscMenu["gap"].Cast<CheckBox>().CurrentValue)
+                || e.End == Vector3.Zero || !MiscMenu["gap"].Cast<CheckBox>().CurrentValue)
             {
                 return;
             }
@@ -877,9 +885,10 @@ namespace KappaXerath
 
             foreach (var spell in SpellList)
             {
+                var color = ColorMenu[spell.Slot + "Color"].Cast<ColorPicker>().CurrentValue;
                 if (DrawMenu[spell.Slot.ToString()].Cast<CheckBox>().CurrentValue)
                 {
-                    Circle.Draw(SharpDX.Color.White, spell.Range, Player.Instance.ServerPosition);
+                    Circle.Draw(new ColorBGRA(color.R, color.G, color.B, color.A), spell.Range, Player.Instance.ServerPosition);
                 }
             }
 
