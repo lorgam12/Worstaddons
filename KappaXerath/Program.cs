@@ -10,7 +10,6 @@ namespace KappaXerath
     using EloBuddy.SDK.Events;
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
-    using EloBuddy.SDK.Notifications;
     using EloBuddy.SDK.Rendering;
 
     using SharpDX;
@@ -214,7 +213,6 @@ namespace KappaXerath
             foreach (var spell in SpellList)
             {
                 DrawMenu.Add(spell.Slot.ToString(), new CheckBox(spell.Slot + " Range"));
-                DrawMenu.Add(spell.Slot + "Color", new ColorPicker(spell.Slot + " Color", Color.Chartreuse));
             }
 
             DrawMenu.Add("Rmini", new CheckBox("Draw R Range (MiniMap)", false));
@@ -226,7 +224,7 @@ namespace KappaXerath
 
             if (notifi.CurrentValue)
             {
-                ShowNotification("KappaXerath - Loaded", 5000);
+                Common.ShowNotification("KappaXerath - Loaded", 5000);
             }
 
             Game.OnUpdate += Game_OnGameUpdate;
@@ -796,7 +794,7 @@ namespace KappaXerath
                 foreach (var enemy in
                     EntityManager.Heroes.Enemies.Where(h => h.IsValidTarget() && R.GetDamage(h) * 3 > h.Health))
                 {
-                    ShowNotification(enemy.ChampionName + ": is killable R!!!", 4000);
+                    Common.ShowNotification(enemy.ChampionName + ": is killable R!!!", 4000);
                     lastNotification = Environment.TickCount;
                 }
             }
@@ -845,11 +843,6 @@ namespace KappaXerath
             }
         }
 
-        private static void ShowNotification(string message, int duration = -1)
-        {
-            Notifications.Show(new SimpleNotification(message, message), duration);
-        }
-
         private static void Drawing_OnEndScene(EventArgs args)
         {
             if (Player.Instance.IsDead)
@@ -861,16 +854,8 @@ namespace KappaXerath
 
             if (Rcirclemap && R.IsReady())
             {
-                Common.MiniMapCircle(Color.White, R.Range, Player.Instance.ServerPosition, 2, 20);
+                Common.DrawCricleMinimap(Color.White, R.Range, Player.Instance.ServerPosition, 5, 20);
             }
-        }
-
-        public static void drawLine(Vector3 pos1, Vector3 pos2, int bold, Color color)
-        {
-            var wts1 = Drawing.WorldToScreen(pos1);
-            var wts2 = Drawing.WorldToScreen(pos2);
-
-            Drawing.DrawLine(wts1[0], wts1[1], wts2[0], wts2[1], bold, color);
         }
 
         private static void Drawing_OnDraw(EventArgs args)
@@ -906,7 +891,7 @@ namespace KappaXerath
                             Drawing.Height * 0.5f,
                             Color.Red,
                             (int)(t.Health / rDamage) + " x Ult can kill: " + t.ChampionName + " have: " + t.Health + "hp");
-                        drawLine(t.Position, Player.Instance.Position, 10, Color.Yellow);
+                        Common.drawLine(t.Position, Player.Instance.Position, 10, Color.Yellow);
                     }
                 }
             }
