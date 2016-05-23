@@ -217,7 +217,7 @@ namespace KappaXerath
                 DrawMenu.Add(spell.Slot + "Color", new ColorPicker(spell.Slot + " Color", Color.Chartreuse));
             }
 
-            DrawMenu.Add("Rmini", new CheckBox("Draw R Range (MiniMap)"));
+            DrawMenu.Add("Rmini", new CheckBox("Draw R Range (MiniMap)", false));
 
             foreach (var spell in SpellList)
             {
