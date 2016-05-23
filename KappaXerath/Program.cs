@@ -854,7 +854,7 @@ namespace KappaXerath
 
             if (Rcirclemap && R.IsReady())
             {
-                Common.DrawCricleMinimap(Color.White, R.Range, Player.Instance.ServerPosition, 5, 20);
+                Common.DrawCricleMinimap(Color.White, R.Range, Player.Instance.ServerPosition, 2, 20);
             }
         }
 
