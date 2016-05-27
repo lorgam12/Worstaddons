@@ -196,7 +196,6 @@
                 var death = damagepercent >= target.HealthPercent || spelldamage >= target.TotalShieldHealth()
                             || caster.GetAutoAttackDamage(target, true) >= target.TotalShieldHealth()
                             || enemy.GetAutoAttackDamage(target, true) >= target.TotalShieldHealth();
-                ;
 
                 if (target.IsAlly && !target.IsMe)
                 {
