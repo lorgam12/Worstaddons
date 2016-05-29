@@ -45,7 +45,7 @@
                         case "Noxious Trap":
                             if (trap.BaseSkinName == "NidaleeSpear")
                             {
-                                var endTime = Math.Max(0, -Game.Time + 120);
+                                var endTime = Math.Max(0, Game.Time);
                                 Drawing.DrawText(Drawing.WorldToScreen(trap.Position) - new Vector2(30, -30), Color.White, "Nidalee Trap", 2);
                                 Circle.Draw(SharpDX.Color.White, trap.BoundingRadius + 25, trap.Position);
                             }

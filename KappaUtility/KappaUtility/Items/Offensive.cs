@@ -129,14 +129,6 @@
                         {
                             Cutlass.Cast(enemy);
                         }
-                        if (OffMenu.GetCheckbox("UseBelt") && Player.Instance.GetItemDamage(enemy, ItemId.Will_of_the_Ancients) >= enemy.Health)
-                        {
-                            ProtoBelt.Cast(enemy.ServerPosition);
-                        }
-                        if (OffMenu.GetCheckbox("UseGLP") && Player.Instance.GetItemDamage(enemy, GLP.Id) >= enemy.Health)
-                        {
-                            GLP.Cast(enemy.ServerPosition);
-                        }
                         if (OffMenu.GetCheckbox("Hydra"))
                         {
                             if (Hydra.IsOwned(Player.Instance) && Hydra.IsReady() && Player.Instance.GetItemDamage(enemy, Hydra.Id) >= enemy.Health)

@@ -1,6 +1,7 @@
 ﻿namespace KappaUtility.Misc
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using EloBuddy;
@@ -9,99 +10,58 @@
     using EloBuddy.SDK.Menu.Values;
     using EloBuddy.SDK.Rendering;
 
+    using KappaUtility.Common;
+    using KappaUtility.Summoners;
+
     using SharpDX;
 
     internal class AutoReveal
     {
-        public static readonly Item Sweeping_Lens_Trinket = new Item(ItemId.Sweeping_Lens_Trinket, 550f);
+        public static readonly Item Sweeping_Lens_Trinket = new Item(ItemId.Sweeping_Lens_Trinket, 600f);
 
-        public static readonly Item Oracle_Alteration = new Item(ItemId.Oracle_Alteration, 550f);
+        public static readonly Item Oracle_Alteration = new Item(ItemId.Oracle_Alteration, 600f);
 
-        public static readonly Item Vision_Ward = new Item(ItemId.Vision_Ward, 550f);
+        public static readonly Item Vision_Ward = new Item(ItemId.Vision_Ward, 600f);
 
-        public static readonly Item Warding_Totem_Trinket = new Item(ItemId.Warding_Totem_Trinket, 550f);
+        public static readonly Item Warding_Totem_Trinket = new Item(ItemId.Warding_Totem_Trinket, 600f);
 
-        public static readonly Item Greater_Stealth_Totem_Trinket = new Item(ItemId.Greater_Stealth_Totem_Trinket, 550f);
+        public static readonly Item Greater_Stealth_Totem_Trinket = new Item(ItemId.Greater_Stealth_Totem_Trinket, 600f);
 
-        public static readonly Item Greater_Vision_Totem_Trinket = new Item(ItemId.Greater_Vision_Totem_Trinket, 550f);
+        public static readonly Item Greater_Vision_Totem_Trinket = new Item(ItemId.Greater_Vision_Totem_Trinket, 600f);
 
-        public static readonly Item Sightstone = new Item((int)ItemId.Sightstone, 550f);
+        public static readonly Item Sightstone = new Item((int)ItemId.Sightstone, 600f);
 
-        public static readonly Item Ruby_Sightstone = new Item((int)ItemId.Ruby_Sightstone, 550f);
+        public static readonly Item Ruby_Sightstone = new Item((int)ItemId.Ruby_Sightstone, 600f);
 
         public static readonly Item Farsight_Alteration = new Item((int)ItemId.Farsight_Alteration, 1250);
 
-        internal class AkaliSmoke
+        static readonly List<Stealth> SpellList = new List<Stealth>();
+
+        public static float vaynebuff = 0f;
+
+        public struct Stealth
         {
-            public GameObject Object { get; set; }
+            public SpellSlot Slot;
 
-            public Vector3 Position { get; set; }
-        }
+            public Champion Hero;
 
-        internal class Shaco
-        {
-            public GameObject Object { get; set; }
-
-            public Vector3 Position { get; set; }
-        }
-
-        internal class Talon
-        {
-            public GameObject Object { get; set; }
-
-            public Vector3 Position { get; set; }
-        }
-
-        internal class Rengar
-        {
-            public GameObject Object { get; set; }
-
-            public Vector3 Position { get; set; }
-        }
-
-        internal class KhaZix
-        {
-            public GameObject Object { get; set; }
-
-            public Vector3 Position { get; set; }
-        }
-
-        internal class Twitch
-        {
-            public GameObject Object { get; set; }
-
-            public Vector3 Position { get; set; }
-        }
-
-        internal class Vayne
-        {
-            public GameObject Object { get; set; }
-
-            public Vector3 Position { get; set; }
-        }
-
-        private static readonly AkaliSmoke Akalismoke = new AkaliSmoke();
-
-        private static readonly Shaco shaco = new Shaco();
-
-        private static readonly Talon talon = new Talon();
-
-        private static readonly Rengar rengar = new Rengar();
-
-        private static readonly KhaZix khazix = new KhaZix();
-
-        private static readonly Vayne vayne = new Vayne();
-
-        private static readonly Twitch twitch = new Twitch();
-
-        public static int LastTickTime;
+            public String Name;
+        } 
 
         public static Menu BushMenu { get; private set; }
 
-        private static bool DontWard, Changing;
-
         internal static void OnLoad()
         {
+
+            SpellList.Add(new Stealth { Hero = Champion.Akali, Name = "akalismokebomb", Slot = SpellSlot.W });
+            SpellList.Add(new Stealth { Hero = Champion.Shaco, Name = "deceive", Slot = SpellSlot.Q });
+            SpellList.Add(new Stealth { Hero = Champion.Khazix, Name = "khazixr", Slot = SpellSlot.R });
+            SpellList.Add(new Stealth { Hero = Champion.Khazix, Name = "khazixrlong", Slot = SpellSlot.R });
+            SpellList.Add(new Stealth { Hero = Champion.Talon, Name = "talonshadowassault", Slot = SpellSlot.R });
+            SpellList.Add(new Stealth { Hero = Champion.MonkeyKing, Name = "monkeykingdecoy", Slot = SpellSlot.W });
+            SpellList.Add(new Stealth { Hero = Champion.Vayne, Name = "vaynetumble", Slot = SpellSlot.Q });
+            SpellList.Add(new Stealth { Hero = Champion.Twitch, Name = "hideinshadows", Slot = SpellSlot.Q });
+
             BushMenu = Load.UtliMenu.AddSubMenu("Auto Revealer");
             BushMenu.AddGroupLabel("Auto Bush Reveal Settings");
             BushMenu.Add("enable", new CheckBox("Enable", false));
@@ -110,263 +70,42 @@
             BushMenu.AddGroupLabel("Auto Stealth Reveal Settings");
             BushMenu.Add("enables", new CheckBox("Enable", false));
             BushMenu.Add("combos", new CheckBox("Only On Combo", false));
-            BushMenu.AddGroupLabel("Select Champions:");
-            BushMenu.Add("akali", new CheckBox("Akali", false));
-            BushMenu.Add("shaco", new CheckBox("Shaco", false));
-            BushMenu.Add("rengar", new CheckBox("Rengar", false));
-            BushMenu.Add("talon", new CheckBox("Talon", false));
-            BushMenu.Add("twitch", new CheckBox("Twitch", false));
-            BushMenu.Add("khazix", new CheckBox("KhaZix", false));
-            BushMenu.Add("vayne", new CheckBox("Vayne", false));
+            BushMenu.AddGroupLabel("Select Stealth Champions:");
+            foreach (var champion in SpellList)
+            {
+                BushMenu.Add(champion.Name, new CheckBox(champion.Hero + " - " + champion.Slot + " - " + champion.Name));
+            }
 
-            GameObject.OnCreate += GameObject_OnCreate;
-            GameObject.OnDelete += GameObject_OnDelete;
+            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
         }
 
-        internal static void Drawings()
+        public static void OnTick()
         {
-            var targets = EntityManager.Heroes.Enemies.Where(x => !x.IsDead);
-            foreach (var target in targets)
+            var vayne =
+                EntityManager.Heroes.Enemies.FirstOrDefault(
+                    v => v.Hero == Champion.Vayne && v.IsEnemy && v.Buffs.Any(b => b.Name.ToLower().Contains("vayneinquisition")));
+
+            if (vayne != null)
             {
-                switch (target.BaseSkinName)
+                vaynebuff = vayne.GetBuff("VayneInquisition").EndTime;
+            }
+        }
+
+        private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if(!sender.IsEnemy || sender == null) return;
+
+            if (SpellList.Any(spell => spell.Name == args.SData.Name.ToLower()))
+            {
+                if (BushMenu.GetCheckbox(args.SData.Name))
                 {
-                    case "Akali":
-                        if (BushMenu["akali"].Cast<CheckBox>().CurrentValue)
-                        {
-                            if (Akalismoke.Object != null)
-                            {
-                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
-                                {
-                                    RevealCast();
-                                }
-
-                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
-                                Drawing.DrawText(
-                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
-                                    System.Drawing.Color.White,
-                                    "Akali Is Around Here",
-                                    2);
-                            }
-                        }
-
-                        break;
-
-                    case "Shaco":
-                        if (BushMenu["shaco"].Cast<CheckBox>().CurrentValue)
-                        {
-                            if (shaco.Object != null)
-                            {
-                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
-                                {
-                                    RevealCast();
-                                }
-
-                                Drawing.DrawText(
-                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
-                                    System.Drawing.Color.White,
-                                    "Shaco Is Around Here",
-                                    12);
-                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
-                            }
-                        }
-
-                        break;
-
-                    case "Talon":
-                        if (BushMenu["talon"].Cast<CheckBox>().CurrentValue)
-                        {
-                            if (talon.Object != null)
-                            {
-                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
-                                {
-                                    RevealCast();
-                                }
-
-                                Drawing.DrawText(
-                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
-                                    System.Drawing.Color.White,
-                                    "Talon Is Around Here",
-                                    12);
-                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
-                            }
-                        }
-
-                        break;
-
-                    case "Rengar":
-                        if (BushMenu["rengar"].Cast<CheckBox>().CurrentValue)
-                        {
-                            if (rengar.Object != null)
-                            {
-                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
-                                {
-                                    RevealCast();
-                                }
-
-                                Drawing.DrawText(
-                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
-                                    System.Drawing.Color.White,
-                                    "Rengar Is Around Here",
-                                    12);
-                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
-                            }
-                        }
-
-                        break;
-
-                    case "KhaZix":
-                        if (BushMenu["khazix"].Cast<CheckBox>().CurrentValue)
-                        {
-                            if (khazix.Object != null)
-                            {
-                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
-                                {
-                                    RevealCast();
-                                }
-
-                                Drawing.DrawText(
-                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
-                                    System.Drawing.Color.White,
-                                    "Kha'Zix Is Around Here",
-                                    12);
-                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
-                            }
-                        }
-
-                        break;
-
-                    case "Twitch":
-                        if (BushMenu["twitch"].Cast<CheckBox>().CurrentValue)
-                        {
-                            if (twitch.Object != null)
-                            {
-                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
-                                {
-                                    RevealCast();
-                                }
-
-                                Drawing.DrawText(
-                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
-                                    System.Drawing.Color.White,
-                                    "Twitch Is Around Here",
-                                    12);
-                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
-                            }
-                        }
-
-                        break;
-
-                    case "Vayne":
-                        if (BushMenu["vayne"].Cast<CheckBox>().CurrentValue)
-                        {
-                            if (vayne.Object != null)
-                            {
-                                if (!target.IsVisible && target.Path.LastOrDefault().IsInRange(Player.Instance, 550))
-                                {
-                                    RevealCast();
-                                }
-
-                                Drawing.DrawText(
-                                    Drawing.WorldToScreen(target.Path.LastOrDefault()) - new Vector2(30, -30),
-                                    System.Drawing.Color.White,
-                                    "Vayne Is Around Here",
-                                    12);
-                                Circle.Draw(Color.White, target.MoveSpeed, target.Position);
-                            }
-                        }
-
-                        break;
+                    if (args.SData.Name.ToLower().Contains("vaynetumble") && Game.Time > vaynebuff)
+                    {
+                        return;
+                    }
+                    
+                    RevealCast(sender.ServerPosition);
                 }
-            }
-        }
-
-        private static void GameObject_OnCreate(GameObject obj, EventArgs args)
-        {
-            if (obj != null && obj.Name.Contains("Akali_Base_smoke_bomb_tar"))
-            {
-                Akalismoke.Object = obj;
-                Akalismoke.Position = obj.Position;
-            }
-
-            if (obj != null && obj.Name.Contains("JackintheboxPoof2"))
-            {
-                shaco.Object = obj;
-                shaco.Position = obj.Position;
-            }
-
-            if (obj != null && obj.Name.Contains("talon_ult_sound"))
-            {
-                talon.Object = obj;
-                talon.Position = obj.Position;
-            }
-
-            if (obj != null && obj.Name.Contains("Rengar_Base_R_Alert"))
-            {
-                rengar.Object = obj;
-                rengar.Position = obj.Position;
-            }
-
-            if (obj != null && obj.Name.ToLower().Contains("khazix_base_r_cas"))
-            {
-                khazix.Object = obj;
-                khazix.Position = obj.Position;
-            }
-
-            if (obj != null && obj.Name.ToLower().Contains("twitch_base_q_invisiible_outro"))
-            {
-                twitch.Object = obj;
-                twitch.Position = obj.Position;
-            }
-
-            if (obj != null && obj.Name.ToLower().Contains("vayne_base_r_cas_invisible"))
-            {
-                vayne.Object = obj;
-                vayne.Position = obj.Position;
-            }
-        }
-
-        private static void GameObject_OnDelete(GameObject obj, EventArgs args)
-        {
-            if (obj != null && obj.Name.Contains("Akali_Base_smoke_bomb_tar"))
-            {
-                Akalismoke.Object = null;
-                LastTickTime = 0;
-            }
-
-            if (obj != null && obj.Name.Contains("JackintheboxPoof2"))
-            {
-                shaco.Object = null;
-                LastTickTime = 0;
-            }
-
-            if (obj != null && obj.Name.Contains("talon_ult_sound"))
-            {
-                talon.Object = null;
-                LastTickTime = 0;
-            }
-
-            if (obj != null && obj.Name.Contains("Rengar_Base_R_Alert"))
-            {
-                rengar.Object = null;
-                LastTickTime = 0;
-            }
-
-            if (obj != null && obj.Name.ToLower().Contains("khazix_base_r_cas"))
-            {
-                khazix.Object = null;
-                LastTickTime = 0;
-            }
-
-            if (obj != null && obj.Name.ToLower().Contains("twitch_base_q_invisiible_outro"))
-            {
-                twitch.Object = null;
-                LastTickTime = 0;
-            }
-
-            if (obj != null && obj.Name.ToLower().Contains("vayne_base_q_cas"))
-            {
-                vayne.Object = null;
-                LastTickTime = 0;
             }
         }
 
@@ -378,172 +117,104 @@
                 var flags = Orbwalker.ActiveModesFlags;
                 foreach (var target in enemies)
                 {
+                    var pred = Prediction.Position.PredictUnitPosition(target, 500).To3D();
+
                     if (!BushMenu["combo"].Cast<CheckBox>().CurrentValue)
                     {
-                        if (NavMesh.IsWallOfGrass(target.Path.LastOrDefault(), 1)
-                            && !NavMesh.IsWallOfGrass(Player.Instance.Position, 1)
-                            && Player.Instance.Distance(target.Path.LastOrDefault()) < 500)
+                        if (NavMesh.IsWallOfGrass(pred, 50))
                         {
-                            var target1 = target;
-                            var wards =
-                                ObjectManager.Get<Obj_AI_Minion>()
-                                    .Where(
-                                        x =>
-                                        x.Name.Contains("Ward") && x.IsAlly
-                                        && x.Position.Distance(target1.Position) < 750);
-
-                            foreach (var ward in
-                                wards.Where(
-                                    ward => (NavMesh.IsWallOfGrass(ward.Position, 50) && ward.Distance(target1) < 750)))
-                            {
-                                DontWard = true;
-                            }
-
-                            if (!DontWard)
-                            {
-                                WardCast();
-                            }
-
-                            if (DontWard && !Changing)
-                            {
-                                Changing = true;
-                                Core.DelayAction(
-                                    delegate
-                                        {
-                                            DontWard = false;
-                                            Changing = false;
-                                        },
-                                    500);
-                            }
+                            WardCast(pred);
                         }
                     }
 
                     if (BushMenu["combo"].Cast<CheckBox>().CurrentValue && flags.HasFlag(Orbwalker.ActiveModes.Combo))
                     {
-                        if (NavMesh.IsWallOfGrass(target.Path.LastOrDefault(), 1)
-                            && !NavMesh.IsWallOfGrass(Player.Instance.Position, 1)
-                            && Player.Instance.Distance(target.Path.LastOrDefault()) < 500)
+                        if (NavMesh.IsWallOfGrass(pred, 50))
                         {
-                            var target1 = target;
-                            var wards =
-                                ObjectManager.Get<Obj_AI_Minion>()
-                                    .Where(
-                                        x =>
-                                        x.Name.Contains("Ward") && x.IsAlly
-                                        && x.Position.Distance(target1.Position) < 750);
-
-                            foreach (var ward in
-                                wards.Where(
-                                    ward => NavMesh.IsWallOfGrass(ward.Position, 50) && ward.Distance(target1) < 750))
-                            {
-                                DontWard = true;
-                            }
-
-                            if (!DontWard)
-                            {
-                                WardCast();
-                            }
-
-                            if (DontWard && !Changing)
-                            {
-                                Changing = true;
-                                Core.DelayAction(
-                                    delegate
-                                        {
-                                            DontWard = false;
-                                            Changing = false;
-                                        },
-                                    500);
-                            }
+                            WardCast(pred);
                         }
                     }
                 }
             }
         }
 
-        public static void RevealCast()
+        public static void RevealCast(Vector3 vector3)
         {
-            var targets = EntityManager.Heroes.Enemies.Where(x => !x.IsDead);
-            foreach (var target in targets)
+            if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady() && vector3.IsInRange(Player.Instance, Sweeping_Lens_Trinket.Range))
             {
-                if (Sweeping_Lens_Trinket.IsOwned() && Sweeping_Lens_Trinket.IsReady())
+                if (Sweeping_Lens_Trinket.Cast(vector3))
                 {
-                    if (Sweeping_Lens_Trinket.Cast(target.Path.LastOrDefault()))
-                    {
-                        return;
-                    }
+                    return;
                 }
+            }
 
-                if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady())
+            if (Oracle_Alteration.IsOwned() && Oracle_Alteration.IsReady() && vector3.IsInRange(Player.Instance, Oracle_Alteration.Range))
+            {
+                if (Oracle_Alteration.Cast(vector3))
                 {
-                    if (Oracle_Alteration.Cast(target.Path.LastOrDefault()))
-                    {
-                        return;
-                    }
+                    return;
                 }
+            }
 
-                if (Vision_Ward.IsOwned() && Vision_Ward.IsReady())
-                {
-                    if (Vision_Ward.Cast(target.Path.LastOrDefault()))
-                    {
-                        return;
-                    }
-                }
+            if (Vision_Ward.IsOwned() && Vision_Ward.IsReady() && vector3.IsInRange(Player.Instance, Oracle_Alteration.Range))
+            {
+                Vision_Ward.Cast(Player.Instance.ServerPosition);
             }
         }
 
-        public static void WardCast()
+        public static void WardCast(Vector3 vector3)
         {
-            var enemies = EntityManager.Heroes.Enemies.Where(x => !x.IsDead && x.Distance(Player.Instance) < 1250);
+            var ward = ObjectManager.Get<Obj_AI_Minion>().Any(w => w.Name.ToLower().Contains("ward") && w.Name != "WardCorpse" && w.IsAlly && w.IsValid && w.Distance(vector3) < 500);
 
-            foreach (var target in enemies)
+            var ally = EntityManager.Heroes.Allies.Any(a => a.Distance(vector3) < 100 && a.IsValidTarget());
+
+            if (ward || ally) return;
+
+            if (Warding_Totem_Trinket.IsOwned() && Warding_Totem_Trinket.IsReady() && Player.Instance.IsInRange(vector3, Warding_Totem_Trinket.Range))
             {
-                if (Warding_Totem_Trinket.IsOwned() && Warding_Totem_Trinket.IsReady())
+                if (Warding_Totem_Trinket.Cast(vector3))
                 {
-                    if (Warding_Totem_Trinket.Cast(target.Path.LastOrDefault()))
-                    {
-                        return;
-                    }
+                    return;
                 }
+            }
 
-                if (Greater_Stealth_Totem_Trinket.IsOwned() && Greater_Stealth_Totem_Trinket.IsReady())
+            if (Greater_Stealth_Totem_Trinket.IsOwned() && Greater_Stealth_Totem_Trinket.IsReady() && Player.Instance.IsInRange(vector3, Greater_Stealth_Totem_Trinket.Range))
+            {
+                if (Greater_Stealth_Totem_Trinket.Cast(vector3))
                 {
-                    if (Greater_Stealth_Totem_Trinket.Cast(target.Path.LastOrDefault()))
-                    {
-                        return;
-                    }
+                    return;
                 }
+            }
 
-                if (Greater_Vision_Totem_Trinket.IsOwned() && Greater_Vision_Totem_Trinket.IsReady())
+            if (Greater_Vision_Totem_Trinket.IsOwned() && Greater_Vision_Totem_Trinket.IsReady() && Player.Instance.IsInRange(vector3, Greater_Vision_Totem_Trinket.Range))
+            {
+                if (Greater_Vision_Totem_Trinket.Cast(vector3))
                 {
-                    if (Greater_Vision_Totem_Trinket.Cast(target.Path.LastOrDefault()))
-                    {
-                        return;
-                    }
+                    return;
                 }
+            }
 
-                if (Sightstone.IsOwned() && Sightstone.IsReady())
+            if (Sightstone.IsOwned() && Sightstone.IsReady() && Player.Instance.IsInRange(vector3, Sightstone.Range))
+            {
+                if (Sightstone.Cast(vector3))
                 {
-                    if (Sightstone.Cast(target.Path.LastOrDefault()))
-                    {
-                        return;
-                    }
+                    return;
                 }
+            }
 
-                if (Ruby_Sightstone.IsOwned() && Ruby_Sightstone.IsReady())
+            if (Ruby_Sightstone.IsOwned() && Ruby_Sightstone.IsReady() && Player.Instance.IsInRange(vector3, Ruby_Sightstone.Range))
+            {
+                if (Ruby_Sightstone.Cast(vector3))
                 {
-                    if (Ruby_Sightstone.Cast(target.Path.LastOrDefault()))
-                    {
-                        return;
-                    }
+                    return;
                 }
+            }
 
-                if (Farsight_Alteration.IsOwned() && Farsight_Alteration.IsReady())
+            if (Farsight_Alteration.IsOwned() && Farsight_Alteration.IsReady() && Player.Instance.IsInRange(vector3, Farsight_Alteration.Range))
+            {
+                if (Farsight_Alteration.Cast(vector3))
                 {
-                    if (Farsight_Alteration.Cast(target.Path.LastOrDefault()))
-                    {
-                        return;
-                    }
+                    return;
                 }
             }
         }

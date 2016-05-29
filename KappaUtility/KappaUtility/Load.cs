@@ -27,7 +27,7 @@
 
         public static Menu UtliMenu;
 
-        public static void Execute()
+        public static void Loading_OnLoadingComplete(EventArgs eventArgs)
         {
             UtliMenu = MainMenu.AddMenu("KappaUtility", "KappaUtility");
             UtliMenu.AddGroupLabel("Global Settings [Must F5 To Take Effect]");
@@ -113,10 +113,6 @@
         {
             try
             {
-                if (loadedreveal)
-                {
-                    AutoReveal.Drawings();
-                }
                 if (loadedtrack)
                 {
                     Traps.Draw();
@@ -152,6 +148,7 @@
                 GanksDetector.OnUpdate();
                 Smite.Smiteopepi();
                 Spells.Cast();
+                AutoReveal.OnTick();
             }
             catch (Exception e)
             {
