@@ -19,7 +19,6 @@
 
     internal static class Program
     {
-
         private static Menu baseMenu;
 
         private static readonly List<EnemyInfo> RecallsList = new List<EnemyInfo>();
@@ -85,11 +84,14 @@
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            if(!baseMenu["draw"].Cast<CheckBox>().CurrentValue) return;
+            if (!baseMenu["draw"].Cast<CheckBox>().CurrentValue)
+            {
+                return;
+            }
 
             var X = Player.Instance.ServerPosition.WorldToScreen().X;
             var Y = Player.Instance.ServerPosition.WorldToScreen().Y;
-            
+
             foreach (var player in RecallsList.Where(e => baseMenu[e.Enemy.NetworkId.ToString()].Cast<CheckBox>().CurrentValue && e.Duration > 0))
             {
                 Drawing.DrawText(
@@ -161,7 +163,10 @@
 
             var champion = Database.Damages.FirstOrDefault(h => h.Champion == hero);
 
-            if (champion.Champion != hero) return 0;
+            if (champion.Champion != hero)
+            {
+                return 0;
+            }
 
             if (champion.DamageType == DamageType.Magical)
             {
@@ -185,8 +190,7 @@
 
             if (champion.Champion == Champion.Jinx)
             {
-                Damage = champion.Floats[level] + new[] { 0.25f * missinghealth, 0.30f * missinghealth, 0.35f * missinghealth }[level]
-                         + (0.1f * AD);
+                Damage = champion.Floats[level] + new[] { 0.25f * missinghealth, 0.30f * missinghealth, 0.35f * missinghealth }[level] + (0.1f * AD);
             }
 
             return Player.Instance.CalculateDamageOnUnit(target, champion.DamageType, Damage);
@@ -241,6 +245,10 @@
         private static bool lastseen(EnemyInfo target)
         {
             float timelimit = baseMenu["limit"].Cast<Slider>().CurrentValue;
+            if (timelimit.Equals(0))
+            {
+                return true;
+            }
             return Game.Time - target.lastseen < timelimit;
         }
 
