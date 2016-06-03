@@ -21,6 +21,8 @@
     {
         private static Menu baseMenu;
 
+        private static readonly List<EnemyInfo> baseultlist = new List<EnemyInfo>();
+
         private static readonly List<EnemyInfo> RecallsList = new List<EnemyInfo>();
 
         private static Spell.Skillshot R { get; set; }
@@ -71,7 +73,15 @@
 
         private static void Game_OnTick(EventArgs args)
         {
-            foreach (var enemy in RecallsList.Where(e => e.Enemy.IsHPBarRendered && !e.Enemy.IsDead))
+            foreach (var target in EntityManager.Heroes.Enemies.Where(e => e.IsHPBarRendered && !e.IsDead && baseMenu[e.NetworkId.ToString()].Cast<CheckBox>().CurrentValue && e.Killable()))
+            {
+                if (!baseultlist.Exists(e => e.Enemy.NetworkId.Equals(target.NetworkId)))
+                {
+                    baseultlist.Add(new EnemyInfo(target));
+                }
+            }
+
+            foreach (var enemy in baseultlist)
             {
                 enemy.lastseen = Game.Time;
             }
@@ -244,10 +254,15 @@
 
         private static bool lastseen(EnemyInfo target)
         {
+            var enemy = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId == target.Enemy.NetworkId);
             float timelimit = baseMenu["limit"].Cast<Slider>().CurrentValue;
-            if (timelimit.Equals(0))
+            if (enemy != null)
             {
-                return true;
+                if (timelimit.Equals(0))
+                {
+                    return true;
+                }
+                return Game.Time - enemy.lastseen < timelimit;
             }
             return Game.Time - target.lastseen < timelimit;
         }
