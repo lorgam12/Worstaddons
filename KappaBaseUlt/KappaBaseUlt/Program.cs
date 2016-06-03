@@ -59,11 +59,12 @@
             baseMenu.AddGroupLabel("Drawings:");
             baseMenu.Add("draw", new CheckBox("Draw Debug Drawings"));
             baseMenu.AddGroupLabel("BaseUlt Enemies:");
+            baseultlist.Clear();
             RecallsList.Clear();
             foreach (var enemy in EntityManager.Heroes.Enemies)
             {
                 baseMenu.Add(enemy.NetworkId.ToString(), new CheckBox("Use On " + enemy.BaseSkinName + " - (" + enemy.Name + ")"));
-                RecallsList.Add(new EnemyInfo(enemy));
+                baseultlist.Add(new EnemyInfo(enemy));
             }
 
             Game.OnTick += Game_OnTick;
@@ -73,14 +74,6 @@
 
         private static void Game_OnTick(EventArgs args)
         {
-            foreach (var target in EntityManager.Heroes.Enemies.Where(e => e.IsHPBarRendered && !e.IsDead && baseMenu[e.NetworkId.ToString()].Cast<CheckBox>().CurrentValue && e.Killable()))
-            {
-                if (!baseultlist.Exists(e => e.Enemy.NetworkId.Equals(target.NetworkId)))
-                {
-                    baseultlist.Add(new EnemyInfo(target));
-                }
-            }
-
             foreach (var enemy in baseultlist)
             {
                 enemy.lastseen = Game.Time;
@@ -113,12 +106,6 @@
                     + player.Enemy.TotalShieldHealth(),
                     5);
             }
-            /*
-            var order = ObjectManager.Get<GameObject>().FirstOrDefault(name => name.Name == "__Spawn_T1");
-            var choes = ObjectManager.Get<GameObject>().FirstOrDefault(name => name.Name == "__Spawn_T2");
-            Circle.Draw(Color.White, 100, order);
-            Circle.Draw(Color.White, 100, choes);
-            */
         }
 
         private static void Teleport_OnTeleport(Obj_AI_Base sender, Teleport.TeleportEventArgs args)
