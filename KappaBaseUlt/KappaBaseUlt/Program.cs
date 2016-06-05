@@ -104,7 +104,7 @@
                     System.Drawing.Color.White,
                     player.Enemy.BaseSkinName + " | CountDown: " + (player.CountDown()) + " | TravelTime: " + player.Enemy.traveltime()
                     + " | LastSeen: " + (Game.Time - lastseen?.lastseen) + " | Damage: " + (player.Enemy.GetDamage()) + " | Health: "
-                    + player.Enemy.TotalShieldHealth(),
+                    + player.Enemy.HP(),
                     5);
             }
         }
@@ -143,7 +143,14 @@
 
         private static bool Killable(this Obj_AI_Base target)
         {
-            return target.GetDamage() >= target.TotalShieldHealth();
+            var enemy = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId.Equals(target.NetworkId));
+            return enemy?.Enemy.GetDamage() >= target.HP();
+        }
+
+        private static float HP(this Obj_AI_Base target)
+        {
+            var enemy = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId.Equals(target.NetworkId));
+            return (float)(enemy?.Enemy.TotalShieldHealth() + (enemy?.Enemy.HPRegenRate * (Game.Time - enemy?.lastseen)));
         }
 
         private static float GetDamage(this Obj_AI_Base target)
@@ -191,7 +198,7 @@
                 Damage = champion.Floats[level] + new[] { 0.25f * missinghealth, 0.30f * missinghealth, 0.35f * missinghealth }[level] + (0.1f * AD);
             }
 
-            return Player.Instance.CalculateDamageOnUnit(target, champion.DamageType, Damage);
+            return Player.Instance.CalculateDamageOnUnit(target, champion.DamageType, Damage - 15);
         }
 
         private static void removeFromList(Obj_AI_Base sender)
