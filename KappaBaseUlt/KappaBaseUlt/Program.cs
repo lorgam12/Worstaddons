@@ -74,7 +74,7 @@
 
         private static void Game_OnTick(EventArgs args)
         {
-            foreach (var enemy in baseultlist)
+            foreach (var enemy in baseultlist.Where(e => e.Enemy.IsHPBarRendered && !e.Enemy.IsDead))
             {
                 enemy.lastseen = Game.Time;
             }
@@ -97,12 +97,13 @@
 
             foreach (var player in RecallsList.Where(e => baseMenu[e.Enemy.NetworkId.ToString()].Cast<CheckBox>().CurrentValue && e.Duration > 0))
             {
+                var lastseen = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId == player.Enemy.NetworkId);
                 Drawing.DrawText(
                     X,
                     Y,
                     System.Drawing.Color.White,
                     player.Enemy.BaseSkinName + " | CountDown: " + (player.CountDown()) + " | TravelTime: " + player.Enemy.traveltime()
-                    + " | LastSeen: " + (Game.Time - player.lastseen) + " | Damage: " + (player.Enemy.GetDamage()) + " | Health: "
+                    + " | LastSeen: " + (Game.Time - lastseen?.lastseen) + " | Damage: " + (player.Enemy.GetDamage()) + " | Health: "
                     + player.Enemy.TotalShieldHealth(),
                     5);
             }
@@ -231,7 +232,7 @@
             {
                 if (lastseen(target) && CountDown >= Traveltime && target.Enemy.Killable())
                 {
-                    if (CountDown - Traveltime < 60 && !target.Enemy.Collison())
+                    if (CountDown - Traveltime < Game.Ping && !target.Enemy.Collison())
                     {
                         Player.CastSpell(R.Slot, target.Enemy.Fountain());
                     }
