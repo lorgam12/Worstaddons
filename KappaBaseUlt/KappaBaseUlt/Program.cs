@@ -19,6 +19,8 @@
 
     internal static class Program
     {
+        private static int Counter;
+
         private static Menu baseMenu;
 
         private static readonly List<EnemyInfo> baseultlist = new List<EnemyInfo>();
@@ -107,6 +109,8 @@
                     + player.Enemy.HP(),
                     5);
             }
+
+            Drawing.DrawText(Drawing.Height * 0.1f, Drawing.Width * 0.1f, System.Drawing.Color.GreenYellow, $"PossibleBaseUlts: {Counter}");
         }
 
         private static void Teleport_OnTeleport(Obj_AI_Base sender, Teleport.TeleportEventArgs args)
@@ -120,13 +124,16 @@
             {
                 if (RecallsList.Exists(s => s.Enemy.NetworkId.Equals(sender.NetworkId)))
                 {
-                    RecallsList.Add(
-                        new EnemyInfo(sender) { Duration = args.Duration, Started = args.Start, RecallDuration = args.Duration + Core.GameTickCount });
+                    RecallsList.Add( new EnemyInfo(sender) { Duration = args.Duration, Started = args.Start, RecallDuration = args.Duration + Core.GameTickCount });
                 }
                 else
                 {
-                    RecallsList.Add(
-                        new EnemyInfo(sender) { Duration = args.Duration, Started = args.Start, RecallDuration = args.Duration + Core.GameTickCount });
+                    RecallsList.Add( new EnemyInfo(sender) { Duration = args.Duration, Started = args.Start, RecallDuration = args.Duration + Core.GameTickCount });
+                }
+
+                if (args.Duration >= sender.traveltime() && sender.Killable())
+                {
+                    Counter ++;
                 }
             }
             else
@@ -150,7 +157,8 @@
         private static float HP(this Obj_AI_Base target)
         {
             var enemy = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId.Equals(target.NetworkId));
-            return (float)(enemy?.Enemy.TotalShieldHealth() + (enemy?.Enemy.HPRegenRate * (Game.Time - enemy?.lastseen)));
+            var f = enemy?.Enemy.TotalShieldHealth() + (enemy?.Enemy.HPRegenRate * (Game.Time - enemy?.lastseen));
+            return f ?? 0;
         }
 
         private static float GetDamage(this Obj_AI_Base target)
