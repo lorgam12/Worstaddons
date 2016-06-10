@@ -11,7 +11,7 @@
     {
         private static Menu flymenu;
 
-        public static int LastAATick;
+        public static float LastAATick;
 
         public static void Execute()
         {
@@ -23,7 +23,6 @@
             flymenu = MainMenu.AddMenu("KalistaFlyHack", "KalistaFlyHack");
             flymenu.AddLabel("ONLY Works with combo mode.");
             flymenu.Add("Fly", new CheckBox("Use FlyHack", false));
-            flymenu.Add("Flyspeed", new Slider("Fly Speed (Adjust Utill it works)", 250, 0, 500));
             flymenu.AddSeparator();
             flymenu.AddGroupLabel("READ BEFORE USING !");
             flymenu.AddLabel("Using This Script Can Lead Into Perma Bans.");
@@ -41,14 +40,16 @@
                     var target = TargetSelector.GetTarget(ObjectManager.Player.GetAutoAttackRange(), DamageType.Physical);
                     if (target.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
                     {
-                        if (Game.Time * (1000 - flymenu["Flyspeed"].Cast<Slider>().CurrentValue) - Game.Ping >= LastAATick + 1)
+                        if (Core.GameTickCount - LastAATick <= 150)
                         {
+                            Chat.Print("MoveTo");
                             Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                         }
-                        if (Game.Time * (1000 - flymenu["Flyspeed"].Cast<Slider>().CurrentValue) - Game.Ping
-                            > LastAATick + ObjectManager.Player.AttackDelay * 1000 - 250)
+                        if (Core.GameTickCount - LastAATick >= 50)
                         {
+                            Chat.Print("AttackTo");
                             Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                            LastAATick = Core.GameTickCount;
                         }
                     }
                     else
