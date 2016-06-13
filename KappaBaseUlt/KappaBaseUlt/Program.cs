@@ -96,21 +96,22 @@
 
             var X = Player.Instance.ServerPosition.WorldToScreen().X;
             var Y = Player.Instance.ServerPosition.WorldToScreen().Y;
-
+            int i = 0;
             foreach (var player in RecallsList.Where(e => baseMenu[e.Enemy.NetworkId.ToString()].Cast<CheckBox>().CurrentValue && e.Duration > 0))
             {
+                i ++;
                 var lastseen = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId == player.Enemy.NetworkId);
                 Drawing.DrawText(
                     X,
-                    Y,
+                    Y + i,
                     System.Drawing.Color.White,
-                    player.Enemy.BaseSkinName + " | CountDown: " + (player.CountDown()) + " | TravelTime: " + player.Enemy.traveltime()
-                    + " | LastSeen: " + (Game.Time - lastseen?.lastseen) + " | Damage: " + (player.Enemy.GetDamage()) + " | Health: "
-                    + player.Enemy.HP(),
+                    player.Enemy.BaseSkinName + " | CountDown: " + (int)(player.CountDown()) + " | TravelTime: " + (int)player.Enemy.traveltime()
+                    + " | LastSeen: " + (int)(Game.Time - lastseen?.lastseen) + " | Damage: " + (int)(player.Enemy.GetDamage()) + " | Health: "
+                    + (int)player.Enemy.HP(),
                     5);
             }
 
-            Drawing.DrawText(Drawing.Height * 0.1f, Drawing.Width * 0.1f, System.Drawing.Color.GreenYellow, $"PossibleBaseUlts: {Counter}");
+            Drawing.DrawText(Drawing.Height * 0.3f, Drawing.Width * 0.1f, System.Drawing.Color.GreenYellow, $"PossibleBaseUlts: {Counter}");
         }
 
         private static void Teleport_OnTeleport(Obj_AI_Base sender, Teleport.TeleportEventArgs args)
@@ -157,7 +158,7 @@
         private static float HP(this Obj_AI_Base target)
         {
             var enemy = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId.Equals(target.NetworkId));
-            var f = enemy?.Enemy.TotalShieldHealth() + (enemy?.Enemy.HPRegenRate * (Game.Time - enemy?.lastseen));
+            var f = (enemy?.Enemy.TotalShieldHealth() + (enemy?.Enemy.HPRegenRate * (Game.Time - enemy?.lastseen))) * 0.9f;
             return f ?? 0;
         }
 
