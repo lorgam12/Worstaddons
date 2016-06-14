@@ -42,12 +42,10 @@
                     {
                         if (Core.GameTickCount - LastAATick <= 150)
                         {
-                            Chat.Print("MoveTo");
                             Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                         }
                         if (Core.GameTickCount - LastAATick >= 50)
                         {
-                            Chat.Print("AttackTo");
                             Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                             LastAATick = Core.GameTickCount;
                         }
