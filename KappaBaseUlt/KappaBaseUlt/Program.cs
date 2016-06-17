@@ -96,10 +96,9 @@
 
             var X = Player.Instance.ServerPosition.WorldToScreen().X;
             var Y = Player.Instance.ServerPosition.WorldToScreen().Y;
-            int i = 0;
+            float i = 0;
             foreach (var player in RecallsList.Where(e => baseMenu[e.Enemy.NetworkId.ToString()].Cast<CheckBox>().CurrentValue && e.Duration > 0))
             {
-                i ++;
                 var lastseen = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId == player.Enemy.NetworkId);
                 Drawing.DrawText(
                     X,
@@ -109,8 +108,8 @@
                     + " | LastSeen: " + (int)(Game.Time - lastseen?.lastseen) + " | Damage: " + (int)(player.Enemy.GetDamage()) + " | Health: "
                     + (int)player.Enemy.HP(),
                     5);
+                i += 20f;
             }
-
             Drawing.DrawText(Drawing.Height * 0.3f, Drawing.Width * 0.1f, System.Drawing.Color.GreenYellow, $"PossibleBaseUlts: {Counter}");
         }
 
@@ -158,7 +157,7 @@
         private static float HP(this Obj_AI_Base target)
         {
             var enemy = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId.Equals(target.NetworkId));
-            var f = (enemy?.Enemy.TotalShieldHealth() + (enemy?.Enemy.HPRegenRate * (Game.Time - enemy?.lastseen))) * 0.9f;
+            var f = (enemy?.Enemy.Health + (enemy?.Enemy.HPRegenRate * (Game.Time - enemy?.lastseen))) * 0.9f;
             return f ?? 0;
         }
 
