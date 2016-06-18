@@ -171,8 +171,8 @@
             var missinghealth = target.MaxHealth - target.Health;
             var level = R.Level - 1;
             var hero = Player.Instance.Hero;
-            var AD = Player.Instance.TotalAttackDamage;
-            var AP = Player.Instance.TotalMagicalDamage;
+            var AD = Player.Instance.FlatPhysicalDamageMod;
+            var AP = Player.Instance.FlatMagicDamageMod;
 
             var champion = Database.Damages.FirstOrDefault(h => h.Champion == hero);
 
@@ -247,7 +247,7 @@
             {
                 if (lastseen(target) && CountDown >= Traveltime && target.Enemy.Killable())
                 {
-                    if (CountDown - Traveltime < Game.Ping && !target.Enemy.Collison())
+                    if (CountDown - Traveltime < 50 + Game.Ping && !target.Enemy.Collison())
                     {
                         Player.CastSpell(R.Slot, target.Enemy.Fountain());
                     }

@@ -137,7 +137,7 @@ namespace KappaBaseUlt
                                                                 new Hero
                                                                     {
                                                                         Champion = Champion.Jinx, Type = SkillShotType.Linear, Slot = SpellSlot.R,
-                                                                        AllowedCollisionCount = 0, CastDelay = 500, Speed = 2100, Width = 140,
+                                                                        AllowedCollisionCount = 0, CastDelay = 500, Speed = 2050, Width = 140,
                                                                         Range = int.MaxValue
                                                                     },
                                                                 new Hero
