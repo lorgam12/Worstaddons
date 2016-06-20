@@ -106,13 +106,7 @@
                     5);
                 i += 20f;
             }
-            Drawing.DrawText(
-                Drawing.Height * 0.3f,
-                Drawing.Width * 0.1f,
-                System.Drawing.Color.GreenYellow,
-                 $
-            "PossibleBaseUlts: {Counter}")
-            ;
+            Drawing.DrawText(Drawing.Height * 0.3f, Drawing.Width * 0.1f, System.Drawing.Color.GreenYellow, $"PossibleBaseUlts: {Counter}");
         }
 
         private static void Teleport_OnTeleport(Obj_AI_Base sender, Teleport.TeleportEventArgs args)
