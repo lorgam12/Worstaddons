@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
 
     using EloBuddy;
@@ -11,11 +10,8 @@
     using EloBuddy.SDK.Events;
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
-    using EloBuddy.SDK.Rendering;
 
     using SharpDX;
-
-    using Color = SharpDX.Color;
 
     internal static class Program
     {
@@ -110,7 +106,13 @@
                     5);
                 i += 20f;
             }
-            Drawing.DrawText(Drawing.Height * 0.3f, Drawing.Width * 0.1f, System.Drawing.Color.GreenYellow, $"PossibleBaseUlts: {Counter}");
+            Drawing.DrawText(
+                Drawing.Height * 0.3f,
+                Drawing.Width * 0.1f,
+                System.Drawing.Color.GreenYellow,
+                 $
+            "PossibleBaseUlts: {Counter}")
+            ;
         }
 
         private static void Teleport_OnTeleport(Obj_AI_Base sender, Teleport.TeleportEventArgs args)
@@ -124,11 +126,13 @@
             {
                 if (RecallsList.Exists(s => s.Enemy.NetworkId.Equals(sender.NetworkId)))
                 {
-                    RecallsList.Add( new EnemyInfo(sender) { Duration = args.Duration, Started = args.Start, RecallDuration = args.Duration + Core.GameTickCount });
+                    RecallsList.Add(
+                        new EnemyInfo(sender) { Duration = args.Duration, Started = args.Start, RecallDuration = args.Duration + Core.GameTickCount });
                 }
                 else
                 {
-                    RecallsList.Add( new EnemyInfo(sender) { Duration = args.Duration, Started = args.Start, RecallDuration = args.Duration + Core.GameTickCount });
+                    RecallsList.Add(
+                        new EnemyInfo(sender) { Duration = args.Duration, Started = args.Start, RecallDuration = args.Duration + Core.GameTickCount });
                 }
 
                 if (args.Duration >= sender.traveltime() && sender.Killable())
@@ -228,9 +232,13 @@
             var distance = Player.Instance.Distance(pos);
             var speed = R.Speed;
 
-            if (hero == Champion.Lux || hero == Champion.Karthus || hero == Champion.Pantheon || hero == Champion.Gangplank)
+            switch (hero)
             {
-                return R.CastDelay;
+                case Champion.Lux:
+                case Champion.Karthus:
+                case Champion.Pantheon:
+                case Champion.Gangplank:
+                    return R.CastDelay;
             }
 
             return ((distance / speed) * 1000f) + R.CastDelay;
@@ -247,7 +255,7 @@
             {
                 if (lastseen(target) && CountDown >= Traveltime && target.Enemy.Killable())
                 {
-                    if (CountDown - Traveltime < 50 + Game.Ping && !target.Enemy.Collison())
+                    if (CountDown - Traveltime < 60 && !target.Enemy.Collison())
                     {
                         Player.CastSpell(R.Slot, target.Enemy.Fountain());
                     }

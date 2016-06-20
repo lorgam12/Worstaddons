@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KappaBaseUlt
+﻿namespace KappaBaseUlt
 {
+    using System.Collections.Generic;
+
     using EloBuddy;
     using EloBuddy.SDK.Enumerations;
 
@@ -137,7 +133,7 @@ namespace KappaBaseUlt
                                                                 new Hero
                                                                     {
                                                                         Champion = Champion.Jinx, Type = SkillShotType.Linear, Slot = SpellSlot.R,
-                                                                        AllowedCollisionCount = 0, CastDelay = 500, Speed = 2050, Width = 140,
+                                                                        AllowedCollisionCount = 0, CastDelay = 600, Speed = 2035, Width = 140,
                                                                         Range = int.MaxValue
                                                                     },
                                                                 new Hero
