@@ -133,7 +133,7 @@
                                                                 new Hero
                                                                     {
                                                                         Champion = Champion.Jinx, Type = SkillShotType.Linear, Slot = SpellSlot.R,
-                                                                        AllowedCollisionCount = 0, CastDelay = 600, Speed = 2050, Width = 140,
+                                                                        AllowedCollisionCount = 0, CastDelay = 600, Speed = 2075, Width = 140,
                                                                         Range = int.MaxValue
                                                                     },
                                                                 new Hero
