@@ -15,6 +15,8 @@
 
     internal static class Program
     {
+        public static bool KeyDown;
+
         private static int Counter;
 
         private static Menu baseMenu;
@@ -55,7 +57,8 @@
             baseMenu.AddLabel("0 = Always");
             baseMenu.AddSeparator(0);
             baseMenu.AddGroupLabel("Drawings:");
-            baseMenu.Add("draw", new CheckBox("Draw Debug Drawings"));
+            baseMenu.Add("count", new CheckBox("Draw Count"));
+            baseMenu.Add("draw", new CheckBox("Draw Recall Bar"));
             baseMenu.AddGroupLabel("BaseUlt Enemies:");
             baseultlist.Clear();
             RecallsList.Clear();
@@ -85,16 +88,22 @@
 
         private static void Drawing_OnDraw(EventArgs args)
         {
+            if (!baseMenu["count"].Cast<CheckBox>().CurrentValue)
+            {
+                Drawing.DrawText(Drawing.Height * 0.3f, Drawing.Width * 0.1f, System.Drawing.Color.GreenYellow, $"PossibleBaseUlts: {Counter}");
+            }
             if (!baseMenu["draw"].Cast<CheckBox>().CurrentValue)
             {
                 return;
             }
-
+            /*
             var X = Player.Instance.ServerPosition.WorldToScreen().X;
             var Y = Player.Instance.ServerPosition.WorldToScreen().Y;
             float i = 0;
+            */
             foreach (var player in RecallsList.Where(e => baseMenu[e.Enemy.NetworkId.ToString()].Cast<CheckBox>().CurrentValue && e.Duration > 0))
             {
+                /*
                 var lastseen = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId == player.Enemy.NetworkId);
                 Drawing.DrawText(
                     X,
@@ -105,8 +114,9 @@
                     + (int)player.Enemy.HP(),
                     5);
                 i += 20f;
+                */
+                player.RecallBarDraw();
             }
-            Drawing.DrawText(Drawing.Height * 0.3f, Drawing.Width * 0.1f, System.Drawing.Color.GreenYellow, $"PossibleBaseUlts: {Counter}");
         }
 
         private static void Teleport_OnTeleport(Obj_AI_Base sender, Teleport.TeleportEventArgs args)
@@ -146,13 +156,13 @@
             }
         }
 
-        private static bool Killable(this Obj_AI_Base target)
+        public static bool Killable(this Obj_AI_Base target)
         {
             var enemy = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId.Equals(target.NetworkId));
             return enemy?.Enemy.GetDamage() >= target.HP();
         }
 
-        private static float HP(this Obj_AI_Base target)
+        public static float HP(this Obj_AI_Base target)
         {
             var enemy = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId.Equals(target.NetworkId));
             var f = (enemy?.Enemy.Health + (enemy?.Enemy.HPRegenRate * (Game.Time - enemy?.lastseen))) * 0.9f;
@@ -161,7 +171,7 @@
 
         private static float GetDamage(this Obj_AI_Base target)
         {
-            if (!R.IsLearned || !R.IsReady())
+            if (!R.IsLearned)
             {
                 return 0;
             }
@@ -219,7 +229,7 @@
             RecallsList.Remove(recall);
         }
 
-        private static float traveltime(this Obj_AI_Base target)
+        public static float traveltime(this Obj_AI_Base target)
         {
             var hero = Player.Instance.Hero;
             var pos = target.Fountain();
@@ -247,7 +257,7 @@
 
             if (enable && !disable)
             {
-                if (lastseen(target) && CountDown >= Traveltime && target.Enemy.Killable())
+                if (R.IsReady() && lastseen(target) && CountDown >= Traveltime && target.Enemy.Killable())
                 {
                     if (CountDown - Traveltime < 60 && !target.Enemy.Collison())
                     {
@@ -272,7 +282,7 @@
             return Game.Time - target.lastseen < timelimit;
         }
 
-        private static float CountDown(this EnemyInfo target)
+        public static float CountDown(this EnemyInfo target)
         {
             return target.Started + target.Duration - Core.GameTickCount;
         }
