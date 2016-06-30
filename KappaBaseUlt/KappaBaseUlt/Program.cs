@@ -15,8 +15,6 @@
 
     internal static class Program
     {
-        public static bool KeyDown;
-
         private static int Counter;
 
         private static Menu baseMenu;
