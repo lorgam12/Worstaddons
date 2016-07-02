@@ -9,9 +9,13 @@
 
     internal static class Recallbar
     {
-        private static readonly float X = Drawing.Width * 0.425f;
+        public static float X2;
 
-        private static readonly float Y = Drawing.Height * 0.80f;
+        public static float Y2;
+
+        public static readonly float X = Drawing.Width * 0.425f;
+
+        public static readonly float Y = Drawing.Height * 0.80f;
 
         private static readonly int Width = (int)(Drawing.Width - 2 * X);
 
@@ -21,7 +25,7 @@
 
         public static void RecallBarDraw(this Program.EnemyInfo enemy)
         {
-            Rect(X, Y, Width, Height, 1, Color.White);
+            Rect(X + X2, Y + Y2, Width, Height, 1, Color.White);
             var c = Color.White;
             if (enemy.CountDown() >= enemy.Enemy.traveltime())
             {
@@ -30,20 +34,20 @@
                 {
                     c = Color.Red;
                     Drawing.DrawLine(
-                        (X + 450) + Scale * enemy.Enemy.traveltime() - 1,
-                        Y + 7,
-                        (X + 450) + Scale * enemy.Enemy.traveltime(),
-                        Y - 11,
+                        (X + 450) + X2 + Scale * enemy.Enemy.traveltime() - 1,
+                        Y + Y2 + 7,
+                        (X + 450) + X2 + Scale * enemy.Enemy.traveltime(),
+                        Y + Y2 - 11,
                         3,
                         c);
                 }
             }
             Drawing.DrawText(
-                (X + 450) + Scale * enemy.CountDown() - 1,
-                Y - 30,
+                (X + 450) + X2 + Scale * enemy.CountDown() - 1,
+                Y + Y2 - 30,
                 c,
                 "(" + (int)enemy.Enemy.HealthPercent + "%)" + enemy.Enemy.BaseSkinName);
-            Drawing.DrawLine((X + 450) + Scale * enemy.CountDown() - 1, Y + 7, (X + 450) + Scale * enemy.CountDown(), Y - 11, 3, c);
+            Drawing.DrawLine((X + 450) + X2 + Scale * enemy.CountDown() - 1, Y + Y2 + 7, (X + 450) + X2 + Scale * enemy.CountDown(), Y + Y2 - 11, 3, c);
         }
 
         public static void Rect(float x, float y, int width, int height, float bold, Color color)

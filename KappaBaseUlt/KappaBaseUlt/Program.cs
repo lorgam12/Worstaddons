@@ -15,6 +15,8 @@
 
     internal static class Program
     {
+        private static float Changed;
+
         private static int Counter;
 
         private static Menu baseMenu;
@@ -57,6 +59,28 @@
             baseMenu.AddGroupLabel("Drawings:");
             baseMenu.Add("count", new CheckBox("Draw Count"));
             baseMenu.Add("draw", new CheckBox("Draw Recall Bar"));
+            var x = baseMenu.Add("rbx", new Slider("RecallBar X", 0, -200, 200));
+                x.OnValueChange +=
+                delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
+                    {
+                        if (changeArgs.NewValue != changeArgs.OldValue)
+                        {
+                            Recallbar.X2 = changeArgs.NewValue * 10;
+                            Changed = Core.GameTickCount;
+                        }
+                    };
+            Recallbar.X2 = x.CurrentValue * 10;
+            var y = baseMenu.Add("rby", new Slider("RecallBar Y", 0, -200, 200));
+            y.OnValueChange +=
+            delegate (ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
+            {
+                if (changeArgs.NewValue != changeArgs.OldValue)
+                {
+                    Recallbar.Y2 = changeArgs.NewValue * 10;
+                    Changed = Core.GameTickCount;
+                }
+            };
+            Recallbar.Y2 = y.CurrentValue * 10;
             baseMenu.AddGroupLabel("BaseUlt Enemies:");
             baseultlist.Clear();
             RecallsList.Clear();
@@ -68,7 +92,7 @@
 
             Game.OnTick += Game_OnTick;
             Teleport.OnTeleport += Teleport_OnTeleport;
-            Drawing.OnDraw += Drawing_OnDraw;
+            Drawing.OnEndScene += Drawing_OnDraw;
         }
 
         private static void Game_OnTick(EventArgs args)
@@ -86,9 +110,9 @@
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            if (!baseMenu["count"].Cast<CheckBox>().CurrentValue)
+            if (baseMenu["count"].Cast<CheckBox>().CurrentValue)
             {
-                Drawing.DrawText(Drawing.Height * 0.3f, Drawing.Width * 0.1f, System.Drawing.Color.GreenYellow, $"PossibleBaseUlts: {Counter}");
+                Drawing.DrawText(Drawing.Height * 0.25f, Drawing.Width * 0.1f, System.Drawing.Color.GreenYellow, $"PossibleBaseUlts: {Counter}");
             }
             if (!baseMenu["draw"].Cast<CheckBox>().CurrentValue)
             {
@@ -114,6 +138,10 @@
                 i += 20f;
                 */
                 player.RecallBarDraw();
+            }
+            if (Core.GameTickCount - Changed < 3000)
+            {
+                new EnemyInfo(Player.Instance).RecallBarDraw();
             }
         }
 
@@ -169,50 +197,7 @@
 
         private static float GetDamage(this Obj_AI_Base target)
         {
-            if (!R.IsLearned)
-            {
-                return 0;
-            }
-
-            var missinghealth = target.MaxHealth - target.Health;
-            var level = R.Level - 1;
-            var hero = Player.Instance.Hero;
-            var AD = Player.Instance.FlatPhysicalDamageMod;
-            var AP = Player.Instance.FlatMagicDamageMod;
-
-            var champion = Database.Damages.FirstOrDefault(h => h.Champion == hero);
-
-            if (champion.Champion != hero)
-            {
-                return 0;
-            }
-
-            if (champion.DamageType == DamageType.Magical)
-            {
-                Damage = champion.Floats[level] + champion.Float * AP;
-            }
-
-            if (champion.DamageType == DamageType.Physical)
-            {
-                Damage = champion.Floats[level] + champion.Float * AD;
-            }
-
-            if (champion.Champion == Champion.Ezreal)
-            {
-                Damage = champion.Floats[level] + (1f * AD + (0.9f * AP));
-            }
-
-            if (champion.Champion == Champion.Gangplank)
-            {
-                Damage = (champion.Floats[level] + champion.Float * AP) * 3;
-            }
-
-            if (champion.Champion == Champion.Jinx)
-            {
-                Damage = champion.Floats[level] + new[] { 0.25f * missinghealth, 0.30f * missinghealth, 0.35f * missinghealth }[level] + (0.1f * AD);
-            }
-
-            return Player.Instance.CalculateDamageOnUnit(target, champion.DamageType, Damage - 15);
+            return !R.IsLearned ? 0 : Player.Instance.GetSpellDamage(target, SpellSlot.R);
         }
 
         private static void removeFromList(Obj_AI_Base sender)
