@@ -25,6 +25,7 @@
         public override void Initialize()
         {
             Tracker = Program.MenuIni.AddSubMenu("Trackers");
+            /*
             Tracker.AddGroupLabel("World Drawings");
             var world = Tracker.Add("textsize", new Slider("(World) Text Size", 10, 1, 20));
             world.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs args) { WorldText = new Text(string.Empty, new Font("Tahoma", args.NewValue, FontStyle.Bold)); };
@@ -66,6 +67,7 @@
                         ObjectsManager.AllObjects.Remove(sender);
                     }
                 };
+                */
         }
     }
 }
