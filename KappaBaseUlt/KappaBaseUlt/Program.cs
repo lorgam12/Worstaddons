@@ -52,6 +52,7 @@
             baseMenu.Add("disable", new KeyBind("Disable Key", false, KeyBind.BindTypes.HoldActive, 32));
             baseMenu.AddSeparator(0);
             baseMenu.AddGroupLabel("Settings:");
+            baseMenu.Add("ping", new CheckBox("Calculate Ping"));
             baseMenu.Add("col", new CheckBox("Check Collison"));
             baseMenu.Add("limit", new Slider("FoW Time Limit [{0}]", 120, 0, 180));
             baseMenu.AddLabel("0 = Always");
@@ -218,6 +219,7 @@
             var pos = target.Fountain();
             var distance = Player.Instance.Distance(pos);
             var speed = R.Speed;
+            var delay = CastDelay(baseMenu["ping"].Cast<CheckBox>().CurrentValue);
 
             switch (hero)
             {
@@ -225,10 +227,15 @@
                 case Champion.Karthus:
                 case Champion.Pantheon:
                 case Champion.Gangplank:
-                    return R.CastDelay;
+                    return delay;
             }
 
-            return ((distance / speed) * 1000f) + R.CastDelay;
+            return ((distance / speed) * 1000f) + delay;
+        }
+
+        public static int CastDelay(bool c)
+        {
+            return c ? R.CastDelay - (Game.Ping / 2) : R.CastDelay;
         }
 
         private static void DoBaseUlt(EnemyInfo target)
