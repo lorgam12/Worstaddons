@@ -85,7 +85,7 @@
             HealthTracker.Add("LX", new Slider("Left Side X", 0, -200, 200));
             HealthTracker.Add("LY", new Slider("Left Side Y", 10, -200, 200));
             HealthTracker.Add("space", new Slider("Spacing Between Huds", 11, 0, 30));
-
+            /*
             HealthTracker.AddSeparator(0);
             HealthTracker.AddGroupLabel("Buildings");
             HealthTracker.Add("World", new ComboBox("World Health Drawings", 1, "Percent", "Current Health"));
@@ -94,7 +94,7 @@
             HealthTracker.Add("obj_AI_Turret", new CheckBox("Track Turrets Health"));
             HealthTracker.Add("obj_HQ", new CheckBox("Track Nexues Health"));
             HealthTracker.Add("obj_BarracksDampener", new CheckBox("Track Inhibitors Health"));
-
+            */
             DeathText = new Text(string.Empty, new Font("Tahoma", 18, FontStyle.Bold)) { Color = System.Drawing.Color.White };
             CDText = new Text(string.Empty, new Font("Tahoma", 9, FontStyle.Bold)) { Color = System.Drawing.Color.White };
             hudText = new Text(string.Empty, new Font("Tahoma", 14, FontStyle.Bold)) { Color = System.Drawing.Color.White };
