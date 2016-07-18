@@ -806,14 +806,12 @@
         {
             if (menuIni["Drawings"].Cast<CheckBox>().CurrentValue)
             {
-                foreach (var enemy in
-                    ObjectManager.Get<AIHeroClient>()
-                        .Where(ene => ene != null && !ene.IsDead && ene.IsEnemy && ene.IsVisible && ene.IsValid && ene.IsHPBarRendered))
+                foreach (var enemy in EntityManager.Heroes.Enemies.Where(e => e.IsValidTarget() && e.IsHPBarRendered))
                 {
                     if (DrawMenu["DrawD"].Cast<CheckBox>().CurrentValue && enemy.IsVisible)
                     {
                         Hpi.unit = enemy;
-                        Hpi.drawDmg(RDmg(enemy, passiveCounter), System.Drawing.Color.Goldenrod);
+                        Hpi.drawDmg((int)RDmg(enemy, passiveCounter), System.Drawing.Color.Goldenrod);
                     }
                     var hpPos = enemy.HPBarPosition;
                     if (DrawMenu["Killable"].Cast<CheckBox>().CurrentValue && enemy.IsVisible)
@@ -829,11 +827,9 @@
                         if (enemy.GetBuffCount("DariusHemo") > 0 && enemy.IsVisible)
                         {
                             var endTime = Math.Max(0, enemy.GetBuff("DariusHemo").EndTime - Game.Time);
-                            Drawing.DrawText(
-                                Drawing.WorldToScreen(enemy.Position)
-                                - new Vector2(DrawMenu["PPx"].Cast<Slider>().CurrentValue, DrawMenu["PPy"].Cast<Slider>().CurrentValue),
+                            Drawing.DrawText(Drawing.WorldToScreen(enemy.Position) - new Vector2(DrawMenu["PPx"].Cast<Slider>().CurrentValue, DrawMenu["PPy"].Cast<Slider>().CurrentValue),
                                 System.Drawing.Color.FromArgb(255, 106, 106),
-                                enemy.GetBuffCount("DariusHemo") + " Stacks " + Convert.ToString(endTime, CultureInfo.InvariantCulture),
+                                (int)enemy.GetBuffCount("DariusHemo") + " Stacks " + Convert.ToString((int)endTime, CultureInfo.InvariantCulture),
                                 2);
                         }
                     }
@@ -844,7 +840,7 @@
                             hpPos.X + DrawMenu["RHx"].Cast<Slider>().CurrentValue,
                             hpPos.Y - 20f,
                             System.Drawing.Color.FromArgb(255, 106, 106),
-                            Convert.ToString(enemy.TotalShieldHealth() - RDmg(enemy, passiveCounter), CultureInfo.CurrentCulture),
+                            Convert.ToString((int)(enemy.TotalShieldHealth() - RDmg(enemy, passiveCounter)), CultureInfo.CurrentCulture),
                             2);
                     }
                 }
