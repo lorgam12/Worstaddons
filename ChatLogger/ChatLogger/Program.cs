@@ -24,7 +24,7 @@ namespace ChatLogger
                 Directory.CreateDirectory(Folder);
             }
 
-            File = Folder + "\\" + Player.Instance.Name + " - " + Player.Instance.ChampionName + " - " + Game.GameId + ".txt";
+            File = Folder + "\\" + Player.Instance.Name + " - " + Player.Instance.ChampionName + " - " + DateTime.Now.ToString("yy-MM-dd") + " - " + Game.GameId + ".txt";
             Chat.OnMessage += Chat_OnMessage;
         }
 
