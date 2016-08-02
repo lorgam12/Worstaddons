@@ -36,6 +36,7 @@ namespace LuxUltBlocker
         {
             new Supported { champ = Champion.Nocturne, slot = SpellSlot.R },
             new Supported { champ = Champion.Graves, slot = SpellSlot.W },
+            new Supported { champ = Champion.MonkeyKing, slot = SpellSlot.W },
             new Supported { champ = Champion.Shaco, slot = SpellSlot.Q },
             new Supported { champ = Champion.Khazix, slot = SpellSlot.R },
         };
@@ -91,19 +92,22 @@ namespace LuxUltBlocker
             {
                 if (Menuini[Stealth.ToString()].Cast<CheckBox>().CurrentValue && spell.IsReady && spell.IsLearned)
                 {
-                    var allydanger = EntityManager.Heroes.Allies.FirstOrDefault(a => LuxUlt.SpellPoly.IsInside(a) && !a.IsMe && a.IsValidTarget() && !a.IsDead);
-                    if (Menuini["ally"].Cast<CheckBox>().CurrentValue && allydanger != null)
+                    if (Player.Instance.Hero == Champion.Graves || Player.Instance.Hero == Champion.Nocturne)
                     {
-                        if (Player.Instance.Hero == Champion.Graves)
+                        var allydanger = EntityManager.Heroes.Allies.FirstOrDefault(a => LuxUlt.SpellPoly.IsInside(a) && !a.IsMe && a.IsValidTarget() && !a.IsDead);
+                        if (Menuini["ally"].Cast<CheckBox>().CurrentValue && allydanger != null)
                         {
-                            if (LuxUlt.Caster != null && LuxUlt.Caster.IsValidTarget(spell.SData.CastRange))
+                            if (Player.Instance.Hero == Champion.Graves)
                             {
-                                Player.CastSpell(Stealth, LuxUlt.Caster.ServerPosition);
+                                if (LuxUlt.Caster != null && LuxUlt.Caster.IsValidTarget(spell.SData.CastRange))
+                                {
+                                    Player.CastSpell(Stealth, LuxUlt.Caster.ServerPosition);
+                                }
                             }
-                        }
-                        if (Player.Instance.Hero == Champion.Nocturne)
-                        {
-                            Player.CastSpell(Stealth);
+                            if (Player.Instance.Hero == Champion.Nocturne)
+                            {
+                                Player.CastSpell(Stealth);
+                            }
                         }
                     }
                     if (LuxUlt.SpellPoly.IsInside(Player.Instance))
@@ -115,7 +119,7 @@ namespace LuxUltBlocker
                                 Player.CastSpell(Stealth, LuxUlt.Caster.ServerPosition);
                             }
                         }
-                        if (Player.Instance.Hero == Champion.Nocturne || Player.Instance.Hero == Champion.Khazix)
+                        if (Player.Instance.Hero == Champion.Nocturne || Player.Instance.Hero == Champion.Khazix || Player.Instance.Hero == Champion.MonkeyKing)
                         {
                             Player.CastSpell(Stealth);
                         }
