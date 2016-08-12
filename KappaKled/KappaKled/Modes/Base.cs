@@ -29,10 +29,10 @@ namespace KappaKled.Modes
         {
             if(sender == null || !sender.IsEnemy || !Q.IsReady()) return;
 
-            if(AutoMenu["GapQkled"].Cast<CheckBox>().CurrentValue && State.MyState.Equals(State.Current.Kled))
+            if(AutoMenu["GapQkled"].Cast<CheckBox>().CurrentValue && State.MyCurrentState(State.Current.Kled))
                 Q.Cast(sender);
 
-            if (AutoMenu["GapQskaarl"].Cast<CheckBox>().CurrentValue && State.MyState.Equals(State.Current.Skaarl))
+            if (AutoMenu["GapQskaarl"].Cast<CheckBox>().CurrentValue && State.MyCurrentState(State.Current.Skaarl))
                 Q.Cast(sender, HitChance.Low);
         }
     }
