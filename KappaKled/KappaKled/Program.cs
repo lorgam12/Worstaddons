@@ -23,10 +23,10 @@ namespace KappaKled
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            if(user != null && user.Hero != Champion.Kled) return;
+            if(user == null || user.Hero != Champion.Kled) return;
             
-            Q = new Spell.Skillshot(SpellSlot.Q, 750, SkillShotType.Linear, 250, 2000, 45) {AllowedCollisionCount = 0};
-            E = new Spell.Skillshot(SpellSlot.E, 600, SkillShotType.Linear, 250, 1500, 100) { AllowedCollisionCount = int.MaxValue };
+            Q = new Spell.Skillshot(SpellSlot.Q, 750, SkillShotType.Linear, 250, 3000, 40) {AllowedCollisionCount = 0};
+            E = new Spell.Skillshot(SpellSlot.E, 550, SkillShotType.Linear, 250, 950, 100) { AllowedCollisionCount = int.MaxValue };
 
             MenuIni = MainMenu.AddMenu("KappaKled", "KappaKled");
             AutoMenu = MenuIni.AddSubMenu("Auto");
@@ -66,7 +66,7 @@ namespace KappaKled
 
         private static void Game_OnTick(EventArgs args)
         {
-            Q = State.MyState == State.Current.Kled ? new Spell.Skillshot(SpellSlot.Q, 700, SkillShotType.Cone, 250, 2000, 90) { AllowedCollisionCount = int.MaxValue } : new Spell.Skillshot(SpellSlot.Q, 750, SkillShotType.Linear, 250, 2000, 45) { AllowedCollisionCount = 0 };
+            Q = State.MyCurrentState(State.Current.Kled) ? new Spell.Skillshot(SpellSlot.Q, 700, SkillShotType.Cone, 250, 1600, 90) { AllowedCollisionCount = int.MaxValue } : new Spell.Skillshot(SpellSlot.Q, 750, SkillShotType.Linear, 250, 3000, 40) { AllowedCollisionCount = 0 };
         }
     }
 }

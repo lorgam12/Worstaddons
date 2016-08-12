@@ -25,7 +25,7 @@ namespace KappaKled.Modes
                 if (ComboMenu.CheckBoxValue("selectedQ") && State.MyCurrentState(State.Current.Skaarl))
                 {
                     if(selected != null)
-                        Q.Cast(target, HitChance.Medium);
+                        Q.Cast(selected, HitChance.Medium);
                 }
                 else
                 {
@@ -41,19 +41,24 @@ namespace KappaKled.Modes
                 }
                 else if(E2Target != null)
                 {
-                    if (ComboMenu.CheckBoxValue("Emouse"))
+                    if (ComboMenu.CheckBoxValue("E2mouse"))
                     {
                         if (user.ServerPosition.Extend(E2Target, 450).To3D().IsFacing(Game.CursorPos))
                         {
                             E.Cast(E2Target);
                         }
                     }
-                    if (ComboMenu.CheckBoxValue("Eally"))
+                    if (ComboMenu.CheckBoxValue("E2ally"))
                     {
-                        if (EntityManager.Heroes.Allies.Any(a => user.ServerPosition.Extend(E2Target, 450).To3D().IsFacing(a.ServerPosition) && a.IsValidTarget() && !a.IsMe))
+                        if (EntityManager.Heroes.Allies.Any(a => a != null && user.ServerPosition.Extend(E2Target, 450).To3D().IsFacing(a.ServerPosition) && a.IsValidTarget() && !a.IsMe))
                         {
                             E.Cast(E2Target);
                         }
+                    }
+
+                    if (!ComboMenu.CheckBoxValue("E2mouse") && !ComboMenu.CheckBoxValue("E2ally"))
+                    {
+                        E.Cast(E2Target);
                     }
                 }
             }
