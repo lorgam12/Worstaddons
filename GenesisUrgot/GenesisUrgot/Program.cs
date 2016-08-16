@@ -32,6 +32,8 @@ namespace GenesisUrgot
             }
 
             // Initialize the classes that we need
+            KappaEvade.KappaEvade.Init();
+            Events.Init();
             Config.Initialize();
             SpellManager.Initialize();
             ModeManager.Initialize();
