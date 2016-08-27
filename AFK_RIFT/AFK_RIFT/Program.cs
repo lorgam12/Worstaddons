@@ -11,13 +11,15 @@ namespace AFK_RIFT
 {
     internal class Program
     {
+        private static float StartTime;
+
         private static bool Ended;
 
         private static Vector3 Position
         {
             get
             {
-                return Player.Instance.Team == GameObjectTeam.Order ? new Vector3(8362, 3330, 52.5825f) : new Vector3(6466, 11634, 55.09142f);
+                return Player.Instance.Team == GameObjectTeam.Order ? new Vector3(8622, 3258, 54.54328f) : new Vector3(6224, 11606, 56.76437f);
             }
         }
 
@@ -38,11 +40,23 @@ namespace AFK_RIFT
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
+            StartTime = Game.Time;
+            if (Game.MapId != GameMapId.SummonersRift)
+            {
+                Chat.Print("AFK_RIFT Works Only In Summoners Rift");
+                return;
+            }
             if (!Player.Instance.IsRanged)
             {
                 Chat.Print("AFK_RIFT Works Only For Ranged Champions");
                 return;
             }
+
+            foreach (var item in ItemsToBuy.Where(i => !new Item(i).IsOwned()))
+            {
+                Shop.BuyItem(item);
+            }
+
             Orbwalker.OverrideOrbwalkPosition = OverrideOrbwalkPosition;
             Game.OnTick += Game_OnTick;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -61,24 +75,23 @@ namespace AFK_RIFT
 
         private static void Game_OnTick(EventArgs args)
         {
+            if(Game.Time - StartTime < 20) return;
+
             if (ObjectManager.Get<Obj_HQ>().Any(n => n.IsDead || n.Health <= 0) && !Ended)
             {
                 Ended = true;
-                Core.DelayAction(() => Game.QuitGame(), new Random().Next(5000, 25000));
+                var random = new Random().Next(5000, 25000);
+                Core.DelayAction(() => Game.QuitGame(), random);
+                Console.WriteLine("Game Ended ! Leaving Game In: " + random / 1000 + " Seconds.");
             }
-
-            foreach (var item in ItemsToBuy.Where(i => !new Item(i).IsOwned()))
-            {
-                Shop.BuyItem(item);
-            }
-
+            
             var visionward = new Item(ItemId.Vision_Ward, 600);
             if (visionward.IsInRange(WardPosition) && visionward.IsOwned(Player.Instance))
             {
                 visionward.Cast(WardPosition);
             }
 
-            Orbwalker.DisableMovement = Player.Instance.ServerPosition.IsInRange(Position, 10);
+            Orbwalker.DisableMovement = Player.Instance.ServerPosition.IsInRange(Position, 1);
             Orbwalker.ActiveModesFlags = Orbwalker.ActiveModes.JungleClear;
             Orbwalker.OrbwalkTo(Position);
         }
