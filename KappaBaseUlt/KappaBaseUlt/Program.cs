@@ -187,7 +187,13 @@ namespace KappaBaseUlt
 
         private static float GetDamage(this Obj_AI_Base target)
         {
-            return !R.IsLearned ? 0 : Player.Instance.GetSpellDamage(target, SpellSlot.R);
+            var dmg = Player.Instance.GetSpellDamage(target, SpellSlot.R);
+            var extradmg = 0f;
+            if (Player.Instance.HasBuff("GangplankRUpgrade2"))
+            {
+                extradmg = dmg * 3F;
+            }
+            return !R.IsLearned ? 0 : dmg + extradmg;
         }
 
         private static void removeFromList(Obj_AI_Base sender)
