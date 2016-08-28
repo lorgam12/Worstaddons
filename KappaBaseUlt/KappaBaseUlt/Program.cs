@@ -1,35 +1,27 @@
-﻿namespace KappaBaseUlt
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using EloBuddy;
+using EloBuddy.SDK;
+using EloBuddy.SDK.Enumerations;
+using EloBuddy.SDK.Events;
+using EloBuddy.SDK.Menu;
+using EloBuddy.SDK.Menu.Values;
+using SharpDX;
+
+namespace KappaBaseUlt
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using EloBuddy;
-    using EloBuddy.SDK;
-    using EloBuddy.SDK.Enumerations;
-    using EloBuddy.SDK.Events;
-    using EloBuddy.SDK.Menu;
-    using EloBuddy.SDK.Menu.Values;
-
-    using SharpDX;
-
     internal static class Program
     {
         private static float Changed;
-
         private static int Counter;
-
         private static Menu baseMenu;
-
-        private static readonly List<EnemyInfo> baseultlist = new List<EnemyInfo>();
-
-        private static readonly List<EnemyInfo> RecallsList = new List<EnemyInfo>();
-
         private static Spell.Skillshot R { get; set; }
 
-        private static float Damage;
-
-        private static void Main(string[] args)
+        private static readonly List<EnemyInfo> baseultlist = new List<EnemyInfo>();
+        private static readonly List<EnemyInfo> RecallsList = new List<EnemyInfo>();
+        
+        private static void Main()
         {
             Loading.OnLoadingComplete += Loading_OnLoadingComplete;
         }
@@ -37,7 +29,7 @@
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
             var me = Database.Champions.FirstOrDefault(hero => hero.Champion == Player.Instance.Hero);
-            if (me.Champion != Player.Instance.Hero)
+            if (me?.Champion != Player.Instance.Hero)
             {
                 return;
             }
@@ -61,26 +53,24 @@
             baseMenu.Add("count", new CheckBox("Draw Count"));
             baseMenu.Add("draw", new CheckBox("Draw Recall Bar"));
             var x = baseMenu.Add("rbx", new Slider("RecallBar X", 0, -200, 200));
-                x.OnValueChange +=
-                delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
+            x.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
+                {
+                    if (changeArgs.NewValue != changeArgs.OldValue)
                     {
-                        if (changeArgs.NewValue != changeArgs.OldValue)
-                        {
-                            Recallbar.X2 = changeArgs.NewValue * 10;
-                            Changed = Core.GameTickCount;
-                        }
-                    };
+                        Recallbar.X2 = changeArgs.NewValue * 10;
+                        Changed = Core.GameTickCount;
+                    }
+                };
             Recallbar.X2 = x.CurrentValue * 10;
             var y = baseMenu.Add("rby", new Slider("RecallBar Y", 0, -200, 200));
-            y.OnValueChange +=
-            delegate (ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
-            {
-                if (changeArgs.NewValue != changeArgs.OldValue)
+            y.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
                 {
-                    Recallbar.Y2 = changeArgs.NewValue * 10;
-                    Changed = Core.GameTickCount;
-                }
-            };
+                    if (changeArgs.NewValue != changeArgs.OldValue)
+                    {
+                        Recallbar.Y2 = changeArgs.NewValue * 10;
+                        Changed = Core.GameTickCount;
+                    }
+                };
             Recallbar.Y2 = y.CurrentValue * 10;
             baseMenu.AddGroupLabel("BaseUlt Enemies:");
             baseultlist.Clear();
@@ -91,7 +81,7 @@
                 baseultlist.Add(new EnemyInfo(enemy));
             }
 
-            Game.OnTick += Game_OnTick;
+            Game.OnUpdate += Game_OnTick;
             Teleport.OnTeleport += Teleport_OnTeleport;
             Drawing.OnEndScene += Drawing_OnDraw;
         }
@@ -157,13 +147,11 @@
             {
                 if (RecallsList.Exists(s => s.Enemy.NetworkId.Equals(sender.NetworkId)))
                 {
-                    RecallsList.Add(
-                        new EnemyInfo(sender) { Duration = args.Duration, Started = args.Start, RecallDuration = args.Duration + Core.GameTickCount });
+                    RecallsList.Add(new EnemyInfo(sender) { Duration = args.Duration, Started = args.Start, RecallDuration = args.Duration + Core.GameTickCount });
                 }
                 else
                 {
-                    RecallsList.Add(
-                        new EnemyInfo(sender) { Duration = args.Duration, Started = args.Start, RecallDuration = args.Duration + Core.GameTickCount });
+                    RecallsList.Add(new EnemyInfo(sender) { Duration = args.Duration, Started = args.Start, RecallDuration = args.Duration + Core.GameTickCount });
                 }
 
                 if (args.Duration >= sender.traveltime() && sender.Killable())
@@ -186,15 +174,16 @@
         public static bool Killable(this Obj_AI_Base target)
         {
             var enemy = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId.Equals(target.NetworkId));
-            return enemy?.Enemy.GetDamage() >= target.HP();
+            return enemy?.Enemy.GetDamage() >= target.TotalShieldHealth();
         }
 
+        /*
         public static float HP(this Obj_AI_Base target)
         {
             var enemy = baseultlist.FirstOrDefault(e => e.Enemy.NetworkId.Equals(target.NetworkId));
             var f = (enemy?.Enemy.Health + (enemy?.Enemy.HPRegenRate * (Game.Time - enemy?.lastseen))) * 0.9f;
             return f ?? 0;
-        }
+        }*/
 
         private static float GetDamage(this Obj_AI_Base target)
         {
@@ -242,8 +231,8 @@
         {
             var disable = baseMenu["disable"].Cast<KeyBind>().CurrentValue;
             var enable = baseMenu["enable"].Cast<KeyBind>().CurrentValue;
-            float CountDown = target.CountDown();
-            float Traveltime = traveltime(target.Enemy);
+            var CountDown = target.CountDown();
+            var Traveltime = traveltime(target.Enemy);
 
             if (enable && !disable)
             {
@@ -267,9 +256,9 @@
                 {
                     return true;
                 }
-                return Game.Time - enemy.lastseen < timelimit;
+                return Game.Time - enemy.lastseen <= timelimit;
             }
-            return Game.Time - target.lastseen < timelimit;
+            return Game.Time - target?.lastseen <= timelimit;
         }
 
         public static float CountDown(this EnemyInfo target)
@@ -282,7 +271,7 @@
             var col = baseMenu["col"].Cast<CheckBox>().CurrentValue;
             var Rectangle = new Geometry.Polygon.Rectangle(Player.Instance.ServerPosition, target.Fountain(), R.Width);
 
-            return col && EntityManager.Heroes.Enemies.Count(e => Rectangle.IsInside(e) && e.IsValidTarget()) > R.AllowedCollisionCount;
+            return col && EntityManager.Heroes.Enemies.Count(e => Rectangle.IsInside(e) && !e.IsDead && e.IsValidTarget()) > R.AllowedCollisionCount;
         }
 
         private static Vector3 Fountain(this Obj_AI_Base target)
@@ -294,15 +283,10 @@
         public class EnemyInfo
         {
             public Obj_AI_Base Enemy;
-
             public float lastseen;
-
             public float RecallDuration;
-
             public float Duration;
-
             public float Started;
-
             public EnemyInfo(Obj_AI_Base enemy)
             {
                 this.Enemy = enemy;
