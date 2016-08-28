@@ -41,7 +41,7 @@ namespace KappaBaseUlt
             baseMenu.AddSeparator(0);
             baseMenu.AddGroupLabel("Key Settings:");
             baseMenu.Add("enable", new KeyBind("Enable BaseUlt", true, KeyBind.BindTypes.PressToggle, 'K'));
-            baseMenu.Add("disable", new KeyBind("Disable Key", false, KeyBind.BindTypes.HoldActive, 32));
+            baseMenu.Add("disable1", new KeyBind("Disable Key", false, KeyBind.BindTypes.HoldActive));
             baseMenu.AddSeparator(0);
             baseMenu.AddGroupLabel("Settings:");
             baseMenu.Add("ping", new CheckBox("Calculate Ping"));
@@ -229,7 +229,7 @@ namespace KappaBaseUlt
 
         private static void DoBaseUlt(EnemyInfo target)
         {
-            var disable = baseMenu["disable"].Cast<KeyBind>().CurrentValue;
+            var disable = baseMenu["disable1"].Cast<KeyBind>().CurrentValue;
             var enable = baseMenu["enable"].Cast<KeyBind>().CurrentValue;
             var CountDown = target.CountDown();
             var Traveltime = traveltime(target.Enemy);
