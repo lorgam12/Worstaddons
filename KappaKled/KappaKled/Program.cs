@@ -29,14 +29,14 @@ namespace KappaKled
             E = new Spell.Skillshot(SpellSlot.E, 550, SkillShotType.Linear, 250, 950, 100) { AllowedCollisionCount = int.MaxValue };
 
             MenuIni = MainMenu.AddMenu("KappaKled", "KappaKled");
-            AutoMenu = MenuIni.AddSubMenu("Auto");
+            //AutoMenu = MenuIni.AddSubMenu("Auto");
             ComboMenu = MenuIni.AddSubMenu("Combo");
             HarassMenu = MenuIni.AddSubMenu("Harass");
             LaneClearMenu = MenuIni.AddSubMenu("LaneClear");
             KillStealMenu = MenuIni.AddSubMenu("KillSteal");
 
-            AutoMenu.Add("GapQkled", new CheckBox("Anti-GapCloser Q (Kled)"));
-            AutoMenu.Add("GapQskaarl", new CheckBox("Anti-GapCloser Q (Skaarl)"));
+            //AutoMenu.Add("GapQkled", new CheckBox("Anti-GapCloser Q (Kled)"));
+            //AutoMenu.Add("GapQskaarl", new CheckBox("Anti-GapCloser Q (Skaarl)"));
 
             ComboMenu.Add("Q", new CheckBox("Use Q"));
             ComboMenu.Add("selectedQ", new CheckBox("Use Q on Selected target only (Skaarl)", false));

@@ -22,7 +22,7 @@ namespace KappaKled.Modes
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)) Harass.Execute();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear)) LaneClear.Execute();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear)) LaneClear.Execute(true);
-            Gapcloser.OnGapcloser += Gapcloser_OnGapcloser;
+            //Gapcloser.OnGapcloser += Gapcloser_OnGapcloser;
         }
 
         private static void Gapcloser_OnGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
