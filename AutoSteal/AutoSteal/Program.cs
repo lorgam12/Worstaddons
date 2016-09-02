@@ -81,15 +81,13 @@ namespace AutoSteal
         {
             foreach (var spell in Spells)
             {
-                foreach (var mob in Common.SupportedJungleMobs.Where(m => m.IsKillable(spell.Skillshot.Range) && JungleStealMenu.CheckBoxValue(m.BaseSkinName) && spell.Skillshot.IsReady() && spell.Skillshot.WillKill(m)))
+                foreach (var mob in Common.SupportedJungleMobs.Where(m => m.IsKillable(spell.Skillshot.Range) && JungleStealMenu.CheckBoxValue(spell.Skillshot.Slot.ToString()) && JungleStealMenu.CheckBoxValue(m.BaseSkinName) && spell.Skillshot.IsReady() && spell.Skillshot.WillKill(m)))
                 {
-                    Chat.Print("attempt JS");
                     ISpells.Cast.On(spell, mob);
                 }
 
-                foreach (var target in EntityManager.Heroes.Enemies.Where(m => m.IsKillable(spell.Skillshot.Range) && KillStealMenu.CheckBoxValue(m.Name()) && spell.Skillshot.IsReady() && spell.Skillshot.WillKill(m)))
+                foreach (var target in EntityManager.Heroes.Enemies.Where(m => m.IsKillable(spell.Skillshot.Range) && KillStealMenu.CheckBoxValue(spell.Skillshot.Slot.ToString()) && KillStealMenu.CheckBoxValue(m.Name()) && spell.Skillshot.IsReady() && spell.Skillshot.WillKill(m)))
                 {
-                    Chat.Print("attempt KS");
                     ISpells.Cast.On(spell, target);
                 }
             }

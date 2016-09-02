@@ -23,8 +23,7 @@ namespace AutoSteal.Misc
             public static void On(ISpells spell, Obj_AI_Base target)
             {
                 var pred = spell.Skillshot.GetPrediction(target);
-
-                Chat.Print(pred.HitChance);
+                
                 if (pred.HitChance < HitChance.Medium || target == null)
                     return;
 
@@ -38,13 +37,11 @@ namespace AutoSteal.Misc
                         if (Core.GameTickCount - LastCasted > 1500)
                         {
                             {
-                                Chat.Print("Cast Shoot Chargeable");
                                 spell.Skillshot.Cast(pred.CastPosition);
                             }
                         }
                         else
                         {
-                            Chat.Print("Cast Starget Chargeable");
                             spell.Skillshot.Cast(target);
                             LastCasted = Core.GameTickCount;
                         }
