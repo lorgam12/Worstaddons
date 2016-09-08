@@ -16,7 +16,7 @@
 
     using SharpDX;
 
-    internal class KappaDarius
+    internal static class KappaDarius
     {
         public const string ChampName = "Darius";
 
@@ -95,7 +95,7 @@
             QMenu.Add("QAA", new CheckBox("Use Q if AA is in Cooldown", false));
             QMenu.Add("range", new CheckBox("Dont Cast Q when Enemy in AA range", false));
             QMenu.Add("Flee", new CheckBox("Q On Flee (Ignores Stick to target)"));
-            QMenu.Add("QFlee", new Slider("Cast Q flee When HP is below %", 90, 0, 100));
+            QMenu.Add("QFlee", new Slider("Cast Q flee When HP is below %", 90));
             QMenu.Add("Qaoe", new CheckBox("Auto Q AoE"));
             QMenu.Add("Qhit", new Slider("Q Aoe Hit >=", 3, 1, 5));
 
@@ -137,9 +137,9 @@
 
             ManaMenu = menuIni.AddSubMenu("Mana Manager");
             ManaMenu.AddGroupLabel("Harass");
-            ManaMenu.Add("harassmana", new Slider("Harass Mana %", 75, 0, 100));
+            ManaMenu.Add("harassmana", new Slider("Harass Mana %", 75));
             ManaMenu.AddGroupLabel("Lane Clear");
-            ManaMenu.Add("lanemana", new Slider("Lane Clear Mana %", 60, 0, 100));
+            ManaMenu.Add("lanemana", new Slider("Lane Clear Mana %", 60));
 
             ItemsMenu = menuIni.AddSubMenu("Items");
             ItemsMenu.AddGroupLabel("Items Settings");
@@ -148,8 +148,8 @@
             ItemsMenu.Add("UseBOTRK", new CheckBox("Use Blade of the Ruined King"));
             ItemsMenu.Add("UseBilge", new CheckBox("Use Bilgewater Cutlass"));
             ItemsMenu.AddSeparator();
-            ItemsMenu.Add("eL", new Slider("Use On Enemy health", 65, 0, 100));
-            ItemsMenu.Add("oL", new Slider("Use On My health", 65, 0, 100));
+            ItemsMenu.Add("eL", new Slider("Use On Enemy health", 65));
+            ItemsMenu.Add("oL", new Slider("Use On My health", 65));
 
             DrawMenu = menuIni.AddSubMenu("Drawings");
             DrawMenu.AddGroupLabel("Drawing Settings");
@@ -188,7 +188,7 @@
             }
 
             var pred = E.GetPrediction(sender);
-            if (E.IsReady() && sender.IsValidTarget(E.Range) && sender.IsEnemy && !sender.IsDead)
+            if (E.IsReady() && sender.IsKillable(E.Range) && sender.IsEnemy && !sender.IsDead)
             {
                 E.Cast(pred.CastPosition);
             }
@@ -235,19 +235,19 @@
                     }
 
                     if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Hydra.IsReady() && Hydra.IsOwned(Player.Instance)
-                        && target.IsValidTarget(Hydra.Range))
+                        && target.IsKillable(Hydra.Range))
                     {
                         Hydra.Cast();
                     }
 
                     if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Timat.IsReady() && Timat.IsOwned(Player.Instance)
-                        && target.IsValidTarget(Timat.Range))
+                        && target.IsKillable(Timat.Range))
                     {
                         Timat.Cast();
                     }
 
                     if (ItemsMenu["Hydra"].Cast<CheckBox>().CurrentValue && Titanic.IsReady() && Titanic.IsOwned(Player.Instance)
-                        && target.IsValidTarget(Titanic.Range))
+                        && target.IsKillable(Titanic.Range))
                     {
                         if (Titanic.Cast())
                         {
@@ -345,7 +345,7 @@
             {
                 if (Qclear)
                 {
-                    allMinions.Any();
+                    if(allMinions.Any())
                     {
                         var fl = EntityManager.MinionsAndMonsters.GetLineFarmLocation(allMinions, 100, (int)Q.Range);
                         if (fl.HitNumber >= QMenu["Qlc"].Cast<Slider>().CurrentValue)
@@ -357,7 +357,7 @@
 
                 if (Wclear)
                 {
-                    if (minion.IsInAutoAttackRange(Player.Instance) && minion.IsValidTarget() && W.IsReady()
+                    if (minion.IsInAutoAttackRange(Player.Instance) && minion.IsKillable() && W.IsReady()
                         && Player.Instance.Distance(minion.ServerPosition) <= 225f
                         && Player.Instance.GetSpellDamage(minion, SpellSlot.W) + Player.Instance.GetAutoAttackDamage(minion)
                         >= minion.TotalShieldHealth())
@@ -391,7 +391,7 @@
                 ObjectManager.Get<AIHeroClient>()
                     .FirstOrDefault(
                         enemy =>
-                        enemy.IsEnemy && enemy.IsValidTarget(1000) && !enemy.IsDead && !enemy.HasBuff("kindredrnodeathbuff")
+                        enemy.IsEnemy && enemy.IsKillable(1000) && !enemy.IsDead && !enemy.HasBuff("kindredrnodeathbuff")
                         && !enemy.HasBuff("JudicatorIntervention") && !enemy.HasBuff("ChronoShift") && !enemy.HasBuff("UndyingRage")
                         && !enemy.IsInvulnerable && !enemy.IsZombie && !enemy.HasUndyingBuff() && !enemy.HasBuff("AatroxPassiveActivate")
                         && !enemy.HasBuff("rebirthcooldown"));
@@ -401,7 +401,7 @@
                 if (Rks)
                 {
                     if (SaveR && ObjectManager.Player.GetAutoAttackDamage(target) * SR > target.TotalShieldHealth()
-                        && target.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
+                        && target.IsKillable(ObjectManager.Player.GetAutoAttackRange()))
                     {
                         return;
                     }
@@ -409,23 +409,23 @@
                     var pred = E.GetPrediction(target);
                     // Credits cancerous
                     passiveCounter = target.GetBuffCount("DariusHemo") <= 0 ? 0 : target.GetBuffCount("DariusHemo");
-                    if (RDmg(target, passiveCounter) >= target.Health + PassiveDmg(target, 1))
+                    if (RDmg(target, passiveCounter) + PassiveDmg(target, 1) >= target.TotalShieldHealth())
                     {
-                        if (target.IsValidTarget(R.Range))
+                        if (target.IsKillable(R.Range))
                         {
                             R.Cast(target);
                         }
 
-                        if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
+                        if (!target.IsKillable(R.Range) && target.IsKillable(E.Range)
                             && Player.Instance.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
                         {
                             E.Cast(pred.CastPosition);
                         }
                     }
 
-                    if (target.IsValidTarget(R.Range) && target.TotalShieldHealth() < Player.Instance.GetSpellDamage(target, SpellSlot.R))
+                    if (target.IsKillable(R.Range) && RDmg(target, passiveCounter) + PassiveDmg(target, 1) > target.TotalShieldHealth())
                     {
-                        if (!target.IsValidTarget(R.Range) && target.IsValidTarget(E.Range)
+                        if (!target.IsKillable(R.Range) && target.IsKillable(E.Range)
                             && Player.Instance.Mana >= (R.Handle.SData.Mana + E.Handle.SData.Mana))
                         {
                             E.Cast(pred.CastPosition);
@@ -435,7 +435,7 @@
                     }
                 }
 
-                if (Rks && target.IsValidTarget(R.Range))
+                if (Rks && target.IsKillable(R.Range))
                 {
                     return;
                 }
@@ -444,12 +444,12 @@
                 {
                     var IG = KillStealMenu["IG"].Cast<CheckBox>().CurrentValue;
                     var IGP = KillStealMenu["IGP"].Cast<CheckBox>().CurrentValue;
-                    if (IGP && target.IsValidTarget(Ignite.Range)
+                    if (IGP && target.IsKillable(Ignite.Range)
                         && Player.Instance.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
                         + PassiveDmg(target, target.GetBuffCount("DariusHemo")) > target.TotalShieldHealth() + target.HPRegenRate)
                     {
                         if (PassiveDmg(target, target.GetBuffCount("DariusHemo")) < target.TotalShieldHealth() + (target.HPRegenRate * 4)
-                            && !target.IsValidTarget(Player.Instance.GetAutoAttackRange()))
+                            && !target.IsKillable(Player.Instance.GetAutoAttackRange()))
                         {
                             Ignite.Cast(target);
                         }
@@ -463,9 +463,9 @@
                         }
                     }
 
-                    if (IG && target.IsValidTarget(Ignite.Range)
+                    if (IG && target.IsKillable(Ignite.Range)
                         && Player.Instance.GetSummonerSpellDamage(target, DamageLibrary.SummonerSpells.Ignite)
-                        > target.TotalShieldHealth() + (target.HPRegenRate * 4) && !target.IsValidTarget(Player.Instance.GetAutoAttackRange()))
+                        > target.TotalShieldHealth() + (target.HPRegenRate * 4) && !target.IsKillable(Player.Instance.GetAutoAttackRange()))
                     {
                         Ignite.Cast(target);
                     }
@@ -492,7 +492,7 @@
 
                 if (flags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
-                    if (Qcombo && target.IsValidTarget(Q.Range))
+                    if (Qcombo && target.IsKillable(Q.Range))
                     {
                         if (Qrange)
                         {
@@ -516,7 +516,7 @@
 
                 if (flags.HasFlag(Orbwalker.ActiveModes.Harass))
                 {
-                    if (Qharass && target.IsValidTarget(Q.Range))
+                    if (Qharass && target.IsKillable(Q.Range))
                     {
                         if (flags.HasFlag(Orbwalker.ActiveModes.Harass))
                         {
@@ -530,7 +530,7 @@
 
                 if (QMenu["Stick"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (Player.Instance.HasBuff("RumbleDangerZone") && target.IsValidTarget(Q.Range) && !target.IsUnderEnemyturret()
+                    if (Player.Instance.HasBuff("RumbleDangerZone") && target.IsKillable(Q.Range) && !target.IsUnderEnemyturret()
                         && !target.IsUnderHisturret())
                     {
                         Player.IssueOrder(GameObjectOrder.MoveTo, target.Position);
@@ -573,7 +573,7 @@
                 {
                     if (Wharass)
                     {
-                        if (target.IsValidTarget(W.Range))
+                        if (target.IsKillable(W.Range))
                         {
                             Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                             W.Cast();
@@ -604,9 +604,9 @@
                             return;
                         }
 
-                        if (target.IsValidTarget(E.Range))
+                        if (target.IsKillable(E.Range))
                         {
-                            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Qcombo
+                            if (Q.IsReady() && target.IsKillable(Q.Range) && Qcombo
                                 || !Q.IsReady() && target.IsInRange(Player.Instance, Player.Instance.GetAutoAttackRange()))
                             {
                                 return;
@@ -622,8 +622,8 @@
                 {
                     if (Eharass)
                     {
-                        if (target.IsValidTarget(E.Range)
-                            && ((Q.IsReady() && !target.IsValidTarget(Q.Range)) || (!Q.IsReady() && target.IsInAutoAttackRange(Player.Instance))))
+                        if (target.IsKillable(E.Range)
+                            && ((Q.IsReady() && !target.IsKillable(Q.Range)) || (!Q.IsReady() && target.IsInAutoAttackRange(Player.Instance))))
                         {
                             var pred = E.GetPrediction(target);
                             E.Cast(pred.CastPosition);
@@ -643,7 +643,7 @@
             var Rstack = RMenu["stack"].Cast<CheckBox>().CurrentValue && R.IsReady();
             var SemiR = RMenu["semiR"].Cast<KeyBind>().CurrentValue && R.IsReady();
             var SemiRtarget =
-                EntityManager.Heroes.Enemies.Where(x => x.IsValidTarget(R.Range) && x != null)
+                EntityManager.Heroes.Enemies.Where(x => x.IsKillable(R.Range) && x != null)
                     .OrderByDescending(x => RDmg(x, passiveCounter))
                     .FirstOrDefault();
             if (rt != null)
@@ -653,7 +653,7 @@
                     && !rt.HasBuff("AatroxPassiveActivate") && !rt.HasBuff("rebirthcooldown"))
                 {
                     if (SaveR && ObjectManager.Player.GetAutoAttackDamage(rt) * SR > rt.TotalShieldHealth()
-                        && rt.IsValidTarget(ObjectManager.Player.GetAutoAttackRange()))
+                        && rt.IsKillable(ObjectManager.Player.GetAutoAttackRange()))
                     {
                         return;
                     }
@@ -665,7 +665,7 @@
 
                     if (Rcombo)
                     {
-                        if (rt.IsValidTarget(R.Range) && Player.Instance.GetSpellDamage(rt, SpellSlot.R) > rt.TotalShieldHealth())
+                        if (rt.IsKillable(R.Range) && RDmg(rt, passiveCounter) + PassiveDmg(rt, 1) > rt.TotalShieldHealth())
                         {
                             R.Cast(rt);
                         }
@@ -673,7 +673,7 @@
 
                     if (Rstack)
                     {
-                        if (rt.IsValidTarget(R.Range) && rt.GetBuffCount("DariusHemo") >= buffcount)
+                        if (rt.IsKillable(R.Range) && rt.GetBuffCount("DariusHemo") >= buffcount)
                         {
                             R.Cast(rt);
                         }
@@ -685,30 +685,30 @@
         private static void Items()
         {
             var target = TargetSelector.GetTarget(W.Range, DamageType.Physical);
-            if (target == null || !target.IsValidTarget())
+            if (target == null || !target.IsKillable())
             {
                 return;
             }
 
-            if (Botrk.IsReady() && Botrk.IsOwned(Player.Instance) && target.IsValidTarget(Botrk.Range)
+            if (Botrk.IsReady() && Botrk.IsOwned(Player.Instance) && target.IsKillable(Botrk.Range)
                 && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
             {
                 Botrk.Cast(target);
             }
 
-            if (Botrk.IsReady() && Botrk.IsOwned(Player.Instance) && target.IsValidTarget(Botrk.Range)
+            if (Botrk.IsReady() && Botrk.IsOwned(Player.Instance) && target.IsKillable(Botrk.Range)
                 && target.HealthPercent <= ItemsMenu["oL"].Cast<Slider>().CurrentValue && ItemsMenu["UseBOTRK"].Cast<CheckBox>().CurrentValue)
             {
                 Botrk.Cast(target);
             }
 
-            if (Cutlass.IsReady() && Cutlass.IsOwned(Player.Instance) && target.IsValidTarget(Cutlass.Range)
+            if (Cutlass.IsReady() && Cutlass.IsOwned(Player.Instance) && target.IsKillable(Cutlass.Range)
                 && target.HealthPercent <= ItemsMenu["eL"].Cast<Slider>().CurrentValue && ItemsMenu["UseBilge"].Cast<CheckBox>().CurrentValue)
             {
                 Cutlass.Cast(target);
             }
 
-            if (Youmuu.IsReady() && Youmuu.IsOwned(Player.Instance) && target.IsValidTarget(Q.Range)
+            if (Youmuu.IsReady() && Youmuu.IsOwned(Player.Instance) && target.IsKillable(Q.Range)
                 && ItemsMenu["useGhostblade"].Cast<CheckBox>().CurrentValue)
             {
                 Youmuu.Cast();
@@ -751,54 +751,22 @@
 
             if (DrawMenu.Get<CheckBox>("Q").CurrentValue && Q.IsLearned)
             {
-                if (Q.IsReady())
-                {
-                    Circle.Draw(Color.OrangeRed, Q.Range, ObjectManager.Player.Position);
-                }
-
-                if (!Q.IsReady())
-                {
-                    Circle.Draw(Color.DarkRed, Q.Range, ObjectManager.Player.Position);
-                }
+                Circle.Draw(Q.IsReady() ? Color.OrangeRed : Color.DarkRed, Q.Range, ObjectManager.Player.Position);
             }
 
             if (DrawMenu.Get<CheckBox>("W").CurrentValue && W.IsLearned)
             {
-                if (W.IsReady())
-                {
-                    Circle.Draw(Color.OrangeRed, W.Range, ObjectManager.Player.Position);
-                }
-
-                if (!W.IsReady())
-                {
-                    Circle.Draw(Color.DarkRed, W.Range, ObjectManager.Player.Position);
-                }
+                Circle.Draw(W.IsReady() ? Color.OrangeRed : Color.DarkRed, W.Range, ObjectManager.Player.Position);
             }
 
             if (DrawMenu.Get<CheckBox>("E").CurrentValue && E.IsLearned)
             {
-                if (E.IsReady())
-                {
-                    Circle.Draw(Color.OrangeRed, E.Range, ObjectManager.Player.Position);
-                }
-
-                if (!E.IsReady())
-                {
-                    Circle.Draw(Color.DarkRed, E.Range, ObjectManager.Player.Position);
-                }
+                Circle.Draw(E.IsReady() ? Color.OrangeRed : Color.DarkRed, E.Range, ObjectManager.Player.Position);
             }
 
             if (DrawMenu.Get<CheckBox>("R").CurrentValue && R.IsLearned)
             {
-                if (R.IsReady())
-                {
-                    Circle.Draw(Color.OrangeRed, R.Range, ObjectManager.Player.Position);
-                }
-
-                if (!R.IsReady())
-                {
-                    Circle.Draw(Color.DarkRed, R.Range, ObjectManager.Player.Position);
-                }
+                Circle.Draw(R.IsReady() ? Color.OrangeRed : Color.DarkRed, R.Range, ObjectManager.Player.Position);
             }
         }
 
@@ -806,9 +774,9 @@
         {
             if (menuIni["Drawings"].Cast<CheckBox>().CurrentValue)
             {
-                foreach (var enemy in EntityManager.Heroes.Enemies.Where(e => e.IsValidTarget() && e.IsHPBarRendered))
+                foreach (var enemy in EntityManager.Heroes.Enemies.Where(e => e.IsKillable() && e.IsHPBarRendered))
                 {
-                    if (DrawMenu["DrawD"].Cast<CheckBox>().CurrentValue && enemy.IsVisible)
+                    if (DrawMenu["DrawD"].Cast<CheckBox>().CurrentValue)
                     {
                         Hpi.unit = enemy;
                         Hpi.drawDmg((int)RDmg(enemy, passiveCounter), System.Drawing.Color.Goldenrod);
@@ -824,17 +792,16 @@
 
                     if (DrawMenu["Stacks"].Cast<CheckBox>().CurrentValue)
                     {
-                        if (enemy.GetBuffCount("DariusHemo") > 0 && enemy.IsVisible)
+                        if (enemy.GetBuffCount("DariusHemo") > 0)
                         {
                             var endTime = Math.Max(0, enemy.GetBuff("DariusHemo").EndTime - Game.Time);
                             Drawing.DrawText(Drawing.WorldToScreen(enemy.Position) - new Vector2(DrawMenu["PPx"].Cast<Slider>().CurrentValue, DrawMenu["PPy"].Cast<Slider>().CurrentValue),
                                 System.Drawing.Color.FromArgb(255, 106, 106),
-                                (int)enemy.GetBuffCount("DariusHemo") + " Stacks " + Convert.ToString((int)endTime, CultureInfo.InvariantCulture),
-                                2);
+                                enemy.GetBuffCount("DariusHemo") + " Stacks " + $"{endTime:0.00}", 10);
                         }
                     }
 
-                    if (DrawMenu["RHealth"].Cast<CheckBox>().CurrentValue && enemy.IsVisible)
+                    if (DrawMenu["RHealth"].Cast<CheckBox>().CurrentValue)
                     {
                         Drawing.DrawText(
                             hpPos.X + DrawMenu["RHx"].Cast<Slider>().CurrentValue,
@@ -845,6 +812,46 @@
                     }
                 }
             }
+        }
+
+        /// <summary>
+        ///     Returns true if you can deal damage to the target.
+        /// </summary>
+        public static bool IsKillable(this Obj_AI_Base target, float range)
+        {
+            return !target.HasBuff("kindredrnodeathbuff") && !target.Buffs.Any(b => b.Name.ToLower().Contains("fioraw")) && !target.HasBuff("JudicatorIntervention") && !target.IsZombie
+                   && !target.HasBuff("ChronoShift") && !target.HasBuff("UndyingRage") && !target.IsInvulnerable && !target.IsZombie && !target.HasBuff("bansheesveil") && !target.IsDead
+                   && !target.IsPhysicalImmune && target.Health > 0 && !target.HasBuffOfType(BuffType.Invulnerability) && !target.HasBuffOfType(BuffType.PhysicalImmunity) && target.IsValidTarget(range);
+        }
+
+        /// <summary>
+        ///     Returns true if you can deal damage to the target.
+        /// </summary>
+        public static bool IsKillable(this Obj_AI_Base target)
+        {
+            return !target.HasBuff("kindredrnodeathbuff") && !target.Buffs.Any(b => b.Name.ToLower().Contains("fioraw")) && !target.HasBuff("JudicatorIntervention") && !target.IsZombie
+                   && !target.HasBuff("ChronoShift") && !target.HasBuff("UndyingRage") && !target.IsInvulnerable && !target.IsZombie && !target.HasBuff("bansheesveil") && !target.IsDead
+                   && !target.IsPhysicalImmune && target.Health > 0 && !target.HasBuffOfType(BuffType.Invulnerability) && !target.HasBuffOfType(BuffType.PhysicalImmunity) && target.IsValidTarget();
+        }
+
+        /// <summary>
+        ///     Returns true if you can deal damage to the target (AIHeroClient).
+        /// </summary>
+        public static bool IsKillable(this AIHeroClient target)
+        {
+            return !target.HasBuff("kindredrnodeathbuff") && !target.Buffs.Any(b => b.Name.ToLower().Contains("fioraw")) && !target.HasBuff("JudicatorIntervention") && !target.IsZombie
+                   && !target.HasBuff("ChronoShift") && !target.HasBuff("UndyingRage") && !target.HasUndyingBuff() && !target.IsInvulnerable && !target.IsZombie && !target.HasBuff("bansheesveil") && !target.IsDead
+                   && !target.IsPhysicalImmune && target.Health > 0 && !target.HasBuffOfType(BuffType.Invulnerability) && !target.HasBuffOfType(BuffType.PhysicalImmunity) && target.IsValidTarget();
+        }
+
+        /// <summary>
+        ///     Returns true if you can deal damage to the target (AIHeroClient).
+        /// </summary>
+        public static bool IsKillable(this AIHeroClient target, float range)
+        {
+            return !target.HasBuff("kindredrnodeathbuff") && !target.Buffs.Any(b => b.Name.ToLower().Contains("fioraw")) && !target.HasBuff("JudicatorIntervention") && !target.IsZombie
+                   && !target.HasBuff("ChronoShift") && !target.HasBuff("UndyingRage") && !target.HasUndyingBuff() && !target.IsInvulnerable && !target.IsZombie && !target.HasBuff("bansheesveil") && !target.IsDead
+                   && !target.IsPhysicalImmune && target.Health > 0 && !target.HasBuffOfType(BuffType.Invulnerability) && !target.HasBuffOfType(BuffType.PhysicalImmunity) && target.IsValidTarget(range);
         }
     }
 }
